@@ -1,0 +1,12 @@
+{
+  "name": "sirib",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Von Christian Halip <vc.halip@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.2"
+  },
+  "scripts": {}
+}
