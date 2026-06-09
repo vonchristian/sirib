@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "Strict red-green-refactor TDD workflow for implementing features, fixing bugs, or changing behavior in Rails applications"
+description: "Strict red-green-refactor TDD workflow for implementing features, fixing bugs, or changing behavior in Rails applications — enforces betterspecs.org style guide"
 license: MIT
 compatibility: opencode
 ---
@@ -86,16 +86,6 @@ Return to the feature spec. Next error drives the next piece.
 | **Clear** | Name describes behavior | `it "test1"` |
 | **Shows intent** | Demonstrates desired API | Obscures what code should do |
 
-## Verification Checklist
-- [ ] Every new function/method has a test
-- [ ] Watched each test fail before implementing
-- [ ] Each test failed for expected reason (feature missing, not typo)
-- [ ] Wrote minimal code to pass each test
-- [ ] All tests pass
-- [ ] Output pristine (no errors, warnings)
-- [ ] Tests use real code (mocks only if unavoidable)
-- [ ] Edge cases and errors covered
-
 ## When Stuck
 | Problem | Solution |
 |---------|----------|
@@ -105,6 +95,155 @@ Return to the feature spec. Next error drives the next piece.
 
 ## Debugging Integration
 Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
+
+## betterspecs.org RSpec Style Guide
+
+These rules apply to every test written. They are not optional.
+
+### 1. Describe Methods Clearly
+Use `.` for class methods, `#` for instance methods.
+```ruby
+describe '.authenticate' do   # class method
+describe '#admin?' do         # instance method
+```
+
+### 2. Use Contexts
+Group conditions with `context`. Start descriptions with `when`, `with`, or `without`.
+```ruby
+context 'when logged in' do
+  it { is_expected.to respond_with 200 }
+end
+context 'when logged out' do
+  it { is_expected.to respond_with 401 }
+end
+```
+
+### 3. Keep Descriptions Short
+Never exceed 40 characters. If you need more, split into a context.
+
+### 4. Single Expectation Per Test (Isolated)
+One assertion per example. Multiple expectations signal multiple behaviours.
+```ruby
+it { is_expected.to respond_with_content_type(:json) }
+it { is_expected.to assign_to(:resource) }
+```
+**Exception:** slow integration/feature specs may group expectations to avoid repeated setup.
+
+### 5. Test All Possible Cases
+Cover valid, edge, and invalid cases. Think of every input and test it.
+```ruby
+context 'when resource is found' do
+  it { is_expected.to respond_with 200 }
+end
+context 'when resource is not found' do
+  it { is_expected.to respond_with 404 }
+end
+```
+
+### 6. Use `expect` Syntax Always
+Never use `should`. Configure RSpec to enforce only `expect` syntax.
+```ruby
+# bad
+response.should respond_with_content_type(:json)
+# good
+expect(response).to respond_with_content_type(:json)
+# one-liner with implicit subject
+it { is_expected.to respond_with 200 }
+```
+
+### 7. Use `subject`
+DRY up repeated subjects with `subject` and named subject.
+```ruby
+subject { assigns('message') }
+it { is_expected.to match /it was born in Billville/ }
+
+subject(:hero) { Hero.first }
+it 'carries a sword' do
+  expect(hero.equipment).to include 'sword'
+end
+```
+
+### 8. Use `let` and `let!`
+Replace `before` + instance variables with `let`. `let` lazy-loads, `let!` eager-loads.
+```ruby
+# bad
+before { @resource = FactoryBot.create :device }
+# good
+let(:resource) { FactoryBot.create :device }
+let!(:populated) { FactoryBot.create_list :user, 3 }  # eager for scopes/queries
+```
+
+### 9. Don't Overuse Mocks
+Test real behaviour when possible. Mocks make specs faster but harder to maintain.
+```ruby
+context 'when not found' do
+  before { allow(Resource).to receive(:where).and_return(false) }
+  it { is_expected.to respond_with 404 }
+end
+```
+
+### 10. Create Only the Data You Need
+Do not load more records than necessary. If you think you need dozens, you're probably wrong.
+```ruby
+before { FactoryBot.create_list(:user, 3) }
+it { expect(User.top(2)).to have(2).item }
+```
+
+### 11. Use Factories, Not Fixtures
+Fixtures are difficult to control. Use FactoryBot.
+```ruby
+user = FactoryBot.create :user
+```
+
+### 12. Use Readable Matchers
+Prefer expressive matchers. Use `expect { }.to raise_error` over `lambda`.
+```ruby
+expect { model.save! }.to raise_error Mongoid::Errors::DocumentNotFound
+```
+
+### 13. Use Shared Examples to DRY
+Extract repeated patterns into shared examples.
+```ruby
+it_behaves_like 'a listable resource'
+it_behaves_like 'a paginable resource'
+```
+
+### 14. Test What You See
+Favour integration tests with Capybara over controller tests. Test the behaviour users experience. Deeply test models. Skip controller tests unless they add unique coverage.
+
+### 15. Don't Use `should` in Descriptions
+Use third-person present tense.
+```ruby
+# bad
+it 'should not change timings'
+# good
+it 'does not change timings'
+```
+
+### 16. Stub HTTP Requests
+Use webmock or VCR for external services. Never hit real APIs in tests.
+```ruby
+before { stub_request(:get, uri).to_return(status: 401, body: fixture('401.json')) }
+```
+
+## Verification Checklist (Extended)
+- [ ] Every new function/method has a test
+- [ ] Watched each test fail before implementing
+- [ ] Each test failed for expected reason (feature missing, not typo)
+- [ ] Wrote minimal code to pass each test
+- [ ] All tests pass
+- [ ] Output pristine (no errors, warnings)
+- [ ] Tests use real code (mocks only if unavoidable)
+- [ ] Edge cases and errors covered
+- [ ] Descriptions use `.`/`#` notation for methods
+- [ ] Contexts start with `when`/`with`/`without`
+- [ ] Descriptions under 40 characters
+- [ ] Single expectation per isolated test
+- [ ] Uses `expect` syntax, never `should`
+- [ ] Uses `let`/`subject` over instance variables
+- [ ] No unnecessary data creation
+- [ ] Stubs external HTTP requests
+- [ ] No `should` in description strings
 
 ## Final Rule
 ```
