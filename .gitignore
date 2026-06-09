@@ -37,6 +37,10 @@
 !/app/assets/builds/.keep
 .aider*
 
+# Test coverage
+/coverage/
+/spec/examples.txt
+
 # Playwright
 node_modules/
 /test-results/
