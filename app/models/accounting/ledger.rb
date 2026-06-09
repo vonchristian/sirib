@@ -5,13 +5,7 @@ module Accounting
     has_many :accounts, dependent: :restrict_with_error
     has_many :running_balances, dependent: :restrict_with_error
 
-    enum :account_type, {
-      asset: "asset",
-      equity: "equity",
-      liability: "liability",
-      revenue: "revenue",
-      expense: "expense"
-    }
+    enum :account_type, Accounting::ACCOUNT_TYPES
 
     validates :name, presence: true
     validates :account_code, presence: true, uniqueness: true

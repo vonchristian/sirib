@@ -15,7 +15,9 @@ module Accounting
 
         entry.amount_lines.group_by(&:account_id).each do |account_id, lines|
           account = lines.first.account
-          net_change = lines.sum { |l| l.debit? ? l.amount_cents : -l.amount_cents }
+          net_change = account.normal_credit_balance? ^ account.contra ?
+            lines.sum { |l| l.credit? ? l.amount_cents : -l.amount_cents } :
+            lines.sum { |l| l.debit? ? l.amount_cents : -l.amount_cents }
 
           account_balances[account_id] += net_change
 

@@ -1,0 +1,29 @@
+<% content_for :page_title, "Settings" %>
+<% content_for :page_subtitle, "Manage your account and system preferences" %>
+
+<div class="animate-fade-in">
+  <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="px-6 py-5">
+      <h2 class="text-sm font-semibold text-gray-900">Profile</h2>
+      <p class="mt-1 text-sm text-gray-500">Manage your account information</p>
+    </div>
+    <div class="border-t border-gray-200 px-6 py-5">
+      <dl class="divide-y divide-gray-100">
+        <div class="flex items-center justify-between py-4">
+          <dt class="text-sm font-medium text-gray-900">Email</dt>
+          <dd class="text-sm text-gray-500"><%= Current.user.email_address %></dd>
+        </div>
+        <div class="flex items-center justify-between py-4">
+          <dt class="text-sm font-medium text-gray-900">Role</dt>
+          <dd class="text-sm text-gray-500">Administrator</dd>
+        </div>
+        <div class="flex items-center justify-between py-4">
+          <dt class="text-sm font-medium text-gray-900">Password</dt>
+          <dd class="text-sm text-gray-500">
+            <%= link_to "Change password", new_password_path, class: "font-medium text-emerald-600 hover:text-emerald-500" %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>

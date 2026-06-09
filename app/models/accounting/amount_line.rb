@@ -2,8 +2,8 @@ module Accounting
   class AmountLine < ApplicationRecord
     self.table_name = "amount_lines"
 
-    belongs_to :entry
-    belongs_to :account
+    belongs_to :entry, inverse_of: :amount_lines
+    belongs_to :account, inverse_of: :amount_lines
 
     monetize :amount_cents
 

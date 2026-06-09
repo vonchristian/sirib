@@ -14,11 +14,9 @@ module Accounting
     validates :reference_number, presence: true, uniqueness: true
     validates :description, presence: true
     validates :posted_at, presence: true
-    validate :credit_amount_lines?
-    validate :debit_amount_lines?
+    validate :validate_credit_amount_lines
+    validate :validate_debit_amount_lines
     validate :amounts_cancel?
-
-    before_save :default_date
 
     scope :posted_on, ->(date) { where(posted_at: date.all_day) }
     scope :posted_between, ->(from, to) { where(posted_at: from..to) }
@@ -50,21 +48,17 @@ module Accounting
 
     private
 
-    def default_date
-      self.posted_at ||= Time.current
-    end
-
-    def credit_amount_lines?
+    def validate_credit_amount_lines
       errors.add(:base, "must have at least one credit amount") if credit_amount_lines.blank?
     end
 
-    def debit_amount_lines?
+    def validate_debit_amount_lines
       errors.add(:base, "must have at least one debit amount") if debit_amount_lines.blank?
     end
 
     def amounts_cancel?
-      debit_total = debit_amount_lines.map { |l| l.amount_cents.to_i }.sum
-      credit_total = credit_amount_lines.map { |l| l.amount_cents.to_i }.sum
+      debit_total = debit_amount_lines.sum(:amount_cents)
+      credit_total = credit_amount_lines.sum(:amount_cents)
       if debit_total != credit_total
         errors.add(:base, "debits (#{debit_total}) do not equal credits (#{credit_total})")
       end

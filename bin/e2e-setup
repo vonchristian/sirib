@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+ENV["RAILS_ENV"] = "test"
+require_relative "../config/environment"
+
+User.find_or_create_by!(email_address: "test@example.com") do |user|
+  user.password = "password123"
+end
+
+puts "E2E setup complete: test user created"

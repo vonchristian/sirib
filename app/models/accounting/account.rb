@@ -19,13 +19,7 @@ module Accounting
     has_many :credit_amount_lines, -> { where(amount_type: :credit) },
              class_name: "Accounting::AmountLine", inverse_of: :account
 
-    enum :account_type, {
-      asset: "asset",
-      equity: "equity",
-      liability: "liability",
-      revenue: "revenue",
-      expense: "expense"
-    }
+    enum :account_type, Accounting::ACCOUNT_TYPES
 
     validates :name, presence: true
     validates :account_code, presence: true, uniqueness: true
