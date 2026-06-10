@@ -1,0 +1,90 @@
+<% content_for :page_title, "Income Statement" %>
+<% content_for :page_subtitle, "For the period ending #{@as_of_date.strftime('%B %d, %Y')}" %>
+
+<div class="animate-fade-in space-y-6">
+  <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-6">
+    <%= form_tag accounting_income_statement_path, method: :get, data: { controller: "balance-sheet-form", turbo_frame: "_top" }, class: "flex flex-wrap items-end gap-4" do %>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">As of Date</label>
+        <%= date_field_tag :as_of_date, @as_of_date, data: { action: "change->balance-sheet-form#submit" }, class: "rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Compare to</label>
+        <%= select_tag :comparison, options_for_select({ "None" => "none", "Prior Month" => "prior_period", "Prior Quarter" => "prior_quarter", "Prior Year" => "prior_year" }, @comparison), data: { action: "change->balance-sheet-form#submit" }, class: "rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+      </div>
+
+      <% if @compare_date %>
+        <div class="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 ml-auto">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          Comparative period: <%= @compare_date.strftime("%b %d, %Y") %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50">
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 w-1/2">Account</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              <%= @as_of_date.strftime("%b %d, %Y") %>
+            </th>
+            <% if @compare_date %>
+              <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <%= @compare_date.strftime("%b %d, %Y") %>
+              </th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+          <% @report.each do |section| %>
+            <%= render "section", section: section, compare: @compare_date.present? %>
+          <% end %>
+
+          <tr class="bg-gray-100/80 dark:bg-gray-800/80 font-bold">
+            <td class="px-6 py-3 text-sm text-gray-900 dark:text-white">
+              NET INCOME (LOSS)
+            </td>
+            <% total_revenue = @report[0] ? @report[0][:total] : Money.new(0, "PHP") %>
+            <% total_expense = @report[1] ? @report[1][:total] : Money.new(0, "PHP") %>
+            <% net_income = total_revenue - total_expense %>
+            <td class="px-6 py-3 text-right text-sm tabular-nums border-t-2 border-gray-400 dark:border-gray-500 <%= net_income.negative? ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' %>">
+              <%= net_income.negative? ? "(#{net_income.abs.format})" : net_income.format %>
+            </td>
+            <% if @compare_date %>
+              <% total_revenue_cmp = @report[0] ? (@report[0][:total_compare] || Money.new(0, "PHP")) : Money.new(0, "PHP") %>
+              <% total_expense_cmp = @report[1] ? (@report[1][:total_compare] || Money.new(0, "PHP")) : Money.new(0, "PHP") %>
+              <% net_income_cmp = total_revenue_cmp - total_expense_cmp %>
+              <td class="px-6 py-3 text-right text-sm tabular-nums border-t-2 border-gray-400 dark:border-gray-500 <%= net_income_cmp.negative? ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' %>">
+                <%= net_income_cmp.negative? ? "(#{net_income_cmp.abs.format})" : net_income_cmp.format %>
+              </td>
+            <% end %>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Chart of Accounts Legend</h3>
+    <div class="flex flex-wrap gap-6 text-xs text-gray-500 dark:text-gray-400">
+      <div class="flex items-center gap-2">
+        <span class="inline-block h-3 w-3 rounded bg-green-100 dark:bg-green-900/40"></span>
+        <span>Revenue</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-block h-3 w-3 rounded bg-orange-100 dark:bg-orange-900/40"></span>
+        <span>Expense</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-block h-3 w-3 rounded bg-gray-200 dark:bg-gray-700"></span>
+        <span>Contra Account (deduction)</span>
+      </div>
+    </div>
+  </div>
+</div>

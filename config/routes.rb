@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
   namespace :accounting do
     get "balance_sheet", to: "balance_sheet#index"
+    get "income_statement", to: "income_statement#index"
     get "chart_of_accounts", to: "chart_of_accounts#index"
   end
 
