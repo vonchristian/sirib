@@ -95,7 +95,7 @@ RSpec.describe Accounting::Entry do
 
   describe "factory" do
     it "creates a valid record with debits and credits" do
-      expect(build(:accounting_entry_with_debits_and_credits)).to be_valid
+      expect(build(:accounting_entry)).to be_valid
     end
   end
 end

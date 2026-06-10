@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_10_101403) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_10_132641) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -77,6 +77,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_101403) do
     t.index ["ancestry"], name: "index_ledgers_on_ancestry"
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "running_balances", force: :cascade do |t|
     t.bigint "account_id"
     t.bigint "ledger_id", null: false
@@ -105,7 +112,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_101403) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "role_id"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["role_id"], name: "index_users_on_role_id"
   end
 
   add_foreign_key "accounting_cash_accounts", "accounts"
@@ -116,4 +125,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_101403) do
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "ledgers"
   add_foreign_key "sessions", "users"
+  add_foreign_key "users", "roles"
 end

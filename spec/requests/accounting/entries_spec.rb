@@ -14,19 +14,19 @@ RSpec.describe "Accounting::Entries" do
     end
 
     it "filters by search query" do
-      create(:accounting_entry_with_debits_and_credits, description: "Special entry")
+      create(:accounting_entry, description: "Special entry")
       get accounting_entries_path, params: { q: "Special" }
       expect(response).to have_http_status(:ok)
     end
 
     it "filters by date range" do
-      create(:accounting_entry_with_debits_and_credits, posted_at: 5.days.ago)
+      create(:accounting_entry, posted_at: 5.days.ago)
       get accounting_entries_path, params: { from_date: 3.days.ago.to_date.to_s, to_date: Date.current.to_s }
       expect(response).to have_http_status(:ok)
     end
 
     it "responds with CSV" do
-      create(:accounting_entry_with_debits_and_credits)
+      create(:accounting_entry)
       get accounting_entries_path, params: { format: :csv }
       expect(response).to have_http_status(:ok)
       expect(response.headers["Content-Disposition"]).to include(".csv")
@@ -85,7 +85,7 @@ RSpec.describe "Accounting::Entries" do
 
   describe "GET /accounting/entries/:id" do
     it "shows the entry" do
-      entry = create(:accounting_entry_with_debits_and_credits)
+      entry = create(:accounting_entry)
       get accounting_entry_path(entry)
       expect(response).to have_http_status(:ok)
     end

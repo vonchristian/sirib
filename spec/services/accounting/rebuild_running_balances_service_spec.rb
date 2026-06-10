@@ -10,7 +10,7 @@ RSpec.describe Accounting::RebuildRunningBalancesService do
     end
 
     it "rebuilds running balances from entries" do
-      create(:accounting_entry_with_debits_and_credits)
+      create(:accounting_entry)
       expect {
         described_class.run!
       }.to change(Accounting::RunningBalance, :count).by_at_least(1)

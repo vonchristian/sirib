@@ -50,16 +50,16 @@ module Accounting
     private
 
     def validate_credit_amount_lines
-      errors.add(:base, "must have at least one credit amount") if amount_lines.credit.blank?
+      errors.add(:base, "must have at least one credit amount") if amount_lines.select(&:credit?).blank?
     end
 
     def validate_debit_amount_lines
-      errors.add(:base, "must have at least one debit amount") if amount_lines.debit.blank?
+      errors.add(:base, "must have at least one debit amount") if amount_lines.select(&:debit?).blank?
     end
 
     def amounts_cancel?
-      debit_total = amount_lines.debit.total
-      credit_total = amount_lines.credit.total
+      debit_total = amount_lines.select(&:debit?).sum(&:amount_cents)
+      credit_total = amount_lines.select(&:credit?).sum(&:amount_cents)
       if debit_total != credit_total
         errors.add(:base, "debits (#{debit_total}) do not equal credits (#{credit_total})")
       end

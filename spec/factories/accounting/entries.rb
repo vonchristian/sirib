@@ -5,16 +5,13 @@ FactoryBot.define do
     description { Faker::Lorem.sentence }
     reference_number { generate(:entry_reference_number) }
     posted_at { Time.zone.now }
-  end
 
-  factory :accounting_entry_with_debits_and_credits, class: "Accounting::Entry" do
-    description { Faker::Lorem.sentence }
-    reference_number { generate(:entry_reference_number) }
-    posted_at { Time.zone.now }
-
-    after(:create) do |entry|
-      create :accounting_amount_line, entry: entry, amount_type: "debit", amount_cents: 1000, amount_currency: "PHP"
-      create :accounting_amount_line, entry: entry, amount_type: "credit", amount_cents: 1000, amount_currency: "PHP"
+    before(:create) do |entry|
+      entry.save!(validate: false)
+      account = create(:accounting_account)
+      create(:accounting_amount_line, entry:, account:, amount_type: "debit", amount_cents: 1000, amount_currency: "PHP")
+      create(:accounting_amount_line, entry:, account:, amount_type: "credit", amount_cents: 1000, amount_currency: "PHP")
+      throw(:skip)
     end
   end
 end
