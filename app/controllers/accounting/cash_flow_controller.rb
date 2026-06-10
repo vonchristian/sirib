@@ -6,7 +6,7 @@ module Accounting
       @to_date = parse_date(params[:to_date]) || Date.current
       @from_date = parse_date(params[:from_date]) || @to_date.beginning_of_month
 
-      result = Accounting::CashFlowStatement.generate(
+      result = Accounting::CashFlowStatement.run!(
         from_date: @from_date,
         to_date: @to_date,
         user: Current.session.user

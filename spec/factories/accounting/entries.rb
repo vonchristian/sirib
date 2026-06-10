@@ -1,7 +1,20 @@
 FactoryBot.define do
+  sequence(:entry_reference_number) { |n| "ENT-#{Time.current.strftime("%Y%m%d-%H%M%S")}-#{n}#{SecureRandom.hex(2).upcase}" }
+
   factory :accounting_entry, class: "Accounting::Entry" do
     description { Faker::Lorem.sentence }
-    reference_number { "ENT-#{Faker::Alphanumeric.alpha(number: 12).upcase}" }
+    reference_number { generate(:entry_reference_number) }
     posted_at { Time.zone.now }
+  end
+
+  factory :accounting_entry_with_debits_and_credits, class: "Accounting::Entry" do
+    description { Faker::Lorem.sentence }
+    reference_number { generate(:entry_reference_number) }
+    posted_at { Time.zone.now }
+
+    after(:create) do |entry|
+      create :accounting_amount_line, entry: entry, amount_type: "debit", amount_cents: 1000, amount_currency: "PHP"
+      create :accounting_amount_line, entry: entry, amount_type: "credit", amount_cents: 1000, amount_currency: "PHP"
+    end
   end
 end

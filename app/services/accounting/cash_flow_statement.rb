@@ -1,5 +1,5 @@
 module Accounting
-  class CashFlowStatement
+  class CashFlowStatement < ActiveInteraction::Base
     SECTIONS = [
       {
         key: :operating,
@@ -25,21 +25,15 @@ module Accounting
       }
     ].freeze
 
-    def self.generate(from_date:, to_date:, user:)
-      new(from_date:, to_date:, user:).generate
-    end
+    date :from_date
+    date :to_date
+    object :user, class: User
 
-    def initialize(from_date:, to_date:, user:)
-      @from_date = from_date
-      @to_date = to_date
-      @user = user
-    end
+    def execute
+      @end_amounts = AccountBalance::RunningBalance.new(to_date: to_date).load_amounts
+      @start_amounts = AccountBalance::RunningBalance.new(to_date: from_date - 1.day).load_amounts
 
-    def generate
-      @end_amounts = AccountBalance::AsOfDate.new(to_date: @to_date).load_amounts
-      @start_amounts = AccountBalance::AsOfDate.new(to_date: @from_date - 1.day).load_amounts
-
-      @cash_accounts = Account.cash_accounts_for(@user).non_contra.to_a
+      @cash_accounts = Account.cash_accounts_for(user).non_contra.to_a
       @cash_ids = @cash_accounts.map(&:id)
 
       sections = build_sections

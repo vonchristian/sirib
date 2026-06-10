@@ -20,15 +20,7 @@ module Accounting
     end
 
     def self.balance(account, amounts)
-      debits = amounts[[ account.id, "debit" ]] || 0
-      credits = amounts[[ account.id, "credit" ]] || 0
-
-      cents = if account.normal_credit_balance? ^ account.contra
-                credits - debits
-      else
-                debits - credits
-      end
-
+      cents = amounts[account.id] || 0
       Money.new(cents, "PHP")
     end
   end

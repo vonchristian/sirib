@@ -74,8 +74,8 @@
       <tbody class="divide-y divide-border dark:divide-gray-800">
         <% if @entries.any? %>
           <% @entries.each do |entry| %>
-            <% debit_total = entry.debit_amount_lines.sum(:amount_cents) %>
-            <% credit_total = entry.credit_amount_lines.sum(:amount_cents) %>
+            <% debit_total = entry.amount_lines.debit.total %>
+            <% credit_total = entry.amount_lines.credit.total %>
             <tr data-href="<%= accounting_entry_path(entry) %>" data-action="click->entries-filter#visitRow" class="hover:bg-surface-alt dark:hover:bg-gray-800/30 transition-colors cursor-pointer">
               <td class="px-5 py-3 text-xs text-text-primary dark:text-gray-200 whitespace-nowrap tabular-nums">
                 <%= entry.posted_at.strftime("%b %d, %Y") %>

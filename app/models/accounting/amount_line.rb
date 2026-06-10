@@ -25,6 +25,10 @@ module Accounting
       joins(:entry).merge(Entry.from_date(date))
     }
 
+    def self.total
+      sum(:amount_cents)
+    end
+
     def self.balance(from_date: nil, to_date: nil, to_time: nil)
       AccountBalance.resolve(from_date: from_date, to_date: to_date, to_time: to_time)
         .apply(all)

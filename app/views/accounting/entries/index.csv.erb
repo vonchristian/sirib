@@ -12,6 +12,6 @@
     ]) %>
   <% end %>
   <%= CSV.generate_line([
-    "", "", "", "", "", "Total Debits: #{entry.debit_amount_lines.sum(:amount_cents) / 100.0}", "Total Credits: #{entry.credit_amount_lines.sum(:amount_cents) / 100.0}"
+    "", "", "", "", "", "Total Debits: #{entry.amount_lines.debit.total / 100.0}", "Total Credits: #{entry.amount_lines.credit.total / 100.0}"
   ]) %>
 <% end %>

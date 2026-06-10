@@ -7,13 +7,7 @@ module Accounting
       using: { tsearch: { prefix: true, dictionary: "english" }, trigram: { threshold: 0.3 } }
 
     has_many :amount_lines, dependent: :restrict_with_error
-
-    has_many :debit_amount_lines, -> { where(amount_type: :debit) },
-             class_name: "Accounting::AmountLine", inverse_of: :entry
-    has_many :credit_amount_lines, -> { where(amount_type: :credit) },
-             class_name: "Accounting::AmountLine", inverse_of: :entry
-    has_many :debit_accounts, through: :debit_amount_lines, source: :account
-    has_many :credit_accounts, through: :credit_amount_lines, source: :account
+    has_many :accounts, through: :amount_lines
 
     validates :reference_number, presence: true, uniqueness: true
     validates :description, presence: true
@@ -35,16 +29,18 @@ module Accounting
       )
 
       debits.each do |attrs|
-        entry.debit_amount_lines.build(
+        entry.amount_lines.build(
           account: attrs[:account],
-          amount_cents: attrs[:amount]
+          amount_cents: attrs[:amount],
+          amount_type: :debit
         )
       end
 
       credits.each do |attrs|
-        entry.credit_amount_lines.build(
+        entry.amount_lines.build(
           account: attrs[:account],
-          amount_cents: attrs[:amount]
+          amount_cents: attrs[:amount],
+          amount_type: :credit
         )
       end
 
@@ -54,16 +50,16 @@ module Accounting
     private
 
     def validate_credit_amount_lines
-      errors.add(:base, "must have at least one credit amount") if credit_amount_lines.blank?
+      errors.add(:base, "must have at least one credit amount") if amount_lines.credit.blank?
     end
 
     def validate_debit_amount_lines
-      errors.add(:base, "must have at least one debit amount") if debit_amount_lines.blank?
+      errors.add(:base, "must have at least one debit amount") if amount_lines.debit.blank?
     end
 
     def amounts_cancel?
-      debit_total = debit_amount_lines.to_a.sum(&:amount_cents)
-      credit_total = credit_amount_lines.to_a.sum(&:amount_cents)
+      debit_total = amount_lines.debit.total
+      credit_total = amount_lines.credit.total
       if debit_total != credit_total
         errors.add(:base, "debits (#{debit_total}) do not equal credits (#{credit_total})")
       end

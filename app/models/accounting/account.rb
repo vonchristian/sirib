@@ -3,7 +3,7 @@ module Accounting
     include PgSearch::Model
     self.table_name = "accounts"
 
-    pg_search_scope :search, against: [:name, :account_code],
+    pg_search_scope :search, against: [ :name, :account_code ],
       using: { tsearch: { prefix: true }, trigram: { threshold: 0.3 } }
 
     NORMAL_CREDIT_BALANCE = {
@@ -17,12 +17,7 @@ module Accounting
     belongs_to :ledger
     has_many :amount_lines, dependent: :restrict_with_error
     has_many :running_balances, dependent: :restrict_with_error
-    has_many :cash_account_assignments, class_name: "Accounting::CashAccount", dependent: :destroy
-
-    has_many :debit_amount_lines, -> { where(amount_type: :debit) },
-             class_name: "Accounting::AmountLine", inverse_of: :account
-    has_many :credit_amount_lines, -> { where(amount_type: :credit) },
-             class_name: "Accounting::AmountLine", inverse_of: :account
+    has_many :cash_accounts, class_name: "Accounting::CashAccount", dependent: :destroy
 
     enum :account_type, Accounting::ACCOUNT_TYPES
 
@@ -62,29 +57,9 @@ module Accounting
     end
 
     def self.balance(from_date: nil, to_date: nil, to_time: nil)
-      strategy = AccountBalance.resolve(from_date:, to_date:, to_time:)
-      amounts = strategy.load_amounts
-
       total = Money.new(0, "PHP")
-      find_each do |account|
-        cents = if account.normal_credit_balance? ^ account.contra
-                  (amounts[[ account.id, "credit" ]] || 0) - (amounts[[ account.id, "debit" ]] || 0)
-        else
-                  (amounts[[ account.id, "debit" ]] || 0) - (amounts[[ account.id, "credit" ]] || 0)
-        end
-        total += account.contra ? -Money.new(cents, "PHP") : Money.new(cents, "PHP")
-      end
+      find_each { |a| total += a.balance(from_date:, to_date:, to_time:) }
       total
-    end
-
-    def self.trial_balance
-      asset_balance = where(account_type: :asset).balance
-      liability_balance = where(account_type: :liability).balance
-      equity_balance = where(account_type: :equity).balance
-      revenue_balance = where(account_type: :revenue).balance
-      expense_balance = where(account_type: :expense).balance
-
-      asset_balance - (liability_balance + equity_balance + revenue_balance - expense_balance)
     end
   end
 end

@@ -21,6 +21,7 @@ gem "stimulus-rails"
 gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
+gem "active_interaction", "~> 5.5"
 gem "ancestry"
 gem "pg_search"
 gem "pagy", "~> 9.0"

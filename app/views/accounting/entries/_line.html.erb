@@ -1,5 +1,5 @@
 <template id="line_template">
-  <div class="grid grid-cols-12 gap-3 items-start" data-entry-form-target="line">
+  <div class="grid grid-cols-12 gap-3 w-full" data-entry-form-target="line">
     <div class="col-span-5" data-controller="typeahead" data-typeahead-url-value="<%= accounting_accounts_search_path %>">
       <%= label_tag nil, "Account", class: "block text-xs font-medium text-text-secondary dark:text-gray-400 mb-1" %>
       <div class="relative">

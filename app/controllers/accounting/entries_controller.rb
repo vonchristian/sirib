@@ -38,7 +38,7 @@ module Accounting
       )
 
       if @entry.save
-        Turbo::StreamsChannel.broadcast_refresh_to "accounting_balances"
+        Accounting::UpdateRunningBalancesJob.perform_later(@entry)
         redirect_to accounting_entry_path(@entry), notice: "Entry created successfully."
       else
         render :new, status: :unprocessable_entity

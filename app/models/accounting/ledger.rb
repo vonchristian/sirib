@@ -13,6 +13,10 @@ module Accounting
     validates :account_code, presence: true, uniqueness: true
     validates :account_type, presence: true
 
+    def balance(to_date: Date.current)
+      accounts.balance(to_date: to_date).cents
+    end
+
     scope :contra, -> { where(contra: true) }
     scope :non_contra, -> { where(contra: false) }
 

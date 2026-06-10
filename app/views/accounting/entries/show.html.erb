@@ -61,10 +61,10 @@
         <tr class="border-t-2 border-border-strong dark:border-gray-600 bg-surface-alt/80 dark:bg-gray-800/40">
           <td colspan="2" class="px-6 py-3 text-sm font-semibold text-text-primary dark:text-white">Total</td>
           <td class="px-6 py-3 text-right text-sm font-semibold tabular-nums text-text-primary dark:text-white font-mono">
-            <%= number_to_currency(@entry.amount_lines.where(amount_type: "debit").sum(:amount_cents) / 100.0, unit: "PHP ") %>
+            <%= number_to_currency(@entry.amount_lines.debit.total / 100.0, unit: "PHP ") %>
           </td>
           <td class="px-6 py-3 text-right text-sm font-semibold tabular-nums text-text-primary dark:text-white font-mono">
-            <%= number_to_currency(@entry.amount_lines.where(amount_type: "credit").sum(:amount_cents) / 100.0, unit: "PHP ") %>
+            <%= number_to_currency(@entry.amount_lines.credit.total / 100.0, unit: "PHP ") %>
           </td>
         </tr>
       </tfoot>
