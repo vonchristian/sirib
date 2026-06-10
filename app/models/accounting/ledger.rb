@@ -2,6 +2,8 @@ module Accounting
   class Ledger < ApplicationRecord
     self.table_name = "ledgers"
 
+    has_ancestry
+
     has_many :accounts, dependent: :restrict_with_error
     has_many :running_balances, dependent: :restrict_with_error
 

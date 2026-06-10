@@ -3,10 +3,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 2,
   reporter: 'html',
 
   use: {
@@ -16,13 +16,18 @@ export default defineConfig({
 
   projects: [
     {
+      name: 'setup',
+      testMatch: /auth\.setup\.js/,
+    },
+    {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
     },
   ],
 
   webServer: {
-    command: 'bin/e2e-setup && bin/rails server -e test -p 3000',
+    command: 'RAILS_ENV=test bin/rails db:seed:replant && bin/e2e-setup && bin/rails server -e test -p 3000',
     url: 'http://localhost:3000/up',
     reuseExistingServer: !process.env.CI,
     timeout: 30000,

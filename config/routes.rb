@@ -15,5 +15,10 @@ Rails.application.routes.draw do
   get "dashboard/reports", to: "dashboard#reports"
   get "dashboard/settings", to: "dashboard#settings"
 
+  namespace :accounting do
+    get "balance_sheet", to: "balance_sheet#index"
+    get "chart_of_accounts", to: "chart_of_accounts#index"
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

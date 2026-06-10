@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_09_141547) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_09_155039) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -60,7 +60,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_141547) do
     t.enum "account_type", null: false, enum_type: "account_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "ancestry"
     t.index ["account_code"], name: "index_ledgers_on_account_code", unique: true
+    t.index ["ancestry"], name: "index_ledgers_on_ancestry"
   end
 
   create_table "running_balances", force: :cascade do |t|
