@@ -2,26 +2,26 @@
 <% content_for :page_subtitle, "Process transactions and manage repayments" %>
 
 <div class="animate-fade-in">
-  <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
+      <table class="min-w-full text-sm">
         <thead>
-          <tr class="bg-gray-50">
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <tr class="border-b border-border dark:border-gray-700">
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400">Reference</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400">Member</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400">Amount</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400">Type</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400">Status</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr class="hover:bg-gray-50 transition-colors">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">—</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">—</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">—</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">—</td>
+        <tbody class="divide-y divide-border dark:divide-gray-800">
+          <tr class="hover:bg-surface-alt dark:hover:bg-gray-800/30 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary dark:text-white">—</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary dark:text-gray-400">—</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary dark:text-gray-400 text-right">—</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-tertiary dark:text-gray-500">—</td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/20">Pending</span>
+              <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 ring-1 ring-inset ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400">Pending</span>
             </td>
           </tr>
         </tbody>

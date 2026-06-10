@@ -2,25 +2,25 @@
 <% content_for :page_subtitle, "Manage your account and system preferences" %>
 
 <div class="animate-fade-in">
-  <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
     <div class="px-6 py-5">
-      <h2 class="text-sm font-semibold text-gray-900">Profile</h2>
-      <p class="mt-1 text-sm text-gray-500">Manage your account information</p>
+      <h2 class="text-sm font-semibold text-text-primary dark:text-white">Profile</h2>
+      <p class="mt-1 text-sm text-text-secondary dark:text-gray-400">Manage your account information</p>
     </div>
-    <div class="border-t border-gray-200 px-6 py-5">
-      <dl class="divide-y divide-gray-100">
+    <div class="border-t border-border px-6 py-5 dark:border-gray-700">
+      <dl class="divide-y divide-border dark:divide-gray-800">
         <div class="flex items-center justify-between py-4">
-          <dt class="text-sm font-medium text-gray-900">Email</dt>
-          <dd class="text-sm text-gray-500"><%= Current.user.email_address %></dd>
+          <dt class="text-sm font-medium text-text-primary dark:text-white">Email</dt>
+          <dd class="text-sm text-text-secondary dark:text-gray-400"><%= Current.user.email_address %></dd>
         </div>
         <div class="flex items-center justify-between py-4">
-          <dt class="text-sm font-medium text-gray-900">Role</dt>
-          <dd class="text-sm text-gray-500">Administrator</dd>
+          <dt class="text-sm font-medium text-text-primary dark:text-white">Role</dt>
+          <dd class="text-sm text-text-secondary dark:text-gray-400">Administrator</dd>
         </div>
         <div class="flex items-center justify-between py-4">
-          <dt class="text-sm font-medium text-gray-900">Password</dt>
-          <dd class="text-sm text-gray-500">
-            <%= link_to "Change password", new_password_path, class: "font-medium text-emerald-600 hover:text-emerald-500" %>
+          <dt class="text-sm font-medium text-text-primary dark:text-white">Password</dt>
+          <dd class="text-sm text-text-secondary dark:text-gray-400">
+            <%= link_to "Change password", new_password_path, class: "font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors" %>
           </dd>
         </div>
       </dl>

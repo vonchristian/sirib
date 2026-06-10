@@ -32,39 +32,38 @@ module Accounting
       NORMAL_CREDIT_BALANCE[account_type]
     end
 
-    def balance(from_date: nil, to_date: nil)
+    def balance(from_date: nil, to_date: nil, to_time: nil)
       cents = if normal_credit_balance? ^ contra
-                credits_balance(from_date: from_date, to_date: to_date) -
-                  debits_balance(from_date: from_date, to_date: to_date)
-              else
-                debits_balance(from_date: from_date, to_date: to_date) -
-                  credits_balance(from_date: from_date, to_date: to_date)
-              end
+                credits_balance(from_date:, to_date:, to_time:) -
+                  debits_balance(from_date:, to_date:, to_time:)
+      else
+                debits_balance(from_date:, to_date:, to_time:) -
+                  credits_balance(from_date:, to_date:, to_time:)
+      end
+
       Money.new(cents, "PHP")
     end
 
-    def credits_balance(from_date: nil, to_date: nil)
-      scope = credit_amount_lines
-      scope = scope.joins(:entry).where(entries: { posted_at: from_date.. }) if from_date
-      scope = scope.joins(:entry).where(entries: { posted_at: ..to_date }) if to_date
-      scope.sum(:amount_cents)
+    def debits_balance(from_date: nil, to_date: nil, to_time: nil)
+      amount_lines.debit.balance(from_date:, to_date:, to_time:)
     end
 
-    def debits_balance(from_date: nil, to_date: nil)
-      scope = debit_amount_lines
-      scope = scope.joins(:entry).where(entries: { posted_at: from_date.. }) if from_date
-      scope = scope.joins(:entry).where(entries: { posted_at: ..to_date }) if to_date
-      scope.sum(:amount_cents)
+    def credits_balance(from_date: nil, to_date: nil, to_time: nil)
+      amount_lines.credit.balance(from_date:, to_date:, to_time:)
     end
 
-    def self.balance(from_date: nil, to_date: nil)
+    def self.balance(from_date: nil, to_date: nil, to_time: nil)
+      strategy = AccountBalance.resolve(from_date:, to_date:, to_time:)
+      amounts = strategy.load_amounts
+
       total = Money.new(0, "PHP")
-      all.find_each do |account|
-        if account.contra
-          total -= account.balance(from_date: from_date, to_date: to_date)
+      find_each do |account|
+        cents = if account.normal_credit_balance? ^ account.contra
+                  (amounts[[ account.id, "credit" ]] || 0) - (amounts[[ account.id, "debit" ]] || 0)
         else
-          total += account.balance(from_date: from_date, to_date: to_date)
+                  (amounts[[ account.id, "debit" ]] || 0) - (amounts[[ account.id, "credit" ]] || 0)
         end
+        total += account.contra ? -Money.new(cents, "PHP") : Money.new(cents, "PHP")
       end
       total
     end

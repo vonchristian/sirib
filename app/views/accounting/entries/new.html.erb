@@ -1,0 +1,106 @@
+<% content_for :page_title, "Journal Entry" %>
+<% content_for :page_subtitle, "New adjusting entry" %>
+
+<div class="animate-fade-in space-y-6">
+  <% if @entry.errors.any? %>
+    <div class="rounded-lg bg-danger-50 border border-danger/20 px-4 py-3 dark:bg-red-900/20 dark:border-red-800">
+      <h3 class="text-sm font-medium text-danger dark:text-red-400"><%= pluralize(@entry.errors.count, "error") %> prevented this entry from being saved:</h3>
+      <ul class="mt-2 list-disc list-inside text-sm text-danger/80 dark:text-red-300">
+        <% @entry.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+    <%= form_tag accounting_entries_path, method: :post, data: { controller: "entry-form", action: "keyup->entry-form#updateTotals change->entry-form#updateTotals submit->entry-form#disableSubmit" }, class: "p-6 space-y-6" do %>
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <%= label_tag "entry[description]", "Description", class: "block text-xs font-semibold text-text-secondary dark:text-gray-400 mb-1.5 uppercase tracking-wider" %>
+          <%= text_field_tag "entry[description]", params.dig(:entry, :description), required: true, placeholder: "e.g. Depreciation for June 2025", class: "block w-full rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+        </div>
+        <div>
+          <%= label_tag "entry[posted_at]", "Date", class: "block text-xs font-semibold text-text-secondary dark:text-gray-400 mb-1.5 uppercase tracking-wider" %>
+          <%= date_field_tag "entry[posted_at]", params.dig(:entry, :posted_at) || Date.current, required: true, class: "block w-full rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-text-primary dark:text-white">Entry Lines</h3>
+          <button type="button" data-action="entry-form#addLine" class="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Add Line
+          </button>
+        </div>
+
+        <div class="overflow-hidden rounded-lg border border-border dark:border-gray-700">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="bg-surface-alt dark:bg-gray-800/50">
+                <th class="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400 w-1/2">Account</th>
+                <th class="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400 w-1/4">Debit</th>
+                <th class="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400 w-1/4">Credit</th>
+                <th class="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-400 w-10"></th>
+              </tr>
+            </thead>
+            <template id="line_template">
+              <tr data-entry-form-target="line">
+                <td class="px-4 py-2">
+                  <select data-entry-form-role="account-select" class="block w-full rounded-lg border border-border bg-surface px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
+                    <option value="">Select account...</option>
+                  </select>
+                </td>
+                <td class="px-4 py-2">
+                  <input type="number" step="0.01" min="0" placeholder="0.00" data-entry-form-role="debit" class="block w-full text-right rounded-lg border border-border bg-surface px-3 py-1.5 text-xs text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
+                </td>
+                <td class="px-4 py-2">
+                  <input type="number" step="0.01" min="0" placeholder="0.00" data-entry-form-role="credit" class="block w-full text-right rounded-lg border border-border bg-surface px-3 py-1.5 text-xs text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
+                </td>
+                <td class="px-4 py-2 text-center">
+                  <button type="button" data-action="entry-form#removeLine" class="text-text-tertiary hover:text-danger transition-colors">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                  </button>
+                </td>
+              </tr>
+            </template>
+
+            <tbody data-entry-form-target="lines" class="divide-y divide-border dark:divide-gray-800"></tbody>
+            <tfoot class="bg-surface-alt dark:bg-gray-800/50 border-t border-border dark:border-gray-700">
+              <tr>
+                <td class="px-4 py-2.5 text-xs font-semibold text-text-secondary dark:text-gray-400">Totals</td>
+                <td class="px-4 py-2.5 text-right text-sm font-bold tabular-nums text-text-primary dark:text-white">
+                  PHP <span data-entry-form-target="debitTotal">0.00</span>
+                </td>
+                <td class="px-4 py-2.5 text-right text-sm font-bold tabular-nums text-text-primary dark:text-white">
+                  PHP <span data-entry-form-target="creditTotal">0.00</span>
+                </td>
+                <td></td>
+              </tr>
+              <tr class="hidden" data-entry-form-target="errorMessage">
+                <td colspan="4" class="px-4 py-2 text-xs text-danger dark:text-red-400">
+                  Debits and credits do not balance (difference: PHP <span data-entry-form-target="diffTotal">0.00</span>)
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <select id="account-options" aria-hidden="true" class="hidden">
+        <% @accounts.group_by { |a| "#{a.ledger.name} (#{a.ledger.account_code})" }.each do |group, accs| %>
+          <optgroup label="<%= group %>">
+            <% accs.each do |a| %>
+              <option value="<%= a.id %>"><%= a.account_code %> — <%= a.name %></option>
+            <% end %>
+          </optgroup>
+        <% end %>
+      </select>
+
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-border dark:border-gray-700">
+        <%= submit_tag "Save Entry", class: "rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

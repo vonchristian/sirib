@@ -5,7 +5,7 @@ module Accounting
     TYPE_LABELS = {
       "asset" => "ASSETS",
       "liability" => "LIABILITIES",
-      "equity" => "EQUITY",
+      "equity" => "EQUITY"
     }.freeze
 
     TYPE_ORDER = %w[asset liability equity].freeze
@@ -15,8 +15,9 @@ module Accounting
       @comparison = params[:comparison].presence_in(%w[none prior_period prior_quarter prior_year]) || "none"
       @compare_date = compute_compare_date
 
-      @amounts = load_amounts(@as_of_date)
-      @compare_amounts = load_amounts(@compare_date) if @compare_date
+      @strategy = Accounting::AccountBalance::AsOfDate.new(to_date: @as_of_date)
+      @amounts = @strategy.load_amounts
+      @compare_amounts = Accounting::AccountBalance::AsOfDate.new(to_date: @compare_date).load_amounts if @compare_date
 
       @report = build_report
     end
@@ -35,15 +36,6 @@ module Accounting
       when "prior_quarter" then @as_of_date - 3.months
       when "prior_year" then @as_of_date - 1.year
       end
-    end
-
-    def load_amounts(date)
-      return {} unless date
-
-      Accounting::AmountLine.joins(:entry)
-        .where(entries: { posted_at: ..date.end_of_day })
-        .group(:account_id, :amount_type)
-        .sum(:amount_cents)
     end
 
     def build_report
@@ -75,22 +67,11 @@ module Accounting
 
     def build_account_rows(accounts)
       accounts.order(:account_code).map do |account|
-        balance = account_balance(account, @amounts)
-        balance_cmp = @compare_date ? account_balance(account, @compare_amounts) : nil
+        balance = Accounting::AccountBalance.balance(account, @amounts)
+        balance_cmp = @compare_date ? Accounting::AccountBalance.balance(account, @compare_amounts) : nil
 
         { account: account, balance: balance, balance_compare: balance_cmp }
       end
-    end
-
-    def account_balance(account, amounts)
-      debits = amounts[[account.id, "debit"]] || 0
-      credits = amounts[[account.id, "credit"]] || 0
-      cents = if account.normal_credit_balance? ^ account.contra
-                credits - debits
-              else
-                debits - credits
-              end
-      Money.new(cents, "PHP")
     end
   end
 end

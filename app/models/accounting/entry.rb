@@ -19,7 +19,8 @@ module Accounting
     validate :amounts_cancel?
 
     scope :posted_on, ->(date) { where(posted_at: date.all_day) }
-    scope :posted_between, ->(from, to) { where(posted_at: from..to) }
+    scope :up_to, ->(date) { where(posted_at: ..date.end_of_day) }
+    scope :from_date, ->(date) { where(posted_at: date.beginning_of_day..) }
 
     def self.build(description:, reference_number: nil, posted_at: nil,
                    debits: [], credits: [])
@@ -57,8 +58,8 @@ module Accounting
     end
 
     def amounts_cancel?
-      debit_total = debit_amount_lines.sum(:amount_cents)
-      credit_total = credit_amount_lines.sum(:amount_cents)
+      debit_total = debit_amount_lines.to_a.sum(&:amount_cents)
+      credit_total = credit_amount_lines.to_a.sum(&:amount_cents)
       if debit_total != credit_total
         errors.add(:base, "debits (#{debit_total}) do not equal credits (#{credit_total})")
       end

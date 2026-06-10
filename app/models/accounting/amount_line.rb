@@ -12,5 +12,23 @@ module Accounting
     validates :amount_type, presence: true
     validates :amount_cents, presence: true,
               numericality: { greater_than: 0 }
+
+    scope :between, ->(from_date, to_date) {
+      from_date(from_date).up_to(to_date)
+    }
+
+    scope :up_to, ->(date) {
+      joins(:entry).merge(Entry.up_to(date))
+    }
+
+    scope :from_date, ->(date) {
+      joins(:entry).merge(Entry.from_date(date))
+    }
+
+    def self.balance(from_date: nil, to_date: nil, to_time: nil)
+      AccountBalance.resolve(from_date: from_date, to_date: to_date, to_time: to_time)
+        .apply(all)
+        .sum(:amount_cents)
+    end
   end
 end

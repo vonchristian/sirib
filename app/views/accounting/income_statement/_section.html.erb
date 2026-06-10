@@ -1,5 +1,5 @@
-<tr class="bg-gray-100/80 dark:bg-gray-800/80">
-  <td colspan="<%= compare ? 3 : 2 %>" class="px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+<tr class="bg-surface-alt dark:bg-gray-800/50">
+  <td colspan="<%= compare ? 3 : 2 %>" class="px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-text-secondary dark:text-gray-400">
     <%= section[:name] %>
   </td>
 </tr>
@@ -9,14 +9,14 @@
 <% end %>
 
 <tr>
-  <td class="px-6 py-3 pl-10 text-sm font-bold text-gray-900 dark:text-white">
+  <td class="px-6 py-2.5 text-sm font-semibold text-text-primary dark:text-white" style="padding-left: 40px">
     Total <%= section[:name] %>
   </td>
-  <td class="px-6 py-3 text-right text-sm font-bold tabular-nums text-gray-900 dark:text-white border-t border-gray-300 dark:border-gray-600">
+  <td class="px-6 py-2.5 text-right text-sm font-semibold tabular-nums text-text-primary dark:text-white border-t border-border-strong dark:border-gray-600">
     <%= section[:total].format %>
   </td>
   <% if compare %>
-    <td class="px-6 py-3 text-right text-sm font-bold tabular-nums text-gray-900 dark:text-white border-t border-gray-300 dark:border-gray-600">
+    <td class="px-6 py-2.5 text-right text-sm font-semibold tabular-nums text-text-primary dark:text-white border-t border-border-strong dark:border-gray-600">
       <%= section[:total_compare]&.format || "—" %>
     </td>
   <% end %>
