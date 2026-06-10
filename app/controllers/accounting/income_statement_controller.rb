@@ -19,6 +19,15 @@ module Accounting
       @compare_amounts = Accounting::AccountBalance::AsOfDate.new(to_date: @compare_date).load_amounts if @compare_date
 
       @report = build_report
+      revenue_total = @report.find { |s| s[:name] == "REVENUES" }&.dig(:total) || Money.new(0, "PHP")
+      expense_total = @report.find { |s| s[:name] == "EXPENSES" }&.dig(:total) || Money.new(0, "PHP")
+      @net_income = revenue_total - expense_total
+
+      if @compare_date
+        cmp_revenue = @report.find { |s| s[:name] == "REVENUES" }&.dig(:total_compare) || Money.new(0, "PHP")
+        cmp_expense = @report.find { |s| s[:name] == "EXPENSES" }&.dig(:total_compare) || Money.new(0, "PHP")
+        @compare_net_income = cmp_revenue - cmp_expense
+      end
     end
 
     private

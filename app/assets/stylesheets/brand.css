@@ -1,56 +1,65 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary: #2563eb;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a5f;
+  --color-primary-50: #eef4fa;
+  --color-primary-100: #dce4ee;
+  --color-primary-200: #b9c9dc;
+  --color-primary-300: #8fa8c4;
+  --color-primary-400: #6086a8;
+  --color-primary: #0f2b4a;
+  --color-primary-500: #0f2b4a;
+  --color-primary-600: #0c223c;
+  --color-primary-700: #091a2d;
+  --color-primary-800: #071222;
+  --color-primary-900: #040b16;
 
-  --color-accent: #059669;
-  --color-accent-50: #ecfdf5;
-  --color-accent-100: #d1fae5;
+  --color-accent: #007dba;
+  --color-accent-50: #e6f3fc;
 
   --color-surface: #ffffff;
-  --color-surface-alt: #f8fafc;
+  --color-surface-alt: #f4f6f9;
+  --color-surface-raised: #ffffff;
 
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #64748b;
-  --color-text-tertiary: #94a3b8;
+  --color-text-primary: #0b1a2e;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #8895a7;
 
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
+  --color-border: #dfe3e9;
+  --color-border-strong: #c5ccd6;
 
-  --color-positive: #059669;
-  --color-positive-50: #ecfdf5;
-  --color-warning: #d97706;
-  --color-warning-50: #fffbeb;
-  --color-danger: #ef4444;
+  --color-positive: #0e734b;
+  --color-positive-50: #e8f6ef;
+  --color-warning: #b45309;
+  --color-warning-50: #fef7e6;
+  --color-danger: #dc2626;
   --color-danger-50: #fef2f2;
 
   --radius-xs: 0.25rem;
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
-  --radius-lg: 0.625rem;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.625rem;
+  --radius-2xl: 0.75rem;
 }
 
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   body {
-    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes fade-in {
@@ -58,30 +67,16 @@
     to { opacity: 1; }
   }
 
-  @keyframes fade-in-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes slide-in-right {
-    from { opacity: 0; transform: translateX(4px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
   .animate-fade-in {
-    animation: fade-in 0.35s ease-out;
+    animation: fade-in 0.3s ease-out;
   }
 
   .animate-fade-in-up {
-    animation: fade-in-up 0.4s ease-out;
+    animation: fade-in-up 0.35s ease-out;
   }
 
-  .animate-fade-in-up-1 { animation: fade-in-up 0.4s ease-out 0.06s both; }
-  .animate-fade-in-up-2 { animation: fade-in-up 0.4s ease-out 0.12s both; }
-  .animate-fade-in-up-3 { animation: fade-in-up 0.4s ease-out 0.18s both; }
-  .animate-fade-in-up-4 { animation: fade-in-up 0.4s ease-out 0.24s both; }
-
-  .animate-slide-in-right {
-    animation: slide-in-right 0.3s ease-out;
-  }
+  .animate-fade-in-up-1 { animation: fade-in-up 0.35s ease-out 0.05s both; }
+  .animate-fade-in-up-2 { animation: fade-in-up 0.35s ease-out 0.10s both; }
+  .animate-fade-in-up-3 { animation: fade-in-up 0.35s ease-out 0.15s both; }
+  .animate-fade-in-up-4 { animation: fade-in-up 0.35s ease-out 0.20s both; }
 }

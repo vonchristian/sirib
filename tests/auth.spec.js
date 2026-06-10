@@ -5,7 +5,7 @@ test.describe('Authentication Flow', () => {
   test('redirects unauthenticated user to sign in page', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveURL(/\/session\/new/);
-    await expect(page.getByRole('heading', { name: /welcome back/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /sign in to sirib/i })).toBeVisible();
   });
 
   test('signs in with valid credentials', async ({ page }) => {

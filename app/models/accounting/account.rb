@@ -1,6 +1,10 @@
 module Accounting
   class Account < ApplicationRecord
+    include PgSearch::Model
     self.table_name = "accounts"
+
+    pg_search_scope :search, against: [:name, :account_code],
+      using: { tsearch: { prefix: true }, trigram: { threshold: 0.3 } }
 
     NORMAL_CREDIT_BALANCE = {
       "asset" => false,
@@ -13,6 +17,7 @@ module Accounting
     belongs_to :ledger
     has_many :amount_lines, dependent: :restrict_with_error
     has_many :running_balances, dependent: :restrict_with_error
+    has_many :cash_account_assignments, class_name: "Accounting::CashAccount", dependent: :destroy
 
     has_many :debit_amount_lines, -> { where(amount_type: :debit) },
              class_name: "Accounting::AmountLine", inverse_of: :account
@@ -27,6 +32,10 @@ module Accounting
 
     scope :contra, -> { where(contra: true) }
     scope :non_contra, -> { where(contra: false) }
+
+    scope :cash_accounts_for, ->(user) {
+      where(id: user.cash_accounts.select(:account_id))
+    }
 
     def normal_credit_balance?
       NORMAL_CREDIT_BALANCE[account_type]

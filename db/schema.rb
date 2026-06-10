@@ -10,13 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_09_155039) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_10_101403) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   # Custom types defined in this database.
   # Note that some types may not work with other database engines. Be careful if changing database.
   create_enum "account_type", ["asset", "equity", "liability", "revenue", "expense"]
+
+  create_table "accounting_cash_accounts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_accounting_cash_accounts_on_account_id"
+    t.index ["user_id", "account_id"], name: "index_accounting_cash_accounts_on_user_id_and_account_id", unique: true
+    t.index ["user_id"], name: "index_accounting_cash_accounts_on_user_id"
+  end
 
   create_table "accounts", force: :cascade do |t|
     t.bigint "ledger_id", null: false
@@ -28,6 +39,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_155039) do
     t.datetime "updated_at", null: false
     t.index ["account_code"], name: "index_accounts_on_account_code", unique: true
     t.index ["ledger_id"], name: "index_accounts_on_ledger_id"
+    t.index ["name", "account_code"], name: "trgm_accounts_idx", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "amount_lines", force: :cascade do |t|
@@ -96,6 +108,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_155039) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "accounting_cash_accounts", "accounts"
+  add_foreign_key "accounting_cash_accounts", "users"
   add_foreign_key "accounts", "ledgers"
   add_foreign_key "amount_lines", "accounts"
   add_foreign_key "amount_lines", "entries"

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["lines", "debitTotal", "creditTotal", "diffTotal", "errorMessage"]
+  static targets = ["lines", "line", "debitTotal", "creditTotal", "difference"]
 
   connect() {
     this.counter = 0
@@ -14,12 +14,8 @@ export default class extends Controller {
     return this.linesTarget.querySelectorAll("[data-entry-form-target='line']")
   }
 
-  get optionsHTML() {
-    return this.element.querySelector("#account-options")?.innerHTML || ""
-  }
-
   formatMoney(n) {
-    return n.toFixed(2)
+    return "PHP " + n.toFixed(2)
   }
 
   addLine(event) {
@@ -28,18 +24,12 @@ export default class extends Controller {
     const tpl = document.getElementById("line_template")
     const row = tpl.content.cloneNode(true)
 
-    const select = row.querySelector("[data-entry-form-role='account-select']")
-    select.name = `entry[lines][${index}][account_id]`
-    select.id = `entry_lines_${index}_account_id`
-    select.innerHTML = "<option value=''>Select account...</option>" + this.optionsHTML
-
-    const debit = row.querySelector("[data-entry-form-role='debit']")
-    debit.name = `entry[lines][${index}][debit_amount]`
-    debit.id = `entry_lines_${index}_debit_amount`
-
-    const credit = row.querySelector("[data-entry-form-role='credit']")
-    credit.name = `entry[lines][${index}][credit_amount]`
-    credit.id = `entry_lines_${index}_credit_amount`
+    row.querySelectorAll("[data-entry-form-name]").forEach(el => {
+      const field = el.dataset.entryFormName
+      el.name = `entry[amount_lines_attributes][${index}][${field}]`
+      el.id = `entry_amount_lines_attributes_${index}_${field}`
+      el.dataset.entryFormName = null
+    })
 
     this.linesTarget.appendChild(row)
     this.updateTotals()
@@ -59,28 +49,21 @@ export default class extends Controller {
     let credits = 0
 
     this.lineElements.forEach((row) => {
-      const debitVal = parseFloat(row.querySelector("[data-entry-form-role='debit']")?.value || "0")
-      const creditVal = parseFloat(row.querySelector("[data-entry-form-role='credit']")?.value || "0")
-      if (!isNaN(debitVal)) debits += debitVal
-      if (!isNaN(creditVal)) credits += creditVal
+      const dir = row.querySelector("[data-entry-form-role='direction']")?.value
+      const amt = parseFloat(row.querySelector("[data-entry-form-role='amount']")?.value || "0")
+      if (isNaN(amt)) return
+      if (dir === "debit") debits += amt
+      else credits += amt
     })
 
     if (this.hasDebitTotalTarget) this.debitTotalTarget.textContent = this.formatMoney(debits)
     if (this.hasCreditTotalTarget) this.creditTotalTarget.textContent = this.formatMoney(credits)
 
     const diff = debits - credits
-    if (this.hasDiffTotalTarget) {
-      this.diffTotalTarget.textContent = this.formatMoney(Math.abs(diff))
-      this.diffTotalTarget.classList.toggle("text-red-600", diff !== 0)
-      this.diffTotalTarget.classList.toggle("text-green-600", diff === 0)
-    }
-
-    if (this.hasErrorMessageTarget) {
-      if (diff !== 0) {
-        this.errorMessageTarget.classList.remove("hidden")
-      } else {
-        this.errorMessageTarget.classList.add("hidden")
-      }
+    if (this.hasDifferenceTarget) {
+      this.differenceTarget.textContent = this.formatMoney(Math.abs(diff))
+      this.differenceTarget.classList.toggle("text-danger", diff !== 0)
+      this.differenceTarget.classList.toggle("text-positive", diff === 0)
     }
   }
 

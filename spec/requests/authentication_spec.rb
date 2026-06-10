@@ -5,7 +5,7 @@ RSpec.describe "Authentication" do
     it "renders the sign in page" do
       get new_session_path
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Welcome back")
+      expect(response.body).to include("Sign in to Sirib")
     end
 
     it "redirects to sign in when accessing protected page" do

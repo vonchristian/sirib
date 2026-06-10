@@ -1,0 +1,83 @@
+<% content_for :page_title, "Cash Flow Statement" %>
+<% content_for :page_subtitle, "For the period #{@from_date.strftime('%b %d, %Y')} to #{@to_date.strftime('%b %d, %Y')}" %>
+
+<% content_for :head do %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
+
+<div class="space-y-6">
+  <%= turbo_stream_from "accounting_balances" %>
+
+  <div class="rounded-md border border-border bg-surface dark:border-gray-800 dark:bg-gray-900">
+    <%= form_tag accounting_cash_flow_path, method: :get, data: { controller: "balance-sheet-form", turbo_frame: "_top" }, class: "flex flex-wrap items-end gap-4 px-5 py-4 sm:px-6" do %>
+      <div>
+        <label class="block text-xs font-medium text-text-secondary dark:text-gray-400 mb-1">From Date</label>
+        <%= date_field_tag :from_date, @from_date, data: { action: "change->balance-sheet-form#submit" }, class: "block w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-text-secondary dark:text-gray-400 mb-1">To Date</label>
+        <%= date_field_tag :to_date, @to_date, data: { action: "change->balance-sheet-form#submit" }, class: "block w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="rounded-md border border-border bg-surface dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
+    <div>
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b border-border dark:border-gray-800">
+            <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-500">Account</th>
+            <th class="px-6 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary dark:text-gray-500 w-44">Change</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border dark:divide-gray-800">
+          <% @report.each do |section| %>
+            <%= render "section", section: section %>
+          <% end %>
+
+          <tr class="bg-surface-alt dark:bg-gray-800/40">
+            <td class="px-6 py-3 text-sm font-semibold text-text-primary dark:text-white">
+              Net Change in Cash
+            </td>
+            <td class="px-6 py-3 text-right text-sm font-semibold tabular-nums border-t-2 border-text-secondary dark:border-gray-500 <%= @net_change.cents >= 0 ? 'text-positive dark:text-emerald-400' : 'text-negative dark:text-red-400' %>">
+              <%= @net_change.format %>
+            </td>
+          </tr>
+
+          <tr class="bg-surface-alt/50 dark:bg-gray-800/20">
+            <td class="px-6 py-2 text-sm text-text-secondary dark:text-gray-400">
+              <span class="ml-8">Cash at Beginning of Period</span>
+            </td>
+            <td class="px-6 py-2 text-right text-sm tabular-nums text-text-secondary dark:text-gray-400">
+              <%= @cash_at_beginning.format %>
+            </td>
+          </tr>
+
+          <tr class="bg-surface-alt/80 dark:bg-gray-800/40">
+            <td class="px-6 py-3 text-sm font-semibold text-text-primary dark:text-white">
+              <span class="ml-8">Cash at End of Period</span>
+            </td>
+            <td class="px-6 py-3 text-right text-sm font-semibold tabular-nums border-t-2 border-text-secondary dark:border-gray-500">
+              <%= @cash_at_end.format %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rounded-md border border-border bg-surface px-5 py-3.5 dark:border-gray-800 dark:bg-gray-900">
+    <h3 class="text-[11px] font-semibold text-text-secondary dark:text-gray-400 mb-3 uppercase tracking-wider">Notes</h3>
+    <ul class="space-y-1 text-xs text-text-tertiary dark:text-gray-400">
+      <li class="flex items-center gap-2">
+        <span class="inline-block h-2 w-2 rounded-full bg-positive-50 dark:bg-emerald-900/40"></span>
+        <span>Positive amounts indicate cash inflows (increases)</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="inline-block h-2 w-2 rounded-full bg-negative-50 dark:bg-red-900/40"></span>
+        <span>Negative amounts indicate cash outflows (decreases)</span>
+      </li>
+    </ul>
+  </div>
+</div>

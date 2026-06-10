@@ -1,0 +1,28 @@
+<template id="line_template">
+  <div class="grid grid-cols-12 gap-3 items-start" data-entry-form-target="line">
+    <div class="col-span-5" data-controller="typeahead" data-typeahead-url-value="<%= accounting_accounts_search_path %>">
+      <%= label_tag nil, "Account", class: "block text-xs font-medium text-text-secondary dark:text-gray-400 mb-1" %>
+      <div class="relative">
+        <%= text_field_tag nil, nil, placeholder: "Search accounts...", data: { typeahead_target: "input", action: "input->typeahead#search blur->typeahead#hideResultsDelayed focus->typeahead#showIfResults" }, class: "block w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200", autocomplete: "off" %>
+        <div data-typeahead-target="results" class="absolute z-50 mt-1 w-full rounded-md border border-border bg-surface shadow-lg dark:border-gray-600 dark:bg-gray-800 hidden"></div>
+      </div>
+      <input type="hidden" data-typeahead-target="hidden" data-entry-form-name="account_id">
+    </div>
+
+    <div class="col-span-2">
+      <%= label_tag nil, "Type", class: "block text-xs font-medium text-text-secondary dark:text-gray-400 mb-1" %>
+      <%= select_tag nil, options_for_select([["Debit", "debit"], ["Credit", "credit"]]), data: { entry_form_role: "direction", entry_form_name: "direction" }, class: "block w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+    </div>
+
+    <div class="col-span-3">
+      <%= label_tag nil, "Amount", class: "block text-xs font-medium text-text-secondary dark:text-gray-400 mb-1" %>
+      <%= number_field_tag nil, nil, placeholder: "0.00", step: "0.01", min: "0.01", data: { entry_form_role: "amount", entry_form_name: "amount_cents", action: "input->entry-form#updateTotals" }, class: "block w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+    </div>
+
+    <div class="col-span-2 flex items-end justify-end pb-1">
+      <button type="button" data-action="entry-form#removeLine" class="rounded-md border border-border p-1.5 text-text-tertiary hover:text-danger hover:border-danger/50 transition-colors dark:border-gray-600">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+</template>

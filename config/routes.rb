@@ -18,8 +18,10 @@ Rails.application.routes.draw do
   namespace :accounting do
     get "balance_sheet", to: "balance_sheet#index"
     get "income_statement", to: "income_statement#index"
+    get "cash_flow", to: "cash_flow#index"
     get "chart_of_accounts", to: "chart_of_accounts#index"
-    resources :entries, only: [:new, :create]
+    resources :entries, only: [:index, :new, :create, :show]
+    get "accounts/search", to: "accounts#search"
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

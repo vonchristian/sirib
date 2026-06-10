@@ -1,6 +1,10 @@
 module Accounting
   class Entry < ApplicationRecord
+    include PgSearch::Model
     self.table_name = "entries"
+
+    pg_search_scope :search, against: [:description, :reference_number],
+      using: { tsearch: { prefix: true, dictionary: "english" }, trigram: { threshold: 0.3 } }
 
     has_many :amount_lines, dependent: :restrict_with_error
 

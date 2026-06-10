@@ -1,0 +1,16 @@
+<% if accounts.any? %>
+  <% accounts.each do |account| %>
+    <button type="button"
+            role="option"
+            data-account-id="<%= account.id %>"
+            data-account-code="<%= account.account_code %>"
+            data-action="typeahead#select"
+            class="w-full text-left px-3 py-2 text-xs hover:bg-primary/10 focus:bg-primary/10 focus:outline-none transition-colors border-b border-border/50 last:border-b-0">
+      <span class="font-mono text-text-tertiary"><%= account.account_code %></span>
+      <span class="text-text-primary"> — <%= account.name %></span>
+      <span class="text-text-tertiary ml-1">(<%= account.ledger.name %>)</span>
+    </button>
+  <% end %>
+<% else %>
+  <div class="px-3 py-2 text-xs text-text-tertiary">No accounts found</div>
+<% end %>

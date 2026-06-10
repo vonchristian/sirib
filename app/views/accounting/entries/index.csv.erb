@@ -1,0 +1,17 @@
+<%= CSV.generate_line(["Date", "Reference", "Description", "Account Code", "Account Name", "Debit", "Credit"]) %>
+<% @entries.each do |entry| %>
+  <% entry.amount_lines.each do |line| %>
+    <%= CSV.generate_line([
+      entry.posted_at.strftime("%Y-%m-%d"),
+      entry.reference_number,
+      entry.description,
+      line.account.account_code,
+      line.account.name,
+      line.debit? ? line.amount.to_f : "",
+      line.credit? ? line.amount.to_f : ""
+    ]) %>
+  <% end %>
+  <%= CSV.generate_line([
+    "", "", "", "", "", "Total Debits: #{entry.debit_amount_lines.sum(:amount_cents) / 100.0}", "Total Credits: #{entry.credit_amount_lines.sum(:amount_cents) / 100.0}"
+  ]) %>
+<% end %>
