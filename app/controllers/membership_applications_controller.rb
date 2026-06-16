@@ -1,6 +1,8 @@
 class MembershipApplicationsController < ApplicationController
   layout "dashboard"
 
+  STEP_KEYS = %w[personal_details address_contact identifications signature_specimens profile_photos].freeze
+
   def index
     @applications = MembershipApplication.all
   end
@@ -13,8 +15,11 @@ class MembershipApplicationsController < ApplicationController
 
   def edit
     @application = MembershipApplication.find_by!(uuid: params[:uuid])
-    @initial_step = params[:step]&.to_i if params[:step]&.to_i&.between?(0, 4)
-    @initial_step ||= @application.current_step
+    @initial_step = if params[:step].present? && STEP_KEYS.include?(params[:step])
+      STEP_KEYS.index(params[:step])
+    else
+      @application.current_step
+    end
   end
 
   def update
@@ -25,7 +30,7 @@ class MembershipApplicationsController < ApplicationController
         @application.update(status: "completed") if @application.complete?
         redirect_to membership_application_path(@application.uuid), notice: "Application completed."
       else
-        redirect_to edit_membership_application_path(@application.uuid, step: @application.current_step), notice: "Progress saved."
+        redirect_to edit_membership_application_path(@application.uuid, step: STEP_KEYS[@application.current_step]), notice: "Progress saved."
       end
     else
       render :edit, status: :unprocessable_entity

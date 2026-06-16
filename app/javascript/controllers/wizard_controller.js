@@ -8,9 +8,17 @@ export default class extends Controller {
   ]
   static values = { currentStep: { type: Number, default: 0 } }
 
+  static stepNames = [
+    "personal_details", "address_contact", "identifications",
+    "signature_specimens", "profile_photos"
+  ]
+
   connect() {
-    const step = parseInt(this.element.dataset.currentStep, 10)
-    this.currentStepValue = isNaN(step) ? 0 : Math.min(4, Math.max(0, step))
+    this.currentStepValue = this.stepIndexFromURL()
+    if (this.currentStepValue < 0) {
+      const step = parseInt(this.element.dataset.currentStep, 10)
+      this.currentStepValue = isNaN(step) ? 0 : Math.min(4, Math.max(0, step))
+    }
     this.photos = []
     try {
       const existing = JSON.parse(this.profileInputTarget.value || "[]")
@@ -71,10 +79,16 @@ export default class extends Controller {
     this.updateCurrentStepField()
   }
 
+  stepIndexFromURL() {
+    const name = new URL(window.location).searchParams.get("step")
+    return name ? this.constructor.stepNames.indexOf(name) : -1
+  }
+
   syncURL() {
+    const name = this.constructor.stepNames[this.currentStepValue]
     const url = new URL(window.location)
-    if (parseInt(url.searchParams.get("step"), 10) !== this.currentStepValue) {
-      url.searchParams.set("step", this.currentStepValue)
+    if (url.searchParams.get("step") !== name) {
+      url.searchParams.set("step", name)
       history.replaceState({ step: this.currentStepValue }, "", url.toString())
     }
   }

@@ -29,7 +29,7 @@ RSpec.describe "MembershipApplications" do
 
     it "renders the specified step when ?step=N is given" do
       app = create(:membership_application)
-      get edit_membership_application_path(app.uuid, step: 2)
+      get edit_membership_application_path(app.uuid, step: "identifications")
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Step 3: Identifications")
     end
@@ -48,7 +48,7 @@ RSpec.describe "MembershipApplications" do
       patch membership_application_path(app.uuid), params: {
         membership_application: { first_name: "Pedro" }
       }
-      expect(response).to redirect_to(edit_membership_application_path(app.uuid, step: 0))
+      expect(response).to redirect_to(edit_membership_application_path(app.uuid, step: "personal_details"))
       expect(app.reload.first_name).to eq("Pedro")
     end
   end
