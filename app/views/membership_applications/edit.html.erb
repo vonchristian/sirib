@@ -24,7 +24,7 @@
 
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <% 5.times do |i| %>
+        <% 6.times do |i| %>
           <span class="flex h-2 w-8 rounded-full <%= i.zero? ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700' %>" data-wizard-target="dot"></span>
         <% end %>
       </div>
@@ -138,7 +138,7 @@
         </div>
 
         <button type="button"
-                data-action="addIdentification"
+                data-action="wizard#addIdentification"
                 class="mt-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
           <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3" />
@@ -148,7 +148,56 @@
       </div>
 
       <div data-wizard-target="step" class="hidden">
-        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 4: Signature Specimens</h2>
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 4: Sources of Income</h2>
+        <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">Specify your source(s) of income. You can add multiple sources.</p>
+
+        <div id="sources-of-income" class="space-y-4">
+          <% @application.sources_of_income.each_with_index do |src, idx| %>
+            <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 income-entry">
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="field-group">
+                  <label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Source of Income</label>
+                  <select name="membership_application[sources_of_income][][source_type]"
+                          required
+                          class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                    <option value="">Select source</option>
+                    <option value="Employment" <%= "selected" if src["source_type"] == "Employment" %>>Employment</option>
+                    <option value="Self-Employed" <%= "selected" if src["source_type"] == "Self-Employed" %>>Self-Employed</option>
+                    <option value="Business" <%= "selected" if src["source_type"] == "Business" %>>Business</option>
+                    <option value="Remittances" <%= "selected" if src["source_type"] == "Remittances" %>>Remittances</option>
+                    <option value="Pension" <%= "selected" if src["source_type"] == "Pension" %>>Pension</option>
+                    <option value="Investment" <%= "selected" if src["source_type"] == "Investment" %>>Investment</option>
+                    <option value="Others" <%= "selected" if src["source_type"] == "Others" %>>Others</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Monthly Income (PHP)</label>
+                  <input type="number"
+                         name="membership_application[sources_of_income][][monthly_income]"
+                         value="<%= src["monthly_income"] %>"
+                         required
+                         min="0"
+                         step="0.01"
+                         placeholder="0.00"
+                         class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <button type="button"
+                data-action="wizard#addIncome"
+                class="mt-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3" />
+          </svg>
+          Add Another Source
+        </button>
+      </div>
+
+      <div data-wizard-target="step" class="hidden">
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 5: Signature Specimens</h2>
         <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">Draw your signature below and capture at least 3 specimens.</p>
 
         <div data-controller="signature-pad" class="space-y-4">
@@ -190,7 +239,7 @@
       </div>
 
       <div data-wizard-target="step" class="hidden">
-        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 5: Profile Photos</h2>
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 6: Profile Photos</h2>
         <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">Capture at least 1 photo using your webcam.</p>
 
         <div class="space-y-4">

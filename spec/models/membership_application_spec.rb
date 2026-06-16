@@ -48,6 +48,11 @@ RSpec.describe MembershipApplication do
       expect(app).not_to be_complete
     end
 
+    it "returns false when no sources of income" do
+      app = build(:membership_application, sources_of_income: [])
+      expect(app).not_to be_complete
+    end
+
     it "returns false when fewer than 3 signature specimens" do
       app = build(:membership_application, signature_specimens: [])
       expect(app).not_to be_complete

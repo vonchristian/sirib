@@ -35,10 +35,10 @@ RSpec.describe "MembershipApplications" do
     end
 
     it "falls back to the saved current_step when no ?step param" do
-      app = create(:membership_application, current_step: 3)
+      app = create(:membership_application, current_step: 4)
       get edit_membership_application_path(app.uuid)
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Step 4: Signature Specimens")
+      expect(response.body).to include("Step 5: Signature Specimens")
     end
   end
 

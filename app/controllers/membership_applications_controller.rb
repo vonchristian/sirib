@@ -1,7 +1,7 @@
 class MembershipApplicationsController < ApplicationController
   layout "dashboard"
 
-  STEP_KEYS = %w[personal_details address_contact identifications signature_specimens profile_photos].freeze
+  STEP_KEYS = %w[personal_details address_contact identifications sources_of_income signature_specimens profile_photos].freeze
 
   def index
     @applications = MembershipApplication.all
@@ -74,8 +74,9 @@ class MembershipApplicationsController < ApplicationController
       :birth_date, :gender, :civil_status,
       :mobile_number, :email_address,
       :house_street, :barangay, :city, :province, :region, :zip_code,
-      :signature_specimens, :profile_images, :current_step,
-      identifications: [:id_type, :id_number]
+      :signature_specimens, :profile_images, :sources_of_income, :current_step,
+      identifications: [:id_type, :id_number],
+      sources_of_income: [:source_type, :monthly_income]
     )
   end
 end

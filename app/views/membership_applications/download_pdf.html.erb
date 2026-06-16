@@ -53,6 +53,31 @@
     <div style="font-size: 8pt; color: #999; font-style: italic; margin-bottom: 14pt;">None provided</div>
   <% end %>
 
+  <hr style="border: none; border-top: 0.5pt solid #ccc; margin: 0 0 10pt 0;">
+  <div style="font-size: 7pt; font-weight: 700; letter-spacing: 0.8pt; text-transform: uppercase; color: #888; margin-bottom: 6pt;">Sources of Income</div>
+  <% if @application.sources_of_income.any? %>
+    <div style="margin-bottom: 14pt;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+        <thead>
+          <tr style="border-bottom: 0.5pt solid #ccc;">
+            <th style="text-align: left; padding: 3pt 6pt; font-weight: 600; color: #555;">Source</th>
+            <th style="text-align: right; padding: 3pt 6pt; font-weight: 600; color: #555;">Monthly Income (PHP)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @application.sources_of_income.each do |src| %>
+            <tr style="border-bottom: 0.5pt solid #eee;">
+              <td style="padding: 3pt 6pt;"><%= src["source_type"] %></td>
+              <td style="padding: 3pt 6pt; text-align: right;"><%= number_with_delimiter(src["monthly_income"].to_f, delimiter: ",") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div style="font-size: 8pt; color: #999; font-style: italic; margin-bottom: 14pt;">None provided</div>
+  <% end %>
+
   <% if @application.signature_specimens.any? %>
     <hr style="border: none; border-top: 0.5pt solid #ccc; margin: 0 0 10pt 0;">
     <div style="font-size: 7pt; font-weight: 700; letter-spacing: 0.8pt; text-transform: uppercase; color: #888; margin-bottom: 6pt;">Signature Specimens</div>

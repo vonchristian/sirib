@@ -10,14 +10,14 @@ export default class extends Controller {
 
   static stepNames = [
     "personal_details", "address_contact", "identifications",
-    "signature_specimens", "profile_photos"
+    "sources_of_income", "signature_specimens", "profile_photos"
   ]
 
   connect() {
     this.currentStepValue = this.stepIndexFromURL()
     if (this.currentStepValue < 0) {
       const step = parseInt(this.element.dataset.currentStep, 10)
-      this.currentStepValue = isNaN(step) ? 0 : Math.min(4, Math.max(0, step))
+      this.currentStepValue = isNaN(step) ? 0 : Math.min(5, Math.max(0, step))
     }
     this.photos = []
     try {
@@ -63,12 +63,12 @@ export default class extends Controller {
       this.submitBtnTarget.classList.toggle("hidden", this.currentStepValue !== this.stepTargets.length - 1)
     }
 
-    if (this.currentStepValue === 3) {
+    if (this.currentStepValue === 4) {
       this.element.querySelector("[data-controller='signature-pad']")
         ?.dispatchEvent(new CustomEvent("signature-pad:resize"))
     }
 
-    if (this.currentStepValue === 4) {
+    if (this.currentStepValue === 5) {
       this.startWebcam()
     } else {
       this.stopWebcam()
@@ -104,6 +104,7 @@ export default class extends Controller {
       "Personal Details",
       "Address & Contact",
       "Identifications",
+      "Sources of Income",
       "Signature Specimens",
       "Profile Photos"
     ]
@@ -141,6 +142,26 @@ export default class extends Controller {
     }
 
     return valid
+  }
+
+  addIdentification() {
+    const container = document.getElementById("identifications")
+    const lastEntry = container.querySelector(".identification-entry:last-of-type")
+    if (lastEntry) {
+      const clone = lastEntry.cloneNode(true)
+      clone.querySelectorAll("input, select").forEach((el) => { el.value = "" })
+      container.appendChild(clone)
+    }
+  }
+
+  addIncome() {
+    const container = document.getElementById("sources-of-income")
+    const lastEntry = container.querySelector(".income-entry:last-of-type")
+    if (lastEntry) {
+      const clone = lastEntry.cloneNode(true)
+      clone.querySelectorAll("input, select").forEach((el) => { el.value = "" })
+      container.appendChild(clone)
+    }
   }
 
   capturePhoto() {
