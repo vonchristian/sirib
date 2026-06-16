@@ -8,6 +8,13 @@ export default class extends Controller {
     this.currentIndex = 0
   }
 
+  imageSrcFor(trigger) {
+    if (trigger.tagName === "IMG") return trigger.src
+    const wrapper = trigger.closest(".group") || trigger.parentElement
+    const img = wrapper?.querySelector("img")
+    return img?.src || ""
+  }
+
   open(event) {
     const trigger = event.currentTarget
     const group = trigger.dataset.imageModalGroup || "default"
@@ -24,16 +31,17 @@ export default class extends Controller {
   renderImage() {
     const trigger = this.images[this.currentIndex]
     if (!trigger) return
-    const src = trigger.dataset.imageModalSrcValue || trigger.src
-    this.imageTarget.src = src
+    this.imageTarget.src = this.imageSrcFor(trigger)
     if (this.hasCounterTarget) {
       this.counterTarget.textContent = `${this.currentIndex + 1} / ${this.images.length}`
     }
     if (this.hasPrevNavTarget) {
-      this.prevNavTarget.classList.toggle("opacity-30 pointer-events-none", this.currentIndex === 0)
+      this.prevNavTarget.classList.toggle("opacity-30", this.currentIndex === 0)
+      this.prevNavTarget.classList.toggle("pointer-events-none", this.currentIndex === 0)
     }
     if (this.hasNextNavTarget) {
-      this.nextNavTarget.classList.toggle("opacity-30 pointer-events-none", this.currentIndex === this.images.length - 1)
+      this.nextNavTarget.classList.toggle("opacity-30", this.currentIndex === this.images.length - 1)
+      this.nextNavTarget.classList.toggle("pointer-events-none", this.currentIndex === this.images.length - 1)
     }
   }
 
