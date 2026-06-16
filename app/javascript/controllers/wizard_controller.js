@@ -131,7 +131,7 @@ export default class extends Controller {
 
   retakePhoto() {
     this.previewTarget.classList.add("hidden")
-    this.capturePlaceholderTarget?.classList.remove("hidden")
+    this.capturePlaceholderTarget?.classList.add("hidden")
     this.profileInputTarget.value = ""
   }
 
@@ -144,6 +144,7 @@ export default class extends Controller {
         if (this.hasVideoTarget) {
           this.videoTarget.srcObject = stream
           this.videoTarget.play()
+          this.capturePlaceholderTarget?.classList.add("hidden")
         }
       })
       .catch(() => {
