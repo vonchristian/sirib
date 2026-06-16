@@ -11,19 +11,10 @@ class Member < ApplicationRecord
   validates :email_address, uniqueness: true, allow_blank: true
   validates :gender, inclusion: { in: %w[male female] }
   validates :civil_status, inclusion: { in: %w[single married divorced widowed] }
-  validate :must_include_bir_identification, on: :create
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   def name
     [first_name, middle_name, last_name].compact.join(" ")
-  end
-
-  private
-
-  def must_include_bir_identification
-    unless identifications.any? { |id| id.id_type == "BIR" }
-      errors.add(:identifications, "must include at least one BIR identification")
-    end
   end
 end

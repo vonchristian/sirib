@@ -1,0 +1,268 @@
+<% content_for :page_title, "Membership Application" %>
+<% content_for :page_subtitle, "Application ##{@application.uuid.first(8).upcase}" %>
+
+<div class="mb-4 rounded-lg border border-primary/20 bg-primary-50 px-4 py-3 text-sm text-primary dark:border-primary-900/30 dark:bg-primary-900/20 dark:text-primary-300">
+  <span class="font-medium">Application ID:</span> <%= @application.uuid %>
+  <span class="ml-4 font-medium">Status:</span>
+  <span class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 text-xs font-medium text-warning ring-1 ring-inset ring-warning/20 dark:bg-amber-900/30 dark:text-amber-400 capitalize"><%= @application.status %></span>
+  <p class="mt-1 text-xs opacity-75">Share this ID so the applicant can resume their application later.</p>
+</div>
+
+<div class="animate-fade-in max-w-3xl mx-auto" data-controller="wizard">
+  <%= form_with model: @application, url: membership_application_path(@application.uuid), method: :patch, html: { class: "space-y-6" } do |f| %>
+    <% if @application.errors.any? %>
+      <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400">
+        <ul class="list-inside list-disc">
+          <% @application.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <% 5.times do |i| %>
+          <span class="flex h-2 w-8 rounded-full <%= i.zero? ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700' %>" data-wizard-target="dot"></span>
+        <% end %>
+      </div>
+      <span class="text-xs text-text-tertiary dark:text-gray-500" data-wizard-target="counter">Step 1 of 5</span>
+    </div>
+
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+      <div data-wizard-target="step">
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 1: Personal Details</h2>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="field-group sm:col-span-2">
+            <%= f.label :first_name, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :first_name, required: true, placeholder: "First name", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :middle_name, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :middle_name, placeholder: "Middle name", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :last_name, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :last_name, required: true, placeholder: "Last name", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :suffix, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.select :suffix, options_for_select([["None", ""], "Jr.", "Sr.", "II", "III", "IV"], @application.suffix), {}, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :birth_date, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.date_field :birth_date, required: true, max: Date.current.to_s, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :gender, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.select :gender, options_for_select([["Select gender", ""], "male", "female"], @application.gender), {}, required: true, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :civil_status, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.select :civil_status, options_for_select([["Select civil status", ""], "single", "married", "divorced", "widowed"], @application.civil_status), {}, required: true, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white" %>
+          </div>
+        </div>
+      </div>
+
+      <div data-wizard-target="step" class="hidden">
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 2: Address & Contact</h2>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="field-group sm:col-span-2">
+            <%= f.label :house_street, "House / Street", class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :house_street, required: true, placeholder: "House number and street name", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :barangay, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :barangay, required: true, placeholder: "Barangay", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :city, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :city, required: true, placeholder: "City / Municipality", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :province, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :province, required: true, placeholder: "Province", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :region, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :region, required: true, placeholder: "Region (e.g. NCR)", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group">
+            <%= f.label :zip_code, class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :zip_code, placeholder: "ZIP code", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group sm:col-span-2">
+            <%= f.label :mobile_number, "Mobile Number", class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.text_field :mobile_number, required: true, placeholder: "09171234567", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+          <div class="field-group sm:col-span-2">
+            <%= f.label :email_address, "Email Address", class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
+            <%= f.email_field :email_address, placeholder: "email@example.com", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" %>
+          </div>
+        </div>
+      </div>
+
+      <div data-wizard-target="step" class="hidden">
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 3: Identifications</h2>
+        <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">At least one BIR identification is required.</p>
+
+        <div id="identifications" class="space-y-4">
+          <% @application.identifications.each_with_index do |id, idx| %>
+            <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 identification-entry">
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="field-group">
+                  <label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">ID Type</label>
+                  <select name="membership_application[identifications][][id_type]"
+                          required
+                          class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                    <option value="">Select ID type</option>
+                    <% MemberIdentification::ID_TYPES.each do |type| %>
+                      <option value="<%= type %>" <%= type == id["id_type"] ? "selected" : "" %>><%= type.titleize %></option>
+                    <% end %>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">ID Number</label>
+                  <input type="text"
+                         name="membership_application[identifications][][id_number]"
+                         value="<%= id["id_number"] %>"
+                         required
+                         placeholder="ID number"
+                         class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <button type="button"
+                data-action="addIdentification"
+                class="mt-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3" />
+          </svg>
+          Add Another ID
+        </button>
+      </div>
+
+      <div data-wizard-target="step" class="hidden">
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 4: Signature Specimen</h2>
+        <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">Draw your signature using your mouse or touchpad.</p>
+
+        <div data-controller="signature-pad" class="space-y-4">
+          <div class="relative overflow-hidden rounded-lg border border-border bg-white dark:border-gray-700" style="touch-action: none;">
+            <canvas data-signature-pad-target="canvas"
+                    class="h-40 w-full cursor-crosshair"
+                    width="600" height="160"></canvas>
+            <div data-signature-pad-target="emptyState"
+                 class="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <span class="text-sm text-gray-400 select-none">Draw signature here</span>
+            </div>
+            <img data-signature-pad-target="preview"
+                 class="hidden absolute inset-0 h-full w-full object-contain bg-white" />
+          </div>
+
+          <%= f.hidden_field :signature_data, data: { signature_pad_target: "hidden" } %>
+
+          <div class="flex items-center gap-2">
+            <button type="button"
+                    data-signature-pad-target="clearBtn"
+                    data-action="signature-pad#clear"
+                    class="hidden inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+              </svg>
+              Clear
+            </button>
+            <button type="button"
+                    data-action="signature-pad#save"
+                    class="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700 transition-colors">
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              Confirm Signature
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div data-wizard-target="step" class="hidden">
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 5: Profile Photo</h2>
+        <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">Capture a photo using your webcam.</p>
+
+        <div class="space-y-4">
+          <div data-wizard-target="webcamError" class="hidden rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400">
+            Could not access camera. Please ensure camera permissions are granted.
+          </div>
+
+          <div class="flex flex-col items-center gap-4">
+            <div class="relative overflow-hidden rounded-lg border border-border bg-gray-100 dark:border-gray-700 dark:bg-gray-800">
+              <video data-wizard-target="video"
+                     autoplay playsinline
+                     class="w-full max-w-md aspect-[4/3] object-cover"></video>
+              <div data-wizard-target="capturePlaceholder"
+                   class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.161a47.474 47.474 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
+                </svg>
+              </div>
+              <img data-wizard-target="preview" class="hidden absolute inset-0 w-full h-full object-cover" />
+            </div>
+
+            <%= f.hidden_field :profile_image_data, data: { wizard_target: "profileInput" } %>
+
+            <div class="flex gap-2">
+              <button type="button"
+                      data-action="wizard#capturePhoto"
+                      class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.161a47.474 47.474 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                </svg>
+                Capture Photo
+              </button>
+              <button type="button"
+                      data-action="wizard#retakePhoto"
+                      class="hidden rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
+                Retake
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <div class="flex gap-2">
+        <button type="button"
+                data-wizard-target="backBtn"
+                data-action="wizard#back"
+                class="inline-flex items-center gap-2 rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+          Back
+        </button>
+
+        <%= f.submit "Save Progress",
+              class: "inline-flex items-center gap-2 rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" %>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="button"
+                data-wizard-target="nextBtn"
+                data-action="wizard#next"
+                class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors">
+          Next
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          </svg>
+        </button>
+
+        <%= f.submit "Complete Registration",
+              data: { wizard_target: "submitBtn" },
+              class: "hidden inline-flex items-center gap-2 rounded-md bg-positive px-4 py-2 text-sm font-medium text-white hover:bg-positive-700 transition-colors" %>
+      </div>
+    </div>
+  <% end %>
+</div>

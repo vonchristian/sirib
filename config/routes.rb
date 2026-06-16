@@ -5,6 +5,14 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   resources :members, only: [:index, :show, :new, :create]
+  resources :membership_applications, only: [:index, :new, :show], param: :uuid do
+    member do
+      get :edit
+      patch :update
+      post :approve
+    end
+  end
+  get "applications", to: "membership_applications#index", as: :applications
 
   namespace :dashboard do
   end

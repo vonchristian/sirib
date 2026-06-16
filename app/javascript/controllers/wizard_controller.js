@@ -1,7 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["step", "nextBtn", "backBtn", "submitBtn"]
+  static targets = [
+    "step", "nextBtn", "backBtn", "submitBtn",
+    "video", "preview", "capturePlaceholder", "webcamError", "profileInput"
+  ]
   static values = { currentStep: { type: Number, default: 0 } }
 
   connect() {
@@ -88,17 +91,9 @@ export default class extends Controller {
     canvas.height = video.videoHeight
     canvas.getContext("2d").drawImage(video, 0, 0)
 
-    canvas.toBlob((blob) => {
-      const file = new File([blob], "profile.jpg", { type: "image/jpeg" })
-      const dataTransfer = new DataTransfer()
-      dataTransfer.items.add(file)
-
-      const input = this.profileInputTarget
-      input.files = dataTransfer.files
-      input.dispatchEvent(new Event("change", { bubbles: true }))
-
-      this.previewCapturedPhoto(canvas.toDataURL())
-    }, "image/jpeg", 0.9)
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.9)
+    this.profileInputTarget.value = dataUrl
+    this.previewCapturedPhoto(dataUrl)
   }
 
   previewCapturedPhoto(dataUrl) {
@@ -111,8 +106,7 @@ export default class extends Controller {
   retakePhoto() {
     this.previewTarget.classList.add("hidden")
     this.capturePlaceholderTarget?.classList.remove("hidden")
-    const input = this.profileInputTarget
-    input.value = ""
+    this.profileInputTarget.value = ""
   }
 
   startWebcam() {

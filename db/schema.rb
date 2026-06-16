@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_16_123703) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_123705) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -83,6 +83,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_123703) do
     t.index ["entry_id"], name: "index_amount_lines_on_entry_id"
   end
 
+  create_table "cooperatives", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "entries", force: :cascade do |t|
     t.string "reference_number", null: false
     t.text "description", null: false
@@ -141,6 +147,34 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_123703) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_members_on_email_address", unique: true
+  end
+
+  create_table "membership_applications", force: :cascade do |t|
+    t.string "uuid", null: false
+    t.bigint "cooperative_id", null: false
+    t.string "status", default: "draft", null: false
+    t.string "first_name"
+    t.string "middle_name"
+    t.string "last_name"
+    t.string "suffix"
+    t.date "birth_date"
+    t.string "gender"
+    t.string "civil_status"
+    t.string "mobile_number"
+    t.string "email_address"
+    t.string "house_street"
+    t.string "barangay"
+    t.string "city"
+    t.string "province"
+    t.string "region"
+    t.string "zip_code"
+    t.jsonb "identifications", default: []
+    t.text "signature_data"
+    t.text "profile_image_data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_membership_applications_on_cooperative_id"
+    t.index ["uuid"], name: "index_membership_applications_on_uuid", unique: true
   end
 
   create_table "running_balances", force: :cascade do |t|
@@ -215,6 +249,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_123703) do
   add_foreign_key "amount_lines", "entries"
   add_foreign_key "member_addresses", "members"
   add_foreign_key "member_identifications", "members"
+  add_foreign_key "membership_applications", "cooperatives"
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "ledgers"
   add_foreign_key "sessions", "users"

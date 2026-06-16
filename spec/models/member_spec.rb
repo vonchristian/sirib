@@ -22,20 +22,6 @@ RSpec.describe Member do
     it { is_expected.to have_many(:identifications).dependent(:destroy) }
   end
 
-  describe "BIR identification requirement" do
-    it "is valid with a BIR identification" do
-      member = build(:member)
-      expect(member).to be_valid
-    end
-
-    it "is invalid without a BIR identification" do
-      member = build(:member)
-      member.identifications = [build(:member_identification, id_type: "Passport", id_number: "P123")]
-      expect(member).not_to be_valid
-      expect(member.errors[:identifications]).to include("must include at least one BIR identification")
-    end
-  end
-
   describe "#name" do
     it "returns the full name" do
       member = build(:member, first_name: "Juan", middle_name: "Santos", last_name: "Dela Cruz")
