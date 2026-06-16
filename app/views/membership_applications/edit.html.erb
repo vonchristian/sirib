@@ -105,6 +105,7 @@
       </div>
 
       <div data-wizard-target="step" class="hidden">
+        <div data-controller="image-modal">
         <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 3: Identifications</h2>
         <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">At least one BIR identification is required.</p>
 
@@ -143,11 +144,12 @@
                          class="id-image-input">
                   <input type="file"
                          accept="image/*"
-                         required
                          data-action="change->wizard#handleIdImage"
-                         class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                         class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
                   <% if id["front_image"].present? %>
-                    <img src="<%= id["front_image"] %>" class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700">
+                    <img src="<%= id["front_image"] %>"
+                         class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow"
+                         data-action="click->image-modal#open">
                   <% else %>
                     <img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">
                   <% end %>
@@ -160,14 +162,15 @@
                          class="id-image-input">
                   <input type="file"
                          accept="image/*"
-                         required
                          data-action="change->wizard#handleIdImage"
-                         class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                  <% if id["back_image"].present? %>
-                    <img src="<%= id["back_image"] %>" class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700">
-                  <% else %>
-                    <img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">
-                  <% end %>
+                         class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                   <% if id["back_image"].present? %>
+                     <img src="<%= id["back_image"] %>"
+                          class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow"
+                          data-action="click->image-modal#open">
+                   <% else %>
+                     <img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">
+                   <% end %>
                 </div>
               </div>
             </div>
@@ -182,6 +185,34 @@
           </svg>
           Add Another ID
         </button>
+
+        <style>
+          .id-modal::backdrop {
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            animation: modalBackdropIn 0.2s ease-out;
+          }
+          .id-modal[open] {
+            animation: modalIn 0.2s ease-out;
+          }
+          @keyframes modalBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+          @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        </style>
+        <dialog data-image-modal-target="dialog"
+                class="id-modal rounded-xl border border-border bg-surface p-0 shadow-2xl max-w-[90vw] max-h-[90vh]"
+                data-action="keydown.self->image-modal#closeOnEscape click->image-modal#close">
+          <div class="relative">
+            <button type="button"
+                    data-action="image-modal#close"
+                    class="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface shadow-md border border-border text-text-secondary hover:text-text-primary transition-colors">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <img data-image-modal-target="image" class="max-h-[85vh] max-w-[85vw] rounded-lg object-contain">
+          </div>
+        </dialog>
+        </div>
       </div>
 
       <div data-wizard-target="step" class="hidden">

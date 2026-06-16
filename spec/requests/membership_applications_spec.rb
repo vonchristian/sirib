@@ -67,6 +67,24 @@ RSpec.describe "MembershipApplications" do
       get membership_application_path(app.uuid)
       expect(response).to have_http_status(:ok)
     end
+
+    it "displays identification front/back images and sources of income" do
+      app = create(:membership_application,
+        identifications: [{
+          "id_type" => "Passport", "id_number" => "P123",
+          "front_image" => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          "back_image" => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        }],
+        sources_of_income: [{ "source_type" => "Business", "monthly_income" => "100000" }])
+      get membership_application_path(app.uuid)
+      expect(response.body).to include("Passport")
+      expect(response.body).to include("P123")
+      expect(response.body).to include("Front")
+      expect(response.body).to include("Back")
+      expect(response.body).to include("img")
+      expect(response.body).to include("Business")
+      expect(response.body).to include("100,000")
+    end
   end
 
   describe "GET /membership_applications/:uuid/download_pdf" do

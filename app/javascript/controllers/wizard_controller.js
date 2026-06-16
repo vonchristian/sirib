@@ -136,6 +136,24 @@ export default class extends Controller {
       }
     })
 
+    currentStep.querySelectorAll(".id-image-input").forEach((hidden) => {
+      const wrapper = hidden.closest(".field-group")
+      if (!wrapper) return
+      const existing = wrapper.querySelector(".field-error")
+      if (existing) existing.remove()
+      wrapper.querySelector(".file-input-highlight")?.classList.remove("border-danger")
+
+      if (!hidden.value.trim()) {
+        valid = false
+        const highlight = wrapper.querySelector(".file-input-highlight")
+        if (highlight) highlight.classList.add("border-danger")
+        const msg = document.createElement("p")
+        msg.className = "field-error mt-1 text-xs text-danger"
+        msg.textContent = "Please upload an image"
+        wrapper.appendChild(msg)
+      }
+    })
+
     if (!valid) {
       const firstInvalid = currentStep.querySelector(".border-danger")
       firstInvalid?.focus()
@@ -195,13 +213,13 @@ export default class extends Controller {
         '<div class="field-group">' +
           '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Front of ID *</label>' +
           '<input type="hidden" name="membership_application[identifications][][front_image]" value="" class="id-image-input">' +
-          '<input type="file" accept="image/*" required data-action="change->wizard#handleIdImage" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+          '<input type="file" accept="image/*" data-action="change->wizard#handleIdImage" class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
           '<img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">' +
         '</div>' +
         '<div class="field-group">' +
           '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Back of ID *</label>' +
           '<input type="hidden" name="membership_application[identifications][][back_image]" value="" class="id-image-input">' +
-          '<input type="file" accept="image/*" required data-action="change->wizard#handleIdImage" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+          '<input type="file" accept="image/*" data-action="change->wizard#handleIdImage" class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
           '<img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">' +
         '</div>' +
       '</div>' +
