@@ -109,7 +109,8 @@
         <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">At least one BIR identification is required.</p>
 
         <div id="identifications" class="space-y-4">
-          <% @application.identifications.each_with_index do |id, idx| %>
+          <% entries = @application.identifications.presence || [{}] %>
+          <% entries.each_with_index do |id, idx| %>
             <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 identification-entry">
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div class="field-group">
@@ -152,7 +153,8 @@
         <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">Specify your source(s) of income. You can add multiple sources.</p>
 
         <div id="sources-of-income" class="space-y-4">
-          <% @application.sources_of_income.each_with_index do |src, idx| %>
+          <% entries = @application.sources_of_income.presence || [{}] %>
+          <% entries.each_with_index do |src, idx| %>
             <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 income-entry">
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div class="field-group">

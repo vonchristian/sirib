@@ -33,6 +33,7 @@ class MembershipApplication < ApplicationRecord
   end
 
   before_validation :assign_uuid, on: :create
+  before_save :reject_blank_entries
 
   scope :draft, -> { where(status: "draft") }
   scope :completed, -> { where(status: "completed") }
@@ -57,5 +58,10 @@ class MembershipApplication < ApplicationRecord
 
   def assign_uuid
     self.uuid ||= SecureRandom.uuid
+  end
+
+  def reject_blank_entries
+    self.identifications = identifications.reject { |e| e.values.all?(&:blank?) }
+    self.sources_of_income = sources_of_income.reject { |e| e.values.all?(&:blank?) }
   end
 end

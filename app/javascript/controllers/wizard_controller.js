@@ -151,6 +151,8 @@ export default class extends Controller {
       const clone = lastEntry.cloneNode(true)
       clone.querySelectorAll("input, select").forEach((el) => { el.value = "" })
       container.appendChild(clone)
+    } else {
+      container.insertAdjacentHTML("beforeend", this.identificationTemplate())
     }
   }
 
@@ -161,7 +163,59 @@ export default class extends Controller {
       const clone = lastEntry.cloneNode(true)
       clone.querySelectorAll("input, select").forEach((el) => { el.value = "" })
       container.appendChild(clone)
+    } else {
+      container.insertAdjacentHTML("beforeend", this.incomeTemplate())
     }
+  }
+
+  identificationTemplate() {
+    return '<div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 identification-entry">' +
+      '<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">' +
+        '<div class="field-group">' +
+          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">ID Type</label>' +
+          '<select name="membership_application[identifications][][id_type]" required class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+            '<option value="">Select ID type</option>' +
+            '<option value="BIR">Bir</option>' +
+            '<option value="UMID">Umid</option>' +
+            '<option value="Passport">Passport</option>' +
+            '<option value="Driver\'s License">Driver\'s License</option>' +
+            '<option value="PRC ID">Prc Id</option>' +
+            '<option value="Postal ID">Postal Id</option>' +
+            '<option value="Voter\'s ID">Voter\'s Id</option>' +
+            '<option value="National ID">National Id</option>' +
+            '<option value="Others">Others</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="field-group">' +
+          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">ID Number</label>' +
+          '<input type="text" name="membership_application[identifications][][id_number]" value="" required placeholder="ID number" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  }
+
+  incomeTemplate() {
+    return '<div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 income-entry">' +
+      '<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">' +
+        '<div class="field-group">' +
+          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Source of Income</label>' +
+          '<select name="membership_application[sources_of_income][][source_type]" required class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+            '<option value="">Select source</option>' +
+            '<option value="Employment">Employment</option>' +
+            '<option value="Self-Employed">Self-Employed</option>' +
+            '<option value="Business">Business</option>' +
+            '<option value="Remittances">Remittances</option>' +
+            '<option value="Pension">Pension</option>' +
+            '<option value="Investment">Investment</option>' +
+            '<option value="Others">Others</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="field-group">' +
+          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Monthly Income (PHP)</label>' +
+          '<input type="number" name="membership_application[sources_of_income][][monthly_income]" value="" required min="0" step="0.01" placeholder="0.00" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">' +
+        '</div>' +
+      '</div>' +
+    '</div>'
   }
 
   capturePhoto() {
