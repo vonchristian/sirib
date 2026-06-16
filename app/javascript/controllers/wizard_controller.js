@@ -4,13 +4,20 @@ export default class extends Controller {
   static targets = [
     "step", "nextBtn", "backBtn", "submitBtn",
     "video", "preview", "capturePlaceholder", "webcamError", "profileInput",
-    "currentStep"
+    "currentStep", "photoCounter", "photoGallery"
   ]
   static values = { currentStep: { type: Number, default: 0 } }
 
   connect() {
     const step = parseInt(this.element.dataset.currentStep, 10)
     this.currentStepValue = isNaN(step) ? 0 : Math.min(4, Math.max(0, step))
+    this.photos = []
+    try {
+      const existing = JSON.parse(this.profileInputTarget.value || "[]")
+      if (Array.isArray(existing)) this.photos = existing
+    } catch (e) {
+      this.photos = []
+    }
     this.syncURL()
     this.showStep()
   }
@@ -118,21 +125,62 @@ export default class extends Controller {
     canvas.getContext("2d").drawImage(video, 0, 0)
 
     const dataUrl = canvas.toDataURL("image/jpeg", 0.9)
-    this.profileInputTarget.value = dataUrl
-    this.previewCapturedPhoto(dataUrl)
+    this.photos.push(dataUrl)
+    this.updatePhotosField()
+    this.renderPhotoGallery()
+
+    this.previewTarget.src = dataUrl
+    this.previewTarget.classList.remove("hidden")
+    setTimeout(() => {
+      this.previewTarget.classList.add("hidden")
+    }, 800)
   }
 
-  previewCapturedPhoto(dataUrl) {
-    const preview = this.previewTarget
-    preview.src = dataUrl
-    preview.classList.remove("hidden")
-    this.capturePlaceholderTarget?.classList.add("hidden")
+  removePhoto(event) {
+    const index = parseInt(event.currentTarget.dataset.index, 10)
+    this.photos.splice(index, 1)
+    this.updatePhotosField()
+    this.renderPhotoGallery()
   }
 
-  retakePhoto() {
-    this.previewTarget.classList.add("hidden")
-    this.capturePlaceholderTarget?.classList.add("hidden")
-    this.profileInputTarget.value = ""
+  renderPhotoGallery() {
+    const gallery = this.photoGalleryTarget
+    gallery.innerHTML = ""
+
+    this.photos.forEach((dataUrl, index) => {
+      const wrapper = document.createElement("div")
+      wrapper.className = "relative group"
+
+      const img = document.createElement("img")
+      img.src = dataUrl
+      img.className = "h-16 w-full rounded-md border border-border bg-gray-50 object-cover dark:border-gray-700"
+      img.alt = `Photo ${index + 1}`
+
+      const removeBtn = document.createElement("button")
+      removeBtn.type = "button"
+      removeBtn.dataset.index = index
+      removeBtn.dataset.action = "wizard#removePhoto"
+      removeBtn.className = "absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-danger text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+      removeBtn.innerHTML = "×"
+
+      wrapper.appendChild(img)
+      wrapper.appendChild(removeBtn)
+
+      const label = document.createElement("p")
+      label.className = "mt-0.5 text-center text-[10px] text-text-tertiary dark:text-gray-500"
+      label.textContent = `#${index + 1}`
+      wrapper.appendChild(label)
+
+      gallery.appendChild(wrapper)
+    })
+
+    if (this.hasPhotoCounterTarget) {
+      this.photoCounterTarget.textContent = `${this.photos.length} captured`
+    }
+  }
+
+  updatePhotosField() {
+    this.profileInputTarget.value = JSON.stringify(this.photos)
   }
 
   startWebcam() {

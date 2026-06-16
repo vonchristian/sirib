@@ -3,10 +3,19 @@ class MembershipApplication < ApplicationRecord
 
   attribute :identifications, :jsonb, default: []
   attribute :signature_specimens, :jsonb, default: []
+  attribute :profile_images, :jsonb, default: []
 
   validates :status, inclusion: { in: %w[draft completed approved rejected] }
 
   def signature_specimens=(value)
+    if value.is_a?(String)
+      super(JSON.parse(value))
+    else
+      super(value)
+    end
+  end
+
+  def profile_images=(value)
     if value.is_a?(String)
       super(JSON.parse(value))
     else
@@ -25,7 +34,7 @@ class MembershipApplication < ApplicationRecord
     when 1 then house_street? && barangay? && city? && province? && region?
     when 2 then identifications.any?
     when 3 then signature_specimens.length >= 3
-    when 4 then profile_image_data?
+    when 4 then profile_images.length >= 1
     else true
     end
   end

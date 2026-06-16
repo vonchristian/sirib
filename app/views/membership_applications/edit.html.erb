@@ -190,8 +190,8 @@
       </div>
 
       <div data-wizard-target="step" class="hidden">
-        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 5: Profile Photo</h2>
-        <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">Capture a photo using your webcam.</p>
+        <h2 class="text-lg font-semibold text-text-primary dark:text-white mb-4">Step 5: Profile Photos</h2>
+        <p class="mb-4 text-sm text-text-secondary dark:text-gray-400">Capture at least 1 photo using your webcam.</p>
 
         <div class="space-y-4">
           <div data-wizard-target="webcamError" class="hidden rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400">
@@ -213,7 +213,7 @@
               <img data-wizard-target="preview" class="hidden absolute inset-0 w-full h-full object-cover" />
             </div>
 
-            <%= f.hidden_field :profile_image_data, data: { wizard_target: "profileInput" } %>
+            <%= f.hidden_field :profile_images, value: @application.profile_images.to_json, data: { wizard_target: "profileInput" } %>
 
             <div class="flex gap-2">
               <button type="button"
@@ -222,13 +222,20 @@
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.161a47.474 47.474 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
                 </svg>
-                Capture Photo
+                Capture
               </button>
               <button type="button"
                       data-action="wizard#retakePhoto"
                       class="hidden rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
                 Retake
               </button>
+            </div>
+
+            <div data-wizard-target="photoCounter" class="text-xs text-text-tertiary dark:text-gray-500">
+              0 captured
+            </div>
+
+            <div data-wizard-target="photoGallery" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 w-full">
             </div>
           </div>
         </div>

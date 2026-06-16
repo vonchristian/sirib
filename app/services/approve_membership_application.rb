@@ -70,11 +70,14 @@ class ApproveMembershipApplication
   end
 
   def attach_profile_image(member)
-    data = @application.profile_image_data
-    return if data.blank?
+    images = @application.profile_images
+    return if images.blank?
 
-    decoded = Base64.decode64(data.sub("data:image/png;base64,", ""))
-    io = StringIO.new(decoded)
-    member.profile_image.attach(io: io, filename: "profile.png", content_type: "image/png")
+    images.each_with_index do |data, index|
+      next if data.blank?
+      decoded = Base64.decode64(data.sub("data:image/png;base64,", ""))
+      io = StringIO.new(decoded)
+      member.profile_image.attach(io: io, filename: "profile_#{index + 1}.png", content_type: "image/png")
+    end
   end
 end

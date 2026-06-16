@@ -58,8 +58,8 @@ RSpec.describe MembershipApplication do
       expect(app).to be_complete
     end
 
-    it "returns false when profile image is missing" do
-      app = build(:membership_application, profile_image_data: nil)
+    it "returns false when no profile images" do
+      app = build(:membership_application, profile_images: [])
       expect(app).not_to be_complete
     end
   end

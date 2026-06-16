@@ -59,7 +59,7 @@ class MembershipApplicationsController < ApplicationController
       :birth_date, :gender, :civil_status,
       :mobile_number, :email_address,
       :house_street, :barangay, :city, :province, :region, :zip_code,
-      :signature_specimens, :profile_image_data, :current_step,
+      :signature_specimens, :profile_images, :current_step,
       identifications: [:id_type, :id_number]
     )
   end
