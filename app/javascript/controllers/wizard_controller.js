@@ -191,7 +191,40 @@ export default class extends Controller {
           '<input type="text" name="membership_application[identifications][][id_number]" value="" required placeholder="ID number" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">' +
         '</div>' +
       '</div>' +
+      '<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">' +
+        '<div class="field-group">' +
+          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Front of ID *</label>' +
+          '<input type="hidden" name="membership_application[identifications][][front_image]" value="" class="id-image-input">' +
+          '<input type="file" accept="image/*" required data-action="change->wizard#handleIdImage" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+          '<img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">' +
+        '</div>' +
+        '<div class="field-group">' +
+          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Back of ID *</label>' +
+          '<input type="hidden" name="membership_application[identifications][][back_image]" value="" class="id-image-input">' +
+          '<input type="file" accept="image/*" required data-action="change->wizard#handleIdImage" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+          '<img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">' +
+        '</div>' +
+      '</div>' +
     '</div>'
+  }
+
+  handleIdImage(event) {
+    const file = event.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const container = event.target.closest(".field-group")
+      if (!container) return
+      const hidden = container.querySelector(".id-image-input")
+      if (hidden) hidden.value = e.target.result
+      const preview = container.querySelector(".id-image-preview")
+      if (preview) {
+        preview.src = e.target.result
+        preview.classList.remove("hidden")
+      }
+    }
+    reader.readAsDataURL(file)
   }
 
   incomeTemplate() {

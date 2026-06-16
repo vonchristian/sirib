@@ -49,12 +49,22 @@ class ApproveMembershipApplication
 
   def create_identifications(member)
     @application.identifications.each do |id|
-      MemberIdentification.create!(
+      record = MemberIdentification.create!(
         member: member,
         id_type: id["id_type"],
         id_number: id["id_number"]
       )
+      attach_id_image(record, id["front_image"], :file)
+      attach_id_image(record, id["back_image"], :back_file)
     end
+  end
+
+  def attach_id_image(record, data_url, attachment_name)
+    return if data_url.blank?
+    decoded = Base64.decode64(data_url.sub(/data:image\/\w+;base64,/, ""))
+    io = StringIO.new(decoded)
+    ext = data_url.match(/data:image\/(\w+);/) { |m| m[1] } || "jpg"
+    record.public_send(attachment_name).attach(io: io, filename: "#{attachment_name}_#{record.id_number}.#{ext}", content_type: "image/#{ext}")
   end
 
   def attach_signature(member)

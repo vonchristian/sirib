@@ -134,6 +134,42 @@
                          class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
                 </div>
               </div>
+              <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="field-group">
+                  <label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Front of ID *</label>
+                  <input type="hidden"
+                         name="membership_application[identifications][][front_image]"
+                         value="<%= id["front_image"] %>"
+                         class="id-image-input">
+                  <input type="file"
+                         accept="image/*"
+                         required
+                         data-action="change->wizard#handleIdImage"
+                         class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                  <% if id["front_image"].present? %>
+                    <img src="<%= id["front_image"] %>" class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700">
+                  <% else %>
+                    <img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">
+                  <% end %>
+                </div>
+                <div class="field-group">
+                  <label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Back of ID *</label>
+                  <input type="hidden"
+                         name="membership_application[identifications][][back_image]"
+                         value="<%= id["back_image"] %>"
+                         class="id-image-input">
+                  <input type="file"
+                         accept="image/*"
+                         required
+                         data-action="change->wizard#handleIdImage"
+                         class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                  <% if id["back_image"].present? %>
+                    <img src="<%= id["back_image"] %>" class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700">
+                  <% else %>
+                    <img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">
+                  <% end %>
+                </div>
+              </div>
             </div>
           <% end %>
         </div>

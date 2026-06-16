@@ -44,8 +44,26 @@
   <% if @application.identifications.any? %>
     <div style="margin-bottom: 14pt;">
       <% @application.identifications.each do |id| %>
-        <div style="display: inline-block; margin: 0 8pt 4pt 0; padding: 3pt 8pt; border: 0.5pt solid #ccc; border-radius: 3pt; font-size: 8pt;">
-          <strong><%= id["id_type"].titleize %></strong>: <%= id["id_number"] %>
+        <div style="margin-bottom: 6pt;">
+          <div style="display: inline-block; padding: 3pt 8pt; border: 0.5pt solid #ccc; border-radius: 3pt; font-size: 8pt;">
+            <strong><%= id["id_type"].titleize %></strong>: <%= id["id_number"] %>
+          </div>
+          <% if id["front_image"].present? || id["back_image"].present? %>
+            <div style="display: flex; gap: 8pt; margin-top: 4pt;">
+              <% if id["front_image"].present? %>
+                <div style="text-align: center;">
+                  <%= image_tag id["front_image"], style: "height: 48pt; width: 72pt; object-fit: cover; border: 0.5pt solid #ccc; border-radius: 2pt;" %>
+                  <div style="font-size: 6pt; color: #999; margin-top: 1pt;">Front</div>
+                </div>
+              <% end %>
+              <% if id["back_image"].present? %>
+                <div style="text-align: center;">
+                  <%= image_tag id["back_image"], style: "height: 48pt; width: 72pt; object-fit: cover; border: 0.5pt solid #ccc; border-radius: 2pt;" %>
+                  <div style="font-size: 6pt; color: #999; margin-top: 1pt;">Back</div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>

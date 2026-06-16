@@ -7,6 +7,7 @@ class MemberIdentification < ApplicationRecord
 
   belongs_to :member
   has_one_attached :file
+  has_one_attached :back_file
 
   validates :id_type, :id_number, presence: true
   validates :id_type, inclusion: { in: ID_TYPES }
