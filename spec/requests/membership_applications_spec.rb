@@ -69,6 +69,16 @@ RSpec.describe "MembershipApplications" do
     end
   end
 
+  describe "GET /membership_applications/:uuid/download_pdf" do
+    it "returns a PDF file" do
+      app = create(:membership_application)
+      get download_pdf_membership_application_path(app.uuid)
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to eq("application/pdf")
+      expect(response.header["Content-Disposition"]).to include("membership_application_")
+    end
+  end
+
   describe "POST /membership_applications/:uuid/approve" do
     it "approves a complete application and creates a member" do
       app = create(:membership_application, status: "completed")

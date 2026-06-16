@@ -3,15 +3,7 @@
 
 <% content_for :head do %>
   <style>
-    @media print {
-      @page { margin: 0.5in; size: letter; }
-      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
-      .no-print { display: none !important; }
-      .screen-only { display: none !important; }
-      .print-only { display: block !important; }
-    }
-    .screen-only { display: block; }
-    .print-only { display: none; }
+    @media print { .no-print { display: none !important; } }
   </style>
 <% end %>
 
@@ -24,13 +16,13 @@
       <p class="text-sm text-text-tertiary dark:text-gray-500">Application #<%= @application.uuid.first(8).upcase %></p>
     </div>
     <div class="flex items-center gap-2">
-      <button onclick="window.print()"
-              class="inline-flex items-center gap-2 rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
+      <%= link_to download_pdf_membership_application_path(@application.uuid),
+            class: "inline-flex items-center gap-2 rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" do %>
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
         </svg>
-        Print / PDF
-      </button>
+        Download PDF
+      <% end %>
       <% if @application.status == "draft" %>
         <%= link_to "Resume",
               edit_membership_application_path(@application.uuid),
@@ -191,93 +183,4 @@
   </div>
 </div>
 
-<div class="print-only" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 7in; margin: 0 auto; color: #1a1a1a; font-size: 9pt; line-height: 1.4;">
-  <div style="border-bottom: 2pt solid #1a1a1a; padding-bottom: 10pt; margin-bottom: 14pt;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-      <div>
-        <div style="font-size: 13pt; font-weight: 700; letter-spacing: 0.3pt; text-transform: uppercase;"><%= cooperative.name %></div>
-        <div style="font-size: 8pt; color: #555; margin-top: 3pt;"><%= cooperative.address.presence %></div>
-      </div>
-      <div style="text-align: right; font-size: 8pt; color: #555; line-height: 1.6;">
-        <% if cooperative.contact_number.present? %><div>Tel: <%= cooperative.contact_number %></div><% end %>
-        <% if cooperative.registration_number.present? %><div>Reg: <%= cooperative.registration_number %></div><% end %>
-      </div>
-    </div>
-  </div>
 
-  <div style="text-align: center; font-size: 10pt; font-weight: 600; letter-spacing: 1pt; text-transform: uppercase; margin-bottom: 14pt;">Membership Application</div>
-
-  <div style="display: flex; gap: 20pt; margin-bottom: 14pt;">
-    <div style="flex: 1;">
-      <div style="font-size: 7pt; font-weight: 700; letter-spacing: 0.8pt; text-transform: uppercase; color: #888; margin-bottom: 6pt;">Applicant</div>
-      <div style="font-size: 10pt; font-weight: 600; margin-bottom: 4pt;"><%= [@application.first_name, @application.middle_name, @application.last_name].compact.join(" ") %><%= " #{@application.suffix}" if @application.suffix.present? %></div>
-      <div style="font-size: 8pt; color: #555;"><%= @application.gender&.titleize %> &middot; <%= @application.civil_status&.titleize %></div>
-      <div style="font-size: 8pt; color: #555;">Born <%= @application.birth_date %></div>
-    </div>
-    <div style="flex: 1;">
-      <div style="font-size: 7pt; font-weight: 700; letter-spacing: 0.8pt; text-transform: uppercase; color: #888; margin-bottom: 6pt;">Contact</div>
-      <div style="font-size: 8pt; line-height: 1.7;"><%= @application.mobile_number %></div>
-      <div style="font-size: 8pt; line-height: 1.7;"><%= @application.email_address.presence || "—" %></div>
-    </div>
-  </div>
-
-  <hr style="border: none; border-top: 0.5pt solid #ccc; margin: 0 0 10pt 0;">
-
-  <div style="font-size: 7pt; font-weight: 700; letter-spacing: 0.8pt; text-transform: uppercase; color: #888; margin-bottom: 6pt;">Address</div>
-  <div style="font-size: 8pt; line-height: 1.7; margin-bottom: 14pt;">
-    <%= @application.house_street %><% if @application.barangay.present? %>, <%= @application.barangay %><% end %><br>
-    <%= @application.city %>, <%= @application.province %><% if @application.region.present? %>, <%= @application.region %><% end %>
-  </div>
-
-  <hr style="border: none; border-top: 0.5pt solid #ccc; margin: 0 0 10pt 0;">
-
-  <div style="font-size: 7pt; font-weight: 700; letter-spacing: 0.8pt; text-transform: uppercase; color: #888; margin-bottom: 6pt;">Identifications</div>
-  <% if @application.identifications.any? %>
-    <div style="margin-bottom: 14pt;">
-      <% @application.identifications.each do |id| %>
-        <div style="display: inline-block; margin: 0 8pt 4pt 0; padding: 3pt 8pt; border: 0.5pt solid #ccc; border-radius: 3pt; font-size: 8pt;">
-          <strong><%= id["id_type"].titleize %></strong>: <%= id["id_number"] %>
-        </div>
-      <% end %>
-    </div>
-  <% else %>
-    <div style="font-size: 8pt; color: #999; font-style: italic; margin-bottom: 14pt;">None provided</div>
-  <% end %>
-
-  <% if @application.signature_specimens.any? %>
-    <hr style="border: none; border-top: 0.5pt solid #ccc; margin: 0 0 10pt 0;">
-    <div style="font-size: 7pt; font-weight: 700; letter-spacing: 0.8pt; text-transform: uppercase; color: #888; margin-bottom: 6pt;">Signature Specimens</div>
-    <div style="display: flex; gap: 12pt; margin-bottom: 14pt;">
-      <% @application.signature_specimens.each_with_index do |data_url, index| %>
-        <div style="text-align: center;">
-          <div style="border: 0.5pt solid #ccc; border-radius: 3pt; padding: 4pt; background: #fafafa;">
-            <%= image_tag data_url, style: "height: 32pt; width: 96pt; object-fit: contain;" %>
-          </div>
-          <div style="font-size: 7pt; color: #888; margin-top: 2pt;">#<%= index + 1 %></div>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
-
-  <% if @application.profile_images.any? %>
-    <hr style="border: none; border-top: 0.5pt solid #ccc; margin: 0 0 10pt 0;">
-    <div style="font-size: 7pt; font-weight: 700; letter-spacing: 0.8pt; text-transform: uppercase; color: #888; margin-bottom: 6pt;">Profile Photos</div>
-    <div style="display: flex; gap: 10pt; margin-bottom: 14pt;">
-      <% @application.profile_images.each_with_index do |data_url, index| %>
-        <div style="text-align: center;">
-          <%= image_tag data_url, style: "height: 48pt; width: 48pt; border-radius: 50%; border: 0.5pt solid #ccc; object-fit: cover;" %>
-          <div style="font-size: 7pt; color: #888; margin-top: 2pt;">#<%= index + 1 %></div>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
-
-  <div style="margin-top: 20pt; border-top: 0.5pt solid #ccc; padding-top: 6pt; font-size: 6.5pt; color: #999;">
-    <div style="display: flex; justify-content: space-between;">
-      <span>UUID: <%= @application.uuid %></span>
-      <span>Status: <%= @application.status.titleize %></span>
-      <span>Filed: <%= @application.created_at.strftime("%b %d, %Y") %></span>
-      <span>Printed: <%= Time.current.strftime("%b %d, %Y") %></span>
-    </div>
-  </div>
-</div>

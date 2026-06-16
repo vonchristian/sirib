@@ -41,6 +41,16 @@ class MembershipApplicationsController < ApplicationController
     @application = MembershipApplication.find_by!(uuid: params[:uuid])
   end
 
+  def download_pdf
+    @application = MembershipApplication.find_by!(uuid: params[:uuid])
+    html = render_to_string("download_pdf", layout: "pdf")
+    pdf = Grover.new(html, format: "Letter").to_pdf
+    send_data pdf,
+      filename: "membership_application_#{@application.uuid.first(8)}.pdf",
+      type: "application/pdf",
+      disposition: "attachment"
+  end
+
   def approve
     @application = MembershipApplication.find_by!(uuid: params[:uuid])
 

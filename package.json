@@ -11,5 +11,8 @@
   "scripts": {
     "test:e2e": "bin/e2e-setup && npx playwright test",
     "test:e2e:ui": "bin/e2e-setup && npx playwright test --ui"
+  },
+  "dependencies": {
+    "puppeteer": "^25.1.0"
   }
 }

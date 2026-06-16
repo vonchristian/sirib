@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       get :edit
       patch :update
       post :approve
+      get :download_pdf
     end
   end
   get "applications", to: "membership_applications#index", as: :applications
