@@ -6,4 +6,35 @@ User.find_or_create_by!(email_address: "test@example.com") do |user|
   user.password = "password123"
 end
 
-puts "E2E setup complete: test user created"
+# Seed time deposit product
+Treasury::TimeDepositProduct.find_or_create_by!(name: "30-Day Time Deposit") do |p|
+  p.minimum_deposit_cents = 1_000_00
+  p.interest_rate = 0.0350
+  p.term_in_days = 30
+  p.status = "active"
+end
+
+# Seed accounting accounts for treasury journal entries
+cash_ledger = Accounting::Ledger.find_or_create_by!(account_code: "11100") do |l|
+  l.name = "Cash"
+  l.account_type = "asset"
+end
+
+deposit_ledger = Accounting::Ledger.find_or_create_by!(account_code: "21100") do |l|
+  l.name = "Deposit Liabilities"
+  l.account_type = "liability"
+end
+
+Accounting::Account.find_or_create_by!(account_code: "11110") do |a|
+  a.name = "Cash on Hand"
+  a.account_type = "asset"
+  a.ledger = cash_ledger
+end
+
+Accounting::Account.find_or_create_by!(account_code: "21120") do |a|
+  a.name = "Time Deposits"
+  a.account_type = "liability"
+  a.ledger = deposit_ledger
+end
+
+puts "E2E setup complete: test user, time deposit product, and accounts created"

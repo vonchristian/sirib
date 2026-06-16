@@ -1,0 +1,43 @@
+<div class="rounded-md border border-border bg-surface">
+  <div class="px-6 py-5 border-b border-border">
+    <h2 class="text-base font-semibold text-text-primary">Time Deposit Opened</h2>
+    <p class="mt-0.5 text-sm text-text-secondary">Your time deposit has been opened successfully.</p>
+  </div>
+
+  <div class="px-6 py-5 space-y-4">
+    <dl class="divide-y divide-border">
+      <div class="flex justify-between py-3">
+        <dt class="text-sm text-text-secondary">Product</dt>
+        <dd class="text-sm font-medium text-text-primary"><%= @deposit.time_deposit_product.name %></dd>
+      </div>
+      <div class="flex justify-between py-3">
+        <dt class="text-sm text-text-secondary">Amount</dt>
+        <dd class="text-sm font-medium text-text-primary"><%= @deposit.amount.format %></dd>
+      </div>
+      <div class="flex justify-between py-3">
+        <dt class="text-sm text-text-secondary">Interest Rate</dt>
+        <dd class="text-sm font-medium text-text-primary"><%= number_to_percentage(@deposit.interest_rate * 100, precision: 2) %></dd>
+      </div>
+      <div class="flex justify-between py-3">
+        <dt class="text-sm text-text-secondary">Interest Earnings</dt>
+        <dd class="text-sm font-medium text-green-600"><%= @deposit.interest_earned.format %></dd>
+      </div>
+      <div class="flex justify-between py-3">
+        <dt class="text-sm text-text-secondary">Maturity Date</dt>
+        <dd class="text-sm font-medium text-text-primary"><%= l @deposit.matured_on, format: :long if @deposit.matured_on %></dd>
+      </div>
+      <div class="flex justify-between py-3">
+        <dt class="text-sm text-text-secondary">Status</dt>
+        <dd class="text-sm font-medium text-text-primary"><%= @deposit.status.titleize %></dd>
+      </div>
+      <div class="flex justify-between py-3">
+        <dt class="text-sm text-text-secondary">Opened At</dt>
+        <dd class="text-sm font-medium text-text-primary"><%= l @deposit.opened_at, format: :long if @deposit.opened_at %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="px-6 py-4 flex items-center justify-end gap-3 border-t border-border">
+    <%= link_to "Back to Time Deposits", treasury_time_deposits_path, class: "rounded-md border border-border px-4 py-2 text-sm font-medium text-text-primary hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" %>
+  </div>
+</div>
