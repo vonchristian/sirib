@@ -214,13 +214,25 @@ export default class extends Controller {
           '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Front of ID *</label>' +
           '<input type="hidden" name="membership_application[identifications][][front_image]" value="" class="id-image-input">' +
           '<input type="file" accept="image/*" data-action="change->wizard#handleIdImage" class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
-          '<img data-action="click->image-modal#open" data-image-modal-group="id" class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow hidden">' +
+          '<div class="group relative">' +
+            '<img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">' +
+            '<button type="button" data-action="click->image-modal#open" data-image-modal-group="id" class="id-image-enlarge absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75 hidden">' +
+              '<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6m0 0h-3m3 0v-3m0 3v3" /></svg>' +
+              'View Larger' +
+            '</button>' +
+          '</div>' +
         '</div>' +
         '<div class="field-group">' +
           '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Back of ID *</label>' +
           '<input type="hidden" name="membership_application[identifications][][back_image]" value="" class="id-image-input">' +
           '<input type="file" accept="image/*" data-action="change->wizard#handleIdImage" class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
-          '<img data-action="click->image-modal#open" data-image-modal-group="id" class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow hidden">' +
+          '<div class="group relative">' +
+            '<img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">' +
+            '<button type="button" data-action="click->image-modal#open" data-image-modal-group="id" class="id-image-enlarge absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75 hidden">' +
+              '<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6m0 0h-3m3 0v-3m0 3v3" /></svg>' +
+              'View Larger' +
+            '</button>' +
+          '</div>' +
         '</div>' +
       '</div>' +
     '</div>'
@@ -241,6 +253,8 @@ export default class extends Controller {
         preview.src = e.target.result
         preview.classList.remove("hidden")
       }
+      const enlarge = container.querySelector(".id-image-enlarge")
+      if (enlarge) enlarge.classList.remove("hidden")
     }
     reader.readAsDataURL(file)
   }
@@ -303,14 +317,22 @@ export default class extends Controller {
 
     this.photos.forEach((dataUrl, index) => {
       const wrapper = document.createElement("div")
-      wrapper.className = "relative group"
+      wrapper.className = "relative"
+
+      const imgWrapper = document.createElement("div")
+      imgWrapper.className = "group relative"
 
       const img = document.createElement("img")
       img.src = dataUrl
-      img.className = "h-16 w-full rounded-md border border-border bg-gray-50 object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow"
+      img.className = "h-16 w-full rounded-md border border-border bg-gray-50 object-cover dark:border-gray-700"
       img.alt = `Photo ${index + 1}`
-      img.dataset.action = "click->image-modal#open"
-      img.dataset.imageModalGroup = "profile"
+
+      const enlargeBtn = document.createElement("button")
+      enlargeBtn.type = "button"
+      enlargeBtn.dataset.action = "click->image-modal#open"
+      enlargeBtn.dataset.imageModalGroup = "profile"
+      enlargeBtn.className = "absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75"
+      enlargeBtn.innerHTML = '<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6m0 0h-3m3 0v-3m0 3v3" /></svg> View Larger'
 
       const removeBtn = document.createElement("button")
       removeBtn.type = "button"
@@ -319,7 +341,9 @@ export default class extends Controller {
       removeBtn.className = "absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-danger text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
       removeBtn.innerHTML = "×"
 
-      wrapper.appendChild(img)
+      imgWrapper.appendChild(img)
+      imgWrapper.appendChild(enlargeBtn)
+      wrapper.appendChild(imgWrapper)
       wrapper.appendChild(removeBtn)
 
       const label = document.createElement("p")

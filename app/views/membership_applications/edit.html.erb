@@ -147,9 +147,17 @@
                          data-action="change->wizard#handleIdImage"
                          class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
                   <% if id["front_image"].present? %>
-                    <img src="<%= id["front_image"] %>"
-                         class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow"
-                         data-action="click->image-modal#open">
+                    <div class="group relative">
+                      <img src="<%= id["front_image"] %>"
+                           class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700">
+                      <button type="button"
+                              data-action="click->image-modal#open"
+                              data-image-modal-group="id"
+                              class="id-image-enlarge absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75">
+                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6m0 0h-3m3 0v-3m0 3v3" /></svg>
+                        View Larger
+                      </button>
+                    </div>
                   <% else %>
                     <img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">
                   <% end %>
@@ -164,13 +172,21 @@
                          accept="image/*"
                          data-action="change->wizard#handleIdImage"
                          class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                   <% if id["back_image"].present? %>
-                     <img src="<%= id["back_image"] %>"
-                          class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow"
-                          data-action="click->image-modal#open">
-                   <% else %>
-                     <img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">
-                   <% end %>
+                  <% if id["back_image"].present? %>
+                    <div class="group relative">
+                      <img src="<%= id["back_image"] %>"
+                           class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700">
+                      <button type="button"
+                              data-action="click->image-modal#open"
+                              data-image-modal-group="id"
+                              class="id-image-enlarge absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75">
+                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6m0 0h-3m3 0v-3m0 3v3" /></svg>
+                        View Larger
+                      </button>
+                    </div>
+                  <% else %>
+                    <img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">
+                  <% end %>
                 </div>
               </div>
             </div>

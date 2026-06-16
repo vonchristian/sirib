@@ -143,17 +143,33 @@
                     <% if id["front_image"].present? %>
                       <div>
                         <p class="text-[10px] text-text-tertiary dark:text-gray-500 mb-1">Front</p>
-                        <%= image_tag id["front_image"],
-                              class: "h-20 w-32 rounded-md border border-border object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow",
-                              data: { action: "click->image-modal#open", image_modal_group: "id" } %>
+                        <div class="group relative w-32">
+                          <%= image_tag id["front_image"],
+                                class: "h-20 w-full rounded-md border border-border object-cover dark:border-gray-700" %>
+                          <button type="button"
+                                  data-action="click->image-modal#open"
+                                  data-image-modal-group="id"
+                                  class="absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75">
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6m0 0h-3m3 0v-3m0 3v3" /></svg>
+                            View Larger
+                          </button>
+                        </div>
                       </div>
                     <% end %>
                     <% if id["back_image"].present? %>
                       <div>
                         <p class="text-[10px] text-text-tertiary dark:text-gray-500 mb-1">Back</p>
-                        <%= image_tag id["back_image"],
-                              class: "h-20 w-32 rounded-md border border-border object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow",
-                              data: { action: "click->image-modal#open", image_modal_group: "id" } %>
+                        <div class="group relative w-32">
+                          <%= image_tag id["back_image"],
+                                class: "h-20 w-full rounded-md border border-border object-cover dark:border-gray-700" %>
+                          <button type="button"
+                                  data-action="click->image-modal#open"
+                                  data-image-modal-group="id"
+                                  class="absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75">
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6m0 0h-3m3 0v-3m0 3v3" /></svg>
+                            View Larger
+                          </button>
+                        </div>
                       </div>
                     <% end %>
                   </div>
@@ -254,9 +270,17 @@
           <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
             <% @application.profile_images.each_with_index do |data_url, index| %>
               <div>
-                <%= image_tag data_url,
-                      class: "h-24 w-full rounded-lg border border-border bg-gray-50 object-cover dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-shadow",
-                      data: { action: "click->image-modal#open", image_modal_group: "profile" } %>
+                <div class="group relative">
+                  <%= image_tag data_url,
+                        class: "h-24 w-full rounded-lg border border-border bg-gray-50 object-cover dark:border-gray-700" %>
+                  <button type="button"
+                          data-action="click->image-modal#open"
+                          data-image-modal-group="profile"
+                          class="absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6m0 0h-3m3 0v-3m0 3v3" /></svg>
+                    View Larger
+                  </button>
+                </div>
                 <p class="mt-1 text-[10px] text-center text-text-tertiary dark:text-gray-500">Photo #<%= index + 1 %></p>
               </div>
             <% end %>
