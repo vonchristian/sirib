@@ -60,7 +60,6 @@ class MembersController < ApplicationController
 
     decoded = Base64.decode64(data_url.sub("data:image/png;base64,", ""))
     io = StringIO.new(decoded)
-    io.original_filename = "signature.png"
-    @member.signature.attach(io: io, filename: "signature.png", content_type: "image/png")
+    @member.signatures.attach(io: io, filename: "signature.png", content_type: "image/png")
   end
 end

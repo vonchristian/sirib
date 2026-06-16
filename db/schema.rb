@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_16_123705) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_130615) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -169,10 +169,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_123705) do
     t.string "region"
     t.string "zip_code"
     t.jsonb "identifications", default: []
-    t.text "signature_data"
     t.text "profile_image_data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "signature_specimens", default: [], null: false
+    t.integer "current_step", default: 0, null: false
     t.index ["cooperative_id"], name: "index_membership_applications_on_cooperative_id"
     t.index ["uuid"], name: "index_membership_applications_on_uuid", unique: true
   end

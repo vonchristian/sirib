@@ -48,9 +48,14 @@ RSpec.describe MembershipApplication do
       expect(app).not_to be_complete
     end
 
-    it "returns false when signature is missing" do
-      app = build(:membership_application, signature_data: nil)
+    it "returns false when fewer than 3 signature specimens" do
+      app = build(:membership_application, signature_specimens: [])
       expect(app).not_to be_complete
+    end
+
+    it "returns true with 3 or more signature specimens" do
+      app = build(:membership_application, signature_specimens: %w[a b c d])
+      expect(app).to be_complete
     end
 
     it "returns false when profile image is missing" do

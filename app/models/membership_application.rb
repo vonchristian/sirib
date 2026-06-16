@@ -1,7 +1,18 @@
 class MembershipApplication < ApplicationRecord
   belongs_to :cooperative
 
+  attribute :identifications, :jsonb, default: []
+  attribute :signature_specimens, :jsonb, default: []
+
   validates :status, inclusion: { in: %w[draft completed approved rejected] }
+
+  def signature_specimens=(value)
+    if value.is_a?(String)
+      super(JSON.parse(value))
+    else
+      super(value)
+    end
+  end
 
   before_validation :assign_uuid, on: :create
 
@@ -13,7 +24,7 @@ class MembershipApplication < ApplicationRecord
     when 0 then first_name? && last_name? && birth_date? && gender? && civil_status?
     when 1 then house_street? && barangay? && city? && province? && region?
     when 2 then identifications.any?
-    when 3 then signature_data?
+    when 3 then signature_specimens.length >= 3
     when 4 then profile_image_data?
     else true
     end

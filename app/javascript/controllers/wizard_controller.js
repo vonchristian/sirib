@@ -3,11 +3,15 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "step", "nextBtn", "backBtn", "submitBtn",
-    "video", "preview", "capturePlaceholder", "webcamError", "profileInput"
+    "video", "preview", "capturePlaceholder", "webcamError", "profileInput",
+    "currentStep"
   ]
   static values = { currentStep: { type: Number, default: 0 } }
 
   connect() {
+    const step = parseInt(this.element.dataset.currentStep, 10)
+    this.currentStepValue = isNaN(step) ? 0 : Math.min(4, Math.max(0, step))
+    this.syncURL()
     this.showStep()
   }
 
@@ -44,10 +48,32 @@ export default class extends Controller {
       this.submitBtnTarget.classList.toggle("hidden", this.currentStepValue !== this.stepTargets.length - 1)
     }
 
+    if (this.currentStepValue === 3) {
+      this.element.querySelector("[data-controller='signature-pad']")
+        ?.dispatchEvent(new CustomEvent("signature-pad:resize"))
+    }
+
     if (this.currentStepValue === 4) {
       this.startWebcam()
     } else {
       this.stopWebcam()
+    }
+
+    this.syncURL()
+    this.updateCurrentStepField()
+  }
+
+  syncURL() {
+    const url = new URL(window.location)
+    if (parseInt(url.searchParams.get("step"), 10) !== this.currentStepValue) {
+      url.searchParams.set("step", this.currentStepValue)
+      history.replaceState({ step: this.currentStepValue }, "", url.toString())
+    }
+  }
+
+  updateCurrentStepField() {
+    if (this.hasCurrentStepTarget) {
+      this.currentStepTarget.value = this.currentStepValue
     }
   }
 
@@ -117,6 +143,7 @@ export default class extends Controller {
         this.stream = stream
         if (this.hasVideoTarget) {
           this.videoTarget.srcObject = stream
+          this.videoTarget.play()
         }
       })
       .catch(() => {

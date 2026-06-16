@@ -26,6 +26,20 @@ RSpec.describe "MembershipApplications" do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Step 1 of 5")
     end
+
+    it "renders the specified step when ?step=N is given" do
+      app = create(:membership_application)
+      get edit_membership_application_path(app.uuid, step: 2)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Step 3: Identifications")
+    end
+
+    it "falls back to the saved current_step when no ?step param" do
+      app = create(:membership_application, current_step: 3)
+      get edit_membership_application_path(app.uuid)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Step 4: Signature Specimens")
+    end
   end
 
   describe "PATCH /membership_applications/:uuid" do
@@ -34,7 +48,7 @@ RSpec.describe "MembershipApplications" do
       patch membership_application_path(app.uuid), params: {
         membership_application: { first_name: "Pedro" }
       }
-      expect(response).to redirect_to(edit_membership_application_path(app.uuid))
+      expect(response).to redirect_to(edit_membership_application_path(app.uuid, step: 0))
       expect(app.reload.first_name).to eq("Pedro")
     end
   end

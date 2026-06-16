@@ -58,12 +58,15 @@ class ApproveMembershipApplication
   end
 
   def attach_signature(member)
-    data = @application.signature_data
-    return if data.blank?
+    specimens = @application.signature_specimens
+    return if specimens.blank?
 
-    decoded = Base64.decode64(data.sub("data:image/png;base64,", ""))
-    io = StringIO.new(decoded)
-    member.signature.attach(io: io, filename: "signature.png", content_type: "image/png")
+    specimens.each_with_index do |data, index|
+      next if data.blank?
+      decoded = Base64.decode64(data.sub("data:image/png;base64,", ""))
+      io = StringIO.new(decoded)
+      member.signatures.attach(io: io, filename: "signature_#{index + 1}.png", content_type: "image/png")
+    end
   end
 
   def attach_profile_image(member)

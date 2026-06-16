@@ -1,7 +1,7 @@
 class Member < ApplicationRecord
   has_one :address, class_name: "MemberAddress", dependent: :destroy
   has_many :identifications, class_name: "MemberIdentification", dependent: :destroy
-  has_one_attached :signature
+  has_many_attached :signatures
   has_one_attached :profile_image
 
   accepts_nested_attributes_for :address, allow_destroy: true

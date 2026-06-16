@@ -19,12 +19,13 @@ RSpec.describe ApproveMembershipApplication do
       expect(app.reload.status).to eq("approved")
     end
 
-    it "attaches signature and profile image" do
+    it "attaches all signature specimens and profile image" do
       app = create(:membership_application, status: "completed")
 
       member = described_class.call(app)
 
-      expect(member.signature).to be_attached
+      expect(member.signatures).to be_attached
+      expect(member.signatures.count).to eq(3)
       expect(member.profile_image).to be_attached
     end
   end
