@@ -1,0 +1,64 @@
+<% content_for :page_title, "Loan Applications" %>
+<% content_for :page_subtitle, "Manage loan applications" %>
+
+<div class="animate-fade-in">
+  <div class="mb-4 flex items-center justify-between">
+    <span class="text-sm text-text-secondary"><%= @applications.size %> application(s)</span>
+    <%= link_to "New Application", new_loans_application_path, class: "btn-primary" %>
+  </div>
+
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+    <table class="min-w-full text-sm">
+      <thead>
+        <tr class="border-b border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50">
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">ID</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Member</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Product</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Amount</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Status</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Created</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border dark:divide-gray-800">
+        <% if @applications.any? %>
+          <% @applications.each do |app| %>
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+              <td class="px-4 py-3"><code class="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono dark:bg-gray-800"><%= app.reference_number || app.uuid.first(8).upcase %></code></td>
+              <td class="px-4 py-3 font-medium text-text-primary dark:text-white"><%= app.member&.name || "—" %></td>
+              <td class="px-4 py-3 text-text-secondary"><%= app.loan_product&.name %></td>
+              <td class="px-4 py-3 text-right text-text-secondary"><%= number_to_currency(app.amount_cents.to_f / 100, unit: "PHP ") %></td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
+                  <%= case app.status
+                  when 'draft' then 'bg-warning-50 text-warning'
+                  when 'submitted' then 'bg-primary-50 text-primary'
+                  when 'verified' then 'bg-blue-50 text-blue-700'
+                  when 'approved' then 'bg-positive-50 text-positive'
+                  when 'rejected' then 'bg-danger-50 text-danger'
+                  when 'disbursed' then 'bg-gray-100 text-text-secondary'
+                  end %>">
+                  <%= app.status %>
+                </span>
+              </td>
+              <td class="px-4 py-3 text-sm text-text-secondary"><%= app.created_at.strftime("%b %d, %Y") %></td>
+              <td class="px-4 py-3 text-right">
+                <% if app.draft? %>
+                  <%= link_to "Resume", edit_loans_application_path(app.uuid), class: "text-sm font-medium text-primary hover:text-primary-700" %>
+                <% else %>
+                  <%= link_to "View", loans_application_path(app.uuid), class: "text-sm font-medium text-primary hover:text-primary-700" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="7" class="px-4 py-12 text-center text-sm text-text-tertiary">
+              No applications yet. <%= link_to "Start a new application", new_loans_application_path, class: "font-medium text-primary hover:text-primary-700" %>.
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

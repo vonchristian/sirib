@@ -37,4 +37,77 @@ Accounting::Account.find_or_create_by!(account_code: "21120") do |a|
   a.ledger = deposit_ledger
 end
 
-puts "E2E setup complete: test user, time deposit product, and accounts created"
+# Seed members for loan application wizard test
+members_seeded = 0
+20.times do |i|
+  first = %w[Maria Juan Elena Jose Ana Pedro Sofia Carlos Luz Ramon Isabel Antonio Carmen Victor Lorna Danilo Gloria Fernando Rosario Miguel][i]
+  last  = %w[Cruz Reyes Villanueva Mercado Dimagiba Santos Gonzales Yulo Macapagal Alcantara Samson Lopez Natividad Mendoza Fernandez Rivera Romero Ramos Castillo Angeles][i]
+  Member.find_or_create_by!(first_name: first, last_name: last) do |m|
+    m.middle_name = "M"
+    m.gender = i.even? ? "female" : "male"
+    m.civil_status = %w[single married married single widowed married single married married divorced married single widowed married single married divorced single married single][i]
+    m.birth_date = Date.new(1980 + (i % 20), 1 + (i % 12), 1 + (i % 28))
+    m.mobile_number = "0917#{format('%07d', i)}"
+  end
+  members_seeded += 1
+end
+
+# Seed loan products
+products = [
+  { name: "Regular Salary Loan",    interest_rate: 1.5,  interest_calculation: "declining_balance", max_term_months: 24, requires_collateral: false },
+  { name: "Emergency Loan",         interest_rate: 2.0,  interest_calculation: "declining_balance", max_term_months: 6,  requires_collateral: false },
+  { name: "Educational Loan",       interest_rate: 1.0,  interest_calculation: "straight_line",     max_term_months: 36, requires_collateral: false },
+]
+products.each do |attrs|
+  Lending::LoanProduct.find_or_create_by!(name: attrs[:name]) do |p|
+    p.assign_attributes(attrs)
+  end
+end
+
+# Seed charges on loan products
+charges_by_product = {
+  "Regular Salary Loan" => [{ name: "Service Fee", charge_type: "percentage", value: 2.0 }, { name: "Application Fee", charge_type: "fixed", value: 200 }],
+  "Emergency Loan"      => [{ name: "Service Fee", charge_type: "percentage", value: 3.0 }, { name: "Processing Fee",  charge_type: "fixed", value: 150 }],
+  "Educational Loan"    => [{ name: "Service Fee", charge_type: "percentage", value: 1.5 }, { name: "Application Fee", charge_type: "fixed", value: 250 }],
+}
+charges_by_product.each do |product_name, product_charges|
+  product = Lending::LoanProduct.find_by(name: product_name)
+  next unless product
+  product_charges.each do |charge_attrs|
+    product.loan_charges.find_or_create_by!(name: charge_attrs[:name]) do |c|
+      c.assign_attributes(charge_attrs)
+    end
+  end
+end
+
+puts "E2E setup complete: #{members_seeded} members, #{products.length} loan products seeded"
+
+# Seed savings products
+savings_ledger = Accounting::Ledger.find_or_create_by!(account_code: "21100") do |l|
+  l.name = "Deposit Liabilities"
+  l.account_type = "liability"
+end
+
+expense_ledger = Accounting::Ledger.find_or_create_by!(account_code: "61100") do |l|
+  l.name = "Interest Expense"
+  l.account_type = "expense"
+end
+
+savings_product = Treasury::SavingsProduct.find_or_create_by!(name: "Regular Savings") do |p|
+  p.description = "Standard savings account"
+  p.liability_ledger = savings_ledger
+  p.interest_expense_ledger = expense_ledger
+end
+savings_product.interest_rates.find_or_create_by!(current: true) { |ir| ir.rate = 0.0025 }
+
+# Create cash account for test user
+test_user = User.find_by!(email_address: "test@example.com")
+cash_account = Accounting::Account.find_or_create_by!(account_code: "11110") do |a|
+  cash_ledger = Accounting::Ledger.find_or_create_by!(account_code: "11100") { |l| l.name = "Cash"; l.account_type = "asset" }
+  a.name = "Cash on Hand"
+  a.account_type = "asset"
+  a.ledger = cash_ledger
+end
+Accounting::CashAccount.find_or_create_by!(user: test_user, account: cash_account)
+
+puts "E2E setup complete: #{Treasury::SavingsProduct.count} savings products, cash account created"

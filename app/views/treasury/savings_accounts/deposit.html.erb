@@ -1,0 +1,50 @@
+<% content_for :page_title, "Deposit" %>
+<% content_for :page_subtitle, @account.account_number %>
+<div class="animate-fade-in max-w-lg mx-auto">
+  <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 sm:p-8">
+    <div class="mb-6">
+      <p class="text-xs text-text-tertiary">Account</p>
+      <p class="text-sm font-medium text-text-primary"><%= @account.account_number %> — <%= @account.depositor_name %></p>
+      <p class="text-xs text-text-tertiary mt-1">Current Balance: <span class="font-medium text-text-primary"><%= @account.balance.format %></span></p>
+    </div>
+
+    <%= form_tag preview_deposit_treasury_savings_account_path(@account), method: :post, data: { turbo: false }, class: "space-y-5" do %>
+      <% if flash[:alert] %>
+        <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger"><%= flash[:alert] %></div>
+      <% end %>
+
+      <div class="field-group">
+        <%= label_tag :amount_cents, "Amount (PHP)", class: "field-label" %>
+        <div class="relative">
+          <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-text-tertiary">₱</span>
+          <%= number_field_tag :amount_cents, params[:amount_cents], required: true, min: 1, step: 0.01,
+                placeholder: "0.00", class: "field-input pl-8" %>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <%= label_tag :cash_account_id, "Cash on Hand Account", class: "field-label" %>
+        <% if @single_cash_account %>
+          <%= hidden_field_tag :cash_account_id, @single_cash_account.id %>
+          <p class="text-sm font-medium text-text-primary"><%= @single_cash_account.name %></p>
+          <p class="mt-0.5 text-xs text-text-tertiary">Only one cash on hand account available. Using this account.</p>
+        <% else %>
+          <%= select_tag :cash_account_id,
+                options_from_collection_for_select(@cash_accounts, :id, :name, params[:cash_account_id]),
+                { prompt: "Select account", required: true, class: "field-input" } %>
+          <p class="mt-0.5 text-xs text-text-tertiary">Default: your current cash on hand account</p>
+        <% end %>
+      </div>
+
+      <div class="field-group">
+        <%= label_tag :notes, "Notes (optional)", class: "field-label" %>
+        <%= text_area_tag :notes, params[:notes], rows: 2, placeholder: "Optional note...", class: "field-input" %>
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-border dark:border-gray-700">
+        <%= link_to "Cancel", treasury_savings_account_path(@account), class: "btn-ghost" %>
+        <%= submit_tag "Preview", class: "btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

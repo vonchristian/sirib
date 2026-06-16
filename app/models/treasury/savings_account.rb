@@ -1,0 +1,77 @@
+module Treasury
+  class SavingsAccount < ApplicationRecord
+    self.table_name = "treasury_savings_accounts"
+
+    ACCOUNT_TYPES = { personal: 0, business: 1 }.freeze
+    STATUSES = %w[active closed].freeze
+
+    belongs_to :savings_product, class_name: "Treasury::SavingsProduct"
+    belongs_to :depositor, polymorphic: true
+    belongs_to :liability_account, class_name: "Accounting::Account", optional: true
+    belongs_to :interest_expense_account, class_name: "Accounting::Account", optional: true
+    has_many :transactions, class_name: "Treasury::SavingsTransaction", dependent: :restrict_with_error
+
+    validates :account_type, presence: true
+    validates :status, inclusion: { in: STATUSES }
+    validates :account_number, presence: true, uniqueness: true
+
+    enum :account_type, ACCOUNT_TYPES
+
+    scope :active, -> { where(status: "active") }
+    scope :by_latest, -> { order(created_at: :desc) }
+
+    before_validation :assign_account_number, on: :create
+    before_validation :set_opened_at, on: :create
+    before_create :assign_accounts_from_product
+
+    def balance
+      liability_account&.balance || Money.new(0, "PHP")
+    end
+
+    def depositor_name
+      depositor.respond_to?(:name) ? depositor.name : depositor.to_s
+    end
+
+    private
+
+    def assign_account_number
+      return if account_number.present?
+      date_part = Time.current.strftime("%Y%m%d")
+      random_part = SecureRandom.hex(3).upcase
+      self.account_number = "SA-#{date_part}-#{random_part}"
+    end
+
+    def set_opened_at
+      self.opened_at ||= Time.current
+    end
+
+    def assign_accounts_from_product
+      return unless savings_product
+
+      if savings_product.liability_ledger
+        self.liability_account ||= savings_product.liability_ledger.accounts.create!(
+          name: "#{savings_product.name} Savings - #{depositor_name}",
+          account_type: :liability,
+          account_code: next_account_code(savings_product.liability_ledger)
+        )
+      end
+
+      if savings_product.interest_expense_ledger
+        self.interest_expense_account ||= savings_product.interest_expense_ledger.accounts.create!(
+          name: "#{savings_product.name} Interest Expense - #{depositor_name}",
+          account_type: :expense,
+          account_code: next_account_code(savings_product.interest_expense_ledger)
+        )
+      end
+    end
+
+    def next_account_code(ledger)
+      max = ledger.accounts.pluck(:account_code).map(&:to_i).max
+      if max
+        format('%05d', max + 1)
+      else
+        "#{ledger.account_code}001"
+      end
+    end
+  end
+end

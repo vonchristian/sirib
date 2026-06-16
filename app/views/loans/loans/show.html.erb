@@ -1,0 +1,165 @@
+<% content_for :page_title, "Loan ##{@loan.reference_number}" %>
+<% content_for :page_subtitle, @loan.member.name %>
+
+<div class="animate-fade-in max-w-5xl mx-auto space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-text-primary dark:text-white">Loan <%= @loan.reference_number %></h2>
+      <div class="mt-1 flex items-center gap-2">
+        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset capitalize
+          <%= case @loan.status
+          when 'active' then 'bg-primary-50 text-primary ring-primary/20'
+          when 'paid' then 'bg-positive-50 text-positive ring-positive/20'
+          when 'defaulted' then 'bg-danger-50 text-danger ring-danger/20'
+          end %>">
+          <%= @loan.status %>
+        </span>
+        <span class="text-xs text-text-tertiary"><%= @loan.disbursed_at ? "Disbursed #{@loan.disbursed_at.strftime('%b %d, %Y')}" : "Not yet disbursed" %></span>
+      </div>
+    </div>
+  </div>
+
+  <div data-controller="tabs" data-tabs-active="border-b-2 border-primary text-primary" data-tabs-inactive="text-text-tertiary hover:text-text-secondary">
+    <div class="flex gap-6 border-b border-border dark:border-gray-700" role="tablist">
+      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="details" class="pb-3 text-sm font-medium border-b-2 border-primary text-primary transition-colors">Details</button>
+      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="schedule" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Schedule</button>
+      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="payments" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Payments</button>
+    </div>
+
+    <div class="mt-6">
+      <div data-tabs-target="panel" id="tab-details">
+        <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 sm:p-8">
+          <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Member</dt>
+              <dd class="mt-1 text-sm font-medium text-text-primary"><%= @loan.member.name %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Product</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @loan.loan_product.name %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Reference</dt>
+              <dd class="mt-1 text-sm font-mono text-text-primary"><%= @loan.reference_number %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Principal</dt>
+              <dd class="mt-1 text-lg font-bold text-text-primary"><%= number_to_currency(@loan.principal_cents.to_f / 100, unit: "PHP ") %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Outstanding</dt>
+              <dd class="mt-1 text-lg font-bold <%= @loan.outstanding_principal_cents > 0 ? 'text-text-primary' : 'text-positive' %>">
+                <%= number_to_currency(@loan.outstanding_principal_cents.to_f / 100, unit: "PHP ") %>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Interest Rate</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @loan.interest_rate %>% (<%= @loan.interest_calculation.titleize %>)</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Term</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @loan.term_months %> months</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Disbursed</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @loan.disbursed_at&.strftime("%b %d, %Y") || "Pending" %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Paid</dt>
+              <dd class="mt-1 text-sm font-medium text-positive"><%= number_to_currency(@total_paid.to_f / 100, unit: "PHP ") %></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <div data-tabs-target="panel" id="tab-schedule" class="hidden">
+        <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+          <% if @payment_schedule.any? %>
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="bg-surface-alt border-b border-border dark:bg-gray-800/50 dark:border-gray-700">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-text-tertiary uppercase">#</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-text-tertiary uppercase">Due Date</th>
+                  <th class="px-4 py-3 text-right text-xs font-semibold text-text-tertiary uppercase">Principal</th>
+                  <th class="px-4 py-3 text-right text-xs font-semibold text-text-tertiary uppercase">Interest</th>
+                  <th class="px-4 py-3 text-right text-xs font-semibold text-text-tertiary uppercase">Total</th>
+                  <th class="px-4 py-3 text-right text-xs font-semibold text-text-tertiary uppercase">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-border dark:divide-gray-800">
+                <% @payment_schedule.each do |sched| %>
+                  <% paid_principal = @payments.where("payment_date <= ?", sched.due_date).sum(:principal_cents) %>
+                  <% paid_interest = @payments.where("payment_date <= ?", sched.due_date).sum(:interest_cents) %>
+                  <% is_fully_paid = paid_principal >= sched.principal_cents && paid_interest >= sched.interest_cents %>
+                  <tr class="<%= is_fully_paid ? 'bg-positive-50/30 dark:bg-emerald-900/10' : (sched.due_date < Date.current ? 'bg-danger-50/30 dark:bg-red-900/10' : '') %>">
+                    <td class="px-4 py-2 text-text-secondary"><%= sched.sequence %></td>
+                    <td class="px-4 py-2 text-text-primary"><%= sched.due_date.strftime("%b %d, %Y") %></td>
+                    <td class="px-4 py-2 text-right text-text-primary"><%= number_to_currency(sched.principal_cents.to_f / 100, unit: "PHP ") %></td>
+                    <td class="px-4 py-2 text-right text-text-primary"><%= number_to_currency(sched.interest_cents.to_f / 100, unit: "PHP ") %></td>
+                    <td class="px-4 py-2 text-right font-medium text-text-primary"><%= number_to_currency(sched.total_cents.to_f / 100, unit: "PHP ") %></td>
+                    <td class="px-4 py-2 text-right">
+                      <% if is_fully_paid %>
+                        <span class="inline-flex items-center rounded-full bg-positive-50 px-2 py-0.5 text-xs font-medium text-positive">Paid</span>
+                      <% elsif sched.due_date < Date.current %>
+                        <span class="inline-flex items-center rounded-full bg-danger-50 px-2 py-0.5 text-xs font-medium text-danger">Overdue</span>
+                      <% else %>
+                        <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-text-tertiary">Pending</span>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% else %>
+            <p class="p-6 text-sm text-text-tertiary italic text-center">No schedule available.</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div data-tabs-target="panel" id="tab-payments" class="hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+            <h4 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Record Payment</h4>
+            <%= form_with url: loans_loan_payments_path(@loan), method: :post, class: "space-y-4" do |f| %>
+              <div>
+                <%= f.label :amount, "Payment Amount (PHP)", class: "field-label" %>
+                <%= f.number_field :amount, required: true, step: 0.01, min: 1,
+                      placeholder: "0.00", class: "field-input" %>
+              </div>
+              <p class="text-xs text-text-tertiary">Payment will be auto-allocated: penalty → interest → principal</p>
+              <%= f.submit "Post Payment", class: "btn-primary w-full" %>
+            <% end %>
+          </div>
+
+          <div>
+            <h4 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Payment History</h4>
+            <% if @payments.any? %>
+              <div class="space-y-2">
+                <% @payments.each do |payment| %>
+                  <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 px-4 py-3">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="text-xs font-mono text-text-tertiary"><%= payment.reference_number %></p>
+                        <p class="text-sm text-text-primary"><%= payment.payment_date.strftime("%b %d, %Y") %></p>
+                      </div>
+                      <span class="text-sm font-semibold text-text-primary"><%= number_to_currency(payment.amount_cents.to_f / 100, unit: "PHP ") %></span>
+                    </div>
+                    <div class="mt-1 flex gap-3 text-xs text-text-tertiary">
+                      <span>P: <%= number_to_currency(payment.principal_cents.to_f / 100, unit: "PHP ") %></span>
+                      <span>I: <%= number_to_currency(payment.interest_cents.to_f / 100, unit: "PHP ") %></span>
+                      <% if payment.penalty_cents > 0 %>
+                        <span class="text-danger">Pen: <%= number_to_currency(payment.penalty_cents.to_f / 100, unit: "PHP ") %></span>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="text-sm text-text-tertiary italic">No payments recorded yet.</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<% content_for :page_title, "Open Savings Account" %>
+<div class="animate-fade-in max-w-2xl mx-auto">
+  <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 sm:p-8">
+    <h1 class="text-lg font-semibold text-text-primary dark:text-white mb-6">Open Savings Account</h1>
+
+    <%= form_with model: @account, url: treasury_savings_accounts_path, class: "space-y-5" do |f| %>
+      <% if @account.errors.any? %>
+        <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger">
+          <ul class="list-inside list-disc">
+            <% @account.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="field-group">
+        <%= f.label :savings_product_id, "Savings Product", class: "field-label" %>
+        <%= f.collection_select :savings_product_id, @products, :id, :name,
+              { prompt: "Select product" }, required: true, class: "field-input" %>
+      </div>
+
+      <div class="field-group">
+        <%= f.label :depositor_id, "Member", class: "field-label" %>
+        <%= f.collection_select :depositor_id, Member.order(:last_name), :id, :name,
+              { prompt: "Select member" }, required: true, class: "field-input" %>
+      </div>
+
+      <div class="field-group">
+        <%= f.label :account_type, "Account Type", class: "field-label" %>
+        <%= f.select :account_type,
+              options_for_select([["Personal", "personal"], ["Business", "business"]], @account.account_type),
+              { prompt: "Select type" }, required: true, class: "field-input" %>
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-border dark:border-gray-700">
+        <%= link_to "Cancel", treasury_savings_accounts_path, class: "btn-ghost" %>
+        <%= f.submit "Open Account", class: "btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

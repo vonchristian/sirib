@@ -4,3 +4,9 @@ eagerLoadControllersFrom("controllers", application)
 
 import WizardController from "controllers/wizard_controller"
 application.register("wizard", WizardController)
+
+import LoanWizardController from "controllers/loan_wizard_controller"
+application.register("loan-wizard", LoanWizardController)
+
+import TabsController from "controllers/tabs_controller"
+application.register("tabs", TabsController)

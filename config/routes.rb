@@ -40,6 +40,11 @@ Rails.application.routes.draw do
   end
 
   namespace :treasury do
+    resources :cash_sessions, only: [:index, :show] do
+      member do
+        post :close
+      end
+    end
     resources :deposits, only: [:index, :new, :create, :show]
     resources :time_deposit_products
     resources :time_deposits, only: [:index, :new, :create, :show] do
@@ -47,6 +52,40 @@ Rails.application.routes.draw do
         post :preview
       end
     end
+    resources :loans, only: [:index], controller: "loans" do
+      member do
+        post :disburse
+        get :voucher
+      end
+    end
+    resources :savings_products
+    resources :savings_accounts, only: [:index, :new, :create, :show] do
+      member do
+        get :deposit
+        post :preview_deposit
+        post :confirm_deposit
+        get :withdraw
+        post :preview_withdraw
+        post :confirm_withdraw
+      end
+    end
+  end
+
+  namespace :loans do
+    resources :products
+    resources :applications, param: :uuid do
+      member do
+        get :edit
+        patch :update
+        post :submit
+        get :download_pdf
+      end
+    end
+    resources :loans, only: [:index, :show] do
+      resources :payments, only: [:create]
+    end
+    get "searches/members", to: "searches#members"
+    get "searches/loan_products", to: "searches#loan_products"
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

@@ -1,2 +1,6 @@
 require_relative "seeds/chart_of_accounts"
 require_relative "seeds/sample_entries"
+require_relative "seeds/members"
+require_relative "seeds/loan_products"
+require_relative "seeds/savings_products"
+require_relative "seeds/users"

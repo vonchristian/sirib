@@ -1,0 +1,58 @@
+<% content_for :page_title, @product.name %>
+<% content_for :page_subtitle, "Loan product details" %>
+
+<div class="animate-fade-in max-w-3xl mx-auto">
+  <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 sm:p-8">
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+      <div class="sm:col-span-2">
+        <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Description</dt>
+        <dd class="mt-1 text-sm text-text-primary"><%= @product.description.presence || "—" %></dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Interest Rate</dt>
+        <dd class="mt-1 text-sm text-text-primary"><%= @product.interest_rate %>%</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Calculation Method</dt>
+        <dd class="mt-1 text-sm text-text-primary capitalize"><%= @product.interest_calculation.titleize %></dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Max Term</dt>
+        <dd class="mt-1 text-sm text-text-primary"><%= @product.max_term_months %> months</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Requires Collateral</dt>
+        <dd class="mt-1 text-sm text-text-primary"><%= @product.requires_collateral? ? "Yes" : "No" %></dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Status</dt>
+        <dd class="mt-1"><span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= @product.status == 'active' ? 'bg-positive-50 text-positive' : 'bg-gray-100 text-text-tertiary' %>"><%= @product.status %></span></dd>
+      </div>
+    </dl>
+  </div>
+
+  <% if @product.loan_charges.any? %>
+    <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 sm:p-8 mt-6">
+      <h3 class="text-base font-semibold text-text-primary dark:text-white mb-4">Charges & Fees</h3>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+        <% @product.loan_charges.ordered.each do |charge| %>
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider"><%= charge.name %></dt>
+            <dd class="mt-1 text-sm text-text-primary">
+              <% if charge.charge_type == "percentage" %>
+                <%= number_to_percentage(charge.value, precision: 1) %> of loan amount
+              <% else %>
+                <%= number_to_currency(charge.value, unit: "PHP ") %>
+              <% end %>
+            </dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+  <% end %>
+
+  <div class="mt-6 flex items-center gap-2">
+    <%= link_to "Edit", edit_loans_product_path(@product), class: "btn-secondary" %>
+    <%= link_to "Back to Products", loans_products_path, class: "btn-ghost" %>
+  </div>
+</div>

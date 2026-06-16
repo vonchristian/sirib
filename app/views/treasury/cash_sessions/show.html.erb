@@ -1,0 +1,100 @@
+<% content_for :page_title, "Cash Session — #{@session.date.strftime('%b %d, %Y')}" %>
+<div class="animate-fade-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-semibold text-text-primary dark:text-white">
+        Cash Session — <%= @session.date.strftime("%B %d, %Y") %>
+      </h1>
+      <p class="text-sm text-text-tertiary mt-0.5"><%= @session.cash_account.name %></p>
+    </div>
+    <div class="flex items-center gap-3">
+      <%= link_to "All Sessions", treasury_cash_sessions_path, class: "btn-ghost" %>
+      <% if @session.open? %>
+        <%= button_to "Close Session", close_treasury_cash_session_path(@session), method: :post,
+              class: "btn-warning",
+              data: { turbo_confirm: "Close this cash session? This will record the ending balance." } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
+      <p class="text-xs font-medium uppercase tracking-wide text-text-tertiary mb-1">Beginning Balance</p>
+      <p class="text-2xl font-semibold text-text-primary"><%= Money.from_cents(@session.beginning_balance_cents.to_i, "PHP").format %></p>
+    </div>
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
+      <p class="text-xs font-medium uppercase tracking-wide text-text-tertiary mb-1">Total Receipts</p>
+      <p class="text-2xl font-semibold text-positive"><%= Money.from_cents(@session.total_receipts, "PHP").format %></p>
+    </div>
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
+      <p class="text-xs font-medium uppercase tracking-wide text-text-tertiary mb-1">Total Disbursements</p>
+      <p class="text-2xl font-semibold text-warning"><%= Money.from_cents(@session.total_disbursements, "PHP").format %></p>
+    </div>
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
+      <p class="text-xs font-medium uppercase tracking-wide text-text-tertiary mb-1">Ending Balance</p>
+      <p class="text-2xl font-semibold text-text-primary"><%= Money.from_cents(@session.computed_ending_balance, "PHP").format %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div>
+      <h2 class="text-base font-semibold text-text-primary dark:text-white mb-3">Receipts</h2>
+      <% if @receipts.any? %>
+        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="bg-surface-alt border-b border-border dark:bg-gray-800/50 dark:border-gray-700">
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Voucher #</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Category</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Amount</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Counterparty</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border dark:divide-gray-800">
+              <% @receipts.each do |v| %>
+                <tr class="hover:bg-surface-alt/50 dark:hover:bg-gray-800/30 transition-colors">
+                  <td class="px-4 py-3 font-medium text-text-primary"><%= v.voucher_number %></td>
+                  <td class="px-4 py-3 text-text-secondary"><%= v.category.titleize %></td>
+                  <td class="px-4 py-3 text-right text-positive font-medium"><%= Money.from_cents(v.amount_cents, "PHP").format %></td>
+                  <td class="px-4 py-3 text-text-secondary"><%= v.counterparty&.respond_to?(:name) ? v.counterparty.name : "—" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-text-tertiary py-8 text-center rounded-lg border border-dashed border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/30">No receipts yet.</p>
+      <% end %>
+    </div>
+
+    <div>
+      <h2 class="text-base font-semibold text-text-primary dark:text-white mb-3">Disbursements</h2>
+      <% if @disbursements.any? %>
+        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="bg-surface-alt border-b border-border dark:bg-gray-800/50 dark:border-gray-700">
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Voucher #</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Category</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Amount</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Counterparty</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border dark:divide-gray-800">
+              <% @disbursements.each do |v| %>
+                <tr class="hover:bg-surface-alt/50 dark:hover:bg-gray-800/30 transition-colors">
+                  <td class="px-4 py-3 font-medium text-text-primary"><%= v.voucher_number %></td>
+                  <td class="px-4 py-3 text-text-secondary"><%= v.category.titleize %></td>
+                  <td class="px-4 py-3 text-right text-warning font-medium"><%= Money.from_cents(v.amount_cents, "PHP").format %></td>
+                  <td class="px-4 py-3 text-text-secondary"><%= v.counterparty&.respond_to?(:name) ? v.counterparty.name : "—" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-text-tertiary py-8 text-center rounded-lg border border-dashed border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/30">No disbursements yet.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

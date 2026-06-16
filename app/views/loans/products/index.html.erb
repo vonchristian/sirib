@@ -1,0 +1,51 @@
+<% content_for :page_title, "Loan Products" %>
+<% content_for :page_subtitle, "Manage loan product offerings" %>
+
+<div class="animate-fade-in">
+  <div class="mb-4 flex items-center justify-between">
+    <span class="text-sm text-text-secondary"><%= @products.size %> product(s)</span>
+    <%= link_to "New Product", new_loans_product_path, class: "btn-primary" %>
+  </div>
+
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+    <table class="min-w-full text-sm">
+      <thead>
+        <tr class="border-b border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50">
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Name</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Interest Rate</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Calculation</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Max Term</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Status</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border dark:divide-gray-800">
+        <% if @products.any? %>
+          <% @products.each do |product| %>
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+              <td class="px-4 py-3 font-medium text-text-primary dark:text-white"><%= product.name %></td>
+              <td class="px-4 py-3 text-text-secondary"><%= product.interest_rate %>%</td>
+              <td class="px-4 py-3"><span class="capitalize text-text-secondary"><%= product.interest_calculation.titleize %></span></td>
+              <td class="px-4 py-3 text-text-secondary"><%= product.max_term_months %> months</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
+                  <%= product.status == 'active' ? 'bg-positive-50 text-positive' : 'bg-gray-100 text-text-tertiary dark:bg-gray-800' %>">
+                  <%= product.status %>
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <%= link_to "Edit", edit_loans_product_path(product), class: "text-sm font-medium text-primary hover:text-primary-700 transition-colors" %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="6" class="px-4 py-12 text-center text-sm text-text-tertiary">
+              No loan products yet. <%= link_to "Create one", new_loans_product_path, class: "font-medium text-primary hover:text-primary-700" %>.
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<% content_for :page_title, "Savings Accounts" %>
+<div class="animate-fade-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-semibold text-text-primary dark:text-white">Savings Accounts</h1>
+      <p class="text-sm text-text-tertiary mt-0.5">Manage member savings accounts</p>
+    </div>
+    <%= link_to "Open Account", new_treasury_savings_account_path, class: "btn-primary" %>
+  </div>
+
+  <% if @accounts.any? %>
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="bg-surface-alt border-b border-border dark:bg-gray-800/50 dark:border-gray-700">
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Account #</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Depositor</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Product</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Type</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Balance</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Status</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border dark:divide-gray-800">
+          <% @accounts.each do |account| %>
+            <tr class="hover:bg-surface-alt/50 dark:hover:bg-gray-800/30 transition-colors">
+              <td class="px-4 py-3 font-medium text-text-primary"><%= account.account_number %></td>
+              <td class="px-4 py-3 text-text-secondary"><%= account.depositor_name %></td>
+              <td class="px-4 py-3 text-text-secondary"><%= account.savings_product.name %></td>
+              <td class="px-4 py-3"><span class="capitalize text-text-secondary"><%= account.account_type %></span></td>
+              <td class="px-4 py-3 text-right font-medium text-text-primary">
+                <%= account.balance.format %>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= account.status == 'active' ? 'bg-positive-50 text-positive' : 'bg-text-tertiary/10 text-text-tertiary' %>">
+                  <%= account.status %>
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <%= link_to "View", treasury_savings_account_path(account), class: "btn-ghost text-xs" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="rounded-lg border-2 border-dashed border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 px-6 py-16 text-center">
+      <svg class="mx-auto h-10 w-10 text-text-tertiary mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/>
+      </svg>
+      <p class="text-sm text-text-tertiary mb-1">No savings accounts yet</p>
+      <p class="text-xs text-text-tertiary mb-4">Open the first savings account for a member.</p>
+      <%= link_to "Open Account", new_treasury_savings_account_path, class: "btn-primary" %>
+    </div>
+  <% end %>
+</div>

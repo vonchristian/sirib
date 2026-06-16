@@ -1,0 +1,49 @@
+<% content_for :page_title, "Preview Deposit" %>
+<% content_for :page_subtitle, @account.account_number %>
+<div class="animate-fade-in max-w-lg mx-auto">
+  <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 sm:p-8">
+    <div class="flex items-center gap-2 mb-6">
+      <span class="inline-flex items-center rounded-full bg-positive-50 px-2.5 py-0.5 text-xs font-medium text-positive">Step 2 of 2</span>
+      <span class="text-sm text-text-tertiary">Confirm Deposit</span>
+    </div>
+
+    <div class="rounded-lg bg-surface-alt dark:bg-gray-800/50 p-4 space-y-3 mb-6">
+      <div class="flex justify-between text-sm">
+        <span class="text-text-tertiary">Account</span>
+        <span class="text-text-primary font-medium"><%= @account.account_number %></span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-text-tertiary">Depositor</span>
+        <span class="text-text-primary"><%= @account.depositor_name %></span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-text-tertiary">Amount</span>
+        <span class="text-positive font-semibold"><%= @amount.format %></span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-text-tertiary">Cash on Hand Account</span>
+        <span class="text-text-primary"><%= @cash_account.name %></span>
+      </div>
+      <% if @notes.present? %>
+        <div class="flex justify-between text-sm">
+          <span class="text-text-tertiary">Notes</span>
+          <span class="text-text-primary max-w-[200px] text-right"><%= @notes %></span>
+        </div>
+      <% end %>
+      <div class="border-t border-border dark:border-gray-700 pt-3 flex justify-between text-sm font-semibold">
+        <span class="text-text-primary">Balance After Deposit</span>
+        <span class="text-positive"><%= (@account.balance + @amount).format %></span>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <%= link_to "Edit", deposit_treasury_savings_account_path(@account, amount_cents: params[:amount_cents], cash_account_id: params[:cash_account_id], notes: params[:notes]), class: "btn-ghost" %>
+      <div class="flex gap-2">
+        <%= link_to "Cancel", treasury_savings_account_path(@account), class: "btn-ghost" %>
+        <%= button_to "Confirm Deposit", confirm_deposit_treasury_savings_account_path(@account),
+              method: :post, data: { turbo: false }, class: "btn-positive",
+              params: { amount_cents: params[:amount_cents], cash_account_id: @cash_account.id, notes: @notes } %>
+      </div>
+    </div>
+  </div>
+</div>

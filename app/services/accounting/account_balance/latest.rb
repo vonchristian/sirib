@@ -1,8 +1,8 @@
 module Accounting
   module AccountBalance
     class Latest
-      def initialize
-        @to_date = Date.current
+      def initialize(from_date: nil, to_date: nil, to_time: nil)
+        @to_date = to_date || Date.current
       end
 
       def load_amounts
