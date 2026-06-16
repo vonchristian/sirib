@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_10_132644) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_123703) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -40,6 +40,34 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_132644) do
     t.index ["account_code"], name: "index_accounts_on_account_code", unique: true
     t.index ["ledger_id"], name: "index_accounts_on_ledger_id"
     t.index ["name", "account_code"], name: "trgm_accounts_idx", opclass: :gin_trgm_ops, using: :gin
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "amount_lines", force: :cascade do |t|
@@ -75,6 +103,44 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_132644) do
     t.string "ancestry"
     t.index ["account_code"], name: "index_ledgers_on_account_code", unique: true
     t.index ["ancestry"], name: "index_ledgers_on_ancestry"
+  end
+
+  create_table "member_addresses", force: :cascade do |t|
+    t.bigint "member_id", null: false
+    t.string "house_street", null: false
+    t.string "barangay", null: false
+    t.string "city", null: false
+    t.string "province", null: false
+    t.string "region", null: false
+    t.string "zip_code"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["member_id"], name: "index_member_addresses_on_member_id"
+  end
+
+  create_table "member_identifications", force: :cascade do |t|
+    t.bigint "member_id", null: false
+    t.string "id_type", null: false
+    t.string "id_number", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id_type", "id_number"], name: "index_member_identifications_on_id_type_and_id_number", unique: true
+    t.index ["member_id"], name: "index_member_identifications_on_member_id"
+  end
+
+  create_table "members", force: :cascade do |t|
+    t.string "first_name", null: false
+    t.string "middle_name"
+    t.string "last_name", null: false
+    t.string "suffix"
+    t.date "birth_date", null: false
+    t.string "gender", null: false
+    t.string "civil_status", null: false
+    t.string "mobile_number", null: false
+    t.string "email_address"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_members_on_email_address", unique: true
   end
 
   create_table "running_balances", force: :cascade do |t|
@@ -143,8 +209,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_132644) do
   add_foreign_key "accounting_cash_accounts", "accounts"
   add_foreign_key "accounting_cash_accounts", "users"
   add_foreign_key "accounts", "ledgers"
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "amount_lines", "accounts"
   add_foreign_key "amount_lines", "entries"
+  add_foreign_key "member_addresses", "members"
+  add_foreign_key "member_identifications", "members"
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "ledgers"
   add_foreign_key "sessions", "users"

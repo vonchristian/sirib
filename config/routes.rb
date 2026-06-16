@@ -4,6 +4,8 @@ Rails.application.routes.draw do
 
   root "dashboard#index"
 
+  resources :members, only: [:index, :show, :new, :create]
+
   namespace :dashboard do
   end
 

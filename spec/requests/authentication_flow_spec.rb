@@ -22,9 +22,9 @@ RSpec.describe "Authentication", type: :request do
       expect(response).to redirect_to(dashboard_loans_path)
     end
 
-    it "redirects to root when no stored URL" do
+    it "redirects to role dashboard when no stored URL" do
       post session_path, params: { email_address: user.email_address, password: "secret123" }
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to(manager_dashboard_path)
     end
   end
 end

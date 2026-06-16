@@ -1,0 +1,66 @@
+class MembersController < ApplicationController
+  layout "dashboard"
+
+  def index
+    @members = Member.all
+  end
+
+  def show
+    @member = Member.find(params[:id])
+  end
+
+  def new
+    @member = Member.new
+    @member.build_address
+    @member.identifications.build
+  end
+
+  def create
+    @member = Member.new(member_params)
+
+    if @member.save
+      attach_files
+      redirect_to @member, notice: "Member registered successfully."
+    else
+      @member.build_address unless @member.address
+      @member.identifications.build if @member.identifications.none?
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def member_params
+    params.require(:member).permit(
+      :first_name, :middle_name, :last_name, :suffix,
+      :birth_date, :gender, :civil_status,
+      :mobile_number, :email_address, :signature_data,
+      address_attributes: [:id, :house_street, :barangay, :city, :province, :region, :zip_code],
+      identifications_attributes: [:id, :id_type, :id_number, :file]
+    )
+  end
+
+  def attach_files
+    identifications_attrs = params.dig(:member, :identifications_attributes)
+    if identifications_attrs
+      identifications_attrs.each do |_, attrs|
+        next if attrs[:file].blank?
+        member_identification = @member.identifications.find_by(id_type: attrs[:id_type])
+        member_identification&.file&.attach(attrs[:file])
+      end
+    end
+
+    attach_signature
+    @member.profile_image.attach(params.dig(:member, :profile_image)) if params.dig(:member, :profile_image).present?
+  end
+
+  def attach_signature
+    data_url = params.dig(:member, :signature_data)
+    return if data_url.blank?
+
+    decoded = Base64.decode64(data_url.sub("data:image/png;base64,", ""))
+    io = StringIO.new(decoded)
+    io.original_filename = "signature.png"
+    @member.signature.attach(io: io, filename: "signature.png", content_type: "image/png")
+  end
+end

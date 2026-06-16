@@ -1,0 +1,120 @@
+<% content_for :page_title, @member.name %>
+<% content_for :page_subtitle, "Member profile" %>
+
+<div class="animate-fade-in space-y-6">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-1">
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+        <div class="flex flex-col items-center text-center">
+          <div class="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-primary-50 text-3xl font-semibold text-primary dark:bg-primary-900/30 dark:text-primary-300">
+            <%= @member.profile_image.attached? ? image_tag(@member.profile_image, class: "h-full w-full rounded-full object-cover") : "#{@member.first_name.first}#{@member.last_name.first}" %>
+          </div>
+          <h2 class="text-lg font-semibold text-text-primary dark:text-white"><%= @member.name %></h2>
+          <p class="text-sm text-text-tertiary dark:text-gray-500 capitalize"><%= @member.gender %> • <%= @member.civil_status %></p>
+          <p class="text-xs text-text-tertiary dark:text-gray-500 mt-1">Member since <%= @member.created_at.strftime("%B %d, %Y") %></p>
+        </div>
+      </div>
+
+      <% if @member.signature.attached? %>
+        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 mt-6">
+          <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-3">Signature Specimen</h3>
+          <%= image_tag @member.signature, class: "max-h-20 object-contain border border-border rounded dark:border-gray-700" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="lg:col-span-2 space-y-6">
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+        <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Personal Details</h3>
+        <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">First Name</dt>
+            <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.first_name %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Middle Name</dt>
+            <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.middle_name || "—" %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Last Name</dt>
+            <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.last_name %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Suffix</dt>
+            <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.suffix || "—" %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Birth Date</dt>
+            <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.birth_date.strftime("%B %d, %Y") %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Age</dt>
+            <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= ((Date.current - @member.birth_date) / 365).to_i %> years old</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Mobile Number</dt>
+            <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.mobile_number %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Email</dt>
+            <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.email_address || "—" %></dd>
+          </div>
+        </dl>
+      </div>
+
+      <% if @member.address %>
+        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+          <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Address</h3>
+          <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">House / Street</dt>
+              <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.address.house_street %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Barangay</dt>
+              <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.address.barangay %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">City</dt>
+              <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.address.city %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Province</dt>
+              <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.address.province %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">Region</dt>
+              <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.address.region %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase tracking-wide">ZIP Code</dt>
+              <dd class="mt-0.5 text-sm text-text-primary dark:text-white"><%= @member.address.zip_code || "—" %></dd>
+            </div>
+          </dl>
+        </div>
+      <% end %>
+
+      <% if @member.identifications.any? %>
+        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+          <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Identifications</h3>
+          <div class="space-y-3">
+            <% @member.identifications.each do |id| %>
+              <div class="flex items-center justify-between rounded-lg border border-border bg-surface-alt px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50">
+                <div>
+                  <p class="text-sm font-medium text-text-primary dark:text-white"><%= id.id_type.titleize %></p>
+                  <p class="text-xs text-text-tertiary dark:text-gray-500"><%= id.id_number %></p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary dark:bg-primary-900/30 dark:text-primary-300">Verified</span>
+                  <% if id.file.attached? %>
+                    <%= link_to "View", url_for(id.file), target: "_blank", class: "text-sm font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors" %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
