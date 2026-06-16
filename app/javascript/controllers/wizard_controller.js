@@ -4,7 +4,7 @@ export default class extends Controller {
   static targets = [
     "step", "nextBtn", "backBtn", "submitBtn",
     "video", "preview", "capturePlaceholder", "webcamError", "profileInput",
-    "currentStep", "photoCounter", "photoGallery"
+    "counter", "currentStep", "photoCounter", "photoGallery"
   ]
   static values = { currentStep: { type: Number, default: 0 } }
 
@@ -66,6 +66,7 @@ export default class extends Controller {
       this.stopWebcam()
     }
 
+    this.updateCounter()
     this.syncURL()
     this.updateCurrentStepField()
   }
@@ -81,6 +82,19 @@ export default class extends Controller {
   updateCurrentStepField() {
     if (this.hasCurrentStepTarget) {
       this.currentStepTarget.value = this.currentStepValue
+    }
+  }
+
+  updateCounter() {
+    const names = [
+      "Personal Details",
+      "Address & Contact",
+      "Identifications",
+      "Signature Specimens",
+      "Profile Photos"
+    ]
+    if (this.hasCounterTarget) {
+      this.counterTarget.textContent = names[this.currentStepValue]
     }
   }
 

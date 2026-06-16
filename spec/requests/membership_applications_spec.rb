@@ -24,7 +24,7 @@ RSpec.describe "MembershipApplications" do
       app = create(:membership_application)
       get edit_membership_application_path(app.uuid)
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Step 1 of 5")
+      expect(response.body).to include("Personal Details")
     end
 
     it "renders the specified step when ?step=N is given" do
