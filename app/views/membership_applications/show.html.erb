@@ -1,138 +1,186 @@
 <% content_for :page_title, "Membership Application" %>
 <% content_for :page_subtitle, "Application ##{@application.uuid.first(8).upcase}" %>
 
-<div class="animate-fade-in space-y-6">
-  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <h3 class="text-sm font-semibold text-text-primary dark:text-white">Application Status</h3>
-        <p class="mt-1 text-sm text-text-secondary dark:text-gray-400">UUID: <code class="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"><%= @application.uuid %></code></p>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset capitalize
-          <%= case @application.status
-          when 'draft' then 'bg-warning-50 text-warning ring-warning/20 dark:bg-amber-900/30 dark:text-amber-400'
-          when 'completed' then 'bg-primary-50 text-primary ring-primary/20 dark:bg-primary-900/30 dark:text-primary-300'
-          when 'approved' then 'bg-positive-50 text-positive ring-positive/20 dark:bg-emerald-900/30 dark:text-emerald-400'
-          when 'rejected' then 'bg-danger-50 text-danger ring-danger/20 dark:bg-red-900/30 dark:text-red-400'
-          end %>">
-          <%= @application.status %>
-        </span>
-        <% if @application.complete? && @application.status != "approved" %>
-          <%= button_to "Approve Membership",
-                approve_membership_application_path(@application.uuid),
-                method: :post,
-                class: "inline-flex items-center gap-2 rounded-md bg-positive px-4 py-2 text-sm font-medium text-white hover:bg-positive-700 transition-colors",
-                data: { turbo_confirm: "Approve this membership? This will create a permanent member record." } %>
-        <% end %>
-        <% if @application.status == "draft" %>
-          <%= link_to "Resume Application",
-                edit_membership_application_path(@application.uuid),
-                class: "inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors" %>
-        <% end %>
-      </div>
-    </div>
-  </div>
+<% content_for :head do %>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+      .print-break-inside { break-inside: avoid; }
+    }
+  </style>
+<% end %>
 
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
-      <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Personal Details</h3>
-      <dl class="space-y-3">
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Name</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= [@application.first_name, @application.middle_name, @application.last_name].compact.join(" ") %><%= " #{@application.suffix}" if @application.suffix.present? %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Birth Date</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= @application.birth_date %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Gender</dt>
-          <dd class="text-sm text-text-primary dark:text-white capitalize"><%= @application.gender %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Civil Status</dt>
-          <dd class="text-sm text-text-primary dark:text-white capitalize"><%= @application.civil_status %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Mobile</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= @application.mobile_number %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Email</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= @application.email_address || "—" %></dd>
-        </div>
-      </dl>
+<div class="animate-fade-in max-w-4xl mx-auto space-y-4 no-print">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-text-primary dark:text-white">Membership Application</h2>
+      <p class="text-sm text-text-tertiary dark:text-gray-500">Application #<%= @application.uuid.first(8).upcase %></p>
     </div>
-
-    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
-      <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Address</h3>
-      <dl class="space-y-3">
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Street</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= @application.house_street %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Barangay</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= @application.barangay %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">City</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= @application.city %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Province</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= @application.province %></dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Region</dt>
-          <dd class="text-sm text-text-primary dark:text-white"><%= @application.region %></dd>
-        </div>
-      </dl>
-    </div>
-
-    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
-      <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Identifications</h3>
-      <% if @application.identifications.any? %>
-        <div class="space-y-2">
-          <% @application.identifications.each do |id| %>
-            <div class="flex items-center justify-between rounded-lg border border-border bg-surface-alt px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50">
-              <div>
-                <p class="text-sm font-medium text-text-primary dark:text-white"><%= id["id_type"].titleize %></p>
-                <p class="text-xs text-text-tertiary dark:text-gray-500"><%= id["id_number"] %></p>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      <% else %>
-        <p class="text-sm text-text-tertiary dark:text-gray-500">No identifications provided.</p>
+    <div class="flex items-center gap-2">
+      <button onclick="window.print()"
+              class="inline-flex items-center gap-2 rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
+        </svg>
+        Print / PDF
+      </button>
+      <% if @application.status == "draft" %>
+        <%= link_to "Resume",
+              edit_membership_application_path(@application.uuid),
+              class: "inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors" %>
+      <% end %>
+      <% if @application.complete? && @application.status != "approved" %>
+        <%= button_to "Approve Membership",
+              approve_membership_application_path(@application.uuid),
+              method: :post,
+              class: "inline-flex items-center gap-2 rounded-md bg-positive px-4 py-2 text-sm font-medium text-white hover:bg-positive-700 transition-colors",
+              data: { turbo_confirm: "Approve this membership? This will create a permanent member record." } %>
       <% end %>
     </div>
+  </div>
+</div>
 
-    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
-      <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Files</h3>
-      <dl class="space-y-3">
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Signature</dt>
-          <dd class="text-sm text-text-primary dark:text-white">
-            <% if @application.signature_specimens.any? %>
-              <span class="inline-flex items-center rounded-full bg-positive-50 px-2 py-0.5 text-xs font-medium text-positive dark:bg-emerald-900/30 dark:text-emerald-400"><%= @application.signature_specimens.size %> captured</span>
-            <% else %>
-              <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 dark:bg-gray-800">Missing</span>
-            <% end %>
-          </dd>
+<div id="print-area" class="animate-fade-in max-w-4xl mx-auto">
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+    <div class="p-6 space-y-6">
+      <div class="flex items-center gap-4">
+        <% if @application.profile_image_data.present? %>
+          <div class="flex-shrink-0">
+            <%= image_tag @application.profile_image_data, class: "h-20 w-20 rounded-full object-cover border-2 border-border dark:border-gray-600" %>
+          </div>
+        <% end %>
+        <div>
+          <h3 class="text-xl font-bold text-text-primary dark:text-white">
+            <%= [@application.first_name, @application.middle_name, @application.last_name].compact.join(" ") %>
+            <%= " #{@application.suffix}" if @application.suffix.present? %>
+          </h3>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset capitalize
+              <%= case @application.status
+              when 'draft' then 'bg-warning-50 text-warning ring-warning/20 dark:bg-amber-900/30 dark:text-amber-400'
+              when 'completed' then 'bg-primary-50 text-primary ring-primary/20 dark:bg-primary-900/30 dark:text-primary-300'
+              when 'approved' then 'bg-positive-50 text-positive ring-positive/20 dark:bg-emerald-900/30 dark:text-emerald-400'
+              when 'rejected' then 'bg-danger-50 text-danger ring-danger/20 dark:bg-red-900/30 dark:text-red-400'
+              end %>">
+              <%= @application.status %>
+            </span>
+            <span class="text-xs text-text-tertiary dark:text-gray-500">UUID: <%= @application.uuid %></span>
+          </div>
         </div>
-        <div class="flex justify-between">
-          <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500 uppercase">Profile Photo</dt>
-          <dd class="text-sm text-text-primary dark:text-white">
-            <% if @application.profile_image_data.present? %>
-              <span class="inline-flex items-center rounded-full bg-positive-50 px-2 py-0.5 text-xs font-medium text-positive dark:bg-emerald-900/30 dark:text-emerald-400">Captured</span>
-            <% else %>
-              <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 dark:bg-gray-800">Missing</span>
+      </div>
+
+      <hr class="border-border dark:border-gray-700">
+
+      <div class="print-break-inside">
+        <h4 class="text-xs font-semibold text-text-tertiary dark:text-gray-500 uppercase tracking-wider mb-3">Personal Details</h4>
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+          <div class="flex justify-between sm:flex-col">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Birth Date</dt>
+            <dd class="text-sm text-text-primary dark:text-white"><%= @application.birth_date %></dd>
+          </div>
+          <div class="flex justify-between sm:flex-col">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Gender</dt>
+            <dd class="text-sm text-text-primary dark:text-white capitalize"><%= @application.gender %></dd>
+          </div>
+          <div class="flex justify-between sm:flex-col">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Civil Status</dt>
+            <dd class="text-sm text-text-primary dark:text-white capitalize"><%= @application.civil_status %></dd>
+          </div>
+          <div class="flex justify-between sm:flex-col">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Mobile</dt>
+            <dd class="text-sm text-text-primary dark:text-white"><%= @application.mobile_number %></dd>
+          </div>
+          <div class="flex justify-between sm:flex-col sm:col-span-2">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Email</dt>
+            <dd class="text-sm text-text-primary dark:text-white"><%= @application.email_address || "—" %></dd>
+          </div>
+        </dl>
+      </div>
+
+      <hr class="border-border dark:border-gray-700">
+
+      <div class="print-break-inside">
+        <h4 class="text-xs font-semibold text-text-tertiary dark:text-gray-500 uppercase tracking-wider mb-3">Address</h4>
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+          <div class="flex justify-between sm:flex-col sm:col-span-2">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Street</dt>
+            <dd class="text-sm text-text-primary dark:text-white"><%= @application.house_street %></dd>
+          </div>
+          <div class="flex justify-between sm:flex-col">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Barangay</dt>
+            <dd class="text-sm text-text-primary dark:text-white"><%= @application.barangay %></dd>
+          </div>
+          <div class="flex justify-between sm:flex-col">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">City</dt>
+            <dd class="text-sm text-text-primary dark:text-white"><%= @application.city %></dd>
+          </div>
+          <div class="flex justify-between sm:flex-col">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Province</dt>
+            <dd class="text-sm text-text-primary dark:text-white"><%= @application.province %></dd>
+          </div>
+          <div class="flex justify-between sm:flex-col">
+            <dt class="text-xs font-medium text-text-tertiary dark:text-gray-500">Region</dt>
+            <dd class="text-sm text-text-primary dark:text-white"><%= @application.region %></dd>
+          </div>
+        </dl>
+      </div>
+
+      <hr class="border-border dark:border-gray-700">
+
+      <div class="print-break-inside">
+        <h4 class="text-xs font-semibold text-text-tertiary dark:text-gray-500 uppercase tracking-wider mb-3">Identifications</h4>
+        <% if @application.identifications.any? %>
+          <div class="space-y-2">
+            <% @application.identifications.each do |id| %>
+              <div class="flex items-center justify-between rounded-lg border border-border bg-surface-alt px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50">
+                <div>
+                  <p class="text-sm font-medium text-text-primary dark:text-white"><%= id["id_type"].titleize %></p>
+                  <p class="text-xs text-text-tertiary dark:text-gray-500"><%= id["id_number"] %></p>
+                </div>
+              </div>
             <% end %>
-          </dd>
-        </div>
-      </dl>
+          </div>
+        <% else %>
+          <p class="text-sm text-text-tertiary dark:text-gray-500 italic">None provided</p>
+        <% end %>
+      </div>
+
+      <hr class="border-border dark:border-gray-700">
+
+      <div class="print-break-inside">
+        <h4 class="text-xs font-semibold text-text-tertiary dark:text-gray-500 uppercase tracking-wider mb-3">Signature Specimens</h4>
+        <% if @application.signature_specimens.any? %>
+          <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+            <% @application.signature_specimens.each_with_index do |data_url, index| %>
+              <div class="text-center">
+                <%= image_tag data_url, class: "h-16 w-full rounded-md border border-border bg-white object-contain dark:border-gray-700" %>
+                <p class="mt-1 text-[10px] text-text-tertiary dark:text-gray-500">Specimen #<%= index + 1 %></p>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-text-tertiary dark:text-gray-500 italic">Not yet provided</p>
+        <% end %>
+      </div>
+
+      <hr class="border-border dark:border-gray-700">
+
+      <div class="print-break-inside">
+        <h4 class="text-xs font-semibold text-text-tertiary dark:text-gray-500 uppercase tracking-wider mb-3">Profile Photo</h4>
+        <% if @application.profile_image_data.present? %>
+          <div class="flex items-center gap-3">
+            <%= image_tag @application.profile_image_data, class: "h-32 w-32 rounded-lg border border-border bg-gray-50 object-cover dark:border-gray-700" %>
+            <div>
+              <p class="text-xs text-text-tertiary dark:text-gray-500">Captured via webcam</p>
+            </div>
+          </div>
+        <% else %>
+          <p class="text-sm text-text-tertiary dark:text-gray-500 italic">Not yet captured</p>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>
