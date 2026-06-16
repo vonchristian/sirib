@@ -4,16 +4,20 @@
 <% content_for :head do %>
   <style>
     @media print {
-      body * { visibility: hidden; }
-      #print-area, #print-area * { visibility: visible; }
-      #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      @page { margin: 0.5in; size: letter; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
       .no-print { display: none !important; }
-      .print-break-inside { break-inside: avoid; }
+      .screen-only { display: none !important; }
+      .print-only { display: block !important; }
     }
+    .screen-only { display: block; }
+    .print-only { display: none; }
   </style>
 <% end %>
 
-<div class="animate-fade-in max-w-4xl mx-auto space-y-4 no-print">
+<% cooperative = @application.cooperative %>
+
+<div class="animate-fade-in max-w-4xl mx-auto space-y-4 no-print screen-only">
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-lg font-semibold text-text-primary dark:text-white">Membership Application</h2>
@@ -43,7 +47,7 @@
   </div>
 </div>
 
-<div id="print-area" class="animate-fade-in max-w-4xl mx-auto">
+<div id="print-area" class="animate-fade-in max-w-4xl mx-auto screen-only">
   <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
     <div class="p-6 space-y-6">
       <div class="flex items-center gap-4">
@@ -184,5 +188,141 @@
         <% end %>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="print-only" style="font-family: 'Times New Roman', Times, serif; max-width: 7in; margin: 0 auto; color: #000; font-size: 11pt; line-height: 1.5;">
+  <div style="text-align: center; margin-bottom: 24pt; border-bottom: 2px solid #000; padding-bottom: 16pt;">
+    <h1 style="font-size: 16pt; font-weight: bold; margin: 0 0 4pt 0; text-transform: uppercase; letter-spacing: 1pt;"><%= cooperative.name %></h1>
+    <p style="margin: 2pt 0; font-size: 10pt;"><%= cooperative.address.presence || "Address" %></p>
+    <p style="margin: 2pt 0; font-size: 10pt;">
+      Contact: <%= cooperative.contact_number.presence || "N/A" %>
+      <% if cooperative.registration_number.present? %> | Reg. No.: <%= cooperative.registration_number %><% end %>
+    </p>
+  </div>
+
+  <h2 style="text-align: center; font-size: 14pt; font-weight: bold; margin: 0 0 16pt 0; text-transform: uppercase; letter-spacing: 0.5pt;">Membership Application Form</h2>
+
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16pt;">
+    <tr>
+      <td colspan="2" style="border: 1px solid #000; padding: 8pt 10pt; background: #f0f0f0; font-weight: bold; font-size: 11pt;" colspan="2">APPLICANT INFORMATION</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; width: 30%; font-weight: bold;">Full Name</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= [@application.first_name, @application.middle_name, @application.last_name].compact.join(" ") %><%= " #{@application.suffix}" if @application.suffix.present? %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">Birth Date</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= @application.birth_date %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">Gender</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; text-transform: capitalize;"><%= @application.gender %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">Civil Status</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; text-transform: capitalize;"><%= @application.civil_status %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">Mobile Number</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= @application.mobile_number %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">Email Address</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= @application.email_address.presence || "—" %></td>
+    </tr>
+  </table>
+
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16pt;">
+    <tr>
+      <td colspan="2" style="border: 1px solid #000; padding: 8pt 10pt; background: #f0f0f0; font-weight: bold; font-size: 11pt;">ADDRESS</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; width: 30%; font-weight: bold;">Street</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= @application.house_street %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">Barangay</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= @application.barangay %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">City</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= @application.city %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">Province</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= @application.province %></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">Region</td>
+      <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= @application.region %></td>
+    </tr>
+  </table>
+
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16pt;">
+    <tr>
+      <td colspan="2" style="border: 1px solid #000; padding: 8pt 10pt; background: #f0f0f0; font-weight: bold; font-size: 11pt;">IDENTIFICATIONS</td>
+    </tr>
+    <% if @application.identifications.any? %>
+      <tr>
+        <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold; width: 30%;">ID Type</td>
+        <td style="border: 1px solid #000; padding: 6pt 10pt; font-weight: bold;">ID Number</td>
+      </tr>
+      <% @application.identifications.each do |id| %>
+        <tr>
+          <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= id["id_type"].titleize %></td>
+          <td style="border: 1px solid #000; padding: 6pt 10pt;"><%= id["id_number"] %></td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+        <td colspan="2" style="border: 1px solid #000; padding: 6pt 10pt; font-style: italic;">None provided</td>
+      </tr>
+    <% end %>
+  </table>
+
+  <% if @application.signature_specimens.any? %>
+    <div style="margin-bottom: 16pt;">
+      <h3 style="border: 1px solid #000; padding: 8pt 10pt; background: #f0f0f0; font-size: 11pt; margin: 0;">SIGNATURE SPECIMENS</h3>
+      <div style="border: 1px solid #000; border-top: none; padding: 10pt; text-align: center;">
+        <div style="display: flex; justify-content: center; gap: 16pt;">
+          <% @application.signature_specimens.each_with_index do |data_url, index| %>
+            <div style="text-align: center;">
+              <%= image_tag data_url, style: "height: 48pt; border: 1px solid #999; object-fit: contain; background: white;" %>
+              <p style="margin: 4pt 0 0 0; font-size: 9pt;">Specimen #<%= index + 1 %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @application.profile_images.any? %>
+    <div style="margin-bottom: 16pt; page-break-inside: avoid;">
+      <h3 style="border: 1px solid #000; padding: 8pt 10pt; background: #f0f0f0; font-size: 11pt; margin: 0;">PROFILE PHOTOS</h3>
+      <div style="border: 1px solid #000; border-top: none; padding: 10pt;">
+        <div style="display: flex; flex-wrap: wrap; gap: 10pt; justify-content: center;">
+          <% @application.profile_images.each_with_index do |data_url, index| %>
+            <div style="text-align: center;">
+              <%= image_tag data_url, style: "height: 72pt; border: 1px solid #999; object-fit: cover;" %>
+              <p style="margin: 4pt 0 0 0; font-size: 9pt;">Photo #<%= index + 1 %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div style="margin-top: 24pt; padding-top: 12pt; border-top: 1px solid #999; font-size: 9pt; color: #666;">
+    <table style="width: 100%;">
+      <tr>
+        <td>Application UUID: <%= @application.uuid %></td>
+        <td style="text-align: right;">Status: <%= @application.status.titleize %></td>
+      </tr>
+      <tr>
+        <td>Printed on: <%= Time.current.strftime("%B %d, %Y at %I:%M %p") %></td>
+        <td style="text-align: right;">Date Filed: <%= @application.created_at.strftime("%B %d, %Y") %></td>
+      </tr>
+    </table>
   </div>
 </div>
