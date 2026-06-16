@@ -199,9 +199,9 @@
           @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         </style>
         <dialog data-image-modal-target="dialog"
-                class="id-modal rounded-xl border border-border bg-surface p-0 shadow-2xl max-w-[90vw] max-h-[90vh]"
-                data-action="keydown.self->image-modal#closeOnEscape click->image-modal#close">
-          <div class="relative">
+                class="id-modal rounded-xl border border-border bg-surface p-0 shadow-2xl max-w-[90vw] max-h-[90vh] m-auto fixed inset-0"
+                data-action="keydown.self->image-modal#navigate click->image-modal#close">
+          <div class="relative flex flex-col items-center">
             <button type="button"
                     data-action="image-modal#close"
                     class="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface shadow-md border border-border text-text-secondary hover:text-text-primary transition-colors">
@@ -209,7 +209,22 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
               </svg>
             </button>
-            <img data-image-modal-target="image" class="max-h-[85vh] max-w-[85vw] rounded-lg object-contain">
+            <div class="flex items-center justify-center gap-4 px-4 pt-4 w-full">
+              <button type="button"
+                      data-image-modal-target="prevNav"
+                      data-action="image-modal#prev"
+                      class="flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+              </button>
+              <span class="text-xs text-text-tertiary dark:text-gray-500 select-none flex-shrink-0" data-image-modal-target="counter">1 / 1</span>
+              <button type="button"
+                      data-image-modal-target="nextNav"
+                      data-action="image-modal#next"
+                      class="flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+              </button>
+            </div>
+            <img data-image-modal-target="image" class="max-h-[75vh] max-w-[85vw] rounded-lg object-contain px-4 pb-4">
           </div>
         </dialog>
         </div>
@@ -353,7 +368,39 @@
               0 captured
             </div>
 
+            <div data-controller="image-modal">
             <div data-wizard-target="photoGallery" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 w-full">
+            </div>
+
+            <dialog data-image-modal-target="dialog"
+                    class="id-modal rounded-xl border border-border bg-surface p-0 shadow-2xl max-w-[90vw] max-h-[90vh] m-auto fixed inset-0"
+                    data-action="keydown.self->image-modal#navigate click->image-modal#close">
+              <div class="relative flex flex-col items-center">
+                <button type="button"
+                        data-action="image-modal#close"
+                        class="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface shadow-md border border-border text-text-secondary hover:text-text-primary transition-colors">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <div class="flex items-center justify-center gap-4 px-4 pt-4 w-full">
+                  <button type="button"
+                          data-image-modal-target="prevNav"
+                          data-action="image-modal#prev"
+                          class="flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+                  </button>
+                  <span class="text-xs text-text-tertiary dark:text-gray-500 select-none flex-shrink-0" data-image-modal-target="counter">1 / 1</span>
+                  <button type="button"
+                          data-image-modal-target="nextNav"
+                          data-action="image-modal#next"
+                          class="flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+                  </button>
+                </div>
+                <img data-image-modal-target="image" class="max-h-[75vh] max-w-[85vw] rounded-lg object-contain px-4 pb-4">
+              </div>
+            </dialog>
             </div>
           </div>
         </div>
