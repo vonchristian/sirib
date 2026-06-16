@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_10_132641) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_10_132644) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -77,13 +77,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_132641) do
     t.index ["ancestry"], name: "index_ledgers_on_ancestry"
   end
 
-  create_table "roles", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "running_balances", force: :cascade do |t|
     t.bigint "account_id"
     t.bigint "ledger_id", null: false
@@ -107,14 +100,44 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_132641) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "treasury_time_deposit_products", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.integer "minimum_deposit_cents", default: 0, null: false
+    t.string "minimum_deposit_currency", default: "PHP", null: false
+    t.decimal "interest_rate", precision: 8, scale: 4, null: false
+    t.integer "term_in_days", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "treasury_time_deposits", force: :cascade do |t|
+    t.string "depositor_type", null: false
+    t.bigint "depositor_id", null: false
+    t.bigint "time_deposit_product_id", null: false
+    t.integer "amount_cents", default: 0, null: false
+    t.string "amount_currency", default: "PHP", null: false
+    t.decimal "interest_rate", precision: 8, scale: 4, null: false
+    t.date "matured_on"
+    t.integer "interest_earned_cents", default: 0
+    t.string "interest_earned_currency", default: "PHP", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "opened_at"
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["depositor_type", "depositor_id"], name: "index_treasury_time_deposits_on_depositor"
+    t.index ["time_deposit_product_id"], name: "index_treasury_time_deposits_on_time_deposit_product_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "role_id"
+    t.integer "role", default: 0, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
-    t.index ["role_id"], name: "index_users_on_role_id"
   end
 
   add_foreign_key "accounting_cash_accounts", "accounts"
@@ -125,5 +148,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_132641) do
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "ledgers"
   add_foreign_key "sessions", "users"
-  add_foreign_key "users", "roles"
+  add_foreign_key "treasury_time_deposits", "treasury_time_deposit_products", column: "time_deposit_product_id"
 end

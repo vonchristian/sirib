@@ -1,0 +1,153 @@
+<% content_for :page_title, "Treasurer Dashboard" %>
+<% content_for :page_subtitle, "Treasury and cash position overview" %>
+
+<div class="animate-fade-in space-y-6">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="rounded-lg border border-border bg-surface px-5 py-5 dark:border-gray-700 dark:bg-gray-900">
+      <div class="flex items-center gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-positive-50 text-positive dark:bg-emerald-900/30 dark:text-emerald-300">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Cash on Hand</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-border bg-surface px-5 py-5 dark:border-gray-700 dark:bg-gray-900">
+      <div class="flex items-center gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Total Time Deposits</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-border bg-surface px-5 py-5 dark:border-gray-700 dark:bg-gray-900">
+      <div class="flex items-center gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-warning-50 text-warning dark:bg-amber-900/30 dark:text-amber-300">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Avg. Interest Rate</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-border bg-surface px-5 py-5 dark:border-gray-700 dark:bg-gray-900">
+      <div class="flex items-center gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-danger-50 text-danger dark:bg-red-900/30 dark:text-red-300">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Maturing This Month</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2 space-y-6">
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+        <div class="flex items-center justify-between border-b border-border px-6 py-4 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-text-primary dark:text-white">Active Time Deposits</h2>
+          <a href="/treasury/time_deposits" class="text-sm font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors">View all</a>
+        </div>
+        <div class="divide-y divide-border">
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-text-primary dark:text-white">TD-2024-001</p>
+              <p class="text-xs text-text-tertiary dark:text-gray-400">Juan Dela Cruz</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-semibold text-text-primary dark:text-white">PHP 100,000.00</p>
+              <p class="text-xs text-text-tertiary dark:text-gray-400">Matures Dec 15, 2024</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-text-primary dark:text-white">TD-2024-002</p>
+              <p class="text-xs text-text-tertiary dark:text-gray-400">Maria Santos</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-semibold text-text-primary dark:text-white">PHP 250,000.00</p>
+              <p class="text-xs text-text-tertiary dark:text-gray-400">Matures Jan 20, 2025</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-text-primary dark:text-white">TD-2024-003</p>
+              <p class="text-xs text-text-tertiary dark:text-gray-400">Pedro Reyes</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-semibold text-text-primary dark:text-white">PHP 50,000.00</p>
+              <p class="text-xs text-text-tertiary dark:text-gray-400">Matures Jun 30, 2025</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+        <div class="border-b border-border px-6 py-4 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-text-primary dark:text-white">Cash Position</h2>
+        </div>
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm text-text-secondary dark:text-gray-300">Operating Cash</span>
+              <span class="text-sm font-semibold text-text-primary dark:text-white tabular-nums">—</span>
+            </div>
+            <div class="h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+              <div class="h-full w-3/5 rounded-full bg-primary"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm text-text-secondary dark:text-gray-300">Time Deposits</span>
+              <span class="text-sm font-semibold text-text-primary dark:text-white tabular-nums">—</span>
+            </div>
+            <div class="h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+              <div class="h-full w-2/5 rounded-full bg-positive"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+        <div class="border-b border-border px-6 py-4 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-text-primary dark:text-white">Quick Actions</h2>
+        </div>
+        <div class="px-6 py-4 space-y-2">
+          <a href="/treasury/time_deposits/new" class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-gray-100 hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3" />
+            </svg>
+            New Time Deposit
+          </a>
+          <a href="/treasury/time_deposit_products/new" class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-gray-100 hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3" />
+            </svg>
+            Create Product
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

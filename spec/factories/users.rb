@@ -4,6 +4,6 @@ FactoryBot.define do
   factory :user do
     email_address
     password { "password123" }
-    role
+    role { :manager }
   end
 end

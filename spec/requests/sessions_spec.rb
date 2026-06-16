@@ -15,7 +15,7 @@ RSpec.describe "Sessions" do
     context "with valid credentials" do
       it "signs the user in and redirects" do
         post session_path, params: { email_address: user.email_address, password: "secret123" }
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(manager_dashboard_path)
         expect(cookies[:session_id]).to be_present
       end
 

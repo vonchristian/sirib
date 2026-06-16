@@ -8,7 +8,7 @@ RSpec.describe "Dashboard" do
   end
 
   it "renders the dashboard index" do
-    get root_path
+    get manager_dashboard_path
     expect(response).to have_http_status(:ok)
   end
 

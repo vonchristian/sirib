@@ -1,0 +1,182 @@
+<% content_for :page_title, "Loan Officer Dashboard" %>
+<% content_for :page_subtitle, "Loan applications and member accounts" %>
+
+<div class="animate-fade-in space-y-6">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="rounded-lg border border-border bg-surface px-5 py-5 dark:border-gray-700 dark:bg-gray-900">
+      <div class="flex items-center gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-warning-50 text-warning dark:bg-amber-900/30 dark:text-amber-300">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Pending Applications</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-border bg-surface px-5 py-5 dark:border-gray-700 dark:bg-gray-900">
+      <div class="flex items-center gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 0 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125V9.75c0 .621-.504 1.125-1.125 1.125H20.25m0 0v.75c0 .414-.336.75-.75.75H3.75" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Active Loans</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-border bg-surface px-5 py-5 dark:border-gray-700 dark:bg-gray-900">
+      <div class="flex items-center gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-positive-50 text-positive dark:bg-emerald-900/30 dark:text-emerald-300">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Due This Week</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-border bg-surface px-5 py-5 dark:border-gray-700 dark:bg-gray-900">
+      <div class="flex items-center gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Total Members</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2 space-y-6">
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+        <div class="flex items-center justify-between border-b border-border px-6 py-4 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-text-primary dark:text-white">Pending Loan Applications</h2>
+          <a href="/dashboard/loans" class="text-sm font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors">View all</a>
+        </div>
+        <div class="divide-y divide-border">
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex items-center gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300 text-xs font-semibold">JD</div>
+              <div>
+                <p class="text-sm font-medium text-text-primary dark:text-white">Juan Dela Cruz</p>
+                <p class="text-xs text-text-tertiary dark:text-gray-400">PHP 50,000 - Personal Loan</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 text-xs font-medium text-warning ring-1 ring-inset ring-warning/20 dark:bg-amber-900/30 dark:text-amber-400">Pending</span>
+          </div>
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex items-center gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300 text-xs font-semibold">MS</div>
+              <div>
+                <p class="text-sm font-medium text-text-primary dark:text-white">Maria Santos</p>
+                <p class="text-xs text-text-tertiary dark:text-gray-400">PHP 100,000 - Housing Loan</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20 dark:bg-primary-900/30 dark:text-primary-300">For Review</span>
+          </div>
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex items-center gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300 text-xs font-semibold">PR</div>
+              <div>
+                <p class="text-sm font-medium text-text-primary dark:text-white">Pedro Reyes</p>
+                <p class="text-xs text-text-tertiary dark:text-gray-400">PHP 25,000 - Emergency Loan</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-positive-50 px-2 py-0.5 text-xs font-medium text-positive ring-1 ring-inset ring-positive/20 dark:bg-emerald-900/30 dark:text-emerald-400">Approved</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+        <div class="border-b border-border px-6 py-4 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-text-primary dark:text-white">Today's Collection Schedule</h2>
+        </div>
+        <div class="divide-y divide-border">
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex items-center gap-3">
+              <div class="flex h-2 w-2 rounded-full bg-positive"></div>
+              <span class="text-sm text-text-primary dark:text-white">Juan Dela Cruz</span>
+            </div>
+            <span class="text-sm font-semibold text-text-primary dark:text-white tabular-nums">PHP 2,500.00</span>
+          </div>
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex items-center gap-3">
+              <div class="flex h-2 w-2 rounded-full bg-positive"></div>
+              <span class="text-sm text-text-primary dark:text-white">Maria Santos</span>
+            </div>
+            <span class="text-sm font-semibold text-text-primary dark:text-white tabular-nums">PHP 4,200.00</span>
+          </div>
+          <div class="flex items-center justify-between px-6 py-3.5">
+            <div class="flex items-center gap-3">
+              <div class="flex h-2 w-2 rounded-full bg-warning"></div>
+              <span class="text-sm text-text-primary dark:text-white">Pedro Reyes</span>
+            </div>
+            <span class="text-sm font-semibold text-text-primary dark:text-white tabular-nums">PHP 1,800.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+        <div class="border-b border-border px-6 py-4 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-text-primary dark:text-white">My Tasks</h2>
+        </div>
+        <div class="divide-y divide-border">
+          <div class="px-6 py-3.5">
+            <div class="flex items-start gap-3">
+              <div class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 transition-colors hover:border-primary-400 dark:border-gray-600 mt-0.5"></div>
+              <div>
+                <p class="text-sm text-text-primary dark:text-white">Review loan docs for Ana Reyes</p>
+                <p class="text-xs text-text-tertiary dark:text-gray-400">Due today</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-3.5">
+            <div class="flex items-start gap-3">
+              <div class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 transition-colors hover:border-primary-400 dark:border-gray-600 mt-0.5"></div>
+              <div>
+                <p class="text-sm text-text-primary dark:text-white">Call Jose Ramirez for missing requirements</p>
+                <p class="text-xs text-text-tertiary dark:text-gray-400">Due tomorrow</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+        <div class="border-b border-border px-6 py-4 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-text-primary dark:text-white">Quick Actions</h2>
+        </div>
+        <div class="px-6 py-4 space-y-2">
+          <a href="/dashboard/members" class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-gray-100 hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3" />
+            </svg>
+            New Member
+          </a>
+          <a href="/dashboard/payments" class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-gray-100 hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3" />
+            </svg>
+            Record Payment
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

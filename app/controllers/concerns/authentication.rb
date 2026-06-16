@@ -35,7 +35,19 @@ module Authentication
     end
 
     def after_authentication_url
-      session.delete(:return_to_after_authenticating) || root_url
+      session.delete(:return_to_after_authenticating) || after_sign_in_url
+    end
+
+    def after_sign_in_url
+      return root_url unless Current.user
+
+      case Current.user.role
+      when "manager" then manager_dashboard_url
+      when "treasurer" then treasurer_dashboard_url
+      when "accountant" then accountant_dashboard_url
+      when "loan_officer" then loan_officer_dashboard_url
+      else root_url
+      end
     end
 
     def start_new_session_for(user)
