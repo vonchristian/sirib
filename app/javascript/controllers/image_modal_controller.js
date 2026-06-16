@@ -1,7 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["dialog", "image", "counter", "prevNav", "nextNav"]
+  static targets = ["dialog", "image", "counter", "prevNav", "nextNav", "title"]
+
+  get groupLabel() {
+    return {
+      identifications: "Identification",
+      signature: "Signature Specimen",
+      profile: "Profile Photo",
+    }[this._groupName] || this._groupName
+  }
 
   connect() {
     this.images = []
@@ -17,8 +25,8 @@ export default class extends Controller {
 
   open(event) {
     const trigger = event.currentTarget
-    const group = trigger.dataset.imageModalGroup || "default"
-    this.images = [...this.element.querySelectorAll(`[data-image-modal-group="${group}"]`)]
+    this._groupName = trigger.dataset.imageModalGroup || "default"
+    this.images = [...this.element.querySelectorAll(`[data-image-modal-group="${this._groupName}"]`)]
     this.currentIndex = this.images.indexOf(trigger)
     if (this.currentIndex === -1) {
       this.images = [trigger]
@@ -42,6 +50,9 @@ export default class extends Controller {
     if (this.hasNextNavTarget) {
       this.nextNavTarget.classList.toggle("opacity-30", this.currentIndex === this.images.length - 1)
       this.nextNavTarget.classList.toggle("pointer-events-none", this.currentIndex === this.images.length - 1)
+    }
+    if (this.hasTitleTarget) {
+      this.titleTarget.textContent = `${this.groupLabel} ${this.currentIndex + 1} / ${this.images.length}`
     }
   }
 
@@ -72,8 +83,11 @@ export default class extends Controller {
     }
   }
 
-  close(event) {
-    if (event && event.target !== this.dialogTarget) return
+  close() {
     this.dialogTarget.close()
+  }
+
+  closeOnBackdrop(event) {
+    if (event.target === this.dialogTarget) this.close()
   }
 }

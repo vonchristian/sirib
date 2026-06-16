@@ -4,7 +4,8 @@ export default class extends Controller {
   static targets = [
     "step", "nextBtn", "backBtn", "submitBtn",
     "video", "preview", "capturePlaceholder", "webcamError", "profileInput",
-    "counter", "currentStep", "photoCounter", "photoGallery"
+    "counter", "currentStep", "photoCounter", "photoGallery",
+    "stepper", "dotMobile"
   ]
   static values = { currentStep: { type: Number, default: 0 } }
 
@@ -26,6 +27,8 @@ export default class extends Controller {
     } catch (e) {
       this.photos = []
     }
+    this.updateStepper()
+    this.updateMobileDots()
     this.syncURL()
     this.showStep()
   }
@@ -48,7 +51,13 @@ export default class extends Controller {
 
   showStep() {
     this.stepTargets.forEach((step, index) => {
-      step.classList.toggle("hidden", index !== this.currentStepValue)
+      const isVisible = index === this.currentStepValue
+      step.classList.toggle("hidden", !isVisible)
+      if (isVisible) {
+        step.classList.remove("animate-fade-in-up")
+        void step.offsetWidth
+        step.classList.add("animate-fade-in-up")
+      }
     })
 
     if (this.hasBackBtnTarget) {
@@ -74,9 +83,73 @@ export default class extends Controller {
       this.stopWebcam()
     }
 
+    this.updateStepper()
     this.updateCounter()
+    this.updateMobileDots()
     this.syncURL()
     this.updateCurrentStepField()
+  }
+
+  updateStepper() {
+    if (!this.hasStepperTarget) return
+    const current = this.currentStepValue
+
+    this.stepperTarget.querySelectorAll("[data-step-index]").forEach((el) => {
+      const idx = parseInt(el.dataset.stepIndex, 10)
+      const circle = el.querySelector("[data-step-circle]")
+      const number = el.querySelector("[data-step-number]")
+      const check = el.querySelector("[data-step-check]")
+      const label = el.querySelector("[data-step-label]")
+      const connectors = el.querySelectorAll("[data-step-connector]")
+
+      if (circle) {
+        if (idx < current) {
+          circle.className = "relative flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-all duration-300 bg-primary border-primary text-white"
+          if (number) number.classList.add("hidden")
+          if (check) { check.classList.remove("hidden"); check.classList.add("text-white") }
+        } else if (idx === current) {
+          circle.className = "relative flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-all duration-300 border-primary text-primary"
+          if (number) { number.classList.remove("hidden"); number.classList.add("text-primary") }
+          if (check) check.classList.add("hidden")
+        } else {
+          circle.className = "relative flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-all duration-300 border-border text-text-tertiary"
+          if (number) { number.classList.remove("hidden"); number.classList.add("text-text-tertiary") }
+          if (check) check.classList.add("hidden")
+        }
+      }
+
+      if (label) {
+        if (idx === current) {
+          label.className = "mt-1.5 text-[11px] font-medium leading-tight text-center truncate max-w-[7rem] transition-colors duration-200 text-primary"
+        } else if (idx < current) {
+          label.className = "mt-1.5 text-[11px] font-medium leading-tight text-center truncate max-w-[7rem] transition-colors duration-200 text-text-tertiary"
+        } else {
+          label.className = "mt-1.5 text-[11px] font-medium leading-tight text-center truncate max-w-[7rem] transition-colors duration-200 text-text-tertiary/50"
+        }
+      }
+
+      connectors.forEach((conn) => {
+        if (idx < current) {
+          conn.className = "flex-1 h-px bg-primary transition-colors duration-300"
+        } else {
+          conn.className = "flex-1 h-px bg-border dark:bg-gray-700 transition-colors duration-300"
+        }
+      })
+    })
+  }
+
+  updateMobileDots() {
+    if (!this.hasDotMobileTarget) return
+    const current = this.currentStepValue
+    this.dotMobileTargets.forEach((dot, idx) => {
+      if (idx < current) {
+        dot.className = "flex-1 h-1.5 rounded-full transition-colors duration-300 bg-primary"
+      } else if (idx === current) {
+        dot.className = "flex-1 h-1.5 rounded-full transition-colors duration-300 bg-primary"
+      } else {
+        dot.className = "flex-1 h-1.5 rounded-full transition-colors duration-300 bg-gray-200 dark:bg-gray-700"
+      }
+    })
   }
 
   stepIndexFromURL() {
@@ -100,16 +173,10 @@ export default class extends Controller {
   }
 
   updateCounter() {
-    const names = [
-      "Personal Details",
-      "Address & Contact",
-      "Identifications",
-      "Sources of Income",
-      "Signature Specimens",
-      "Profile Photos"
-    ]
+    const step = this.currentStepValue + 1
+    const total = this.stepTargets.length
     if (this.hasCounterTarget) {
-      this.counterTarget.textContent = names[this.currentStepValue]
+      this.counterTarget.textContent = `Step ${step} of ${total}`
     }
   }
 
@@ -119,18 +186,18 @@ export default class extends Controller {
     let valid = true
 
     requiredFields.forEach((field) => {
-      field.classList.remove("border-danger")
+      field.classList.remove("field-input-error")
       const errorMsg = field.closest(".field-group")?.querySelector(".field-error")
       if (errorMsg) errorMsg.remove()
 
       if (!field.value.trim()) {
-        field.classList.add("border-danger")
+        field.classList.add("field-input-error")
         valid = false
         const wrapper = field.closest(".field-group")
         if (wrapper) {
           const msg = document.createElement("p")
-          msg.className = "field-error mt-1 text-xs text-danger"
-          msg.textContent = "This field is required"
+          msg.className = "field-error"
+          msg.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg> This field is required'
           wrapper.appendChild(msg)
         }
       }
@@ -141,21 +208,21 @@ export default class extends Controller {
       if (!wrapper) return
       const existing = wrapper.querySelector(".field-error")
       if (existing) existing.remove()
-      wrapper.querySelector(".file-input-highlight")?.classList.remove("border-danger")
+      wrapper.querySelector(".file-input-highlight")?.classList.remove("field-input-error")
 
       if (!hidden.value.trim()) {
         valid = false
         const highlight = wrapper.querySelector(".file-input-highlight")
-        if (highlight) highlight.classList.add("border-danger")
+        if (highlight) highlight.classList.add("field-input-error")
         const msg = document.createElement("p")
-        msg.className = "field-error mt-1 text-xs text-danger"
-        msg.textContent = "Please upload an image"
+        msg.className = "field-error"
+        msg.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg> Please upload an image'
         wrapper.appendChild(msg)
       }
     })
 
     if (!valid) {
-      const firstInvalid = currentStep.querySelector(".border-danger")
+      const firstInvalid = currentStep.querySelector(".field-input-error")
       firstInvalid?.focus()
     }
 
@@ -187,11 +254,12 @@ export default class extends Controller {
   }
 
   identificationTemplate() {
+    const className = this.inputClass
     return '<div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 identification-entry">' +
       '<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">' +
         '<div class="field-group">' +
-          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">ID Type</label>' +
-          '<select name="membership_application[identifications][][id_type]" required class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+          '<label class="field-label">ID Type</label>' +
+          '<select name="membership_application[identifications][][id_type]" required class="' + className + '">' +
             '<option value="">Select ID type</option>' +
             '<option value="BIR">Bir</option>' +
             '<option value="UMID">Umid</option>' +
@@ -205,15 +273,15 @@ export default class extends Controller {
           '</select>' +
         '</div>' +
         '<div class="field-group">' +
-          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">ID Number</label>' +
-          '<input type="text" name="membership_application[identifications][][id_number]" value="" required placeholder="ID number" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">' +
+          '<label class="field-label">ID Number</label>' +
+          '<input type="text" name="membership_application[identifications][][id_number]" value="" required placeholder="ID number" class="' + className + '">' +
         '</div>' +
       '</div>' +
       '<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">' +
         '<div class="field-group">' +
-          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Front of ID *</label>' +
+          '<label class="field-label">Front of ID *</label>' +
           '<input type="hidden" name="membership_application[identifications][][front_image]" value="" class="id-image-input">' +
-          '<input type="file" accept="image/*" data-action="change->wizard#handleIdImage" class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+          '<input type="file" accept="image/*" data-action="change->wizard#handleIdImage" class="file-input-highlight ' + className + ' file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700">' +
           '<div class="group relative">' +
             '<img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">' +
             '<button type="button" data-action="click->image-modal#open" data-image-modal-group="id" class="id-image-enlarge absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75 hidden">' +
@@ -223,9 +291,9 @@ export default class extends Controller {
           '</div>' +
         '</div>' +
         '<div class="field-group">' +
-          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Back of ID *</label>' +
+          '<label class="field-label">Back of ID *</label>' +
           '<input type="hidden" name="membership_application[identifications][][back_image]" value="" class="id-image-input">' +
-          '<input type="file" accept="image/*" data-action="change->wizard#handleIdImage" class="file-input-highlight block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+          '<input type="file" accept="image/*" data-action="change->wizard#handleIdImage" class="file-input-highlight ' + className + ' file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700">' +
           '<div class="group relative">' +
             '<img class="id-image-preview mt-2 h-24 w-full rounded-md border border-border object-cover dark:border-gray-700 hidden">' +
             '<button type="button" data-action="click->image-modal#open" data-image-modal-group="id" class="id-image-enlarge absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/75 hidden">' +
@@ -259,12 +327,17 @@ export default class extends Controller {
     reader.readAsDataURL(file)
   }
 
+  get inputClass() {
+    return "field-input"
+  }
+
   incomeTemplate() {
+    const className = this.inputClass
     return '<div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 income-entry">' +
       '<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">' +
         '<div class="field-group">' +
-          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Source of Income</label>' +
-          '<select name="membership_application[sources_of_income][][source_type]" required class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white">' +
+          '<label class="field-label">Source of Income</label>' +
+          '<select name="membership_application[sources_of_income][][source_type]" required class="' + className + '">' +
             '<option value="">Select source</option>' +
             '<option value="Employment">Employment</option>' +
             '<option value="Self-Employed">Self-Employed</option>' +
@@ -276,8 +349,8 @@ export default class extends Controller {
           '</select>' +
         '</div>' +
         '<div class="field-group">' +
-          '<label class="mb-1 block text-sm font-medium text-text-primary dark:text-white">Monthly Income (PHP)</label>' +
-          '<input type="number" name="membership_application[sources_of_income][][monthly_income]" value="" required min="0" step="0.01" placeholder="0.00" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">' +
+          '<label class="field-label">Monthly Income (PHP)</label>' +
+          '<input type="number" name="membership_application[sources_of_income][][monthly_income]" value="" required min="0" step="0.01" placeholder="0.00" class="' + className + '">' +
         '</div>' +
       '</div>' +
     '</div>'
