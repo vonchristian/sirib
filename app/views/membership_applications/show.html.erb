@@ -183,18 +183,29 @@
 
         <style>
           .id-modal::backdrop {
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             animation: modalBackdropIn 0.2s ease-out;
           }
-          .id-modal[open] {
+          .id-modal {
+            border-radius: 0.75rem;
+            border: 1px solid rgb(229 231 235);
+            background: rgb(255 255 255);
+            padding: 0;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            max-width: 90vw;
+            max-height: 90vh;
             animation: modalIn 0.2s ease-out;
+          }
+          .dark .id-modal {
+            border-color: rgb(55 65 81);
+            background: rgb(17 24 39);
           }
           @keyframes modalBackdropIn { from { opacity: 0; } to { opacity: 1; } }
           @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         </style>
-        <dialog data-image-modal-target="dialog"
-                class="id-modal rounded-xl border border-border bg-surface p-0 shadow-2xl max-w-[90vw] max-h-[90vh] m-auto fixed inset-0"
+        <dialog data-image-modal-target="dialog" class="id-modal"
                 data-action="keydown.self->image-modal#navigate click->image-modal#close">
           <div class="relative flex flex-col items-center">
             <button type="button"
@@ -290,7 +301,7 @@
         <% end %>
 
         <dialog data-image-modal-target="dialog"
-                class="id-modal rounded-xl border border-border bg-surface p-0 shadow-2xl max-w-[90vw] max-h-[90vh] m-auto fixed inset-0"
+                class="id-modal"
                 data-action="keydown.self->image-modal#navigate click->image-modal#close">
           <div class="relative flex flex-col items-center">
             <button type="button"
