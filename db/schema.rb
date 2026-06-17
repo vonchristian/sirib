@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_17_072136) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_17_072142) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -100,6 +100,70 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_072136) do
     t.datetime "updated_at", null: false
     t.index ["posted_at"], name: "index_entries_on_posted_at"
     t.index ["reference_number"], name: "index_entries_on_reference_number", unique: true
+  end
+
+  create_table "equity_accounts", force: :cascade do |t|
+    t.bigint "member_id", null: false
+    t.bigint "share_product_id", null: false
+    t.string "account_number", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "opened_at", null: false
+    t.integer "opened_by_id", null: false
+    t.string "branch"
+    t.text "remarks"
+    t.bigint "equity_account_id"
+    t.integer "shares_owned", default: 0, null: false
+    t.integer "paid_up_shares", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_number"], name: "index_equity_accounts_on_account_number", unique: true
+    t.index ["equity_account_id"], name: "index_equity_accounts_on_equity_account_id"
+    t.index ["member_id", "share_product_id"], name: "index_equity_accounts_on_member_id_and_share_product_id", unique: true
+    t.index ["member_id"], name: "index_equity_accounts_on_member_id"
+    t.index ["share_product_id"], name: "index_equity_accounts_on_share_product_id"
+  end
+
+  create_table "equity_products", force: :cascade do |t|
+    t.string "product_code", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.integer "share_type", default: 0, null: false
+    t.string "status", default: "active", null: false
+    t.date "effective_date"
+    t.integer "price_per_share_cents", default: 0, null: false
+    t.integer "minimum_required_shares", default: 1, null: false
+    t.integer "maximum_allowed_shares"
+    t.integer "minimum_initial_purchase", default: 1, null: false
+    t.boolean "allow_fractional_shares", default: false, null: false
+    t.boolean "redeemable", default: true, null: false
+    t.boolean "dividend_eligible", default: true, null: false
+    t.boolean "voting_rights", default: true, null: false
+    t.bigint "equity_ledger_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["equity_ledger_id"], name: "index_equity_products_on_equity_ledger_id"
+    t.index ["product_code"], name: "index_equity_products_on_product_code", unique: true
+  end
+
+  create_table "equity_transactions", force: :cascade do |t|
+    t.bigint "share_capital_account_id", null: false
+    t.integer "transaction_type", default: 0, null: false
+    t.integer "shares", null: false
+    t.integer "price_per_share_cents", null: false
+    t.integer "total_amount_cents", null: false
+    t.bigint "cash_account_id"
+    t.bigint "entry_id"
+    t.string "reference_number", null: false
+    t.string "status", default: "completed", null: false
+    t.datetime "posted_at", null: false
+    t.integer "posted_by_id", null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cash_account_id"], name: "index_equity_transactions_on_cash_account_id"
+    t.index ["entry_id"], name: "index_equity_transactions_on_entry_id"
+    t.index ["reference_number"], name: "index_equity_transactions_on_reference_number", unique: true
+    t.index ["share_capital_account_id"], name: "index_equity_transactions_on_share_capital_account_id"
   end
 
   create_table "ledgers", force: :cascade do |t|
@@ -486,6 +550,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_072136) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "amount_lines", "accounts"
   add_foreign_key "amount_lines", "entries"
+  add_foreign_key "equity_accounts", "accounts", column: "equity_account_id"
+  add_foreign_key "equity_accounts", "equity_products", column: "share_product_id"
+  add_foreign_key "equity_accounts", "members"
+  add_foreign_key "equity_products", "ledgers", column: "equity_ledger_id"
+  add_foreign_key "equity_transactions", "accounts", column: "cash_account_id"
+  add_foreign_key "equity_transactions", "entries"
+  add_foreign_key "equity_transactions", "equity_accounts", column: "share_capital_account_id"
   add_foreign_key "loan_applications", "cooperatives"
   add_foreign_key "loan_applications", "loan_products"
   add_foreign_key "loan_applications", "members"

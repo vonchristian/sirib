@@ -1,0 +1,107 @@
+<% content_for :page_title, "New Share Capital Product" %>
+
+<div class="animate-fade-in max-w-2xl mx-auto">
+  <div class="rounded-xl border border-border bg-surface p-6 sm:p-8">
+    <h1 class="text-lg font-semibold text-text-primary mb-6">New Share Capital Product</h1>
+
+    <%= form_with model: @product, url: equity_products_path, class: "space-y-6" do |f| %>
+      <% if @product.errors.any? %>
+        <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger">
+          <ul class="list-inside list-disc">
+            <% @product.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <h2 class="text-sm font-semibold text-text-primary mb-4">Basic Information</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <%= f.label :product_code, "Product Code", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <%= f.text_field :product_code, required: true, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder: "e.g. COMMON" %>
+          </div>
+          <div>
+            <%= f.label :share_type, "Share Type", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <%= f.select :share_type, options_for_select(Equity::Product.share_types.keys.map { |k| [k.titleize, k] }), { prompt: "Select type" }, required: true, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.75rem_center] pr-10" %>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :name, "Product Name", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+        <%= f.text_field :name, required: true, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder: "e.g. Common Shares" %>
+      </div>
+
+      <div>
+        <%= f.label :description, "Description", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+        <%= f.text_area :description, rows: 2, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-y min-h-[2.5rem]", placeholder: "Optional description..." %>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :status, "Status", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+          <%= f.select :status, options_for_select([["Active", "active"], ["Inactive", "inactive"]], @product.status), {}, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.75rem_center] pr-10" %>
+        </div>
+        <div>
+          <%= f.label :effective_date, "Effective Date", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+          <%= f.date_field :effective_date, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+        </div>
+      </div>
+
+      <div class="border-t border-border pt-6">
+        <h2 class="text-sm font-semibold text-text-primary mb-4">Share Rules</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <%= f.label :price_per_share_cents, "Price Per Share (cents)", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-text-tertiary font-medium pointer-events-none">₱</span>
+              <%= f.number_field :price_per_share_cents, required: true, min: 1, step: 1, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 pl-8 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder: "e.g. 10000 for ₱100" %>
+            </div>
+            <p class="mt-1 text-xs text-text-tertiary">Amount in cents (e.g. 10000 = ₱100.00)</p>
+          </div>
+          <div>
+            <%= f.label :minimum_required_shares, "Minimum Required Shares", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <%= f.number_field :minimum_required_shares, required: true, min: 1, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+          </div>
+          <div>
+            <%= f.label :maximum_allowed_shares, "Maximum Allowed Shares", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <%= f.number_field :maximum_allowed_shares, min: 0, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder: "Leave blank for unlimited" %>
+          </div>
+          <div>
+            <%= f.label :minimum_initial_purchase, "Minimum Initial Purchase", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <%= f.number_field :minimum_initial_purchase, required: true, min: 1, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-border pt-6">
+        <h2 class="text-sm font-semibold text-text-primary mb-4">Options</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <label class="flex items-center gap-3 rounded-lg border border-border bg-surface-alt p-3 cursor-pointer hover:bg-surface transition-colors">
+            <%= f.check_box :allow_fractional_shares, class: "h-4 w-4 rounded border-border text-primary focus:ring-primary" %>
+            <span class="text-sm text-text-primary">Allow Fractional Shares</span>
+          </label>
+          <label class="flex items-center gap-3 rounded-lg border border-border bg-surface-alt p-3 cursor-pointer hover:bg-surface transition-colors">
+            <%= f.check_box :redeemable, class: "h-4 w-4 rounded border-border text-primary focus:ring-primary" %>
+            <span class="text-sm text-text-primary">Redeemable</span>
+          </label>
+          <label class="flex items-center gap-3 rounded-lg border border-border bg-surface-alt p-3 cursor-pointer hover:bg-surface transition-colors">
+            <%= f.check_box :dividend_eligible, class: "h-4 w-4 rounded border-border text-primary focus:ring-primary" %>
+            <span class="text-sm text-text-primary">Dividend Eligible</span>
+          </label>
+          <label class="flex items-center gap-3 rounded-lg border border-border bg-surface-alt p-3 cursor-pointer hover:bg-surface transition-colors">
+            <%= f.check_box :voting_rights, class: "h-4 w-4 rounded border-border text-primary focus:ring-primary" %>
+            <span class="text-sm text-text-primary">Voting Rights</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-border">
+        <%= link_to "Cancel", equity_products_path, class: "inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %>
+        <%= f.submit "Create Product", class: "inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" %>
+      </div>
+    <% end %>
+  </div>
+</div>

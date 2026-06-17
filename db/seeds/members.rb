@@ -21,9 +21,11 @@ members = [
   { first_name: "Miguel", middle_name: "N.",        last_name: "Angeles",   suffix: nil,    gender: "male",   civil_status: "single",  mobile_number: "09093334455", birth_date: Date.new(1996, 12, 19) },
 ]
 
-members.each do |attrs|
-  Member.find_or_create_by!(first_name: attrs[:first_name], last_name: attrs[:last_name]) do |m|
-    m.assign_attributes(attrs)
+members.each_with_index do |attrs, i|
+  unless Member.exists?(first_name: attrs[:first_name], last_name: attrs[:last_name])
+    Member.create!(attrs.merge(
+      identifications_attributes: [ { id_type: "BIR", id_number: "BIR-#{format('%09d', i)}" } ]
+    ))
   end
 end
 

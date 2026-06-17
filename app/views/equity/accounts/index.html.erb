@@ -1,0 +1,60 @@
+<% content_for :page_title, "Share Capital Accounts" %>
+
+<div class="animate-fade-in-up">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <p class="text-xl font-semibold text-text-primary">Share Capital Accounts</p>
+    </div>
+    <div>
+      <%= link_to "Open Account", new_equity_account_path, class: "inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors" %>
+    </div>
+  </div>
+
+  <% if @accounts.any? %>
+    <div class="rounded-lg border border-border bg-surface overflow-x-auto">
+      <table class="w-full min-w-[48rem] border-collapse text-xs">
+        <thead>
+          <tr>
+            <th class="bg-surface-alt px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border whitespace-nowrap">Account #</th>
+            <th class="bg-surface-alt px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border whitespace-nowrap">Member</th>
+            <th class="bg-surface-alt px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border whitespace-nowrap">Product</th>
+            <th class="bg-surface-alt px-4 py-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border whitespace-nowrap">Shares Owned</th>
+            <th class="bg-surface-alt px-4 py-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border whitespace-nowrap">Paid-up Capital</th>
+            <th class="bg-surface-alt px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border whitespace-nowrap">Status</th>
+            <th class="bg-surface-alt px-4 py-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border whitespace-nowrap">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @accounts.each do |account| %>
+            <tr class="hover:bg-surface-alt transition-colors">
+              <td class="px-4 py-3 text-sm font-medium text-text-primary border-b border-border align-middle"><%= account.account_number %></td>
+              <td class="px-4 py-3 text-sm text-text-secondary border-b border-border align-middle">
+                <span><%= account.member_name %></span>
+              </td>
+              <td class="px-4 py-3 text-sm text-text-secondary border-b border-border align-middle"><%= account.share_product.name %></td>
+              <td class="px-4 py-3 text-sm text-text-primary font-medium text-right border-b border-border align-middle tabular-nums"><%= account.shares_owned %></td>
+              <td class="px-4 py-3 text-sm text-text-primary font-medium text-right border-b border-border align-middle tabular-nums"><%= account.paid_up_capital.format %></td>
+              <td class="px-4 py-3 text-sm border-b border-border align-middle">
+                <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium leading-5 whitespace-nowrap <%= account.status == 'active' ? 'bg-positive-50 text-positive' : 'bg-surface-alt text-text-tertiary' %>">
+                  <%= account.status %>
+                </span>
+              </td>
+              <td class="px-4 py-3 border-b border-border align-middle text-right">
+                <%= link_to "View", equity_account_path(account), class: "inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-text-tertiary hover:text-primary hover:bg-primary-50 transition-colors no-underline" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="flex flex-col items-center justify-center px-6 py-12 text-center rounded-lg border border-dashed border-border bg-surface-alt">
+      <svg class="w-10 h-10 text-text-tertiary mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/>
+      </svg>
+      <p class="text-xs text-text-tertiary max-w-80">No share capital accounts yet</p>
+      <p class="text-xs text-text-tertiary mt-1">Open a share capital account for a member.</p>
+      <%= link_to "Open Account", new_equity_account_path, class: "inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors mt-4" %>
+    </div>
+  <% end %>
+</div>

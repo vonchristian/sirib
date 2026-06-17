@@ -1,0 +1,58 @@
+<% content_for :page_title, "Share Capital Products" %>
+
+<div class="animate-fade-in-up">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <p class="text-xl font-semibold text-text-primary">Share Capital Products</p>
+      <p class="text-sm text-text-tertiary mt-1"><%= @products.count %> product(s)</p>
+    </div>
+    <div>
+      <%= link_to "New Product", new_equity_product_path, class: "inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors" %>
+    </div>
+  </div>
+
+  <% if @products.any? %>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <% @products.each do |product| %>
+        <%= link_to equity_product_path(product), class: "block rounded-xl border border-border bg-surface p-5 hover:shadow-sm hover:border-border-strong transition-all" do %>
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <h3 class="text-sm font-semibold text-text-primary"><%= product.name %></h3>
+              <p class="text-xs text-text-tertiary mt-0.5"><%= product.product_code %></p>
+            </div>
+            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= product.status == 'active' ? 'bg-positive-50 text-positive' : 'bg-surface-alt text-text-tertiary' %>">
+              <%= product.status %>
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+            <div>
+              <span class="text-text-tertiary">Type</span>
+              <p class="text-text-primary font-medium capitalize"><%= product.share_type %></p>
+            </div>
+            <div>
+              <span class="text-text-tertiary">Price</span>
+              <p class="text-text-primary font-medium"><%= product.price_per_share.format %></p>
+            </div>
+            <div>
+              <span class="text-text-tertiary">Min Shares</span>
+              <p class="text-text-primary font-medium"><%= product.minimum_required_shares %></p>
+            </div>
+            <div>
+              <span class="text-text-tertiary">Max Shares</span>
+              <p class="text-text-primary font-medium"><%= product.maximum_allowed_shares || "Unlimited" %></p>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="flex flex-col items-center justify-center px-6 py-12 text-center rounded-lg border border-dashed border-border bg-surface-alt">
+      <svg class="w-10 h-10 text-text-tertiary mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/>
+      </svg>
+      <p class="text-xs text-text-tertiary max-w-80">No share capital products yet</p>
+      <p class="text-xs text-text-tertiary mt-1">Create your first share capital product to get started.</p>
+      <%= link_to "New Product", new_equity_product_path, class: "inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors mt-4" %>
+    </div>
+  <% end %>
+</div>

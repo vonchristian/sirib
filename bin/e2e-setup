@@ -42,12 +42,17 @@ members_seeded = 0
 20.times do |i|
   first = %w[Maria Juan Elena Jose Ana Pedro Sofia Carlos Luz Ramon Isabel Antonio Carmen Victor Lorna Danilo Gloria Fernando Rosario Miguel][i]
   last  = %w[Cruz Reyes Villanueva Mercado Dimagiba Santos Gonzales Yulo Macapagal Alcantara Samson Lopez Natividad Mendoza Fernandez Rivera Romero Ramos Castillo Angeles][i]
-  Member.find_or_create_by!(first_name: first, last_name: last) do |m|
-    m.middle_name = "M"
-    m.gender = i.even? ? "female" : "male"
-    m.civil_status = %w[single married married single widowed married single married married divorced married single widowed married single married divorced single married single][i]
-    m.birth_date = Date.new(1980 + (i % 20), 1 + (i % 12), 1 + (i % 28))
-    m.mobile_number = "0917#{format('%07d', i)}"
+  unless Member.exists?(first_name: first, last_name: last)
+    Member.create!(
+      first_name: first,
+      last_name: last,
+      middle_name: "M",
+      gender: i.even? ? "female" : "male",
+      civil_status: %w[single married married single widowed married single married married divorced married single widowed married single married divorced single married single][i],
+      birth_date: Date.new(1980 + (i % 20), 1 + (i % 12), 1 + (i % 28)),
+      mobile_number: "0917#{format('%07d', i)}",
+      identifications_attributes: [ { id_type: "BIR", id_number: "BIR-#{format('%09d', i)}" } ]
+    )
   end
   members_seeded += 1
 end
@@ -80,7 +85,7 @@ charges_by_product.each do |product_name, product_charges|
   end
 end
 
-puts "E2E setup complete: #{members_seeded} members, #{products.length} loan products seeded"
+puts "Seeded: #{members_seeded} members, #{products.length} loan products"
 
 # Seed savings products
 savings_ledger = Accounting::Ledger.find_or_create_by!(account_code: "21100") do |l|
@@ -110,4 +115,35 @@ cash_account = Accounting::Account.find_or_create_by!(account_code: "11110") do 
 end
 Accounting::CashAccount.find_or_create_by!(user: test_user, account: cash_account)
 
-puts "E2E setup complete: #{Treasury::SavingsProduct.count} savings products, cash account created"
+# Seed share capital products
+share_capital_product = Equity::Product.find_or_create_by!(product_code: "COMMON") do |p|
+  p.name = "Common Shares"
+  p.description = "Standard common shares for member ownership"
+  p.share_type = :common
+  p.status = "active"
+  p.price_per_share_cents = 100_00
+  p.minimum_required_shares = 50
+  p.maximum_allowed_shares = 500
+  p.minimum_initial_purchase = 10
+  p.allow_fractional_shares = false
+  p.redeemable = true
+  p.dividend_eligible = true
+  p.voting_rights = true
+end
+
+Equity::Product.find_or_create_by!(product_code: "PREF") do |p|
+  p.name = "Preferred Shares"
+  p.description = "Preferred shares with dividend priority"
+  p.share_type = :preferred
+  p.status = "active"
+  p.price_per_share_cents = 150_00
+  p.minimum_required_shares = 25
+  p.maximum_allowed_shares = 300
+  p.minimum_initial_purchase = 5
+  p.allow_fractional_shares = false
+  p.redeemable = true
+  p.dividend_eligible = true
+  p.voting_rights = false
+end
+
+puts "E2E setup complete: #{Treasury::SavingsProduct.count} savings products, #{Equity::Product.count} share capital products, cash account created"

@@ -89,5 +89,16 @@ Rails.application.routes.draw do
     get "searches/loan_products", to: "searches#loan_products"
   end
 
+  namespace :equity, path: :equity do
+    resources :products
+    resources :accounts, only: [:index, :new, :create, :show] do
+      member do
+        get :buy
+        post :preview_buy
+        post :confirm_buy
+      end
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end
