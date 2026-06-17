@@ -69,6 +69,7 @@ Rails.application.routes.draw do
         post :confirm_withdraw
       end
     end
+    get "searches/savings_accounts", to: "searches#savings_accounts"
   end
 
   namespace :loans do

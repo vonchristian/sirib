@@ -1,50 +1,78 @@
 <% content_for :page_title, "Withdraw" %>
 <% content_for :page_subtitle, @account.account_number %>
-<div class="animate-fade-in max-w-lg mx-auto">
-  <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 sm:p-8">
-    <div class="mb-6">
-      <p class="text-xs text-text-tertiary">Account</p>
-      <p class="text-sm font-medium text-text-primary"><%= @account.account_number %> — <%= @account.depositor_name %></p>
-      <p class="text-xs text-text-tertiary mt-1">Current Balance: <span class="font-medium text-text-primary"><%= @account.balance.format %></span></p>
+
+<div class="animate-fade-in-up max-w-2xl">
+  <div class="rounded-lg border border-border bg-surface overflow-hidden">
+    <div class="flex items-center justify-between border-b border-border px-5 py-4">
+      <h2 class="text-sm font-semibold text-text-primary">Account Information</h2>
+    </div>
+    <div class="p-5">
+      <div class="grid grid-cols-3 gap-6">
+        <div>
+          <p class="text-[11px] font-medium uppercase tracking-wider text-text-tertiary">Account</p>
+          <p class="mt-1 text-sm font-medium text-text-primary"><%= @account.account_number %></p>
+        </div>
+        <div>
+          <p class="text-[11px] font-medium uppercase tracking-wider text-text-tertiary">Depositor</p>
+          <p class="mt-1 text-sm font-medium text-text-primary"><%= @account.depositor_name %></p>
+        </div>
+        <div>
+          <p class="text-[11px] font-medium uppercase tracking-wider text-text-tertiary">Available Balance</p>
+          <p class="mt-1 text-sm font-medium text-text-primary"><%= @account.balance.format %></p>
+        </div>
+      </div>
     </div>
 
-    <%= form_tag preview_withdraw_treasury_savings_account_path(@account), method: :post, data: { turbo: false }, class: "space-y-5" do %>
-      <% if flash[:alert] %>
-        <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger"><%= flash[:alert] %></div>
-      <% end %>
+    <%= form_tag preview_withdraw_treasury_savings_account_path(@account), method: :post, data: { turbo: false } do %>
+      <div class="border-t border-border">
+        <div class="p-5 space-y-5">
+          <% if flash[:alert] %>
+            <div class="flex items-center gap-3 rounded-md border border-danger bg-danger-50 p-3 text-sm leading-5 text-danger">
+              <svg class="flex-shrink-0 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+              <span><%= flash[:alert] %></span>
+            </div>
+          <% end %>
 
-      <div class="field-group">
-        <%= label_tag :amount_cents, "Amount (PHP)", class: "field-label" %>
-        <div class="relative">
-          <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-text-tertiary">₱</span>
-          <%= number_field_tag :amount_cents, params[:amount_cents], required: true, min: 1, step: 0.01,
-                placeholder: "0.00", class: "field-input pl-8" %>
+          <div>
+            <%= label_tag :amount_cents, "Amount", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-text-tertiary font-medium pointer-events-none">₱</span>
+              <%= number_field_tag :amount_cents, params[:amount_cents], required: true, min: 1, step: 0.01, placeholder: "0.00", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 pl-8 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", autocomplete: "off" %>
+            </div>
+            <p class="mt-1 text-xs text-text-tertiary">Available: <%= @account.balance.format %></p>
+          </div>
+
+          <div>
+            <%= label_tag :cash_account_id, "Cash on Hand Account", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <% if @single_cash_account %>
+              <%= hidden_field_tag :cash_account_id, @single_cash_account.id %>
+              <div class="py-2 text-sm font-medium text-text-primary"><%= @single_cash_account.name %></div>
+              <p class="mt-1 text-xs text-text-tertiary">This is the only cash account available.</p>
+            <% elsif @cash_accounts.many? %>
+              <%= select_tag :cash_account_id, options_from_collection_for_select(@cash_accounts, :id, :name, params[:cash_account_id]), { prompt: "Select cash account", required: true, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.75rem_center] pr-10" } %>
+              <p class="mt-1 text-xs text-text-tertiary">Select the cash account to record this transaction against.</p>
+            <% else %>
+              <div class="flex flex-col items-center justify-center px-6 py-8 text-center rounded-lg border border-dashed border-border bg-surface-alt">
+                <svg class="w-8 h-8 text-text-tertiary mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+                </svg>
+                <p class="text-xs text-text-tertiary max-w-80">No cash accounts are linked to your profile.</p>
+                <p class="text-xs text-text-tertiary mt-1">Contact an administrator to set up your cash accounts.</p>
+              </div>
+            <% end %>
+          </div>
+
+          <div>
+            <%= label_tag :notes, "Notes", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+            <%= text_area_tag :notes, params[:notes], rows: 2, placeholder: "Optional notes...", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-y min-h-[2.5rem]" %>
+            <p class="mt-1 text-xs text-text-tertiary">Reference or memo for this transaction.</p>
+          </div>
         </div>
-        <p class="mt-0.5 text-xs text-text-tertiary">Available: <%= @account.balance.format %></p>
       </div>
 
-      <div class="field-group">
-        <%= label_tag :cash_account_id, "Cash on Hand Account", class: "field-label" %>
-        <% if @single_cash_account %>
-          <%= hidden_field_tag :cash_account_id, @single_cash_account.id %>
-          <p class="text-sm font-medium text-text-primary"><%= @single_cash_account.name %></p>
-          <p class="mt-0.5 text-xs text-text-tertiary">Only one cash on hand account available. Using this account.</p>
-        <% else %>
-          <%= select_tag :cash_account_id,
-                options_from_collection_for_select(@cash_accounts, :id, :name, params[:cash_account_id]),
-                { prompt: "Select account", required: true, class: "field-input" } %>
-          <p class="mt-0.5 text-xs text-text-tertiary">Default: your current cash on hand account</p>
-        <% end %>
-      </div>
-
-      <div class="field-group">
-        <%= label_tag :notes, "Notes (optional)", class: "field-label" %>
-        <%= text_area_tag :notes, params[:notes], rows: 2, placeholder: "Optional note...", class: "field-input" %>
-      </div>
-
-      <div class="flex items-center justify-between pt-4 border-t border-border dark:border-gray-700">
-        <%= link_to "Cancel", treasury_savings_account_path(@account), class: "btn-ghost" %>
-        <%= submit_tag "Preview", class: "btn-primary" %>
+      <div class="flex items-center justify-end gap-2 border-t border-border bg-surface-alt px-5 py-3">
+        <%= link_to "Cancel", treasury_savings_account_path(@account), class: "inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %>
+        <%= submit_tag "Preview Withdrawal", class: "inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", data: { disable_with: "Processing..." } %>
       </div>
     <% end %>
   </div>

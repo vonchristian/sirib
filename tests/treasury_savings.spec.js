@@ -65,7 +65,7 @@ test.describe('Treasury Savings', () => {
       await page.getByRole('button', { name: /Preview/i }).click();
 
       await expect(page.getByRole('button', { name: /Confirm Withdrawal/i })).toBeVisible();
-      await expect(page.getByText(/3,000\.00/)).toBeVisible();
+      await expect(page.getByRole('cell', { name: /₱3,000\.00/ }).first()).toBeVisible();
 
       await page.getByRole('button', { name: /Confirm Withdrawal/i }).click();
       await expect(page.getByText(/Withdrawal of.*completed/i)).toBeVisible();
@@ -99,7 +99,7 @@ test.describe('Treasury Savings', () => {
       await page.getByRole('button', { name: /Preview/i }).click();
       await expect(page.getByRole('button', { name: /Confirm Deposit/i })).toBeVisible();
 
-      await page.getByText('Edit').first().click();
+      await page.getByRole('link', { name: /Edit/i }).click();
       await expect(page).toHaveURL(/\/deposit(\?|$)/);
     });
   });

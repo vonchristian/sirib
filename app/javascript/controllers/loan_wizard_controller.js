@@ -158,7 +158,8 @@ export default class extends Controller {
         if (wrapper) {
           const msg = document.createElement("p")
           msg.className = "field-error"
-          msg.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg> This field is required'
+          appendErrorIcon(msg)
+          msg.appendChild(document.createTextNode(" This field is required"))
           wrapper.appendChild(msg)
         }
       }
@@ -316,4 +317,21 @@ export default class extends Controller {
       this.currentStepTarget.value = this.currentStepValue
     }
   }
+}
+
+function appendErrorIcon(msg) {
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+  icon.setAttribute("viewBox", "0 0 24 24")
+  icon.setAttribute("fill", "none")
+  icon.setAttribute("stroke", "currentColor")
+  icon.setAttribute("stroke-width", "1.5")
+  icon.style.width = "1em"
+  icon.style.height = "1em"
+  icon.style.flexShrink = "0"
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+  path.setAttribute("stroke-linecap", "round")
+  path.setAttribute("stroke-linejoin", "round")
+  path.setAttribute("d", "M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z")
+  icon.appendChild(path)
+  msg.appendChild(icon)
 }

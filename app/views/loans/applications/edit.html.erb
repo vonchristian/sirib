@@ -1,27 +1,7 @@
 <% content_for :page_title, "Loan Application" %>
 <% content_for :page_subtitle, "#{@application.reference_number || 'New'}" %>
 
-<style>
-  .field-input { display: block; width: 100%; border-radius: 0.375rem; border-width: 1px; border-color: var(--color-border); background-color: var(--color-surface); padding: 0.5rem 0.75rem; font-size: 0.875rem; color: var(--color-text-primary); }
-  .field-input::placeholder { color: var(--color-text-tertiary); }
-  .field-input:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 2px var(--color-surface); }
-  .dark .field-input { border-color: rgb(75 85 99); background-color: rgb(31 41 55); color: rgb(255 255 255); }
-  .field-input-error { border-color: var(--color-danger) !important; }
-  .field-label { display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text-primary); }
-  .dark .field-label { color: rgb(255 255 255); }
-  .field-error { margin-top: 0.25rem; display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; color: var(--color-danger); }
-  .field-error svg { height: 0.75rem; width: 0.75rem; flex-shrink: 0; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 0.375rem; background-color: var(--color-primary); padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; color: #fff; transition: background-color 0.15s; }
-  .btn-primary:hover { background-color: var(--color-primary-700); }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 0.375rem; border: 1px solid var(--color-border); background-color: var(--color-surface); padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text-secondary); transition: background-color 0.15s; }
-  .btn-secondary:hover { background-color: rgb(243 244 246); }
-  .dark .btn-secondary { border-color: rgb(55 65 81); background-color: rgb(31 41 55); color: rgb(156 163 175); }
-  .btn-ghost { display: inline-flex; align-items: center; gap: 0.375rem; border-radius: 0.375rem; border: 1px solid var(--color-border); background-color: var(--color-surface); padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; color: var(--color-text-secondary); transition: background-color 0.15s; }
-  .btn-ghost:hover { background-color: rgb(243 244 246); }
-  .dark .btn-ghost { border-color: rgb(55 65 81); background-color: rgb(31 41 55); color: rgb(156 163 175); }
-  .btn-positive { display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 0.375rem; background-color: var(--color-positive); padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; color: #fff; transition: background-color 0.15s; }
-  .btn-positive:hover { background-color: var(--color-positive-700); }
-</style>
+
 
 <div class="animate-fade-in max-w-5xl mx-auto" data-controller="loan-wizard" data-current-step="<%= @initial_step %>" data-action="autocomplete:selected->loan-wizard#onProductSelected">
   <%= form_with model: @application, url: loans_application_path(@application.uuid), method: :patch, html: { class: "space-y-6" } do |f| %>
@@ -74,13 +54,13 @@
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div class="lg:col-span-2 space-y-4">
             <div class="field-group" data-controller="autocomplete" data-autocomplete-url-value="/loans/searches/members">
-              <%= f.label :member_id, "Member", class: "field-label" %>
+              <%= f.label :member_id, "Member", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
               <div class="relative">
                 <%= f.hidden_field :member_id, required: true, data: { autocomplete_target: "hidden" } %>
                 <input type="text" name="member_search"
                        value="<%= @application.member&.name %>"
                        placeholder="Search by name or mobile number..."
-                       class="field-input"
+                       class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                        data-autocomplete-target="input"
                        data-action="input->autocomplete#search keydown->autocomplete#keyboard">
                 <div data-autocomplete-target="results"
@@ -88,13 +68,13 @@
               </div>
             </div>
             <div class="field-group" data-controller="autocomplete" data-autocomplete-url-value="/loans/searches/loan_products">
-              <%= f.label :loan_product_id, "Loan Product", class: "field-label" %>
+              <%= f.label :loan_product_id, "Loan Product", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
               <div class="relative">
                 <%= f.hidden_field :loan_product_id, required: true, data: { autocomplete_target: "hidden", loan_wizard_target: "productAutocomplete" } %>
                 <input type="text" name="product_search"
                        value="<%= @application.loan_product&.name %>"
                        placeholder="Search product name..."
-                       class="field-input"
+                       class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                        data-autocomplete-target="input"
                        data-action="input->autocomplete#search keydown->autocomplete#keyboard">
                 <div data-autocomplete-target="results"
@@ -103,30 +83,30 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="field-group">
-                <%= f.label :amount_cents, "Loan Amount (PHP)", class: "field-label" %>
+                <%= f.label :amount_cents, "Loan Amount (PHP)", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
                 <%= f.number_field :amount_cents, required: true, min: 1, step: 0.01,
                       placeholder: "e.g. 50000",
-                      class: "field-input", data: { loan_wizard_target: "amountField", action: "input->loan-wizard#recalculate" } %>
+                      class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", data: { loan_wizard_target: "amountField", action: "input->loan-wizard#recalculate" } %>
               </div>
               <div class="field-group">
-                <%= f.label :term_months, "Term (months)", class: "field-label" %>
+                <%= f.label :term_months, "Term (months)", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
                 <%= f.number_field :term_months, required: true, min: 1,
                       placeholder: "e.g. 12",
-                      class: "field-input", data: { loan_wizard_target: "termField", action: "input->loan-wizard#recalculate" } %>
+                      class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", data: { loan_wizard_target: "termField", action: "input->loan-wizard#recalculate" } %>
               </div>
             </div>
             <div class="field-group">
-              <%= f.label :interest_rate, "Interest Rate (%)", class: "field-label" %>
+              <%= f.label :interest_rate, "Interest Rate (%)", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
               <div class="relative">
                 <%= f.number_field :interest_rate, required: true, step: 0.01, min: 0.01, max: 100,
-                      class: "field-input pr-8", data: { loan_wizard_target: "rateField", action: "input->loan-wizard#recalculate" } %>
+                      class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none pr-8", data: { loan_wizard_target: "rateField", action: "input->loan-wizard#recalculate" } %>
                 <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-text-tertiary">%</span>
               </div>
               <p class="mt-1 text-xs text-text-tertiary">Pre-filled from product. Adjust if needed.</p>
             </div>
             <div>
-              <%= f.label :notes, class: "field-label" %>
-              <%= f.text_area :notes, rows: 2, placeholder: "Any additional notes...", class: "field-input" %>
+              <%= f.label :notes, class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+              <%= f.text_area :notes, rows: 2, placeholder: "Any additional notes...", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
             </div>
           </div>
 
@@ -190,9 +170,9 @@
             <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 income-entry">
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label class="field-label">Source Type</label>
+                  <label class="block mb-1.5 text-xs font-medium text-text-primary">Source Type</label>
                   <select name="lending_loan_application[sources_of_income][][source_type]"
-                          required class="field-input">
+                          required class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                     <option value="">Select type</option>
                     <% %w[Employment Self-Employed Business Remittances Pension Investment Others].each do |t| %>
                       <option value="<%= t %>" <%= "selected" if src["source_type"] == t %>><%= t %></option>
@@ -200,10 +180,10 @@
                   </select>
                 </div>
                 <div>
-                  <label class="field-label">Monthly Income (PHP)</label>
+                  <label class="block mb-1.5 text-xs font-medium text-text-primary">Monthly Income (PHP)</label>
                   <input type="number" name="lending_loan_application[sources_of_income][][monthly_income]"
                          value="<%= src["monthly_income"] %>" required min="0" step="0.01"
-                         placeholder="0.00" class="field-input">
+                         placeholder="0.00" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                 </div>
               </div>
             </div>
@@ -211,7 +191,7 @@
         </div>
 
         <button type="button" data-action="loan-wizard#addIncome"
-                class="btn-ghost mt-3">
+                class="inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors mt-3">
           <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3"/>
           </svg>
@@ -228,13 +208,13 @@
           <%= f.fields_for :loan_co_makers do |cf| %>
             <div class="co-maker-entry rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4">
               <div class="field-group" data-controller="autocomplete" data-autocomplete-url-value="/loans/searches/members">
-                <%= cf.label :member_id, "Co-Maker", class: "field-label" %>
+                <%= cf.label :member_id, "Co-Maker", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
                 <div class="relative">
                   <%= cf.hidden_field :member_id, required: true, data: { autocomplete_target: "hidden" } %>
                   <input type="text" name="lending_loan_application[loan_co_makers_attributes][<%= cf.index %>][member_search]"
                          value="<%= cf.object.member&.name %>"
                          placeholder="Search by name or mobile number..."
-                         class="field-input"
+                         class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                          data-autocomplete-target="input"
                          data-action="input->autocomplete#search keydown->autocomplete#keyboard">
                   <div data-autocomplete-target="results"
@@ -254,7 +234,7 @@
         </div>
 
         <button type="button" data-action="loan-wizard#addCoMaker"
-                class="btn-ghost mt-3">
+                class="inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors mt-3">
           <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3"/>
           </svg>
@@ -272,48 +252,48 @@
             <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4 mb-4 collateral-entry">
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <%= cf.label :category, class: "field-label" %>
+                  <%= cf.label :category, class: "block mb-1.5 text-xs font-medium text-text-primary" %>
                   <%= cf.select :category,
                         options_for_select(Lending::LoanCollateral::CATEGORIES.map { |c| [c.titleize, c] }, cf.object.category),
-                        { prompt: "Select category" }, required: true, class: "field-input",
+                        { prompt: "Select category" }, required: true, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none",
                         data: { action: "change->loan-wizard#toggleCollateralDetails" } %>
                 </div>
                 <div>
-                  <%= cf.label :name, class: "field-label" %>
-                  <%= cf.text_field :name, required: true, placeholder: "e.g. Lot 123, Brgy. San Jose", class: "field-input" %>
+                  <%= cf.label :name, class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+                  <%= cf.text_field :name, required: true, placeholder: "e.g. Lot 123, Brgy. San Jose", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
                 </div>
                 <div class="sm:col-span-2">
-                  <%= cf.label :description, class: "field-label" %>
-                  <%= cf.text_area :description, rows: 2, placeholder: "Describe the property...", class: "field-input" %>
+                  <%= cf.label :description, class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+                  <%= cf.text_area :description, rows: 2, placeholder: "Describe the property...", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
                 </div>
                 <div>
-                  <%= cf.label :assessed_value_cents, "Assessed Value (PHP)", class: "field-label" %>
+                  <%= cf.label :assessed_value_cents, "Assessed Value (PHP)", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
                   <%= cf.number_field :assessed_value_cents, step: 0.01, min: 0,
-                        placeholder: "0.00", class: "field-input" %>
+                        placeholder: "0.00", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
                 </div>
                 <div>
-                  <%= cf.label :address, class: "field-label" %>
-                  <%= cf.text_field :address, placeholder: "Property address", class: "field-input" %>
+                  <%= cf.label :address, class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+                  <%= cf.text_field :address, placeholder: "Property address", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
                 </div>
                 <div>
-                  <%= cf.label :pin_lat, "Latitude", class: "field-label" %>
-                  <%= cf.text_field :pin_lat, placeholder: "e.g. 14.5995", class: "field-input" %>
+                  <%= cf.label :pin_lat, "Latitude", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+                  <%= cf.text_field :pin_lat, placeholder: "e.g. 14.5995", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
                 </div>
                 <div>
-                  <%= cf.label :pin_lng, "Longitude", class: "field-label" %>
-                  <%= cf.text_field :pin_lng, placeholder: "e.g. 120.9842", class: "field-input" %>
+                  <%= cf.label :pin_lng, "Longitude", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
+                  <%= cf.text_field :pin_lng, placeholder: "e.g. 120.9842", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
                 </div>
                 <div class="sm:col-span-2">
-                  <%= cf.label :images, "Property Images", class: "field-label" %>
+                  <%= cf.label :images, "Property Images", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
                   <%= cf.file_field :images, multiple: true, accept: "image/*",
-                        class: "field-input file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700" %>
+                        class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-medium file:text-white hover:file:bg-primary-700" %>
                 </div>
                 <div class="sm:col-span-2">
-                  <%= cf.label :details, "Additional Details (JSON)", class: "field-label" %>
+                  <%= cf.label :details, "Additional Details (JSON)", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
                   <%= cf.text_area :details, rows: 2,
                         value: cf.object.details.is_a?(Hash) ? cf.object.details.to_json : cf.object.details,
                         placeholder: '{"lot_area": "200 sqm", "zoning": "residential"}',
-                        class: "field-input font-mono text-xs" %>
+                        class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none font-mono text-xs" %>
                 </div>
               </div>
               <% if cf.object.persisted? %>
@@ -385,24 +365,24 @@
 
         <%= f.submit "Generate Schedule",
               name: "commit", value: "Generate Schedule",
-              class: "btn-secondary mt-4" %>
+              class: "inline-flex items-center justify-center gap-2 rounded-md border border-border bg-surface px-5 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors mt-4" %>
       </div>
     </div>
 
     <div class="flex items-center justify-between">
       <div class="flex gap-2">
         <button type="button" data-loan-wizard-target="backBtn" data-action="loan-wizard#back"
-                class="btn-secondary hidden">
+                class="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-surface px-5 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors hidden">
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
           </svg>
           Back
         </button>
-        <%= f.submit "Save Progress", class: "btn-ghost" %>
+        <%= f.submit "Save Progress", class: "inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %>
       </div>
       <div class="flex gap-2">
         <button type="button" data-loan-wizard-target="nextBtn" data-action="loan-wizard#next"
-                class="btn-primary">
+                class="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors">
           Next
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
@@ -410,7 +390,7 @@
         </button>
         <%= f.submit "Complete Application",
               data: { loan_wizard_target: "submitBtn" },
-              class: "hidden btn-positive" %>
+              class: "hidden inline-flex items-center justify-center gap-2 rounded-md bg-positive px-5 py-2 text-xs font-medium text-white hover:bg-positive-700 transition-colors" %>
       </div>
     </div>
   <% end %>

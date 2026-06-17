@@ -1,2 +1,4 @@
 @import "tailwindcss";
 @import "../stylesheets/brand";
+@import "../../../node_modules/preline/variants.css";
+@source "../../../node_modules/preline/dist/*.js";

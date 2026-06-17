@@ -2,11 +2,18 @@ class MembersController < ApplicationController
   layout "dashboard"
 
   def index
-    @members = Member.all
+    @pagy, @members = pagy(Member.order(created_at: :desc), limit: 20)
+    @total_members = Member.count
+    @male_count = Member.where(gender: "male").count
+    @female_count = Member.where(gender: "female").count
   end
 
   def show
     @member = Member.find(params[:id])
+    @savings_accounts = Treasury::SavingsAccount.where(depositor: @member).includes(:savings_product).by_latest
+    @time_deposits = Treasury::TimeDeposit.where(depositor: @member).includes(:time_deposit_product).by_latest
+    @loans = Lending::Loan.where(member: @member).includes(:loan_product, :loan_payments).order(created_at: :desc)
+    @loan_applications = Lending::LoanApplication.where(member: @member).order(created_at: :desc)
   end
 
   def new

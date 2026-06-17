@@ -9,6 +9,21 @@
     <%= link_to "Register Member", new_member_path, class: "inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors" %>
   </div>
 
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
+    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
+      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Total Members</p>
+      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @total_members %></p>
+    </div>
+    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
+      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Male</p>
+      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @male_count %></p>
+    </div>
+    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
+      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Female</p>
+      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @female_count %></p>
+    </div>
+  </div>
+
   <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full text-sm">
@@ -57,5 +72,31 @@
         </tbody>
       </table>
     </div>
+    <% if @pagy.pages > 1 %>
+      <div class="flex items-center justify-between border-t border-border px-4 py-3 dark:border-gray-700">
+        <p class="text-xs text-text-tertiary dark:text-gray-500">Showing <%= @pagy.from %>–<%= @pagy.to %> of <%= @pagy.count %> members</p>
+        <div class="flex items-center gap-1">
+          <% if @pagy.prev %>
+            <%= link_to pagy_url_for(@pagy, @pagy.prev), class: "rounded-md px-2.5 py-1.5 text-xs font-medium text-text-secondary hover:bg-surface-alt dark:hover:bg-gray-800 transition-colors" do %>
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+            <% end %>
+          <% end %>
+          <% @pagy.series.each do |item| %>
+            <% if item.is_a?(Integer) %>
+              <%= link_to pagy_url_for(@pagy, item), class: "rounded-md px-2.5 py-1.5 text-xs font-medium #{item == @pagy.page ? 'bg-primary text-white' : 'text-text-secondary hover:bg-surface-alt dark:hover:bg-gray-800'} transition-colors" do %>
+                <%= item %>
+              <% end %>
+            <% elsif item.is_a?(String) %>
+              <span class="px-2 text-xs text-text-tertiary"><%= item %></span>
+            <% end %>
+          <% end %>
+          <% if @pagy.next %>
+            <%= link_to pagy_url_for(@pagy, @pagy.next), class: "rounded-md px-2.5 py-1.5 text-xs font-medium text-text-secondary hover:bg-surface-alt dark:hover:bg-gray-800 transition-colors" do %>
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

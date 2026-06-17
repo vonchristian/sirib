@@ -6,6 +6,10 @@ module Loans
 
     def index
       @applications = Lending::LoanApplication.order(created_at: :desc)
+      @total_applications = @applications.size
+      @pending_review = Lending::LoanApplication.where(status: %w[submitted verified]).count
+      @approved_today = Lending::LoanApplication.where(status: "approved", approved_at: Date.current.all_day).count
+      @total_amount = Money.new(@applications.sum(:amount_cents) || 0, "PHP")
     end
 
     def new

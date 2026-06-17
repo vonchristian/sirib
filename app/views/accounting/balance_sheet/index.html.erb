@@ -31,6 +31,53 @@
     <% end %>
   </div>
 
+  <% if @report.present? %>
+    <% total_assets = @report[0][:total].to_f %>
+    <% total_liabilities = @report.size > 1 ? @report[1][:total].to_f : 0 %>
+    <% total_equity = @report.size > 2 ? @report[2][:total].to_f : 0 %>
+    <% grand_total = total_assets + total_liabilities + total_equity %>
+    <% if grand_total > 0 %>
+      <% assets_pct = (total_assets / grand_total * 100).round(1) %>
+      <% liab_pct = (total_liabilities / grand_total * 100).round(1) %>
+      <% equity_pct = (total_equity / grand_total * 100).round(1) %>
+      <div class="rounded-md border border-border bg-surface p-5 dark:border-gray-800 dark:bg-gray-900">
+        <p class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-4">Portfolio Composition</p>
+        <div class="flex items-center gap-8">
+          <div class="relative flex-shrink-0">
+            <div class="h-28 w-28 rounded-full"
+                 style="background: conic-gradient(#93c5fd 0% <%= assets_pct %>%,
+                                                  #fcd34d <%= assets_pct %>% <%= (assets_pct + liab_pct) %>%,
+                                                  #86efac <%= (assets_pct + liab_pct) %>% 100%);">
+            </div>
+            <div class="absolute inset-2 flex items-center justify-center rounded-full bg-surface dark:bg-gray-900">
+              <span class="text-xs font-semibold text-text-tertiary">100%</span>
+            </div>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="inline-block h-2.5 w-2.5 rounded-sm" style="background:#93c5fd"></span>
+              <span class="text-text-secondary">Assets</span>
+              <span class="font-medium text-text-primary tabular-nums"><%= @report[0][:total].format %></span>
+              <span class="text-text-tertiary">(<%= assets_pct %>%)
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-block h-2.5 w-2.5 rounded-sm" style="background:#fcd34d"></span>
+              <span class="text-text-secondary">Liabilities</span>
+              <span class="font-medium text-text-primary tabular-nums"><%= @report.size > 1 ? @report[1][:total].format : Money.new(0, "PHP").format %></span>
+              <span class="text-text-tertiary">(<%= liab_pct %>%)
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-block h-2.5 w-2.5 rounded-sm" style="background:#86efac"></span>
+              <span class="text-text-secondary">Equity</span>
+              <span class="font-medium text-text-primary tabular-nums"><%= @report.size > 2 ? @report[2][:total].format : Money.new(0, "PHP").format %></span>
+              <span class="text-text-tertiary">(<%= equity_pct %>%)
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
   <div class="rounded-md border border-border bg-surface dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
     <div>
       <table class="min-w-full text-sm">

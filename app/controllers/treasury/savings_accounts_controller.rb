@@ -26,16 +26,27 @@ module Treasury
     def show
       @account = Treasury::SavingsAccount.find(params[:id])
       @transactions = @account.transactions.by_latest
+      @month_transactions = @account.transactions.where(posted_at: Time.current.beginning_of_month..)
+      @month_deposits = @month_transactions.deposit.sum(:amount_cents)
+      @month_withdrawals = @month_transactions.withdraw.sum(:amount_cents)
     end
 
     def deposit
       @account = Treasury::SavingsAccount.find(params[:id])
       @cash_accounts = cash_accounts_for_select
+
+      redirect_to treasury_savings_account_path(@account), alert: "No cash accounts are linked to your profile. Contact an administrator." if @cash_accounts.empty?
     end
 
     def preview_deposit
       @account = Treasury::SavingsAccount.find(params[:id])
       @cash_accounts = cash_accounts_for_select
+
+      if @cash_accounts.empty?
+        redirect_to treasury_savings_account_path(@account), alert: "No cash accounts are linked to your profile. Contact an administrator."
+        return
+      end
+
       @amount = parse_amount(params[:amount_cents])
       @cash_account = resolve_cash_account
       @notes = params[:notes]
@@ -51,6 +62,9 @@ module Treasury
         render :deposit, status: :unprocessable_entity
         return
       end
+
+      @debits = [{ account: @cash_account, amount: @amount }]
+      @credits = [{ account: @account.liability_account, amount: @amount }]
     end
 
     def confirm_deposit
@@ -87,11 +101,19 @@ module Treasury
     def withdraw
       @account = Treasury::SavingsAccount.find(params[:id])
       @cash_accounts = cash_accounts_for_select
+
+      redirect_to treasury_savings_account_path(@account), alert: "No cash accounts are linked to your profile. Contact an administrator." if @cash_accounts.empty?
     end
 
     def preview_withdraw
       @account = Treasury::SavingsAccount.find(params[:id])
       @cash_accounts = cash_accounts_for_select
+
+      if @cash_accounts.empty?
+        redirect_to treasury_savings_account_path(@account), alert: "No cash accounts are linked to your profile. Contact an administrator."
+        return
+      end
+
       @amount = parse_amount(params[:amount_cents])
       @cash_account = resolve_cash_account
       @notes = params[:notes]
@@ -113,6 +135,9 @@ module Treasury
         render :withdraw, status: :unprocessable_entity
         return
       end
+
+      @debits = [{ account: @account.liability_account, amount: @amount }]
+      @credits = [{ account: @cash_account, amount: @amount }]
     end
 
     def confirm_withdraw

@@ -2,6 +2,25 @@
 <% content_for :page_subtitle, "Manage loan applications" %>
 
 <div class="animate-fade-in">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-6">
+    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
+      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Total Applications</p>
+      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @total_applications %></p>
+    </div>
+    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
+      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Pending Review</p>
+      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @pending_review %></p>
+    </div>
+    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
+      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Approved Today</p>
+      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @approved_today %></p>
+    </div>
+    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
+      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Total Amount</p>
+      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @total_amount.format %></p>
+    </div>
+  </div>
+
   <div class="mb-4 flex items-center justify-between">
     <span class="text-sm text-text-secondary"><%= @applications.size %> application(s)</span>
     <%= link_to "New Application", new_loans_application_path, class: "btn-primary" %>

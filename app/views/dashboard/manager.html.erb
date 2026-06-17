@@ -12,7 +12,7 @@
         </div>
         <div>
           <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Active Loans</p>
-          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums"><%= @active_loans_count %></p>
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
         </div>
         <div>
           <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Pending Disbursement</p>
-          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums"><%= @pending_disbursements_count %></p>
         </div>
       </div>
     </div>
@@ -40,7 +40,7 @@
         </div>
         <div>
           <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Today's Collections</p>
-          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums"><%= @todays_collections.format %></p>
         </div>
       </div>
     </div>
@@ -54,7 +54,7 @@
         </div>
         <div>
           <p class="text-xs font-medium text-text-secondary dark:text-gray-400 uppercase tracking-wide">Total Members</p>
-          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums">—</p>
+          <p class="mt-0.5 text-2xl font-semibold text-text-primary dark:text-white tabular-nums"><%= @total_members_count %></p>
         </div>
       </div>
     </div>
@@ -68,38 +68,20 @@
           <a href="/dashboard/tasks" class="text-sm font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors">View all</a>
         </div>
         <div class="divide-y divide-border">
-          <div class="flex items-center gap-4 px-6 py-3.5">
-            <div class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 transition-colors hover:border-primary-400 dark:border-gray-600"></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-text-primary dark:text-white">Review loan application #LA-2024-001</p>
-              <p class="text-xs text-text-tertiary dark:text-gray-400">Due today</p>
-            </div>
-            <span class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 text-xs font-medium text-warning ring-1 ring-inset ring-warning/20 dark:bg-amber-900/30 dark:text-amber-400">High</span>
-          </div>
-          <div class="flex items-center gap-4 px-6 py-3.5">
-            <div class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 transition-colors hover:border-primary-400 dark:border-gray-600"></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-text-primary dark:text-white">Approve disbursement for Maria Santos</p>
-              <p class="text-xs text-text-tertiary dark:text-gray-400">Due tomorrow</p>
-            </div>
-            <span class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 text-xs font-medium text-warning ring-1 ring-inset ring-warning/20 dark:bg-amber-900/30 dark:text-amber-400">High</span>
-          </div>
-          <div class="flex items-center gap-4 px-6 py-3.5">
-            <div class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 transition-colors hover:border-primary-400 dark:border-gray-600"></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-text-primary dark:text-white">Verify collateral documents</p>
-              <p class="text-xs text-text-tertiary dark:text-gray-400">Due in 3 days</p>
-            </div>
-            <span class="inline-flex items-center rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20 dark:bg-primary-900/30 dark:text-primary-300">Medium</span>
-          </div>
-          <div class="flex items-center gap-4 px-6 py-3.5">
-            <div class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 transition-colors hover:border-primary-400 dark:border-gray-600"></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-text-primary dark:text-white">End-of-day cash session reconciliation</p>
-              <p class="text-xs text-text-tertiary dark:text-gray-400">Due in 5 days</p>
-            </div>
-            <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 ring-1 ring-inset ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400">Low</span>
-          </div>
+          <% if @pending_applications.any? %>
+            <% @pending_applications.each do |app| %>
+              <div class="flex items-center gap-4 px-6 py-3.5">
+                <div class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 transition-colors hover:border-primary-400 dark:border-gray-600"></div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-text-primary dark:text-white">Review application — <%= app.member&.name || "Unknown" %></p>
+                  <p class="text-xs text-text-tertiary dark:text-gray-400"><%= app.loan_product&.name || "Loan" %> · <%= number_to_currency(app.amount_cents.to_f / 100, unit: "PHP ") %></p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 text-xs font-medium text-warning ring-1 ring-inset ring-warning/20 dark:bg-amber-900/30 dark:text-amber-400"><%= app.status %></span>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="px-6 py-8 text-center text-sm text-text-tertiary">No pending applications</div>
+          <% end %>
         </div>
       </div>
 
@@ -108,39 +90,35 @@
           <h2 class="text-sm font-semibold text-text-primary dark:text-white">Recent Activity</h2>
         </div>
         <div class="divide-y divide-border">
-          <div class="flex items-center gap-4 px-6 py-3.5">
-            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-positive-50 text-positive dark:bg-emerald-900/30 dark:text-emerald-300">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
+          <% @recent_payments.each do |payment| %>
+            <div class="flex items-center gap-4 px-6 py-3.5">
+              <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-positive-50 text-positive dark:bg-emerald-900/30 dark:text-emerald-300">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-text-primary dark:text-white">Payment received — <span class="font-medium"><%= payment.loan.member.name %></span></p>
+                <p class="text-xs text-text-tertiary dark:text-gray-400"><%= time_ago_in_words(payment.created_at) %> ago · <%= payment.amount.format %></p>
+              </div>
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm text-text-primary dark:text-white">Payment received — <span class="font-medium">Juan Dela Cruz</span></p>
-              <p class="text-xs text-text-tertiary dark:text-gray-400">2 hours ago</p>
+          <% end %>
+          <% @recent_members.each do |member| %>
+            <div class="flex items-center gap-4 px-6 py-3.5">
+              <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-text-primary dark:text-white">New member registered — <span class="font-medium"><%= member.name %></span></p>
+                <p class="text-xs text-text-tertiary dark:text-gray-400"><%= time_ago_in_words(member.created_at) %> ago</p>
+              </div>
             </div>
-          </div>
-          <div class="flex items-center gap-4 px-6 py-3.5">
-            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3" />
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm text-text-primary dark:text-white">Loan disbursed — <span class="font-medium">#LN-2024-089</span></p>
-              <p class="text-xs text-text-tertiary dark:text-gray-400">4 hours ago</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-4 px-6 py-3.5">
-            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-warning-50 text-warning dark:bg-amber-900/30 dark:text-amber-300">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm text-text-primary dark:text-white">New member registered — <span class="font-medium">Ana Reyes</span></p>
-              <p class="text-xs text-text-tertiary dark:text-gray-400">Yesterday</p>
-            </div>
-          </div>
+          <% end %>
+          <% if @recent_payments.empty? && @recent_members.empty? %>
+            <div class="px-6 py-8 text-center text-sm text-text-tertiary">No recent activity</div>
+          <% end %>
         </div>
       </div>
     </div>

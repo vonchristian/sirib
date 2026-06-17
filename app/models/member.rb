@@ -1,4 +1,5 @@
 class Member < ApplicationRecord
+  attr_accessor :signature_data
   has_one :address, class_name: "MemberAddress", dependent: :destroy
   has_many :identifications, class_name: "MemberIdentification", dependent: :destroy
   has_many_attached :signatures
@@ -13,6 +14,14 @@ class Member < ApplicationRecord
   validates :civil_status, inclusion: { in: %w[single married divorced widowed] }
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+
+  validate :must_have_bir_identification, on: :create
+
+  def must_have_bir_identification
+    unless identifications.any? { |id| id.id_type == "BIR" }
+      errors.add(:identifications, "must include at least one BIR identification")
+    end
+  end
 
   def name
     [first_name, middle_name, last_name].compact.join(" ")
