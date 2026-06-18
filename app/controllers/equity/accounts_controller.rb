@@ -56,13 +56,16 @@ module Equity
         return
       end
 
-      @shares = params[:shares].to_i
       @product = @account.share_product
       @cash_account = resolve_cash_account
       @notes = params[:notes]
+      @price_per_share = @product.price_per_share
 
-      unless @shares.positive?
-        flash.now[:alert] = "Number of shares must be greater than zero."
+      amount_cents = parse_amount_cents(params[:amount])
+      price_cents = @product.price_per_share_cents
+
+      unless amount_cents&.positive?
+        flash.now[:alert] = "Amount must be greater than zero."
         render :buy, status: :unprocessable_entity
         return
       end
@@ -73,14 +76,24 @@ module Equity
         return
       end
 
-      if @account.shares_owned.zero? && @shares < @product.minimum_initial_purchase
-        flash.now[:alert] = "Minimum initial purchase is #{@product.minimum_initial_purchase} shares."
+      @shares = amount_cents / price_cents
+
+      unless @shares.positive?
+        flash.now[:alert] = "Amount must be at least #{@price_per_share.format} to purchase one share."
         render :buy, status: :unprocessable_entity
         return
       end
 
-      @total_amount = Money.new(@shares * @product.price_per_share_cents, "PHP")
-      @price_per_share = @product.price_per_share
+      if @account.shares_owned.zero? && @shares < @product.minimum_initial_purchase
+        min_amount = Money.new(@product.minimum_initial_purchase * price_cents, "PHP")
+        flash.now[:alert] = "Minimum initial purchase is #{@product.minimum_initial_purchase} shares (#{min_amount.format})."
+        render :buy, status: :unprocessable_entity
+        return
+      end
+
+      @amount_entered = Money.new(amount_cents, "PHP")
+      @amount_input = params[:amount]
+      @total_amount = Money.new(@shares * price_cents, "PHP")
 
       @debits = [{ account: @cash_account.name, amount: @total_amount.format }]
       @credits = [{ account: @account.equity_account&.name || "Share Capital Equity", amount: @total_amount.format }]
@@ -90,9 +103,17 @@ module Equity
 
     def confirm_buy
       @account = Equity::Account.find(params[:id])
-      @shares = params[:shares].to_i
       @cash_account = resolve_cash_account
       @notes = params[:notes]
+
+      unless Current.cash_session
+        redirect_to buy_equity_account_path(@account), alert: "No active cash session. Please log in again."
+        return
+      end
+
+      amount_cents = parse_amount_cents(params[:amount])
+      price_cents = @account.share_product.price_per_share_cents
+      @shares = amount_cents.to_i / price_cents
 
       unless @shares.positive? && @cash_account
         redirect_to buy_equity_account_path(@account), alert: "Invalid purchase parameters."
@@ -103,6 +124,7 @@ module Equity
         share_capital_account: @account,
         shares: @shares,
         cash_account: @cash_account,
+        cash_session: Current.cash_session,
         posted_by_id: Current.user.id,
         notes: @notes
       )
@@ -132,6 +154,11 @@ module Equity
       else
         cash_accounts_for_select.first
       end
+    end
+
+    def parse_amount_cents(value)
+      return nil if value.blank?
+      (value.to_s.gsub(/[^0-9.]/, "").to_f * 100).round
     end
   end
 end

@@ -6,12 +6,11 @@ FactoryBot.define do
     reference_number { generate(:entry_reference_number) }
     posted_at { Time.zone.now }
 
-    before(:create) do |entry|
-      entry.save!(validate: false)
+    # Use after_create instead to properly build the associated records
+    after(:create) do |entry|
       account = create(:accounting_account)
       create(:accounting_amount_line, entry:, account:, amount_type: "debit", amount_cents: 1000, amount_currency: "PHP")
       create(:accounting_amount_line, entry:, account:, amount_type: "credit", amount_cents: 1000, amount_currency: "PHP")
-      throw(:skip)
     end
   end
 end

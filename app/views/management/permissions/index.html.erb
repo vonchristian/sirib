@@ -1,0 +1,34 @@
+<% content_for :page_title, "Permissions" %>
+<% content_for :page_subtitle, "View all system permissions" %>
+
+<div class="rounded-lg border border-border bg-surface dark:border-gray-800 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-border dark:border-gray-800 text-left text-xs text-text-tertiary uppercase tracking-wider">
+        <th class="px-5 py-3 font-medium">Subject</th>
+        <th class="px-5 py-3 font-medium">Action</th>
+        <th class="px-5 py-3 font-medium">Description</th>
+        <th class="px-5 py-3 font-medium text-right">Roles Using</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-border dark:divide-gray-800">
+      <% @permissions.each do |perm| %>
+        <tr class="hover:bg-surface-alt transition-colors">
+          <td class="px-5 py-3 font-medium text-text-primary"><%= perm.subject.titleize %></td>
+          <td class="px-5 py-3">
+            <span class="inline-flex items-center rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-700"><%= perm.action %></span>
+          </td>
+          <td class="px-5 py-3 text-text-secondary"><%= perm.description || "—" %></td>
+          <td class="px-5 py-3 text-right text-text-secondary"><%= perm.roles.count %></td>
+        </tr>
+      <% end %>
+      <% if @permissions.empty? %>
+        <tr><td colspan="4" class="px-5 py-8 text-center text-text-tertiary">No permissions found.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4">
+  <%= render "shared/pagination", pagy: @pagy if defined?(@pagy) %>
+</div>

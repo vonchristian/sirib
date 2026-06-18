@@ -1,0 +1,44 @@
+<% content_for :page_title, "Approval Workflows" %>
+<% content_for :page_subtitle, "Manage approval processes" %>
+
+<div class="flex items-center justify-end mb-6">
+  <%= link_to "New Workflow", new_management_approval_workflow_path, class: "rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors" %>
+</div>
+
+<div class="rounded-lg border border-border bg-surface dark:border-gray-800 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-border dark:border-gray-800 text-left text-xs text-text-tertiary uppercase tracking-wider">
+        <th class="px-5 py-3 font-medium">Name</th>
+        <th class="px-5 py-3 font-medium">Code</th>
+        <th class="px-5 py-3 font-medium">Category</th>
+        <th class="px-5 py-3 font-medium">Steps</th>
+        <th class="px-5 py-3 font-medium">Pending</th>
+        <th class="px-5 py-3 font-medium text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-border dark:divide-gray-800">
+      <% @workflows.each do |wf| %>
+        <tr class="hover:bg-surface-alt transition-colors">
+          <td class="px-5 py-3">
+            <%= link_to wf.name, management_approval_workflow_path(wf), class: "font-medium text-text-primary hover:text-primary transition-colors" %>
+          </td>
+          <td class="px-5 py-3 text-text-secondary"><%= wf.code %></td>
+          <td class="px-5 py-3"><span class="inline-flex items-center rounded-full bg-surface-alt px-2.5 py-0.5 text-xs text-text-secondary"><%= wf.category %></span></td>
+          <td class="px-5 py-3 text-text-secondary"><%= wf.steps.size %></td>
+          <td class="px-5 py-3 text-text-secondary"><%= wf.approval_requests.pending.count %></td>
+          <td class="px-5 py-3 text-right">
+            <%= link_to "Edit", edit_management_approval_workflow_path(wf), class: "text-xs text-text-secondary hover:text-primary transition-colors" %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @workflows.empty? %>
+        <tr><td colspan="6" class="px-5 py-8 text-center text-text-tertiary">No workflows found.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4">
+  <%= render "shared/pagination", pagy: @pagy if defined?(@pagy) %>
+</div>

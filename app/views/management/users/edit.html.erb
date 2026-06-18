@@ -1,0 +1,25 @@
+<% content_for :page_title, "Edit #{@user.email_address}" %>
+<% content_for :page_subtitle, "Update user information" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-800 p-6">
+    <%= form_with model: [:management, @user], class: "space-y-4" do |f| %>
+      <div>
+        <%= f.label :email_address, class: "block text-xs font-medium text-text-secondary mb-1" %>
+        <%= f.email_field :email_address, class: "w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+      </div>
+      <div>
+        <%= f.label :password, class: "block text-xs font-medium text-text-secondary mb-1" %>
+        <%= f.password_field :password, class: "w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+      </div>
+      <div>
+        <%= f.label :password_confirmation, class: "block text-xs font-medium text-text-secondary mb-1" %>
+        <%= f.password_field :password_confirmation, class: "w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+      </div>
+      <div class="flex items-center gap-3 pt-2">
+        <%= f.submit class: "rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %>
+        <%= link_to "Cancel", management_user_path(@user), class: "text-xs text-text-secondary hover:text-primary transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -113,5 +113,69 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :management do
+    # Executive Dashboard
+    get "dashboard", to: "dashboard#index"
+    get "executive_dashboard", to: "executive_dashboard#index"
+    get "branch_performance", to: "branch_performance#index"
+    get "risk_monitoring", to: "risk_monitoring#index"
+    get "system_health", to: "system_health#index"
+
+    # Organizational Structure
+    resources :branches, except: [:destroy]
+    resources :departments, except: [:destroy]
+    resources :teams, except: [:destroy]
+
+    # Roles & Permissions
+    resources :roles, only: [:index, :show, :new, :create, :edit, :update]
+    resources :permissions, only: [:index, :show]
+    resources :users, only: [:index, :show, :edit, :update] do
+      resources :role_assignments, only: [:new, :create, :destroy], controller: "user_role_assignments"
+    end
+
+    # Policies
+    resources :policies do
+      member do
+        post :activate
+        post :deactivate
+      end
+    end
+
+    # Approval Workflows
+    resources :approval_workflows do
+      resources :approval_requests, only: [:index, :show] do
+        member do
+          post :approve
+          post :reject
+        end
+      end
+    end
+
+    # Configurations
+    resources :configurations, only: [:index, :new, :create, :show, :edit, :update] do
+      member do
+        post :approve
+        post :activate
+      end
+    end
+
+    # Alerts
+    resources :alerts, only: [:index, :show] do
+      member do
+        post :resolve
+      end
+    end
+
+    # Audit Logs
+    resources :audit_logs, only: [:index, :show]
+
+    # Settings
+    get "settings", to: "settings#index"
+
+    # Search
+    get "searches/branches", to: "searches#branches"
+    get "searches/users", to: "searches#users"
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

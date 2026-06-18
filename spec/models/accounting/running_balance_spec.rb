@@ -21,7 +21,7 @@ RSpec.describe Accounting::RunningBalance do
     it "requires account_id for account balance" do
       rb = build(:accounting_running_balance, account: nil)
       rb.valid?
-      expect(rb.errors[:account_id]).to include("can't be blank")
+      expect(rb.errors[:base]).to include("must belong to either an account or a ledger")
     end
   end
 

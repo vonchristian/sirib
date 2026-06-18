@@ -2,6 +2,7 @@
 <% show_main_menu = %w[manager loan_officer].include?(role) %>
 <% show_accounting = %w[manager treasurer accountant].include?(role) %>
 <% show_treasury = %w[treasurer].include?(role) %>
+<% show_management = %w[manager admin].include?(role) %>
 <% current_path = request.path %>
 
 <div data-sidebar-target="backdrop" class="fixed inset-0 z-30 hidden bg-gray-900/30 lg:hidden" data-action="click->sidebar#close"></div>
@@ -159,6 +160,77 @@
           Journal Entries
         </a>
       <% end %>
+    <% end %>
+
+    <% if %w[manager].include?(role) %>
+      <div class="px-3 pb-1.5 pt-5">
+        <p class="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-tertiary/70 dark:text-gray-500">Management</p>
+      </div>
+
+      <a href="/management/dashboard" class="<%= current_path.start_with?('/management/dashboard') && !current_path.include?('executive') ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605"/>
+        </svg>
+        Operations Dashboard
+      </a>
+
+      <a href="/management/executive_dashboard" class="<%= current_path == '/management/executive_dashboard' ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"/>
+        </svg>
+        Executive Dashboard
+      </a>
+
+      <a href="/management/branches" class="<%= current_path.start_with?('/management/branches') ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/>
+        </svg>
+        Branches
+      </a>
+
+      <a href="/management/policies" class="<%= current_path.start_with?('/management/policies') ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
+        </svg>
+        Policies
+      </a>
+
+      <a href="/management/approval_workflows" class="<%= current_path.start_with?('/management/approval_workflows') || current_path.start_with?('/management/approval_requests') ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/>
+        </svg>
+        Approvals
+      </a>
+
+      <a href="/management/configurations" class="<%= current_path.start_with?('/management/configurations') ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/>
+        </svg>
+        Configurations
+      </a>
+
+      <a href="/management/alerts" class="<%= current_path.start_with?('/management/alerts') ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+        </svg>
+        Alerts
+      </a>
+
+      <a href="/management/audit_logs" class="<%= current_path.start_with?('/management/audit_logs') ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+        </svg>
+        Audit Log
+      </a>
+
+      <a href="/management/settings" class="<%= current_path == '/management/settings' ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+        </svg>
+        Settings
+      </a>
     <% end %>
 
     <div class="px-3 pb-1.5 pt-5">

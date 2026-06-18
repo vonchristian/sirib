@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_18_073000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -309,6 +309,297 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_073000) do
     t.index ["reference_number"], name: "index_loans_on_reference_number", unique: true
   end
 
+  create_table "management_alert_subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "alert_type", null: false
+    t.string "channel", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "alert_type", "channel"], name: "idx_mgmt_alert_subs_on_user_type_channel", unique: true
+    t.index ["user_id"], name: "index_management_alert_subscriptions_on_user_id"
+  end
+
+  create_table "management_alerts", force: :cascade do |t|
+    t.string "alert_type", null: false
+    t.string "severity", default: "info", null: false
+    t.string "title", null: false
+    t.text "message"
+    t.string "source"
+    t.string "status", default: "active", null: false
+    t.string "triggered_by_type"
+    t.bigint "triggered_by_id"
+    t.bigint "resolved_by_id"
+    t.datetime "resolved_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["alert_type"], name: "index_management_alerts_on_alert_type"
+    t.index ["resolved_by_id"], name: "index_management_alerts_on_resolved_by_id"
+    t.index ["status"], name: "index_management_alerts_on_status"
+    t.index ["triggered_by_type", "triggered_by_id"], name: "idx_on_triggered_by_type_triggered_by_id_3442429c14"
+  end
+
+  create_table "management_approval_requests", force: :cascade do |t|
+    t.string "requestable_type", null: false
+    t.bigint "requestable_id", null: false
+    t.bigint "workflow_id", null: false
+    t.string "status", default: "pending", null: false
+    t.bigint "requested_by_id", null: false
+    t.integer "current_step", default: 1, null: false
+    t.text "reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["requestable_type", "requestable_id"], name: "idx_on_requestable_type_requestable_id_1031046bff"
+    t.index ["requested_by_id"], name: "index_management_approval_requests_on_requested_by_id"
+    t.index ["status"], name: "index_management_approval_requests_on_status"
+    t.index ["workflow_id"], name: "index_management_approval_requests_on_workflow_id"
+  end
+
+  create_table "management_approval_workflow_steps", force: :cascade do |t|
+    t.bigint "approval_workflow_id", null: false
+    t.integer "sequence", null: false
+    t.bigint "approver_role_id"
+    t.bigint "approver_user_id"
+    t.bigint "threshold_cents_min"
+    t.bigint "threshold_cents_max"
+    t.string "condition"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approval_workflow_id", "sequence"], name: "idx_on_approval_workflow_id_sequence_340a85b293", unique: true
+    t.index ["approval_workflow_id"], name: "idx_on_approval_workflow_id_a1ea19780b"
+    t.index ["approver_role_id"], name: "index_management_approval_workflow_steps_on_approver_role_id"
+    t.index ["approver_user_id"], name: "index_management_approval_workflow_steps_on_approver_user_id"
+  end
+
+  create_table "management_approval_workflows", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "code", null: false
+    t.text "description"
+    t.string "category", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_management_approval_workflows_on_code", unique: true
+  end
+
+  create_table "management_approvals", force: :cascade do |t|
+    t.bigint "approval_request_id", null: false
+    t.bigint "step_id", null: false
+    t.bigint "approver_id", null: false
+    t.string "status", null: false
+    t.text "comment"
+    t.datetime "signed_at", default: -> { "now()" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approval_request_id"], name: "index_management_approvals_on_approval_request_id"
+    t.index ["approver_id"], name: "index_management_approvals_on_approver_id"
+    t.index ["step_id"], name: "index_management_approvals_on_step_id"
+  end
+
+  create_table "management_audit_logs", force: :cascade do |t|
+    t.string "auditable_type"
+    t.bigint "auditable_id"
+    t.string "action", null: false
+    t.bigint "actor_id"
+    t.string "actor_role"
+    t.bigint "branch_id"
+    t.string "ip_address"
+    t.text "user_agent"
+    t.jsonb "before_state"
+    t.jsonb "after_state"
+    t.jsonb "approval_chain"
+    t.string "config_version"
+    t.datetime "created_at", null: false
+    t.index ["action"], name: "index_management_audit_logs_on_action"
+    t.index ["actor_id"], name: "index_management_audit_logs_on_actor_id"
+    t.index ["auditable_type", "auditable_id"], name: "index_management_audit_logs_on_auditable_type_and_auditable_id"
+    t.index ["branch_id"], name: "index_management_audit_logs_on_branch_id"
+    t.index ["created_at"], name: "index_management_audit_logs_on_created_at"
+  end
+
+  create_table "management_branch_performance_snapshots", force: :cascade do |t|
+    t.bigint "branch_id", null: false
+    t.date "snapshot_date", null: false
+    t.jsonb "metrics", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id", "snapshot_date"], name: "idx_mgmt_branch_perf_on_branch_date", unique: true
+    t.index ["branch_id"], name: "index_management_branch_performance_snapshots_on_branch_id"
+  end
+
+  create_table "management_branches", force: :cascade do |t|
+    t.bigint "cooperative_id"
+    t.string "name", null: false
+    t.string "code", null: false
+    t.text "address"
+    t.string "contact_number"
+    t.string "status", default: "active", null: false
+    t.bigint "parent_id"
+    t.integer "lft"
+    t.integer "rgt"
+    t.integer "depth", default: 0
+    t.integer "children_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "phone"
+    t.string "email"
+    t.index ["code"], name: "index_management_branches_on_code", unique: true
+    t.index ["cooperative_id"], name: "index_management_branches_on_cooperative_id"
+    t.index ["parent_id"], name: "index_management_branches_on_parent_id"
+  end
+
+  create_table "management_configuration_versions", force: :cascade do |t|
+    t.bigint "configuration_id", null: false
+    t.integer "version", null: false
+    t.jsonb "value", default: {}, null: false
+    t.bigint "changed_by_id"
+    t.text "change_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["changed_by_id"], name: "index_management_configuration_versions_on_changed_by_id"
+    t.index ["configuration_id", "version"], name: "idx_on_configuration_id_version_a1261d1f20", unique: true
+    t.index ["configuration_id"], name: "index_management_configuration_versions_on_configuration_id"
+  end
+
+  create_table "management_configurations", force: :cascade do |t|
+    t.string "key", null: false
+    t.jsonb "value", default: {}, null: false
+    t.integer "version", default: 1, null: false
+    t.string "status", default: "draft", null: false
+    t.string "configurable_type"
+    t.bigint "configurable_id"
+    t.bigint "changed_by_id"
+    t.bigint "approved_by_id"
+    t.datetime "approved_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_id"], name: "index_management_configurations_on_approved_by_id"
+    t.index ["changed_by_id"], name: "index_management_configurations_on_changed_by_id"
+    t.index ["key", "configurable_type", "configurable_id"], name: "idx_mgmt_configs_on_key_and_configurable", unique: true
+  end
+
+  create_table "management_departments", force: :cascade do |t|
+    t.bigint "branch_id", null: false
+    t.string "name", null: false
+    t.string "code", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id", "code"], name: "index_management_departments_on_branch_id_and_code", unique: true
+    t.index ["branch_id"], name: "index_management_departments_on_branch_id"
+  end
+
+  create_table "management_permissions", force: :cascade do |t|
+    t.string "action", null: false
+    t.string "subject", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action", "subject"], name: "index_management_permissions_on_action_and_subject", unique: true
+  end
+
+  create_table "management_policies", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "code", null: false
+    t.text "description"
+    t.string "category", null: false
+    t.string "scope"
+    t.string "status", default: "active", null: false
+    t.integer "version", default: 1, null: false
+    t.jsonb "config", default: {}
+    t.string "target_entity_type"
+    t.bigint "target_entity_id"
+    t.bigint "created_by_id"
+    t.bigint "approved_by_id"
+    t.datetime "approved_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_id"], name: "index_management_policies_on_approved_by_id"
+    t.index ["code"], name: "index_management_policies_on_code", unique: true
+    t.index ["created_by_id"], name: "index_management_policies_on_created_by_id"
+    t.index ["target_entity_type", "target_entity_id"], name: "idx_on_target_entity_type_target_entity_id_24780f1bbe"
+  end
+
+  create_table "management_policy_rules", force: :cascade do |t|
+    t.bigint "policy_id", null: false
+    t.string "field", null: false
+    t.string "operator", null: false
+    t.string "value", null: false
+    t.string "effect", default: "deny", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["policy_id"], name: "index_management_policy_rules_on_policy_id"
+  end
+
+  create_table "management_risk_indicators", force: :cascade do |t|
+    t.bigint "branch_id"
+    t.string "indicator_type", null: false
+    t.decimal "value", precision: 20, scale: 4
+    t.decimal "threshold", precision: 20, scale: 4
+    t.string "status", default: "normal", null: false
+    t.date "as_of_date", default: -> { "CURRENT_DATE" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id", "indicator_type", "as_of_date"], name: "idx_mgmt_risk_indicators_on_branch_type_date", unique: true
+    t.index ["branch_id"], name: "index_management_risk_indicators_on_branch_id"
+  end
+
+  create_table "management_role_assignments", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "role_id", null: false
+    t.bigint "branch_id"
+    t.bigint "department_id"
+    t.date "active_from", default: -> { "CURRENT_DATE" }, null: false
+    t.date "active_until"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_management_role_assignments_on_branch_id"
+    t.index ["department_id"], name: "index_management_role_assignments_on_department_id"
+    t.index ["role_id"], name: "index_management_role_assignments_on_role_id"
+    t.index ["user_id"], name: "index_management_role_assignments_on_user_id"
+  end
+
+  create_table "management_role_permissions", force: :cascade do |t|
+    t.bigint "role_id", null: false
+    t.bigint "permission_id", null: false
+    t.jsonb "constraints", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["permission_id"], name: "index_management_role_permissions_on_permission_id"
+    t.index ["role_id", "permission_id"], name: "index_management_role_permissions_on_role_id_and_permission_id", unique: true
+    t.index ["role_id"], name: "index_management_role_permissions_on_role_id"
+  end
+
+  create_table "management_roles", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "code", null: false
+    t.text "description"
+    t.integer "rank", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_management_roles_on_code", unique: true
+  end
+
+  create_table "management_system_health_snapshots", force: :cascade do |t|
+    t.string "metric_name", null: false
+    t.decimal "value", precision: 20, scale: 4
+    t.string "unit"
+    t.string "status", default: "healthy", null: false
+    t.datetime "captured_at", default: -> { "now()" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["metric_name", "captured_at"], name: "idx_on_metric_name_captured_at_597dc63458"
+  end
+
+  create_table "management_teams", force: :cascade do |t|
+    t.bigint "department_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["department_id"], name: "index_management_teams_on_department_id"
+  end
+
   create_table "member_addresses", force: :cascade do |t|
     t.bigint "member_id", null: false
     t.string "house_street", null: false
@@ -590,6 +881,37 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_073000) do
   add_foreign_key "loans", "loan_applications"
   add_foreign_key "loans", "loan_products"
   add_foreign_key "loans", "members"
+  add_foreign_key "management_alert_subscriptions", "users"
+  add_foreign_key "management_alerts", "users", column: "resolved_by_id"
+  add_foreign_key "management_approval_requests", "management_approval_workflows", column: "workflow_id"
+  add_foreign_key "management_approval_requests", "users", column: "requested_by_id"
+  add_foreign_key "management_approval_workflow_steps", "management_approval_workflows", column: "approval_workflow_id"
+  add_foreign_key "management_approval_workflow_steps", "management_roles", column: "approver_role_id"
+  add_foreign_key "management_approval_workflow_steps", "users", column: "approver_user_id"
+  add_foreign_key "management_approvals", "management_approval_requests", column: "approval_request_id"
+  add_foreign_key "management_approvals", "management_approval_workflow_steps", column: "step_id"
+  add_foreign_key "management_approvals", "users", column: "approver_id"
+  add_foreign_key "management_audit_logs", "management_branches", column: "branch_id"
+  add_foreign_key "management_audit_logs", "users", column: "actor_id"
+  add_foreign_key "management_branch_performance_snapshots", "management_branches", column: "branch_id"
+  add_foreign_key "management_branches", "cooperatives"
+  add_foreign_key "management_branches", "management_branches", column: "parent_id"
+  add_foreign_key "management_configuration_versions", "management_configurations", column: "configuration_id"
+  add_foreign_key "management_configuration_versions", "users", column: "changed_by_id"
+  add_foreign_key "management_configurations", "users", column: "approved_by_id"
+  add_foreign_key "management_configurations", "users", column: "changed_by_id"
+  add_foreign_key "management_departments", "management_branches", column: "branch_id"
+  add_foreign_key "management_policies", "users", column: "approved_by_id"
+  add_foreign_key "management_policies", "users", column: "created_by_id"
+  add_foreign_key "management_policy_rules", "management_policies", column: "policy_id"
+  add_foreign_key "management_risk_indicators", "management_branches", column: "branch_id"
+  add_foreign_key "management_role_assignments", "management_branches", column: "branch_id"
+  add_foreign_key "management_role_assignments", "management_departments", column: "department_id"
+  add_foreign_key "management_role_assignments", "management_roles", column: "role_id"
+  add_foreign_key "management_role_assignments", "users"
+  add_foreign_key "management_role_permissions", "management_permissions", column: "permission_id"
+  add_foreign_key "management_role_permissions", "management_roles", column: "role_id"
+  add_foreign_key "management_teams", "management_departments", column: "department_id"
   add_foreign_key "member_addresses", "members"
   add_foreign_key "member_identifications", "members"
   add_foreign_key "membership_applications", "cooperatives"

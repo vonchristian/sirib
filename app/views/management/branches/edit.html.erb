@@ -1,0 +1,8 @@
+<% content_for :page_title, "Edit #{@branch.name}" %>
+<% content_for :page_subtitle, "Update branch information" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-800 p-6">
+    <%= render "form", branch: @branch %>
+  </div>
+</div>

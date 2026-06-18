@@ -1,0 +1,8 @@
+<% content_for :page_title, "Edit #{@workflow.name}" %>
+<% content_for :page_subtitle, "Update approval workflow" %>
+
+<div class="max-w-3xl mx-auto">
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-800 p-6">
+    <%= render "form", workflow: @workflow %>
+  </div>
+</div>

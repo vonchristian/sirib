@@ -1,4 +1,4 @@
-# Product Manager Prompt: Unified Treasury Operations (Core Banking System for Cooperatives)
+Unified Treasury Module Design: Core Principles and Features
 
 ## Role
 

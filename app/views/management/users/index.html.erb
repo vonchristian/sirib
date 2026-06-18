@@ -1,0 +1,53 @@
+<% content_for :page_title, "Users" %>
+<% content_for :page_subtitle, "Manage system users" %>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <%= form_tag management_users_path, method: :get, class: "flex items-center gap-2" do %>
+      <%= text_field_tag :search, params[:search], placeholder: "Search by email...", class: "rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none w-60" %>
+      <%= submit_tag "Search", class: "rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="rounded-lg border border-border bg-surface dark:border-gray-800 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-border dark:border-gray-800 text-left text-xs text-text-tertiary uppercase tracking-wider">
+        <th class="px-5 py-3 font-medium">Email</th>
+        <th class="px-5 py-3 font-medium">Role</th>
+        <th class="px-5 py-3 font-medium">Management Roles</th>
+        <th class="px-5 py-3 font-medium text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-border dark:divide-gray-800">
+      <% @users.each do |user| %>
+        <tr class="hover:bg-surface-alt transition-colors">
+          <td class="px-5 py-3">
+            <%= link_to user.email_address, management_user_path(user), class: "font-medium text-text-primary hover:text-primary transition-colors" %>
+          </td>
+          <td class="px-5 py-3">
+            <span class="inline-flex items-center rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-700"><%= user.role.titleize %></span>
+          </td>
+          <td class="px-5 py-3">
+            <div class="flex flex-wrap gap-1">
+              <% user.management_roles.each do |mr| %>
+                <span class="inline-flex items-center rounded-full bg-surface-alt px-2 py-0.5 text-xs text-text-secondary"><%= mr.name %></span>
+              <% end %>
+            </div>
+          </td>
+          <td class="px-5 py-3 text-right">
+            <%= link_to "Edit", edit_management_user_path(user), class: "text-xs text-text-secondary hover:text-primary transition-colors" %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @users.empty? %>
+        <tr><td colspan="4" class="px-5 py-8 text-center text-text-tertiary">No users found.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4">
+  <%= render "shared/pagination", pagy: @pagy if defined?(@pagy) %>
+</div>

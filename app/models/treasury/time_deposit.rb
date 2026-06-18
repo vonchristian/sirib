@@ -10,6 +10,10 @@ module Treasury
     belongs_to :depositor, polymorphic: true
     belongs_to :time_deposit_product
 
+    def active?
+      status == "active"
+    end
+
     validates :amount_cents, presence: true, numericality: { greater_than: 0 }
     validates :interest_rate, presence: true, numericality: { greater_than: 0 }
     validates :status, inclusion: { in: STATUSES }

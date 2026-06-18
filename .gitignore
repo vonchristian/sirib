@@ -36,6 +36,7 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 .aider*
+.DS_Store
 
 # Test coverage
 /coverage/

@@ -29,7 +29,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-surface-alt text-text-primary antialiased dark:bg-gray-950 dark:text-gray-100" data-controller="sidebar" data-action="keydown.window->sidebar#closeKeydown click@window->sidebar#hideUserMenu">
+  <body class="bg-surface-alt text-text-primary antialiased dark:bg-gray-950 dark:text-gray-100" data-controller="sidebar" data-action="keydown@window->sidebar#closeKeydown click@window->sidebar#hideUserMenu">
     <%= render "shared/sidebar" %>
     <%= render "shared/mobile_header" %>
 

@@ -128,23 +128,24 @@ test.describe('Share Capital', () => {
         await page.getByRole('link', { name: /Buy Shares/i }).click();
         await expect(page).toHaveURL(/\/buy$/);
         await expect(page.getByText(/₱100\.00 per share/)).toBeVisible();
-        await expect(page.getByLabel(/Number of Shares/i)).toBeVisible();
+        await expect(page.getByLabel(/Amount \(₱\)/i)).toBeVisible();
       });
 
       test('previews purchase before confirming', async ({ page }) => {
         await openAccount(page, memberNames[4]);
         await page.getByRole('link', { name: /Buy Shares/i }).click();
-        await page.getByLabel(/Number of Shares/i).fill('25');
+        await page.getByLabel(/Amount \(₱\)/i).fill('2500');
         await page.getByRole('button', { name: /Preview Purchase/i }).click();
         await expect(page.getByRole('button', { name: /Confirm Purchase/i })).toBeVisible();
         await expect(page.getByText(/Confirmation/)).toBeVisible();
         await expect(page.getByText(/₱2,500\.00/).first()).toBeVisible();
+        await expect(page.getByText('Shares to Purchase')).toBeVisible();
       });
 
       test('completes a share purchase', async ({ page }) => {
         await openAccount(page, memberNames[5]);
         await page.getByRole('link', { name: /Buy Shares/i }).click();
-        await page.getByLabel(/Number of Shares/i).fill('25');
+        await page.getByLabel(/Amount \(₱\)/i).fill('2500');
         await page.getByRole('button', { name: /Preview Purchase/i }).click();
         await expect(page.getByRole('button', { name: /Confirm Purchase/i })).toBeVisible();
         await page.getByRole('button', { name: /Confirm Purchase/i }).click();
@@ -153,18 +154,26 @@ test.describe('Share Capital', () => {
         await expect(page.getByText(/₱2,500\.00/).first()).toBeVisible();
       });
 
-      test('validates zero shares', async ({ page }) => {
+      test('validates zero amount', async ({ page }) => {
         await openAccount(page, memberNames[6]);
         await page.getByRole('link', { name: /Buy Shares/i }).click();
-        await page.getByLabel(/Number of Shares/i).fill('0');
+        await page.getByLabel(/Amount \(₱\)/i).fill('0');
         await page.getByRole('button', { name: /Preview Purchase/i }).click();
         await expect(page.getByText(/must be greater than zero/i)).toBeVisible();
       });
 
-      test('edits shares from preview', async ({ page }) => {
+      test('validates insufficient amount for one share', async ({ page }) => {
         await openAccount(page, memberNames[7]);
         await page.getByRole('link', { name: /Buy Shares/i }).click();
-        await page.getByLabel(/Number of Shares/i).fill('25');
+        await page.getByLabel(/Amount \(₱\)/i).fill('50');
+        await page.getByRole('button', { name: /Preview Purchase/i }).click();
+        await expect(page.getByText(/at least ₱100\.00/)).toBeVisible();
+      });
+
+      test('edits amount from preview', async ({ page }) => {
+        await openAccount(page, memberNames[8]);
+        await page.getByRole('link', { name: /Buy Shares/i }).click();
+        await page.getByLabel(/Amount \(₱\)/i).fill('2500');
         await page.getByRole('button', { name: /Preview Purchase/i }).click();
         await expect(page.getByRole('button', { name: /Confirm Purchase/i })).toBeVisible();
         await page.getByRole('link', { name: /Edit/i }).click();
@@ -172,23 +181,23 @@ test.describe('Share Capital', () => {
       });
 
       test('cancels at preview stage', async ({ page }) => {
-        await openAccount(page, memberNames[8]);
+        await openAccount(page, memberNames[9]);
         await page.getByRole('link', { name: /Buy Shares/i }).click();
-        await page.getByLabel(/Number of Shares/i).fill('25');
+        await page.getByLabel(/Amount \(₱\)/i).fill('2500');
         await page.getByRole('button', { name: /Preview Purchase/i }).click();
         await page.getByRole('link', { name: 'Cancel' }).first().click();
         await expect(page).toHaveURL(/\/equity\/accounts\/\d+$/);
       });
 
       test('increases share count on second purchase', async ({ page }) => {
-        await openAccount(page, memberNames[9]);
+        await openAccount(page, memberNames[10]);
         await page.getByRole('link', { name: /Buy Shares/i }).click();
-        await page.getByLabel(/Number of Shares/i).fill('25');
+        await page.getByLabel(/Amount \(₱\)/i).fill('2500');
         await page.getByRole('button', { name: /Preview Purchase/i }).click();
         await page.getByRole('button', { name: /Confirm Purchase/i }).click();
         await expect(page.getByText(/Successfully purchased 25 shares/)).toBeVisible();
         await page.getByRole('link', { name: /Buy Shares/i }).click();
-        await page.getByLabel(/Number of Shares/i).fill('30');
+        await page.getByLabel(/Amount \(₱\)/i).fill('3000');
         await page.getByRole('button', { name: /Preview Purchase/i }).click();
         await page.getByRole('button', { name: /Confirm Purchase/i }).click();
         await expect(page.getByText(/Successfully purchased 30 shares/)).toBeVisible();
@@ -196,9 +205,9 @@ test.describe('Share Capital', () => {
       });
 
       test('validates minimum initial purchase', async ({ page }) => {
-        await openAccount(page, memberNames[10]);
+        await openAccount(page, memberNames[11]);
         await page.getByRole('link', { name: /Buy Shares/i }).click();
-        await page.getByLabel(/Number of Shares/i).fill('3');
+        await page.getByLabel(/Amount \(₱\)/i).fill('999');
         await page.getByRole('button', { name: /Preview Purchase/i }).click();
         await expect(page.getByText(/minimum initial purchase/i)).toBeVisible();
       });
@@ -217,6 +226,22 @@ test.describe('Share Capital', () => {
         await expect(page.getByText('Share capital product created.')).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Accounting' }).first()).toBeVisible();
         await expect(page.getByText(/Equity Ledger/)).toBeVisible();
+      });
+    });
+
+    test.describe('Cash Session Integration', () => {
+      test('appears as a receipt in the cash session report', async ({ page }) => {
+        await openAccount(page, memberNames[12]);
+        await page.getByRole('link', { name: /Buy Shares/i }).click();
+        await page.getByLabel(/Amount \(₱\)/i).fill('2500');
+        await page.getByRole('button', { name: /Preview Purchase/i }).click();
+        await page.getByRole('button', { name: /Confirm Purchase/i }).click();
+        await expect(page.getByText(/Successfully purchased/)).toBeVisible();
+
+        await page.goto('/treasury/cash_sessions');
+        await page.getByRole('link', { name: /View/ }).first().click();
+        await expect(page.getByText(/Share Capital Purchase/).first()).toBeVisible();
+        await expect(page.getByText(/₱2,500\.00/).first()).toBeVisible();
       });
     });
 

@@ -1,0 +1,50 @@
+<% content_for :page_title, @department.name %>
+<% content_for :page_subtitle, "Department details" %>
+
+<div class="flex items-center justify-end gap-2 mb-6">
+  <%= link_to "Edit", edit_management_department_path(@department), class: "rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors" %>
+  <%= link_to "Back", management_departments_path, class: "rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors" %>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-800">
+    <div class="border-b border-border px-5 py-4 dark:border-gray-800">
+      <h3 class="text-sm font-semibold text-text-primary">Details</h3>
+    </div>
+    <div class="p-5 space-y-3">
+      <div class="flex justify-between">
+        <span class="text-sm text-text-tertiary">Name</span>
+        <span class="text-sm font-medium text-text-primary"><%= @department.name %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-sm text-text-tertiary">Code</span>
+        <span class="text-sm text-text-primary"><%= @department.code %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-sm text-text-tertiary">Branch</span>
+        <span class="text-sm text-text-primary"><%= @department.branch.name %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-sm text-text-tertiary">Description</span>
+        <span class="text-sm text-text-primary"><%= @department.description || "—" %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-lg border border-border bg-surface dark:border-gray-800">
+    <div class="border-b border-border px-5 py-4 dark:border-gray-800">
+      <h3 class="text-sm font-semibold text-text-primary">Teams</h3>
+    </div>
+    <div class="divide-y divide-border dark:divide-gray-800">
+      <% @teams.each do |team| %>
+        <div class="px-5 py-3 flex items-center justify-between">
+          <p class="text-sm text-text-primary"><%= team.name %></p>
+          <span class="text-xs text-text-tertiary"><%= team.description || "—" %></span>
+        </div>
+      <% end %>
+      <% if @teams.empty? %>
+        <p class="px-5 py-4 text-sm text-text-tertiary">No teams in this department.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

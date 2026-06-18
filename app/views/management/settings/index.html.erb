@@ -1,0 +1,39 @@
+<% content_for :page_title, "Management Settings" %>
+<% content_for :page_subtitle, "System settings overview" %>
+
+<div class="rounded-lg border border-border bg-surface dark:border-gray-800">
+  <div class="border-b border-border px-5 py-4 dark:border-gray-800">
+    <h3 class="text-sm font-semibold text-text-primary">System Configurations</h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-border dark:border-gray-800 text-left text-xs text-text-tertiary uppercase tracking-wider">
+          <th class="px-5 py-3 font-medium">Key</th>
+          <th class="px-5 py-3 font-medium">Value</th>
+          <th class="px-5 py-3 font-medium">Status</th>
+          <th class="px-5 py-3 font-medium text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border dark:divide-gray-800">
+        <% @configurations.each do |config| %>
+          <tr class="hover:bg-surface-alt transition-colors">
+            <td class="px-5 py-3 font-medium text-text-primary"><%= config.key %></td>
+            <td class="px-5 py-3 text-text-secondary max-w-[300px] truncate"><%= config.value %></td>
+            <td class="px-5 py-3">
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= config.active? ? 'bg-positive-50 text-positive' : config.draft? ? 'bg-warning-50 text-warning' : 'bg-gray-100 text-text-tertiary' %>">
+                <%= config.status.titleize %>
+              </span>
+            </td>
+            <td class="px-5 py-3 text-right">
+              <%= link_to "View", management_configuration_path(config), class: "text-xs text-primary hover:text-primary-700 transition-colors" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @configurations.empty? %>
+          <tr><td colspan="4" class="px-5 py-8 text-center text-text-tertiary">No configurations found.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

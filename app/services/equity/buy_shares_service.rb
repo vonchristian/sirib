@@ -3,6 +3,7 @@ module Equity
     object :share_capital_account, class: Equity::Account
     integer :shares
     object :cash_account, class: Accounting::Account
+    object :cash_session, class: Treasury::CashSession, default: nil
     integer :posted_by_id
     string :notes, default: nil
 
@@ -36,6 +37,8 @@ module Equity
           posted_at: Time.current
         )
 
+        create_cash_session_voucher!(entry, txn, total_amount_cents) if cash_session
+
         share_capital_account.update!(
           shares_owned: share_capital_account.shares_owned + shares,
           paid_up_shares: share_capital_account.paid_up_shares + shares
@@ -66,6 +69,22 @@ module Equity
         posted_at: Time.current,
         debits: [ { account: cash_account, amount: total_amount_cents } ],
         credits: [ { account: share_capital_account.equity_account, amount: total_amount_cents } ]
+      )
+    end
+
+    def create_cash_session_voucher!(entry, txn, total_amount_cents)
+      voucher = cash_session.vouchers.create!(
+        type: "Treasury::CashReceiptVoucher",
+        cash_account: cash_account,
+        amount_cents: total_amount_cents,
+        amount_currency: "PHP",
+        category: "share_capital_purchase",
+        description: "Share capital purchase — #{share_capital_account.account_number}",
+        counterparty: share_capital_account.member,
+        transactable: txn,
+        entry: entry,
+        status: "posted",
+        posted_at: Time.current
       )
     end
   end

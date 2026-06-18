@@ -22,6 +22,11 @@
   resolved "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.11.tgz"
   integrity sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==
 
+"@hotwired/stimulus@^3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@hotwired/stimulus/-/stimulus-3.2.2.tgz#071aab59c600fed95b97939e605ff261a4251608"
+  integrity sha512-eGeIqNOQpXoPAIP7tC1+1Yc1yl1xnwYqg+3mzqxyrbE5pg5YFBZcA6YoTiByJB6DKAEsiWtl6tjTJS4IYtbB7A==
+
 "@playwright/test@^1.60.0":
   version "1.60.0"
   resolved "https://registry.npmjs.org/@playwright/test/-/test-1.60.0.tgz"
@@ -166,7 +171,7 @@ datatables.net@2.3.8:
   dependencies:
     jquery ">=1.7"
 
-devtools-protocol@*, devtools-protocol@0.0.1624250:
+devtools-protocol@0.0.1624250:
   version "0.0.1624250"
   resolved "https://registry.npmjs.org/devtools-protocol/-/devtools-protocol-0.0.1624250.tgz"
   integrity sha512-YFAat/lOiIk0ARmBweG+ygrEcbZrq5B9urRyUoeQKp53MlidHXE2TmTbxKcaXoQj7u/aX+jebDO4BW55rs0WwA==
@@ -311,11 +316,6 @@ strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
   dependencies:
     ansi-regex "^5.0.1"
-
-"tailwindcss@>=3.0.0 || >= 3.0.0-alpha.1 || >= 4.0.0-alpha.20 || >= 4.0.0-beta.1":
-  version "4.3.1"
-  resolved "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.3.1.tgz"
-  integrity sha512-hk+TB1m+K8CYNrP6rjQaq/Y+4Zylwpa87mLYBKCunwnnQ9p+fHb7kmSfGqyEJoxF/O6CDyABWVFEafNSYKll+Q==
 
 typed-query-selector@^2.12.2:
   version "2.12.2"

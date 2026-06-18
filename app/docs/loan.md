@@ -1,71 +1,55 @@
-# Product Manager Prompt: Loan Lifecycle Module for a Cooperative Core Banking System
+# Product Manager Prompt: Loan Operations Module (Core Banking System for Cooperatives)
 
 ## Role
 
-You are an experienced Product Manager specializing in **Core Banking Systems**, **Lending**, and **Cooperative Financial Management**.
+You are an expert Product Manager specializing in **Core Banking Systems**, **Lending Operations**, and **Financial Accounting Integration** for cooperative institutions.
 
-Your task is to design a **production-ready Loan Management module** for a cooperative core banking application.
+Your task is to design a **production-grade Loan Operations module** that serves as the execution layer for the entire lending lifecycle.
 
-Think like a banking product manager—not a CRUD application developer.
+This is not a CRUD loan tracker.
 
-Design workflows that reflect how real cooperative lending operations work, with strong accounting, auditability, and future regulatory compliance.
+This is a **financial operations engine that executes, controls, and accounts for lending activities**.
 
 ---
 
 # Business Context
 
-The application is a **Core Banking Platform** built specifically for **Cooperatives**.
+The cooperative operates a full lending business under strict financial control and audit requirements.
 
-Members may apply for different loan products.
+Loan operations must integrate with:
 
-The complete loan lifecycle must be supported:
+* Treasury (cash movement)
+* Accounting (double-entry GL posting)
+* Member accounts (savings, share capital)
+* Risk and compliance systems
+* Collections and delinquency management
 
-* Loan Application
-* Credit Investigation
-* Approval Workflow
-* Loan Disbursement
-* Repayment Schedule
-* Collections
-* Aging
-* Delinquency Monitoring
-* Demand Notices
-* Loan Restructuring
-* Loan Closure
-
-Every financial event must generate proper accounting entries.
-
-All transactions must be fully auditable.
+Every loan action is a **financial event**, not just a record update.
 
 ---
 
-# Objectives
+# Core Design Principle
 
-Design:
+> “A loan is not data. A loan is a lifecycle of financial obligations.”
 
-* Business workflows
-* UI/UX
-* Database schema
-* Domain model
-* Accounting entries
-* Service layer
-* Validation rules
-* Approval workflows
-* Audit logging
-* User permissions
+Every loan event must:
 
-Avoid generic CRUD. Design a banking-grade lending system.
+* Produce accounting entries
+* Update subledgers
+* Trigger audit logs
+* Be fully traceable
+* Be immutable after posting (reversal only)
 
 ---
 
-# Feature 1 — Loan Product
+# Feature 1 — Loan Product Engine
 
-Design the screen for creating Loan Products.
+Defines how loans behave.
 
-## Basic Information
+## Configuration Fields
 
 * Product Code
 * Product Name
-* Description
 * Loan Type
 
   * Personal
@@ -75,541 +59,447 @@ Design the screen for creating Loan Products.
   * Emergency
   * Housing
   * Vehicle
-  * Other
-* Status
-* Effective Date
-
----
-
-## Loan Rules
-
-* Minimum Loan Amount
-* Maximum Loan Amount
-* Minimum Term
-* Maximum Term
 * Interest Rate
 * Interest Method
 
   * Flat
-  * Diminishing Balance
-* Interest Frequency
-* Repayment Frequency
+  * Declining Balance
+* Term Range (min/max months)
+* Loan Amount Range (min/max)
+* Payment Frequency
 
   * Daily
   * Weekly
   * Semi-monthly
   * Monthly
-  * Quarterly
-* Grace Period
-* Penalty Rate
-* Processing Fee
-* Service Fee
-* Insurance Fee
-* Documentary Stamp Tax
-* Maximum Number of Active Loans
-* Requires Guarantor
-* Requires Collateral
+* Grace Period Rules
+* Penalty Rules
+* Fees (processing, insurance, service)
+* Collateral Requirement
+* Guarantor Requirement
+* Max Active Loans per Member
 
 ---
 
-## Accounting Configuration
+## Accounting Mapping
 
-Automatically create the required GL mappings.
+Each product must map to GL accounts:
 
-Example
-
-```text
-Loans Receivable
-Interest Income
-Penalty Income
-Unearned Interest
-Processing Fee Income
-```
-
-Users should not manually configure accounting for every loan.
+* Loans Receivable
+* Interest Income
+* Penalty Income
+* Fees Income
+* Unearned Interest (if applicable)
 
 ---
 
-## Validation Rules
+# Feature 2 — Loan Application Lifecycle
 
-Prevent:
-
-* Negative interest rates
-* Invalid loan amounts
-* Invalid terms
-* Duplicate product codes
-* Editing accounting mappings once transactions exist
-
----
-
-# Feature 2 — Loan Application
-
-Create a Loan Application.
-
-## Inputs
-
-* Member
-* Loan Product
-* Branch
-* Loan Amount
-* Loan Purpose
-* Loan Term
-* Payment Frequency
-* Guarantors
-* Collateral
-* Attachments
-* Remarks
-
----
-
-Automatically display:
-
-* Existing Loans
-* Outstanding Balance
-* Delinquent Loans
-* Share Capital Balance
-* Savings Balance
-* Member Risk Rating
-* Credit Score (future)
-
----
-
-Application Status
+## Status Flow
 
 * Draft
 * Submitted
 * Under Review
 * Credit Investigation
-* Pending Approval
 * Approved
 * Rejected
 * Cancelled
 
-Applications become read-only once submitted.
+---
+
+## Rules
+
+* Submitted applications become read-only
+* Credit investigation must capture financial profile snapshot
+* No loan can proceed without approval workflow completion
 
 ---
 
-# Feature 3 — Credit Investigation
+# Feature 3 — Credit Assessment Engine
 
-Credit Officer reviews:
+Evaluates borrower risk.
 
-* Member Profile
-* Employment
-* Income
-* Existing Loans
+## Inputs
+
+* Member financial history
+* Existing loans
+* Savings balance
+* Share capital balance
+* Payment behavior
 * Guarantors
-* Collateral
-* Payment History
-* Share Capital
-* Savings
-* Previous Delinquencies
-
-Generate an internal Credit Recommendation.
-
-Possible outcomes:
-
-* Recommend Approval
-* Recommend Approval with Conditions
-* Recommend Rejection
+* Collateral value
 
 ---
 
-# Feature 4 — Approval Workflow
+## Outputs
 
-Support configurable approval levels.
+* Credit Score (internal)
+* Risk Tier
 
-Examples:
+  * Low
+  * Medium
+  * High
+* Recommendation
 
-* Credit Officer
+  * Approve
+  * Conditional Approve
+  * Reject
+
+---
+
+# Feature 4 — Approval Workflow Engine
+
+Configurable multi-level approval.
+
+## Approval Levels
+
+* Loan Officer
 * Branch Manager
 * Credit Committee
-* Board of Directors
-
-Approval thresholds should be configurable.
-
-Example:
-
-* Below ₱50,000 → Manager
-* ₱50,000–₱500,000 → Committee
-* Above ₱500,000 → Board
-
-Track:
-
-* Approver
-* Decision
-* Comments
-* Date
-* Digital Signature (future)
+* Board (high-value loans)
 
 ---
 
-# Feature 5 — Loan Disbursement
+## Rules
 
-Disbursement methods:
+* Approval thresholds based on loan amount
+* No self-approval
+* All approvals are immutable records
+* Digital signature support (future-ready)
+
+---
+
+# Feature 5 — Loan Disbursement Engine
+
+Executes fund release.
+
+## Disbursement Methods
 
 * Cash
-* Savings Account
-* Check
 * Bank Transfer
+* Check
+* Savings Offset (internal)
 * Wallet (future)
 
-Automatically compute:
+---
 
-* Processing Fees
-* Insurance
-* Taxes
-* Net Proceeds
+## System Behavior
 
-Example
+Before posting:
 
-```text
+* Validate approval completion
+* Validate account status
+* Compute net proceeds
+
+---
+
+## Net Disbursement Formula
+
+```text id="loan_net_001"
+Net Proceeds =
 Loan Amount
-₱100,000
-
-Less Fees
-₱3,000
-
-Net Proceeds
-₱97,000
+- Processing Fee
+- Insurance Fee
+- Taxes
 ```
 
 ---
 
-After posting:
+## Accounting Entry
 
-Automatically:
-
-* Create Loan Account
-* Create Loan Ledger
-* Generate Journal Entries
-* Create Repayment Schedule
-* Record Audit Log
-* Update Member Balance
-
-Transactions become immutable.
-
----
-
-# Accounting Entries
-
-Example
-
-```text
-Debit
-Loans Receivable
-
-Credit
-Cash on Hand
+```text id="loan_disb_001"
+Debit: Loans Receivable
+Credit: Cash / Bank
 ```
 
-Record all fee income separately.
+---
+
+## Post-Disbursement Actions
+
+* Create loan account
+* Generate amortization schedule
+* Create subledger entry
+* Trigger audit log
+* Emit LoanDisbursed event
 
 ---
 
-# Feature 6 — Repayment Schedule
+# Feature 6 — Amortization Engine
 
-Automatically generate amortization schedule.
+Generates repayment schedule.
 
-Display:
+## Supports
+
+* Flat interest
+* Declining balance
+* Balloon payments
+* Grace periods
+* Irregular schedules
+
+---
+
+## Schedule Fields
 
 * Due Date
 * Principal
 * Interest
-* Penalty
+* Fees
+* Penalty Accrual
 * Remaining Balance
-* Installment Number
 * Status
-
-Support:
-
-* Flat Interest
-* Diminishing Balance
-* Balloon Payments
-* Grace Period
-* Irregular Schedules
-* Early Payments
 
 ---
 
-# Feature 7 — Collections
+# Feature 7 — Loan Repayment Engine
 
-Create Collection transaction.
-
-Payment Sources:
-
-* Cash
-* Savings
-* Payroll
-* Bank Transfer
-* Wallet
-
-Automatically allocate payments:
+## Payment Allocation Priority
 
 1. Penalties
 2. Interest
 3. Principal
 
-Support:
+---
 
-* Partial Payments
-* Advance Payments
-* Overpayments
+## Partial Payments Supported
 
-Generate official receipts.
+System must correctly allocate partial payments across components.
 
 ---
 
-# Feature 8 — Aging
+## Accounting Entry
 
-Automatically classify loans.
+```text id="loan_pay_001"
+Debit: Cash
+Credit: Interest Income
+Credit: Loans Receivable
+```
 
-Examples:
+---
+
+# Feature 8 — Loan Restructuring Engine
+
+Allows modification without destroying history.
+
+## Allowed Changes
+
+* Term extension
+* Interest rate adjustment
+* Payment rescheduling
+* Principal restructuring
+* Moratorium (payment holiday)
+
+---
+
+## Rule
+
+* Original loan remains unchanged
+* New restructuring record is linked
+* New amortization schedule is generated
+
+---
+
+# Feature 9 — Loan Closure Engine
+
+Triggers when:
+
+* Balance = 0
+
+## Actions
+
+* Mark loan as CLOSED
+* Archive schedule
+* Generate closure certificate
+* Lock account (read-only)
+
+---
+
+# Feature 10 — Delinquency & Aging Engine
+
+## Aging Buckets
 
 * Current
-* 1–30 Days Past Due
-* 31–60 Days
-* 61–90 Days
-* 91–180 Days
-* Over 180 Days
-* Non-performing Loan (NPL)
-
-Dashboard should display:
-
-* Aging Summary
-* Portfolio at Risk
-* Total Delinquent Amount
-* Collection Rate
-* NPL Ratio
+* 1–30 days
+* 31–60 days
+* 61–90 days
+* 91–180 days
+* Over 180 days (NPL)
 
 ---
 
-# Feature 9 — Notices
+## Metrics
 
-Automatically generate notices.
+* Portfolio at Risk (PAR)
+* Non-performing loans
+* Collection efficiency
+* Default rate
 
-Examples:
+---
 
-* Payment Reminder
-* Past Due Notice
-* Final Demand
-* Legal Notice
+# Feature 11 — Collection Operations
 
-Delivery Channels:
+## Channels
 
-* Email
+* Cash
+* Bank transfer
+* Payroll deduction
+* Savings offset
+
+---
+
+## System Behavior
+
+* Auto-allocate payments
+* Update amortization schedule
+* Update GL entries
+* Generate official receipt
+
+---
+
+# Feature 12 — Loan Notices Engine
+
+Automated notifications:
+
+* Payment reminder
+* Past due notice
+* Demand letter
+* Final notice
+
+---
+
+## Channels
+
 * SMS
-* In-app Notification
-* Printable Letter
-
-Track:
-
-* Sent Date
-* Delivery Status
-* Recipient
-* Acknowledgement
+* Email
+* In-app notification
+* Printable letters
 
 ---
 
-# Feature 10 — Loan Closure
+# Feature 13 — Accounting Integration
 
-When loan balance reaches zero:
+Every loan event generates:
 
-Automatically:
+## Journal Entries
 
-* Mark Loan Paid
-* Close Loan Account
-* Update Member Status
-* Generate Certificate of Full Payment
-* Archive Schedule
-
-Loan becomes read-only.
+* Disbursement
+* Repayment
+* Interest accrual
+* Penalty posting
+* Write-offs
 
 ---
 
-# Feature 11 — Loan Restructuring
+## Rule
 
-Support restructuring.
-
-Examples:
-
-* Extend Term
-* Reduce Installment
-* Change Interest Rate
-* Payment Moratorium
-* Principal Adjustment
-* Refinancing
-
-Maintain complete history.
-
-Never overwrite the original loan.
-
-Create restructuring records linked to the original loan.
+> No loan exists without accounting records.
 
 ---
 
-# Feature 12 — Dashboard Widgets
+# Feature 14 — Audit Trail (Mandatory)
 
-Display:
+Every action must record:
 
-* Active Loans
-* Outstanding Balance
-* Past Due Balance
-* Next Due Date
-* Collection Today
-* Total Interest Earned
-* Loan Portfolio
-* Portfolio at Risk
-* Aging Distribution
-* Loan Product Mix
-* Collection Performance
-
----
-
-# Feature 13 — Audit Trail
-
-Record every action.
-
-Store:
-
-* User
+* User/system actor
 * Branch
 * Timestamp
-* IP Address
+* IP address
 * Device
-* Before Values
-* After Values
-* Approval History
-* Remarks
-
-No posted financial transaction may be edited.
-
-Corrections require reversal transactions.
+* Before state
+* After state
+* Approval chain
+* Reference ID
 
 ---
 
-# Feature 14 — Permissions
+## Rule
+
+* Immutable records
+* Only reversal entries allowed
+
+---
+
+# Feature 15 — Permissions Model
 
 ## Loan Officer
 
-Can:
-
-* Create Applications
-* Edit Drafts
-* Conduct Credit Investigation
-
-Cannot:
-
-* Approve Own Loan
-* Disburse Loans
-
----
+* Create applications
+* Initiate credit investigation
 
 ## Branch Manager
 
-Can:
-
-* Review
-* Approve within limits
-* View Reports
-
----
+* Approve loans within limits
+* View portfolio
 
 ## Credit Committee
 
-Can:
-
-* Approve Committee-Level Loans
-
----
-
-## Board
-
-Can:
-
-* Approve Large Loans
-* Override Policies (with audit)
-
----
+* Approve large loans
 
 ## Teller
 
-Can:
-
-* Accept Payments
-* Print Receipts
-
-Cannot:
-
-* Modify Loan Products
-
----
+* Accept payments
 
 ## Accounting
 
-Can:
-
-* View Journal Entries
-* Reconcile Loans
-* Generate Financial Reports
-
----
+* View financial entries
 
 ## Auditor
 
-Read-only access to all loan and accounting records.
+* Full read-only access
+
+## Admin
+
+* Configure loan products and workflows
 
 ---
 
-## System Administrator
+# Feature 16 — UX Requirements
 
-Configure:
+The system must feel:
 
-* Products
-* Approval Workflows
-* Permissions
-* Accounting Rules
-
----
-
-# Feature 15 — User Experience
-
-The UI should feel like a modern financial institution.
-
-Requirements:
-
-* Clean
+* Financial-grade
 * Minimal
-* Serious
-* Enterprise-grade
-* Inspired by Refactoring UI
-* Excellent whitespace
-* Keyboard-first navigation
-* Responsive
-* Fast workflows
-* Built for high-volume daily operations
-
-Avoid unnecessary animations or decorative illustrations.
+* Fast for operations staff
+* Audit-first
+* Keyboard efficient
+* No clutter
+* Clear balance visibility at all times
 
 ---
 
-# Future Features
+# Event-Driven Architecture
 
-Design the module to support:
+Loan operations emit events:
 
-* Co-maker substitution
-* Collateral valuation
-* Foreclosure
-* Loan refinancing
-* Batch collections
-* Automatic payroll deductions
+* LoanCreated
+* LoanApproved
+* LoanDisbursed
+* PaymentReceived
+* LoanRestructured
+* LoanClosed
+* LoanDefaulted
+
+Events trigger:
+
+* Accounting engine
+* Treasury movement
+* Notifications
+* Reporting engine
+
+---
+
+# Future Enhancements
+
+Design for:
+
 * AI credit scoring
-* AI collection assistant
-* SMS payment reminders
-* Digital signatures
-* Electronic loan documents
-* Regulatory reporting
-* IFRS 9 Expected Credit Loss (ECL)
-* Portfolio stress testing
+* Fraud detection
+* Automated underwriting
+* Real-time risk scoring
+* IFRS 9 ECL provisioning
+* Predictive delinquency alerts
+* Digital loan contracts
+* API-based lending partnerships
+* Automated restructuring suggestions
 
 ---
 
@@ -621,42 +511,45 @@ Generate:
 2. Business Rules
 3. Acceptance Criteria
 4. Validation Rules
-5. Database Schema
-6. Entity Relationship Diagram (ERD)
-7. Domain Model
+5. Domain Model
+6. Database Schema
+7. ERD
 8. Rails Models
 9. Service Objects
 10. State Machines
-11. Event-Driven Architecture
-12. Accounting Flow
-13. Journal Entry Flow
-14. Amortization Engine Design
-15. Collection Allocation Logic
-16. API Endpoints
-17. Hotwire UI Wireframes
-18. Screen Layouts
-19. Dashboard Design
-20. Audit Logging Strategy
-21. Authorization Matrix
-22. Future Extension Strategy
+11. Amortization Engine Design
+12. Collection Allocation Logic
+13. Accounting Flow
+14. Journal Entry Design
+15. API Endpoints
+16. Hotwire UI Wireframes
+17. Screen Layouts
+18. Dashboard Design
+19. Audit Logging Strategy
+20. Authorization Matrix
+21. Event-Driven Architecture
+22. Risk & Delinquency Engine Design
+23. Future Extension Strategy
 
 ---
 
 # Technical Constraints
 
-Optimize the design for:
+Must be designed for:
 
 * Ruby on Rails 8
-* Hotwire
-* Turbo
-* Stimulus
+* Hotwire / Turbo / Stimulus
 * PostgreSQL
 * Solid Queue
 * Domain-Driven Design (DDD)
-* Event-Driven Architecture
-* Double-entry Accounting
-* Banking-grade Auditability
-* High Maintainability
-* Horizontal Scalability
+* Event-driven architecture
+* Double-entry accounting
+* Strict immutability
+* Banking-grade auditability
+* High reliability financial systems
 
-Prioritize correctness, financial integrity, auditability, and long-term maintainability over rapid development or demo-quality implementations.
+---
+
+# Core Principle
+
+> A loan system is not a record system. It is a controlled financial obligation engine with accounting truth at its core.

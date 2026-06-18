@@ -24,6 +24,10 @@ module Treasury
     before_validation :set_opened_at, on: :create
     before_create :assign_accounts_from_product
 
+    def active?
+      status == "active"
+    end
+
     def balance
       liability_account&.balance || Money.new(0, "PHP")
     end
