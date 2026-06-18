@@ -1,5 +1,5 @@
 class MembershipApplicationsController < ApplicationController
-  layout "dashboard"
+  layout "shell"
 
   STEP_KEYS = %w[personal_details address_contact identifications sources_of_income signature_specimens profile_photos].freeze
 

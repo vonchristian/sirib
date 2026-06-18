@@ -1,6 +1,6 @@
 module Treasury
   class CashSessionsController < ApplicationController
-    layout "dashboard"
+    layout "shell"
     helper_method :category_label
 
     def index

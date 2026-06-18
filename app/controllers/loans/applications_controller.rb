@@ -1,6 +1,6 @@
 module Loans
   class ApplicationsController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     STEP_KEYS = %w[loan_details sources_of_income co_makers collaterals repayment_schedule].freeze
 

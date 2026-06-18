@@ -1,6 +1,6 @@
 module Treasury
   class TimeDepositsController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     before_action :set_products, only: [:new, :preview]
 

@@ -1,6 +1,6 @@
 module Treasury
   class LoansController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     def index
       @loans = Lending::Loan.for_disbursement.includes(:member, :loan_product).order(created_at: :desc)

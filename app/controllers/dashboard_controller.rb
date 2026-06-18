@@ -1,5 +1,5 @@
 class DashboardController < ApplicationController
-  layout "dashboard"
+  layout "shell"
 
   def index
     redirect_to role_dashboard_path

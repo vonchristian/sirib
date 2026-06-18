@@ -1,6 +1,6 @@
 module Treasury
   class SavingsProductsController < ApplicationController
-    layout "dashboard"
+    layout "shell"
     before_action :set_product, only: [:show, :edit, :update, :destroy]
 
     def index

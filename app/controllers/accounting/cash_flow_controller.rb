@@ -1,6 +1,6 @@
 module Accounting
   class CashFlowController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     def index
       @to_date = parse_date(params[:to_date]) || Date.current

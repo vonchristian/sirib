@@ -1,0 +1,67 @@
+<div class="flex items-center gap-2 px-4 h-14 flex-shrink-0 relative" style="border-bottom: 1px solid var(--border-color);">
+  <div class="w-8 h-8 rounded-sm flex items-center justify-center relative" style="background: linear-gradient(135deg, var(--accent) 0%, #0099cc 100%);">
+    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+    </svg>
+    <div class="absolute inset-0 rounded-sm blur-lg opacity-30" style="background: var(--accent);"></div>
+  </div>
+  <span class="text-sm font-semibold tracking-tight" style="color: var(--text-primary);">AI Copilot</span>
+  <div class="flex-1"></div>
+  <button type="button" data-action="click->ai-sidebar#toggle" class="p-1.5 rounded-sm hover:bg-tertiary transition-colors lg:hidden">
+    <svg class="w-4 h-4" style="color: var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+</div>
+
+<div class="px-4 py-3" style="border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">
+  <div class="flex items-center gap-2 text-xs" style="color: var(--text-muted);">
+    <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-sm font-medium font-mono uppercase tracking-wider" style="background: var(--accent-dim); color: var(--accent);">
+      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+      </svg>
+      <%= Current.user&.role&.titleize || "User" %>
+    </span>
+  </div>
+</div>
+
+<div class="flex-1 overflow-y-auto px-4 py-4 space-y-4" data-ai-sidebar-target="messages" style="scrollbar-width: thin;">
+  <div class="text-center py-12" data-ai-sidebar-target="emptyState">
+    <div class="w-16 h-16 mx-auto mb-4 rounded-sm flex items-center justify-center relative" style="background: var(--bg-tertiary);">
+      <svg class="w-8 h-8" style="color: var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+      </svg>
+      <div class="absolute inset-0 rounded-sm blur-xl opacity-20" style="background: var(--accent);"></div>
+    </div>
+    <p class="text-sm font-medium mb-1" style="color: var(--text-primary);">AI Banking Copilot</p>
+    <p class="text-xs" style="color: var(--text-muted);">Ask about transactions,<br>accounts, or risks</p>
+  </div>
+
+  <div data-ai-sidebar-target="suggestions" class="space-y-2 hidden">
+    <p class="text-[10px] font-semibold uppercase tracking-wider font-mono" style="color: var(--text-muted);">Suggested Actions</p>
+    <div data-ai-sidebar-target="suggestionList" class="space-y-1.5"></div>
+  </div>
+
+  <div data-ai-sidebar-target="insights" class="space-y-2 hidden">
+    <p class="text-[10px] font-semibold uppercase tracking-wider font-mono" style="color: var(--text-muted);">System Insights</p>
+    <div data-ai-sidebar-target="insightList" class="space-y-1.5"></div>
+  </div>
+</div>
+
+<div class="p-4 flex-shrink-0" style="border-top: 1px solid var(--border-color);">
+  <form data-action="submit->ai-sidebar#send" class="flex gap-2">
+    <input type="text"
+           data-ai-sidebar-target="input"
+           placeholder="Ask the AI Copilot..."
+           class="flex-1 min-w-0 rounded-sm border text-sm px-3 py-2.5 placeholder-text-muted focus:outline-none focus:ring-2 transition-all"
+           style="background: var(--bg-tertiary); border-color: var(--border-color); color: var(--text-primary); --tw-ring-color: var(--accent);">
+    <button type="submit"
+            class="flex-shrink-0 inline-flex items-center justify-center rounded-sm px-4 py-2.5 text-sm font-medium text-white transition-all hover:opacity-90 disabled:opacity-50"
+            style="background: var(--accent);"
+            data-ai-sidebar-target="submitBtn">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+      </svg>
+    </button>
+  </form>
+</div>

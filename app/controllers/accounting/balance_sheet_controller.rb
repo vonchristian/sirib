@@ -1,6 +1,6 @@
 module Accounting
   class BalanceSheetController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     TYPE_LABELS = {
       "asset" => "ASSETS",

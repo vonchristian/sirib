@@ -1,6 +1,6 @@
 module Management
   class BaseController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     private
 

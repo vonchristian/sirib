@@ -1,6 +1,6 @@
 module Accounting
   class EntriesController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     def index
       entries = Accounting::Entry.order(posted_at: :desc, id: :desc)

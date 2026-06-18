@@ -1,6 +1,6 @@
 module Accounting
   class IncomeStatementController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     TYPE_LABELS = {
       "revenue" => "REVENUES",

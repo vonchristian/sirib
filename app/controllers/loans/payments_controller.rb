@@ -1,6 +1,6 @@
 module Loans
   class PaymentsController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     def create
       @loan = Lending::Loan.find(params[:loan_id])

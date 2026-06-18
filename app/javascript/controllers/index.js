@@ -13,3 +13,15 @@ application.register("tabs", TabsController)
 
 import CashCountController from "controllers/cash_count_controller"
 application.register("cash-count", CashCountController)
+
+import AiSidebarController from "controllers/ai_sidebar_controller"
+application.register("ai-sidebar", AiSidebarController)
+
+import TransactionFormController from "controllers/transaction_form_controller"
+application.register("transaction-form", TransactionFormController)
+
+import RailController from "controllers/rail_controller"
+application.register("rail", RailController)
+
+import SidebarController from "controllers/sidebar_controller"
+application.register("sidebar", SidebarController)

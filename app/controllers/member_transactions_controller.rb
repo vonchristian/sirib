@@ -1,5 +1,5 @@
 class MemberTransactionsController < ApplicationController
-  layout "dashboard"
+  layout "shell"
 
   def new
     @member = Member.find(params[:member_id])

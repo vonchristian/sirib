@@ -1,6 +1,6 @@
 module Treasury
   class VaultTransfersController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     before_action :require_treasurer
 

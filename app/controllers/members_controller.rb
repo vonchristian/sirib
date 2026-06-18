@@ -1,5 +1,5 @@
 class MembersController < ApplicationController
-  layout "dashboard"
+  layout "shell"
 
   def index
     @pagy, @members = pagy(Member.order(created_at: :desc), limit: 20)

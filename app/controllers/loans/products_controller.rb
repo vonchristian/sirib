@@ -1,6 +1,6 @@
 module Loans
   class ProductsController < ApplicationController
-    layout "dashboard"
+    layout "shell"
     before_action :set_product, only: [:show, :edit, :update, :destroy]
 
     def index

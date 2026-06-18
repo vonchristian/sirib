@@ -1,6 +1,6 @@
 module Loans
   class LoansController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     def index
       @loans = Lending::Loan.includes(:member, :loan_product).order(created_at: :desc)

@@ -1,6 +1,6 @@
 module Equity
   class AccountsController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     def index
       @accounts = Equity::Account.includes(:member, :share_product).by_latest

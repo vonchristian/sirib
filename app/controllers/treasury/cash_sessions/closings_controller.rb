@@ -1,7 +1,7 @@
 module Treasury
   module CashSessions
     class ClosingsController < ApplicationController
-      layout "dashboard"
+      layout "shell"
 
       DENOMINATIONS = [
         { amount: 100_000, label: "1,000.00" },

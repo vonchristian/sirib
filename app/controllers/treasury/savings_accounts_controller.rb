@@ -1,6 +1,6 @@
 module Treasury
   class SavingsAccountsController < ApplicationController
-    layout "dashboard"
+    layout "shell"
 
     def index
       @accounts = Treasury::SavingsAccount.includes(:savings_product, :depositor).by_latest
