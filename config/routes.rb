@@ -4,7 +4,11 @@ Rails.application.routes.draw do
 
   root "dashboard#index"
 
-  resources :members, only: [:index, :show, :new, :create]
+  resources :members, only: [:index, :show, :new, :create] do
+    resource :transaction, only: [:new, :create], controller: "member_transactions" do
+      post :preview
+    end
+  end
   resources :membership_applications, only: [:index, :new, :show], param: :uuid do
     member do
       get :edit
@@ -41,8 +45,11 @@ Rails.application.routes.draw do
 
   namespace :treasury do
     resources :cash_sessions, only: [:index, :show] do
+      resources :closings, only: [:new, :create], controller: "cash_sessions/closings"
       member do
-        post :close
+        get :download_pdf
+        post :receive_from_vault
+        post :return_to_vault
       end
     end
     resources :deposits, only: [:index, :new, :create, :show]
@@ -67,6 +74,12 @@ Rails.application.routes.draw do
         get :withdraw
         post :preview_withdraw
         post :confirm_withdraw
+      end
+    end
+    resources :vault_transfers, only: [:index] do
+      member do
+        post :approve
+        post :reject
       end
     end
     get "searches/savings_accounts", to: "searches#savings_accounts"

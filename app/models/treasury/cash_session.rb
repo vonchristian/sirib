@@ -6,6 +6,8 @@ module Treasury
     belongs_to :cash_account, class_name: "Accounting::Account"
     has_many :vouchers, class_name: "Treasury::Voucher", foreign_key: :cash_session_id,
              dependent: :restrict_with_error
+    has_many :vault_transfers, class_name: "Treasury::VaultTransfer", foreign_key: :cash_session_id,
+             dependent: :destroy
 
     validates :date, presence: true
     validates :status, inclusion: { in: %w[open closed] }
@@ -37,6 +39,16 @@ module Treasury
       )
     end
 
+    def close_with_count!(total_counted, notes: nil, counts: [])
+      update!(
+        status: "closed",
+        closed_at: Time.current,
+        ending_balance_cents: total_counted,
+        notes: notes,
+        counts: counts
+      )
+    end
+
     def open?
       status == "open"
     end
@@ -57,8 +69,20 @@ module Treasury
       total_receipts - total_disbursements
     end
 
+    def vault_transfers_in
+      vault_transfers.approved.where(direction: :to_teller).sum(:amount_cents)
+    end
+
+    def vault_transfers_out
+      vault_transfers.approved.where(direction: :to_vault).sum(:amount_cents)
+    end
+
+    def net_vault_flow
+      vault_transfers_in - vault_transfers_out
+    end
+
     def computed_ending_balance
-      beginning_balance_cents.to_i + net_cash_flow
+      beginning_balance_cents.to_i + net_cash_flow + net_vault_flow
     end
   end
 end

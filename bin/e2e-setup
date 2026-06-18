@@ -4,7 +4,9 @@ require_relative "../config/environment"
 
 User.find_or_create_by!(email_address: "test@example.com") do |user|
   user.password = "password123"
+  user.role = :manager
 end
+User.find_by(email_address: "test@example.com")&.update!(role: :manager)
 
 # Seed time deposit product
 Treasury::TimeDepositProduct.find_or_create_by!(name: "30-Day Time Deposit") do |p|
@@ -144,6 +146,21 @@ Equity::Product.find_or_create_by!(product_code: "PREF") do |p|
   p.redeemable = true
   p.dividend_eligible = true
   p.voting_rights = false
+end
+
+# Create cash session for admin user (used by cash_count e2e tests)
+admin_user = User.find_by!(email_address: "admin@example.com")
+admin_account = admin_user.cash_accounts.includes(:account).first&.account
+if admin_account
+  Treasury::CashSession.find_or_create_by!(
+    user: admin_user,
+    cash_account: admin_account,
+    date: Date.current
+  ) do |s|
+    s.opened_at = Time.current - 4.hours
+    s.status = "open"
+    s.beginning_balance_cents = 1_035_000 # ₱10,350.00 in centavos
+  end
 end
 
 puts "E2E setup complete: #{Treasury::SavingsProduct.count} savings products, #{Equity::Product.count} share capital products, cash account created"

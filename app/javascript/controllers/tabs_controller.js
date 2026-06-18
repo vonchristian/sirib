@@ -3,20 +3,42 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["tab", "panel"]
 
-  activate(event) {
-    const tab = event.currentTarget
-    const panelId = tab.dataset.tab
+  connect() {
+    const hash = window.location.hash.replace("#", "")
+    if (hash) this._show(hash)
 
+    this._onHashChange = this._onHashChange.bind(this)
+    window.addEventListener("hashchange", this._onHashChange)
+  }
+
+  disconnect() {
+    window.removeEventListener("hashchange", this._onHashChange)
+  }
+
+  activate(event) {
+    const panelId = event.currentTarget.dataset.tab
+    if (panelId) {
+      this._show(panelId)
+      history.replaceState(null, "", `#${panelId}`)
+    }
+  }
+
+  _show(panelId) {
     this.tabTargets.forEach(t => {
-      t.classList.remove("border-primary", "text-primary")
-      t.classList.add("border-transparent", "text-text-tertiary", "hover:text-text-secondary")
+      t.classList.toggle("border-primary", t.dataset.tab === panelId)
+      t.classList.toggle("border-transparent", t.dataset.tab !== panelId)
+      t.classList.toggle("text-primary", t.dataset.tab === panelId)
+      t.classList.toggle("text-text-tertiary", t.dataset.tab !== panelId)
+      t.classList.toggle("hover:text-text-secondary", t.dataset.tab !== panelId)
     })
 
-    tab.classList.remove("border-transparent", "text-text-tertiary", "hover:text-text-secondary")
-    tab.classList.add("border-primary", "text-primary")
+    this.panelTargets.forEach(p => {
+      p.classList.toggle("hidden", p.id !== `tab-${panelId}`)
+    })
+  }
 
-    this.panelTargets.forEach(p => p.classList.add("hidden"))
-    const panel = this.element.querySelector(`#tab-${panelId}`)
-    if (panel) panel.classList.remove("hidden")
+  _onHashChange() {
+    const hash = window.location.hash.replace("#", "")
+    if (hash) this._show(hash)
   }
 }

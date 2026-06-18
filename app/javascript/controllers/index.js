@@ -10,3 +10,6 @@ application.register("loan-wizard", LoanWizardController)
 
 import TabsController from "controllers/tabs_controller"
 application.register("tabs", TabsController)
+
+import CashCountController from "controllers/cash_count_controller"
+application.register("cash-count", CashCountController)

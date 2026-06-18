@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_17_072142) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_18_073000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -90,6 +90,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_072142) do
     t.string "address"
     t.string "contact_number"
     t.string "registration_number"
+    t.bigint "vault_account_id"
+    t.index ["vault_account_id"], name: "index_cooperatives_on_vault_account_id"
   end
 
   create_table "entries", force: :cascade do |t|
@@ -410,6 +412,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_072142) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "counts", default: []
     t.index ["cash_account_id"], name: "index_treasury_cash_sessions_on_cash_account_id"
     t.index ["user_id", "cash_account_id", "date"], name: "idx_cash_sessions_on_user_account_date", unique: true
     t.index ["user_id"], name: "index_treasury_cash_sessions_on_user_id"
@@ -506,6 +509,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_072142) do
     t.index ["time_deposit_product_id"], name: "index_treasury_time_deposits_on_time_deposit_product_id"
   end
 
+  create_table "treasury_vault_transfers", force: :cascade do |t|
+    t.bigint "cash_session_id", null: false
+    t.string "direction", null: false
+    t.decimal "amount_cents", precision: 15, scale: 2, null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "status", default: "pending", null: false
+    t.bigint "approved_by_id"
+    t.datetime "approved_at"
+    t.bigint "voucher_id"
+    t.index ["approved_by_id"], name: "index_treasury_vault_transfers_on_approved_by_id"
+    t.index ["cash_session_id"], name: "index_treasury_vault_transfers_on_cash_session_id"
+    t.index ["voucher_id"], name: "index_treasury_vault_transfers_on_voucher_id"
+  end
+
   create_table "treasury_vouchers", force: :cascade do |t|
     t.string "type", null: false
     t.bigint "cash_session_id", null: false
@@ -550,6 +569,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_072142) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "amount_lines", "accounts"
   add_foreign_key "amount_lines", "entries"
+  add_foreign_key "cooperatives", "accounts", column: "vault_account_id"
   add_foreign_key "equity_accounts", "accounts", column: "equity_account_id"
   add_foreign_key "equity_accounts", "equity_products", column: "share_product_id"
   add_foreign_key "equity_accounts", "members"
@@ -586,6 +606,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_072142) do
   add_foreign_key "treasury_savings_products", "ledgers", column: "liability_ledger_id"
   add_foreign_key "treasury_savings_transactions", "treasury_savings_accounts", column: "savings_account_id"
   add_foreign_key "treasury_time_deposits", "treasury_time_deposit_products", column: "time_deposit_product_id"
+  add_foreign_key "treasury_vault_transfers", "treasury_cash_sessions", column: "cash_session_id"
+  add_foreign_key "treasury_vault_transfers", "treasury_vouchers", column: "voucher_id"
+  add_foreign_key "treasury_vault_transfers", "users", column: "approved_by_id"
   add_foreign_key "treasury_vouchers", "accounts", column: "cash_account_id"
   add_foreign_key "treasury_vouchers", "entries"
   add_foreign_key "treasury_vouchers", "treasury_cash_sessions", column: "cash_session_id"

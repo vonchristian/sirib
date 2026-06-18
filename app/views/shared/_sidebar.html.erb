@@ -116,6 +116,13 @@
         </svg>
         Cash Sessions
       </a>
+
+      <a href="/treasury/vault_transfers" class="<%= current_path.start_with?('/treasury/vault_transfers') ? 'bg-sidebar-active text-sidebar-text-active font-medium dark:bg-primary-900/20 dark:text-primary-300' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200' %> group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors">
+        <svg class="h-4.5 w-4.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"/>
+        </svg>
+        Vault Transfers
+      </a>
     <% end %>
 
     <% if show_accounting %>
@@ -173,4 +180,9 @@
       Settings
     </a>
   </nav>
+
+  <div data-controller="clock" class="border-t border-border dark:border-gray-800 px-4 py-3.5">
+    <div data-clock-target="time" class="text-2xl font-mono font-bold tracking-tight text-text-primary dark:text-white tabular-nums leading-none">00:00:00</div>
+    <div data-clock-target="date" class="text-[0.6rem] font-medium text-text-tertiary dark:text-gray-500 mt-1 leading-tight">Loading...</div>
+  </div>
 </div>
