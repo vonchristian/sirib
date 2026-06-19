@@ -7,7 +7,6 @@ module Treasury
 
     STATUSES = %w[pending active matured closed].freeze
 
-    belongs_to :depositor, polymorphic: true
     belongs_to :time_deposit_product
 
     def active?
@@ -21,5 +20,20 @@ module Treasury
     scope :pending, -> { where(status: "pending") }
     scope :active, -> { where(status: "active") }
     scope :by_latest, -> { order(created_at: :desc) }
+
+    def depositor
+      @depositor ||= Treasury::DepositorResolver.resolve(depositor_type, depositor_id)
+    end
+
+    def depositor=(record)
+      self.depositor_type = record.class.model_name.name
+      self.depositor_id = record.id
+      @depositor = record
+    end
+
+    def reload(*args)
+      @depositor = nil
+      super
+    end
   end
 end

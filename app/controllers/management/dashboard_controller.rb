@@ -9,7 +9,7 @@ module Management
       cash_account = Accounting::Account.joins(:ledger).where(ledgers: { account_code: "11110" }).first
       @cash_position = cash_account&.balance || Money.new(0, "PHP")
       @branch_count = Management::Branch.active.count
-      @member_count = Member.count
+      @member_count = Membership::Member.count
       @recent_alerts = Management::Alert.active.by_severity.limit(5)
       @pending_approvals = Management::ApprovalRequest.pending.includes(:workflow, :requested_by).limit(5)
     end

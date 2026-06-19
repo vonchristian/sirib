@@ -3,7 +3,7 @@ module Lending
     self.table_name = "loans"
 
     belongs_to :loan_application
-    belongs_to :member
+    belongs_to :member, class_name: "Membership::Member"
     belongs_to :loan_product
     has_many :loan_payments, dependent: :restrict_with_error
 

@@ -42,14 +42,14 @@ RSpec.describe "Members" do
     it "creates a new member" do
       expect {
         post members_path, params: valid_params
-      }.to change(Member, :count).by(1)
-        .and change(MemberAddress, :count).by(1)
-        .and change(MemberIdentification, :count).by(1)
+      }.to change(Membership::Member, :count).by(1)
+        .and change(Membership::Address, :count).by(1)
+        .and change(Membership::Identification, :count).by(1)
     end
 
     it "redirects to the member page" do
       post members_path, params: valid_params
-      expect(response).to redirect_to(member_path(Member.last))
+      expect(response).to redirect_to(member_path(Membership::Member.last))
     end
 
     it "re-renders form with errors on invalid data" do

@@ -3,6 +3,8 @@ puts "Seeding users..."
 user = User.find_or_create_by!(email_address: "admin@example.com") do |u|
   u.password = "password123"
   u.role = :manager
+  u.full_name = "System Administrator"
+  u.status = "active"
 end
 
 cash_account = Accounting::Account.find_by(account_code: "11110")

@@ -24,6 +24,8 @@ demo_users.each do |email, attrs|
   user = User.find_or_create_by!(email_address: email) do |u|
     u.password = "password123"
     u.role = attrs[:role]
+    u.full_name = attrs[:name]
+    u.status = "active"
   end
   created_users[email] = user
 end
@@ -49,6 +51,22 @@ role_assignments.each do |ra|
   next unless role && user
 
   Management::RoleAssignment.find_or_create_by!(user: user, role: role, branch: ra[:branch])
+end
+
+# ── 2A. CASH ACCOUNTS FOR TREASURY USERS ──────────────────────────────
+
+cash_on_hand = Accounting::Account.find_or_create_by!(account_code: "11110") do |a|
+  cash_ledger = Accounting::Ledger.find_or_create_by!(account_code: "11100") { |l| l.name = "Cash"; l.account_type = "asset" }
+  a.name = "Cash on Hand"
+  a.account_type = "asset"
+  a.ledger = cash_ledger
+end
+
+treasury_user_emails = %w[teller@example.com branch_mgr_mkt@example.com branch_mgr_qc@example.com gm@example.com admin@example.com]
+treasury_user_emails.each do |email|
+  user = User.find_by(email_address: email)
+  next unless user
+  Accounting::CashAccount.find_or_create_by!(user: user, account: cash_on_hand)
 end
 
 # ── 2. EQUITY PRODUCTS & ACCOUNTS ─────────────────────────────────────
@@ -83,9 +101,9 @@ unless Equity::Product.exists?
   )
 end
 
-member1 = Member.find_by(first_name: "Maria", last_name: "Cruz")
-member2 = Member.find_by(first_name: "Juan", last_name: "Reyes")
-member3 = Member.find_by(first_name: "Elena", last_name: "Villanueva")
+member1 = Membership::Member.find_by(first_name: "Maria", last_name: "Cruz")
+member2 = Membership::Member.find_by(first_name: "Juan", last_name: "Reyes")
+member3 = Membership::Member.find_by(first_name: "Elena", last_name: "Villanueva")
 members_sample = [member1, member2, member3].compact
 
 common_product = Equity::Product.find_by(product_code: "COMMON")

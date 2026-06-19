@@ -3,7 +3,7 @@ module Lending
     self.table_name = "loan_applications"
 
     belongs_to :cooperative
-    belongs_to :member, optional: true
+    belongs_to :member, class_name: "Membership::Member", optional: true
     belongs_to :loan_product, optional: true
     has_many :loan_collaterals, dependent: :destroy
     has_many :loan_repayment_schedules, dependent: :destroy

@@ -4,7 +4,7 @@ class MembershipApplicationsController < ApplicationController
   STEP_KEYS = %w[personal_details address_contact identifications sources_of_income signature_specimens profile_photos].freeze
 
   def index
-    @applications = MembershipApplication.all
+    @applications = Membership::Application.all
   end
 
   def new
@@ -14,7 +14,7 @@ class MembershipApplicationsController < ApplicationController
   end
 
   def edit
-    @application = MembershipApplication.find_by!(uuid: params[:uuid])
+    @application = Membership::Application.find_by!(uuid: params[:uuid])
     @initial_step = if params[:step].present? && STEP_KEYS.include?(params[:step])
       STEP_KEYS.index(params[:step])
     else
@@ -23,7 +23,7 @@ class MembershipApplicationsController < ApplicationController
   end
 
   def update
-    @application = MembershipApplication.find_by!(uuid: params[:uuid])
+    @application = Membership::Application.find_by!(uuid: params[:uuid])
 
     if @application.update(application_params)
       if params[:commit] == "Complete Registration"
@@ -38,11 +38,11 @@ class MembershipApplicationsController < ApplicationController
   end
 
   def show
-    @application = MembershipApplication.find_by!(uuid: params[:uuid])
+    @application = Membership::Application.find_by!(uuid: params[:uuid])
   end
 
   def download_pdf
-    @application = MembershipApplication.find_by!(uuid: params[:uuid])
+    @application = Membership::Application.find_by!(uuid: params[:uuid])
     html = render_to_string("download_pdf", layout: "pdf")
     pdf = Grover.new(html, format: "Letter").to_pdf
     send_data pdf,
@@ -52,7 +52,7 @@ class MembershipApplicationsController < ApplicationController
   end
 
   def approve
-    @application = MembershipApplication.find_by!(uuid: params[:uuid])
+    @application = Membership::Application.find_by!(uuid: params[:uuid])
 
     unless @application.complete?
       return redirect_to membership_application_path(@application.uuid),

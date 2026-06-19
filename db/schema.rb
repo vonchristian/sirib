@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_19_014429) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -81,6 +81,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
     t.index ["account_id", "entry_id"], name: "index_amount_lines_on_account_id_and_entry_id"
     t.index ["account_id"], name: "index_amount_lines_on_account_id"
     t.index ["entry_id"], name: "index_amount_lines_on_entry_id"
+  end
+
+  create_table "backup_codes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "code_digest", null: false
+    t.datetime "used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "used_at"], name: "index_backup_codes_on_user_id_and_used_at"
+    t.index ["user_id"], name: "index_backup_codes_on_user_id"
   end
 
   create_table "cooperatives", force: :cascade do |t|
@@ -668,6 +678,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
     t.index ["uuid"], name: "index_membership_applications_on_uuid", unique: true
   end
 
+  create_table "mfa_attempt_logs", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "action", null: false
+    t.boolean "success", null: false
+    t.string "ip_address"
+    t.text "user_agent"
+    t.string "device_fingerprint"
+    t.string "failure_reason"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_mfa_attempt_logs_on_action"
+    t.index ["created_at"], name: "index_mfa_attempt_logs_on_created_at"
+    t.index ["user_id", "created_at"], name: "index_mfa_attempt_logs_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_mfa_attempt_logs_on_user_id"
+  end
+
   create_table "running_balances", force: :cascade do |t|
     t.bigint "account_id"
     t.bigint "ledger_id", null: false
@@ -688,6 +715,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
     t.string "user_agent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "revoked_at"
+    t.datetime "last_activity_at"
+    t.datetime "mfa_verified_at"
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -844,13 +874,35 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
     t.index ["voucher_number"], name: "index_treasury_vouchers_on_voucher_number", unique: true
   end
 
+  create_table "trusted_devices", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "device_fingerprint_hash", null: false
+    t.datetime "last_used_at", null: false
+    t.datetime "expires_at", null: false
+    t.string "user_agent"
+    t.string "ip_address"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_trusted_devices_on_expires_at"
+    t.index ["user_id", "device_fingerprint_hash"], name: "index_trusted_devices_on_user_id_and_device_fingerprint_hash", unique: true
+    t.index ["user_id"], name: "index_trusted_devices_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "role", default: 0, null: false
+    t.string "otp_secret"
+    t.boolean "otp_enabled", default: false, null: false
+    t.datetime "otp_verified_at"
+    t.string "employee_id"
+    t.string "full_name"
+    t.string "status"
+    t.jsonb "permission_overrides"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["employee_id"], name: "index_users_on_employee_id", unique: true
   end
 
   add_foreign_key "accounting_cash_accounts", "accounts"
@@ -860,6 +912,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "amount_lines", "accounts"
   add_foreign_key "amount_lines", "entries"
+  add_foreign_key "backup_codes", "users"
   add_foreign_key "cooperatives", "accounts", column: "vault_account_id"
   add_foreign_key "equity_accounts", "accounts", column: "equity_account_id"
   add_foreign_key "equity_accounts", "equity_products", column: "share_product_id"
@@ -915,6 +968,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
   add_foreign_key "member_addresses", "members"
   add_foreign_key "member_identifications", "members"
   add_foreign_key "membership_applications", "cooperatives"
+  add_foreign_key "mfa_attempt_logs", "users"
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "ledgers"
   add_foreign_key "sessions", "users"
@@ -934,4 +988,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_18_105244) do
   add_foreign_key "treasury_vouchers", "accounts", column: "cash_account_id"
   add_foreign_key "treasury_vouchers", "entries"
   add_foreign_key "treasury_vouchers", "treasury_cash_sessions", column: "cash_session_id"
+  add_foreign_key "trusted_devices", "users"
 end

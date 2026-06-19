@@ -2,6 +2,20 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
 
+  resource :mfa, only: [] do
+    get :setup, to: "mfa#setup"
+    post :enable, to: "mfa#enable"
+    get :challenge, to: "mfa#challenge"
+    post :verify, to: "mfa#verify"
+    post :disable, to: "mfa#disable"
+    get :backup_codes, to: "mfa#backup_codes"
+    get :step_up_challenge, to: "mfa#step_up_challenge"
+    post :step_up_verify, to: "mfa#step_up_verify"
+    get :devices, to: "mfa#devices"
+    delete :devices, to: "mfa#revoke_all_devices", as: :revoke_all_devices
+    delete "devices/:id", to: "mfa#revoke_device", as: :revoke_device
+  end
+
   root "dashboard#index"
 
   resources :members, only: [:index, :show, :new, :create] do

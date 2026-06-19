@@ -28,10 +28,10 @@
 
     <div class="animate-fade-in-up-1 mt-8">
       <div class="rounded-md border border-border bg-surface px-6 py-8">
-        <%= form_with url: session_url, class: "space-y-5" do |form| %>
+        <%= form_with url: session_url, class: "space-y-5", data: { turbo: false } do |form| %>
           <div>
-            <%= form.label :email_address, "Email address", class: "block text-xs font-medium text-text-secondary dark:text-gray-400 mb-1.5" %>
-            <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com", value: params[:email_address], class: "block w-full rounded-md border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
+            <%= form.label :email_address, "Email address or Employee ID", class: "block text-xs font-medium text-text-secondary dark:text-gray-400 mb-1.5" %>
+            <%= form.text_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com or employee ID", value: params[:email_address], class: "block w-full rounded-md border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200" %>
           </div>
 
           <div>

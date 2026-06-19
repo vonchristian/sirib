@@ -8,6 +8,12 @@ User.find_or_create_by!(email_address: "test@example.com") do |user|
 end
 User.find_by(email_address: "test@example.com")&.update!(role: :manager)
 
+# Create admin user for identity tests & auth setup
+admin_user = User.find_or_initialize_by(email_address: "admin@example.com")
+admin_user.assign_attributes(password: "password123", role: :manager, status: "active", otp_enabled: false, otp_secret: nil, otp_verified_at: nil)
+admin_user.employee_id ||= SecureRandom.hex(4).upcase
+admin_user.save!
+
 # Seed time deposit product
 Treasury::TimeDepositProduct.find_or_create_by!(name: "30-Day Time Deposit") do |p|
   p.minimum_deposit_cents = 1_000_00
@@ -44,8 +50,8 @@ members_seeded = 0
 20.times do |i|
   first = %w[Maria Juan Elena Jose Ana Pedro Sofia Carlos Luz Ramon Isabel Antonio Carmen Victor Lorna Danilo Gloria Fernando Rosario Miguel][i]
   last  = %w[Cruz Reyes Villanueva Mercado Dimagiba Santos Gonzales Yulo Macapagal Alcantara Samson Lopez Natividad Mendoza Fernandez Rivera Romero Ramos Castillo Angeles][i]
-  unless Member.exists?(first_name: first, last_name: last)
-    Member.create!(
+  unless Membership::Member.exists?(first_name: first, last_name: last)
+    Membership::Member.create!(
       first_name: first,
       last_name: last,
       middle_name: "M",
@@ -271,6 +277,32 @@ unless Management::AuditLog.exists?
       created_at: (3 - i).hours.ago
     )
   end
+end
+
+# ── IDENTITY LAYER TEST DATA ────────────────────────────────────────────
+# Create a teller user for RBAC tests
+teller_user = User.find_or_create_by!(email_address: "teller@example.com") do |u|
+  u.password = "password123"
+  u.role = :manager
+  u.full_name = "Juan Teller"
+end
+
+teller_role = Management::Role.find_by(code: "teller")
+mkt_branch = Management::Branch.find_by(code: "MKT")
+if teller_role && mkt_branch && !Management::RoleAssignment.exists?(user: teller_user, role: teller_role)
+  Management::RoleAssignment.create!(user: teller_user, role: teller_role, branch: mkt_branch)
+end
+
+# Create a branch manager for branch isolation tests
+bm_user = User.find_or_create_by!(email_address: "branch_manager@example.com") do |u|
+  u.password = "password123"
+  u.role = :manager
+  u.full_name = "Maria Manager"
+end
+
+bm_role = Management::Role.find_by(code: "branch_manager")
+if bm_role && mkt_branch && !Management::RoleAssignment.exists?(user: bm_user, role: bm_role)
+  Management::RoleAssignment.create!(user: bm_user, role: bm_role, branch: mkt_branch)
 end
 
 puts "E2E setup complete: #{Treasury::SavingsProduct.count} savings products, #{Equity::Product.count} share capital products, cash account created"

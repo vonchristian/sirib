@@ -1,5 +1,5 @@
 class MemberTransactionService < ActiveInteraction::Base
-  object :member
+  object :member, class: Membership::Member
   object :cash_session, class: Treasury::CashSession
   object :cash_account, class: Accounting::Account
   array :items

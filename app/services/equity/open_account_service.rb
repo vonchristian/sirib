@@ -1,6 +1,6 @@
 module Equity
   class OpenAccountService < ActiveInteraction::Base
-    object :member, class: Member
+    object :member, class: Membership::Member
     object :share_product, class: Equity::Product
     integer :opened_by_id
     string :branch, default: nil

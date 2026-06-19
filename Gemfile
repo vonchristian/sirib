@@ -24,6 +24,8 @@ gem "jbuilder"
 gem "active_interaction", "~> 5.5"
 gem "ancestry"
 gem "pg_search"
+gem "rotp"
+gem "rqrcode"
 gem "pagy", "~> 9.0"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]

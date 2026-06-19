@@ -1,29 +1,75 @@
 <% content_for :page_title, "Settings" %>
-<% content_for :page_subtitle, "Manage your account and system preferences" %>
+<% content_for :page_subtitle, "Manage your account and security preferences" %>
 
 <div class="animate-fade-in">
-  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
-    <div class="px-6 py-5">
-      <h2 class="text-sm font-semibold text-text-primary dark:text-white">Profile</h2>
-      <p class="mt-1 text-sm text-text-secondary dark:text-gray-400">Manage your account information</p>
-    </div>
-    <div class="border-t border-border px-6 py-5 dark:border-gray-700">
-      <dl class="divide-y divide-border dark:divide-gray-800">
-        <div class="flex items-center justify-between py-4">
-          <dt class="text-sm font-medium text-text-primary dark:text-white">Email</dt>
-          <dd class="text-sm text-text-secondary dark:text-gray-400"><%= Current.user.email_address %></dd>
-        </div>
-        <div class="flex items-center justify-between py-4">
-          <dt class="text-sm font-medium text-text-primary dark:text-white">Role</dt>
-          <dd class="text-sm text-text-secondary dark:text-gray-400"><%= Current.user.role&.titleize %></dd>
-        </div>
-        <div class="flex items-center justify-between py-4">
-          <dt class="text-sm font-medium text-text-primary dark:text-white">Password</dt>
-          <dd class="text-sm text-text-secondary dark:text-gray-400">
-            <%= link_to "Change password", new_password_path, class: "font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors" %>
-          </dd>
-        </div>
-      </dl>
-    </div>
+  <div class="border-b border-border mb-6">
+    <nav class="flex gap-6 -mb-px">
+      <a href="<%= dashboard_settings_path %>"
+         class="pb-3 text-sm font-medium border-b-2 transition-colors <%= params[:tab] == 'security' ? 'border-transparent text-text-tertiary' : 'border-accent text-text-primary' %>">
+        Profile
+      </a>
+      <a href="<%= dashboard_settings_path %>?tab=security"
+         class="pb-3 text-sm font-medium border-b-2 transition-colors <%= params[:tab] == 'security' ? 'border-accent text-text-primary' : 'border-transparent text-text-tertiary' %>">
+        Security
+      </a>
+    </nav>
   </div>
+
+  <% if params[:tab] == 'security' %>
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+      <div class="px-6 py-5">
+        <h2 class="text-sm font-semibold text-text-primary dark:text-white">Two-Factor Authentication</h2>
+        <p class="mt-1 text-sm text-text-secondary dark:text-gray-400">Add an extra layer of security to your account</p>
+      </div>
+      <div class="border-t border-border px-6 py-5 dark:border-gray-700">
+        <% if Current.user.otp_enabled %>
+          <div class="flex items-center gap-3 mb-4">
+            <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">Enabled</span>
+            <span class="text-sm text-text-secondary">Your account is protected by two-factor authentication.</span>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <%= link_to "View backup codes", backup_codes_mfa_path, class: "rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors" %>
+            <%= link_to "Trusted Devices", devices_mfa_path, class: "rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors" %>
+            <%= button_to "Disable", disable_mfa_path, method: :post, class: "rounded-md border border-danger/30 bg-danger-50 px-4 py-2 text-xs font-semibold text-danger hover:bg-danger transition-colors hover:text-white", data: { turbo_confirm: "Are you sure? This will remove two-factor authentication from your account." } %>
+          </div>
+        <% else %>
+          <p class="text-sm text-text-secondary mb-4">Two-factor authentication is not yet enabled. It adds an extra layer of security by requiring a verification code from your authenticator app when signing in.</p>
+          <%= link_to "Set up two-factor authentication", setup_mfa_path, class: "inline-flex items-center rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors" %>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900">
+      <div class="px-6 py-5">
+        <h2 class="text-sm font-semibold text-text-primary dark:text-white">Profile</h2>
+        <p class="mt-1 text-sm text-text-secondary dark:text-gray-400">Manage your account information</p>
+      </div>
+      <div class="border-t border-border px-6 py-5 dark:border-gray-700">
+        <dl class="divide-y divide-border dark:divide-gray-800">
+          <div class="flex items-center justify-between py-4">
+            <dt class="text-sm font-medium text-text-primary dark:text-white">Employee ID</dt>
+            <dd class="text-sm font-mono text-text-secondary dark:text-gray-400"><%= Current.user.employee_id %></dd>
+          </div>
+          <div class="flex items-center justify-between py-4">
+            <dt class="text-sm font-medium text-text-primary dark:text-white">Full Name</dt>
+            <dd class="text-sm text-text-secondary dark:text-gray-400"><%= Current.user.full_name %></dd>
+          </div>
+          <div class="flex items-center justify-between py-4">
+            <dt class="text-sm font-medium text-text-primary dark:text-white">Email</dt>
+            <dd class="text-sm text-text-secondary dark:text-gray-400"><%= Current.user.email_address %></dd>
+          </div>
+          <div class="flex items-center justify-between py-4">
+            <dt class="text-sm font-medium text-text-primary dark:text-white">Role</dt>
+            <dd class="text-sm text-text-secondary dark:text-gray-400"><%= Current.user.role&.titleize %></dd>
+          </div>
+          <div class="flex items-center justify-between py-4">
+            <dt class="text-sm font-medium text-text-primary dark:text-white">Password</dt>
+            <dd class="text-sm text-text-secondary dark:text-gray-400">
+              <%= link_to "Change password", new_password_path, class: "font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors" %>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  <% end %>
 </div>

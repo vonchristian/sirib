@@ -142,7 +142,7 @@
                           required
                           class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                     <option value="">Select ID type</option>
-                    <% MemberIdentification::ID_TYPES.each do |type| %>
+                    <% Membership::Identification::ID_TYPES.each do |type| %>
                       <option value="<%= type %>" <%= type == id["id_type"] ? "selected" : "" %>><%= type.titleize %></option>
                     <% end %>
                   </select>

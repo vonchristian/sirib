@@ -1,5 +1,5 @@
 <% content_for :page_title, @product.persisted? ? "Edit #{@product.name}" : "New Savings Product" %>
-<div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6 sm:p-8">
+<div class="card p-6 sm:p-8">
   <%= form_with model: @product, url: @product.persisted? ? treasury_savings_product_path(@product) : treasury_savings_products_path, class: "space-y-6" do |f| %>
     <% if @product.errors.any? %>
       <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger">
@@ -12,21 +12,21 @@
     <% end %>
 
     <div>
-      <%= f.label :name, class: "block mb-1.5 text-xs font-medium text-text-primary" %>
-      <%= f.text_field :name, required: true, placeholder: "e.g. Regular Savings", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+      <%= f.label :name, class: "input-label" %>
+      <%= f.text_field :name, required: true, placeholder: "e.g. Regular Savings", class: "input" %>
     </div>
 
     <div>
-      <%= f.label :description, class: "block mb-1.5 text-xs font-medium text-text-primary" %>
-      <%= f.text_area :description, rows: 2, placeholder: "Optional description...", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+      <%= f.label :description, class: "input-label" %>
+      <%= f.text_area :description, rows: 2, placeholder: "Optional description...", class: "input" %>
     </div>
 
     <div>
-      <%= f.label :status, class: "block mb-1.5 text-xs font-medium text-text-primary" %>
-      <%= f.select :status, options_for_select([["Active", "active"], ["Inactive", "inactive"]], @product.status), {}, class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+      <%= f.label :status, class: "input-label" %>
+      <%= f.select :status, options_for_select([["Active", "active"], ["Inactive", "inactive"]], @product.status), {}, class: "input" %>
     </div>
 
-    <div class="rounded-lg bg-surface-alt dark:bg-gray-800/50 p-4 text-xs text-text-tertiary">
+    <div class="rounded-lg bg-surface-alt p-4 text-xs text-text-tertiary">
       <p>A liability ledger and an interest expense ledger will be automatically created for this product with the correct account types.</p>
     </div>
 
@@ -34,21 +34,21 @@
       <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-3">Interest Rates</h3>
       <div data-controller="nested-form" class="space-y-3">
         <%= f.fields_for :interest_rates do |irf| %>
-          <div class="nested-fields rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4" data-nested-form-target="fields">
+          <div class="nested-fields rounded-lg border border-border bg-surface-alt p-4" data-nested-form-target="fields">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <%= irf.label :rate, "Rate (decimal)", class: "block mb-1.5 text-xs font-medium text-text-primary" %>
-                <%= irf.number_field :rate, step: 0.0001, min: 0, placeholder: "e.g. 0.025", class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+                <%= irf.label :rate, "Rate (decimal)", class: "input-label" %>
+                <%= irf.number_field :rate, step: 0.0001, min: 0, placeholder: "e.g. 0.025", class: "input" %>
               </div>
               <div class="flex items-end pb-2">
-                <label class="flex items-center gap-2 text-sm">
+                <label class="flex items-center gap-2 text-sm text-text-primary">
                   <%= irf.check_box :current, class: "h-4 w-4 rounded border-border text-primary focus:ring-primary" %>
                   Current rate
                 </label>
               </div>
               <div class="flex items-end pb-2 justify-end">
                 <%= irf.hidden_field :_destroy %>
-                <button type="button" data-action="nested-form#remove" class="inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-danger hover:bg-surface-alt transition-colors">
+                <button type="button" data-action="nested-form#remove" class="btn-ghost text-xs text-danger">
                   Remove
                 </button>
               </div>
@@ -57,21 +57,21 @@
         <% end %>
 
         <template data-nested-form-target="template">
-          <div class="nested-fields rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-4">
+          <div class="nested-fields rounded-lg border border-border bg-surface-alt p-4">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label class="block mb-1.5 text-xs font-medium text-text-primary">Rate (decimal)</label>
-                <input type="number" name="savings_product[interest_rates_attributes][NEW_RECORD][rate]" step="0.0001" min="0" placeholder="e.g. 0.025" class="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                <label class="input-label">Rate (decimal)</label>
+                <input type="number" name="savings_product[interest_rates_attributes][NEW_RECORD][rate]" step="0.0001" min="0" placeholder="e.g. 0.025" class="input">
               </div>
               <div class="flex items-end pb-2">
-                <label class="flex items-center gap-2 text-sm">
+                <label class="flex items-center gap-2 text-sm text-text-primary">
                   <input type="checkbox" name="savings_product[interest_rates_attributes][NEW_RECORD][current]" value="1" class="h-4 w-4 rounded border-border text-primary focus:ring-primary">
                   Current rate
                 </label>
               </div>
               <div class="flex items-end pb-2 justify-end">
                 <input type="hidden" name="savings_product[interest_rates_attributes][NEW_RECORD][_destroy]" value="false">
-                <button type="button" data-action="nested-form#remove" class="inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-danger hover:bg-surface-alt transition-colors">
+                <button type="button" data-action="nested-form#remove" class="btn-ghost text-xs text-danger">
                   Remove
                 </button>
               </div>
@@ -79,15 +79,15 @@
           </div>
         </template>
 
-        <button type="button" data-action="nested-form#add" class="inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors">
+        <button type="button" data-action="nested-form#add" class="btn-ghost text-xs">
           + Add Interest Rate
         </button>
       </div>
     </div>
 
-    <div class="flex items-center justify-between pt-4 border-t border-border dark:border-gray-700">
-      <%= link_to "Cancel", @product.persisted? ? treasury_savings_product_path(@product) : treasury_savings_products_path, class: "inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %>
-      <%= f.submit @product.persisted? ? "Update Product" : "Create Product", class: "inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" %>
+    <div class="flex items-center justify-between pt-4 border-t border-border">
+      <%= link_to "Cancel", @product.persisted? ? treasury_savings_product_path(@product) : treasury_savings_products_path, class: "btn-ghost text-xs" %>
+      <%= f.submit @product.persisted? ? "Update Product" : "Create Product", class: "btn-primary text-xs" %>
     </div>
   <% end %>
 </div>

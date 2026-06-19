@@ -4,7 +4,7 @@ module Equity
 
     STATUSES = %w[active closed].freeze
 
-    belongs_to :member
+    belongs_to :member, class_name: "Membership::Member"
     belongs_to :share_product, class_name: "Equity::Product"
     belongs_to :equity_account, class_name: "Accounting::Account", optional: true
     has_many :transactions, class_name: "Equity::Transaction", foreign_key: :share_capital_account_id, dependent: :restrict_with_error

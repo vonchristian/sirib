@@ -2,7 +2,7 @@ module Management
   class ExecutiveDashboardController < BaseController
     def index
       @branch_count = Management::Branch.active.count
-      @total_members = Member.count
+      @total_members = Membership::Member.count
       @total_assets = Money.new(Accounting::Ledger.where(account_type: :asset).sum(&:balance), "PHP")
       @total_liabilities = Money.new(Accounting::Ledger.where(account_type: :liability).sum(&:balance), "PHP")
       @net_income = Money.new(

@@ -2,6 +2,11 @@ module Lending
   class LoanPayment < ApplicationRecord
     self.table_name = "loan_payments"
 
+    monetize :amount_cents
+    monetize :principal_cents
+    monetize :interest_cents
+    monetize :penalty_cents
+
     belongs_to :loan
     belongs_to :entry, class_name: "Accounting::Entry", optional: true
 

@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :member_address do
+  factory :member_address, class: "Membership::Address" do
     member
     house_street { "123 Rizal St" }
     barangay { "Barangay 1" }

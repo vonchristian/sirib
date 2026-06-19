@@ -7,3 +7,4 @@ require_relative "seeds/users"
 require_relative "seeds/cooperative"
 require_relative "seeds/management" if defined?(Management)
 require_relative "seeds/demo_data" if defined?(Management) && Management::Branch.exists? && !Rails.env.test?
+require_relative "seeds/demo_rich_data" if !Rails.env.test? && Membership::Member.count < 100

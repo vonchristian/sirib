@@ -1,29 +1,51 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["sidebar", "messages", "input", "submitBtn", "emptyState", "suggestions", "suggestionList", "insights", "insightList"]
+  static targets = ["sidebar", "messages", "input", "submitBtn", "emptyState", "suggestions", "suggestionList", "insights", "insightList", "floatingToggle", "closeBtn"]
 
   connect() {
-    this.open = window.innerWidth >= 1024
+    this.open = localStorage.getItem("ai_sidebar_open") !== "false"
     this.csrfToken = document.querySelector("[name='csrf-token']")?.content
+    if (this.open) {
+      this.sidebarTarget.style.width = "24rem"
+      this.sidebarTarget.style.minWidth = "24rem"
+      this.sidebarTarget.style.opacity = "1"
+    } else {
+      this.sidebarTarget.style.width = "0"
+      this.sidebarTarget.style.minWidth = "0"
+      this.sidebarTarget.style.opacity = "0"
+    }
+    requestAnimationFrame(() => { this.sidebarTarget.style.transition = "all 300ms" })
   }
 
   toggle() {
+    this.open = !this.open
+    localStorage.setItem("ai_sidebar_open", this.open.toString())
     if (this.open) {
-      this.close()
+      this.sidebarTarget.style.width = "24rem"
+      this.sidebarTarget.style.minWidth = "24rem"
+      this.sidebarTarget.style.opacity = "1"
     } else {
-      this.openSidebar()
+      this.sidebarTarget.style.width = "0"
+      this.sidebarTarget.style.minWidth = "0"
+      this.sidebarTarget.style.opacity = "0"
     }
   }
 
   openSidebar() {
     this.open = true
-    this.sidebarTarget.classList.remove("hidden")
+    localStorage.setItem("ai_sidebar_open", "true")
+    this.sidebarTarget.style.width = "24rem"
+    this.sidebarTarget.style.minWidth = "24rem"
+    this.sidebarTarget.style.opacity = "1"
   }
 
-  close() {
+  closeSidebar() {
     this.open = false
-    this.sidebarTarget.classList.add("hidden")
+    localStorage.setItem("ai_sidebar_open", "false")
+    this.sidebarTarget.style.width = "0"
+    this.sidebarTarget.style.minWidth = "0"
+    this.sidebarTarget.style.opacity = "0"
   }
 
   async send(event) {
@@ -69,7 +91,7 @@ export default class extends Controller {
     const bubble = document.createElement("div")
     bubble.className = role === "user"
       ? "rounded-lg bg-primary text-white px-3.5 py-2.5 text-sm max-w-[85%]"
-      : "rounded-lg bg-surface-alt border border-border px-3.5 py-2.5 text-sm max-w-[85%] dark:bg-gray-800 dark:border-gray-700"
+      : "rounded-lg bg-surface-alt border border-border px-3.5 py-2.5 text-sm max-w-[85%]"
 
     bubble.textContent = text
     div.appendChild(bubble)
@@ -85,7 +107,7 @@ export default class extends Controller {
     button.dataset.action = action
     button.dataset.payload = JSON.stringify(payload)
     button.dataset.action = "click->ai-sidebar#suggestAction"
-    button.className = "w-full text-left rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary hover:bg-surface-alt transition-colors dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
+    button.className = "w-full text-left rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary hover:bg-surface-alt transition-colors"
     button.textContent = label
     this.suggestionListTarget.appendChild(button)
   }

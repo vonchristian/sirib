@@ -9,12 +9,12 @@ module Equity
     def new
       @account = Equity::Account.new
       @products = Equity::Product.active.by_name
-      @members = Member.order(:last_name)
+      @members = Membership::Member.order(:last_name)
     end
 
     def create
       outcome = Equity::OpenAccountService.run(
-        member: Member.find(account_params[:member_id]),
+        member: Membership::Member.find(account_params[:member_id]),
         share_product: Equity::Product.find(account_params[:share_product_id]),
         opened_by_id: Current.user.id,
         branch: account_params[:branch],
@@ -26,7 +26,7 @@ module Equity
       else
         @account = Equity::Account.new(account_params)
         @products = Equity::Product.active.by_name
-        @members = Member.order(:last_name)
+        @members = Membership::Member.order(:last_name)
         flash.now[:alert] = outcome.errors.full_messages.to_sentence
         render :new, status: :unprocessable_entity
       end

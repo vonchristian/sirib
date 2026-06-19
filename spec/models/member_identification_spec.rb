@@ -1,10 +1,10 @@
 require "rails_helper"
 
-RSpec.describe MemberIdentification do
+RSpec.describe Membership::Identification do
   describe "validations" do
     it { is_expected.to validate_presence_of(:id_type) }
     it { is_expected.to validate_presence_of(:id_number) }
-    it { is_expected.to validate_inclusion_of(:id_type).in_array(MemberIdentification::ID_TYPES) }
+    it { is_expected.to validate_inclusion_of(:id_type).in_array(Membership::Identification::ID_TYPES) }
   end
 
   describe "associations" do

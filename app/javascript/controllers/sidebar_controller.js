@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["rail", "contextNav", "contextNavContent", "contextTitle", "backdrop", "mobileSidebar"]
+  static targets = ["rail", "contextNav", "contextNavContent", "contextTitle", "backdrop", "mobileSidebar", "userMenu"]
 
   connect() {
     this._applyTheme()
@@ -114,7 +114,7 @@ export default class extends Controller {
     if (!railId) return
 
     const routes = {
-      deposits: "/deposits/savings",
+      deposits: "/treasury/savings_accounts",
       loans: "/loans/applications",
       equity: "/equity/capital",
       members: "/members",
@@ -172,6 +172,13 @@ export default class extends Controller {
       mobile.classList.remove("-translate-x-full")
       backdrop.classList.remove("hidden")
       document.body.classList.add("overflow-hidden")
+    }
+  }
+
+  toggleUserMenu() {
+    const menu = this.element.querySelector("[data-sidebar-target='userMenu']")
+    if (menu) {
+      menu.classList.toggle("hidden")
     }
   }
 

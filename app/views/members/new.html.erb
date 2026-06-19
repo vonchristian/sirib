@@ -125,7 +125,7 @@
                 <div class="field-group">
                   <%= idf.label :id_type, "ID Type", class: "mb-1 block text-sm font-medium text-text-primary dark:text-white" %>
                   <%= idf.select :id_type,
-                        options_for_select(MemberIdentification::ID_TYPES, idf.object.id_type),
+                        options_for_select(Membership::Identification::ID_TYPES, idf.object.id_type),
                         { include_blank: "Select ID type" },
                         required: true,
                         class: "block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white" %>

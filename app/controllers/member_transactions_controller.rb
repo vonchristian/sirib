@@ -2,7 +2,7 @@ class MemberTransactionsController < ApplicationController
   layout "shell"
 
   def new
-    @member = Member.find(params[:member_id])
+    @member = Membership::Member.find(params[:member_id])
     load_accounts
     @cash_accounts = cash_accounts_for_select
 
@@ -12,7 +12,7 @@ class MemberTransactionsController < ApplicationController
   end
 
   def preview
-    @member = Member.find(params[:member_id])
+    @member = Membership::Member.find(params[:member_id])
     @cash_accounts = cash_accounts_for_select
     load_accounts
     @cash_account = resolve_cash_account
@@ -39,7 +39,7 @@ class MemberTransactionsController < ApplicationController
   end
 
   def create
-    @member = Member.find(params[:member_id])
+    @member = Membership::Member.find(params[:member_id])
     @cash_accounts = cash_accounts_for_select
     load_accounts
     @cash_account = resolve_cash_account
@@ -76,7 +76,7 @@ class MemberTransactionsController < ApplicationController
   private
 
   def load_accounts
-    @savings_accounts = Treasury::SavingsAccount.where(depositor: @member).active.includes(:savings_product).by_latest
+    @savings_accounts = Treasury::SavingsAccount.where(depositor_id: @member.id, depositor_type: "Member").active.includes(:savings_product).by_latest
     @share_accounts = Equity::Account.where(member: @member).active.includes(:share_product).by_latest
     @loans = Lending::Loan.where(member: @member).active.includes(:loan_product).order(created_at: :desc)
   end

@@ -7,11 +7,11 @@ RSpec.describe ApproveMembershipApplication do
 
       expect {
         described_class.call(app)
-      }.to change(Member, :count).by(1)
-        .and change(MemberAddress, :count).by(1)
-        .and change(MemberIdentification, :count).by(1)
+      }.to change(Membership::Member, :count).by(1)
+        .and change(Membership::Address, :count).by(1)
+        .and change(Membership::Identification, :count).by(1)
 
-      member = Member.last
+      member = Membership::Member.last
       expect(member.first_name).to eq("Juan")
       expect(member.last_name).to eq("Dela Cruz")
       expect(member.address.city).to eq("Manila")

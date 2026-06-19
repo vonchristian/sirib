@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe MemberAddress do
+RSpec.describe Membership::Address do
   describe "validations" do
     it { is_expected.to validate_presence_of(:house_street) }
     it { is_expected.to validate_presence_of(:barangay) }

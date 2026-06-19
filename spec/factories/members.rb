@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :member do
+  factory :member, class: "Membership::Member" do
     first_name { "Juan" }
     middle_name { "Santos" }
     last_name { "Dela Cruz" }

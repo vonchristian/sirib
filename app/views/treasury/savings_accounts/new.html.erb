@@ -22,7 +22,7 @@
 
       <div class="field-group">
         <%= f.label :depositor_id, "Member", class: "field-label" %>
-        <%= f.collection_select :depositor_id, Member.order(:last_name), :id, :name,
+        <%= f.collection_select :depositor_id, Membership::Member.order(:last_name), :id, :name,
               { prompt: "Select member" }, required: true, class: "field-input" %>
       </div>
 

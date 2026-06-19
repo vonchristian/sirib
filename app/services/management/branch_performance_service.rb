@@ -68,7 +68,7 @@ module Management
     end
 
     def compute_member_count
-      Member.count
+      Membership::Member.count
     end
   end
 end

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe MembershipApplication do
+RSpec.describe Membership::Application do
   describe "validations" do
     subject { build(:membership_application) }
 
@@ -9,7 +9,7 @@ RSpec.describe MembershipApplication do
 
   describe "callbacks" do
     it "assigns a UUID before validation on create" do
-      app = MembershipApplication.new(cooperative: create(:cooperative))
+      app = Membership::Application.new(cooperative: create(:cooperative))
       app.validate
       expect(app.uuid).to be_present
     end

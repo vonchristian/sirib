@@ -11,9 +11,9 @@ RSpec.describe "MembershipApplications" do
     it "creates a draft application and redirects to edit" do
       expect {
         get new_membership_application_path
-      }.to change(MembershipApplication, :count).by(1)
+      }.to change(Membership::Application, :count).by(1)
 
-      app = MembershipApplication.last
+      app = Membership::Application.last
       expect(app.status).to eq("draft")
       expect(response).to redirect_to(edit_membership_application_path(app.uuid))
     end
@@ -103,12 +103,12 @@ RSpec.describe "MembershipApplications" do
 
       expect {
         post approve_membership_application_path(app.uuid)
-      }.to change(Member, :count).by(1)
-        .and change(MemberAddress, :count).by(1)
-        .and change(MemberIdentification, :count).by(1)
+      }.to change(Membership::Member, :count).by(1)
+        .and change(Membership::Address, :count).by(1)
+        .and change(Membership::Identification, :count).by(1)
 
       expect(app.reload.status).to eq("approved")
-      expect(response).to redirect_to(member_path(Member.last))
+      expect(response).to redirect_to(member_path(Membership::Member.last))
     end
 
     it "rejects incomplete applications" do

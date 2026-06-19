@@ -34,8 +34,6 @@ test.describe('Authentication Flow', () => {
 
     await expect(page).toHaveURL(/\/dashboard/);
 
-    // Sign out is inside user dropdown — open it first
-    await page.locator('[data-action="click->sidebar#toggleUserMenu"]').last().click();
     await page.getByRole('button', { name: /sign out/i }).click();
     await expect(page).toHaveURL(/\/session\/new/);
   });

@@ -22,7 +22,7 @@ class ApproveMembershipApplication
   private
 
   def create_member
-    Member.create!(
+    Membership::Member.create!(
       first_name: @application.first_name,
       middle_name: @application.middle_name,
       last_name: @application.last_name,
@@ -36,7 +36,7 @@ class ApproveMembershipApplication
   end
 
   def create_address(member)
-    MemberAddress.create!(
+    Membership::Address.create!(
       member: member,
       house_street: @application.house_street,
       barangay: @application.barangay,
@@ -49,7 +49,7 @@ class ApproveMembershipApplication
 
   def create_identifications(member)
     @application.identifications.each do |id|
-      record = MemberIdentification.create!(
+      record = Membership::Identification.create!(
         member: member,
         id_type: id["id_type"],
         id_number: id["id_number"]

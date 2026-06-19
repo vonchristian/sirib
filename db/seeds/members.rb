@@ -22,11 +22,11 @@ members = [
 ]
 
 members.each_with_index do |attrs, i|
-  unless Member.exists?(first_name: attrs[:first_name], last_name: attrs[:last_name])
-    Member.create!(attrs.merge(
+  unless Membership::Member.exists?(first_name: attrs[:first_name], last_name: attrs[:last_name])
+    Membership::Member.create!(attrs.merge(
       identifications_attributes: [ { id_type: "BIR", id_number: "BIR-#{format('%09d', i)}" } ]
     ))
   end
 end
 
-puts "Seeded #{Member.count} members"
+puts "Seeded #{Membership::Member.count} members"

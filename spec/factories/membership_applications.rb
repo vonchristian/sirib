@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :membership_application do
+  factory :membership_application, class: "Membership::Application" do
     cooperative { Cooperative.first_or_create!(name: "Test Cooperative") }
     first_name { "Juan" }
     last_name { "Dela Cruz" }

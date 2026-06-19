@@ -2,28 +2,38 @@ class MembersController < ApplicationController
   layout "shell"
 
   def index
-    @pagy, @members = pagy(Member.order(created_at: :desc), limit: 20)
-    @total_members = Member.count
-    @male_count = Member.where(gender: "male").count
-    @female_count = Member.where(gender: "female").count
+    members = Membership::Member.order(created_at: :desc)
+    members = members.search(params[:q]) if params[:q].present?
+
+    respond_to do |format|
+      format.html do
+        @pagy, @members = pagy(members, limit: 20)
+        @total_members = Membership::Member.count
+        @male_count = Membership::Member.where(gender: "male").count
+        @female_count = Membership::Member.where(gender: "female").count
+      end
+      format.turbo_stream do
+        @members = members.limit(20)
+      end
+    end
   end
 
   def show
-    @member = Member.find(params[:id])
-    @savings_accounts = Treasury::SavingsAccount.where(depositor: @member).includes(:savings_product).by_latest
-    @time_deposits = Treasury::TimeDeposit.where(depositor: @member).includes(:time_deposit_product).by_latest
+    @member = Membership::Member.find(params[:id])
+    @savings_accounts = Treasury::SavingsAccount.where(depositor_id: @member.id, depositor_type: "Member").includes(:savings_product).by_latest
+    @time_deposits = Treasury::TimeDeposit.where(depositor_id: @member.id, depositor_type: "Member").includes(:time_deposit_product).by_latest
     @loans = Lending::Loan.where(member: @member).includes(:loan_product, :loan_payments).order(created_at: :desc)
     @loan_applications = Lending::LoanApplication.where(member: @member).order(created_at: :desc)
   end
 
   def new
-    @member = Member.new
+    @member = Membership::Member.new
     @member.build_address
     @member.identifications.build
   end
 
   def create
-    @member = Member.new(member_params)
+    @member = Membership::Member.new(member_params)
 
     if @member.save
       attach_files

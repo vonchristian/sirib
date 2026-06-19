@@ -5,7 +5,7 @@ module Treasury
     before_action :set_products, only: [:new, :preview]
 
     def index
-      @deposits = Treasury::TimeDeposit.where(depositor: Current.user).by_latest
+      @deposits = Treasury::TimeDeposit.where(depositor_id: Current.user.id, depositor_type: "User").by_latest
     end
 
     def new

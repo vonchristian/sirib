@@ -5,10 +5,10 @@ module Loans
     def members
       query = params[:q]
       @members = if query.present?
-        Member.where("first_name ILIKE :q OR last_name ILIKE :q OR CONCAT(first_name, ' ', last_name) ILIKE :q OR mobile_number ILIKE :q",
+        Membership::Member.where("first_name ILIKE :q OR last_name ILIKE :q OR CONCAT(first_name, ' ', last_name) ILIKE :q OR mobile_number ILIKE :q",
                      q: "%#{query}%").order(:last_name).limit(15)
       else
-        Member.none
+        Membership::Member.none
       end
 
       render partial: "loans/searches/members", locals: { members: @members }

@@ -3,7 +3,7 @@ module Treasury
     layout "shell"
 
     def index
-      @accounts = Treasury::SavingsAccount.includes(:savings_product, :depositor).by_latest
+      @accounts = Treasury::SavingsAccount.includes(:savings_product).by_latest
     end
 
     def new
@@ -13,7 +13,8 @@ module Treasury
 
     def create
       @account = Treasury::SavingsAccount.new(account_params)
-      @account.depositor = Member.find(account_params[:depositor_id]) if account_params[:depositor_id].present?
+      @account.depositor_id = account_params[:depositor_id]
+      @account.depositor_type = "Member"
 
       if @account.save
         redirect_to treasury_savings_account_path(@account), notice: "Savings account opened."

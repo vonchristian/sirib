@@ -3,9 +3,9 @@
 
 <div class="animate-fade-in space-y-6">
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    <div class="rounded-lg border border-border bg-surface p-5">
-      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Active Loans</p>
-      <p class="text-2xl font-semibold text-text-primary tabular-nums mt-1.5">—</p>
+    <div class="stat-card">
+      <p class="stat-label">Active Loans</p>
+      <p class="stat-value">—</p>
       <span class="inline-flex items-center gap-1 mt-1.5 text-xs font-medium text-positive">
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/>
@@ -14,9 +14,9 @@
       </span>
     </div>
 
-    <div class="rounded-lg border border-border bg-surface p-5">
-      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Pending Disbursement</p>
-      <p class="text-2xl font-semibold text-text-primary tabular-nums mt-1.5">—</p>
+    <div class="stat-card">
+      <p class="stat-label">Pending Disbursement</p>
+      <p class="stat-value">—</p>
       <span class="inline-flex items-center gap-1 mt-1.5 text-xs font-medium text-danger">
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/>
@@ -25,14 +25,14 @@
       </span>
     </div>
 
-    <div class="rounded-lg border border-border bg-surface p-5">
-      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Today's Collections</p>
-      <p class="text-2xl font-semibold text-text-primary tabular-nums mt-1.5">—</p>
+    <div class="stat-card">
+      <p class="stat-label">Today's Collections</p>
+      <p class="stat-value">—</p>
     </div>
 
-    <div class="rounded-lg border border-border bg-surface p-5">
-      <p class="text-xs font-medium uppercase tracking-wider text-text-tertiary">Total Members</p>
-      <p class="text-2xl font-semibold text-text-primary tabular-nums mt-1.5">—</p>
+    <div class="stat-card">
+      <p class="stat-label">Total Members</p>
+      <p class="stat-value">—</p>
       <span class="inline-flex items-center gap-1 mt-1.5 text-xs font-medium text-positive">
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/>
@@ -44,10 +44,10 @@
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
     <div class="lg:col-span-2 space-y-6">
-      <div class="rounded-lg border border-border bg-surface overflow-hidden">
-        <div class="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 class="text-sm font-semibold text-text-primary">Pending Tasks</h2>
-          <a href="/dashboard/tasks" class="text-xs font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors">View all</a>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-header-title">Pending Tasks</h2>
+          <a href="/dashboard/tasks" class="text-xs font-medium text-primary hover:text-primary-700 transition-colors">View all</a>
         </div>
         <div class="divide-y divide-border">
           <div class="flex items-center gap-4 px-6 py-3">
@@ -85,9 +85,9 @@
         </div>
       </div>
 
-      <div class="rounded-lg border border-border bg-surface overflow-hidden">
-        <div class="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 class="text-sm font-semibold text-text-primary">Recent Activity</h2>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-header-title">Recent Activity</h2>
         </div>
         <div class="divide-y divide-border">
           <div class="flex items-center gap-4 px-6 py-3">
@@ -131,9 +131,9 @@
     </div>
 
     <div class="space-y-6">
-      <div class="rounded-lg border border-border bg-surface overflow-hidden">
-        <div class="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 class="text-sm font-semibold text-text-primary">Today's Schedule</h2>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-header-title">Today's Schedule</h2>
         </div>
         <div class="p-5 space-y-3">
           <div class="flex items-center justify-between">
@@ -167,9 +167,9 @@
         </div>
       </div>
 
-      <div class="rounded-lg border border-border bg-surface overflow-hidden">
-        <div class="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 class="text-sm font-semibold text-text-primary">Productivity</h2>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-header-title">Productivity</h2>
         </div>
         <div class="p-5 space-y-4">
           <div>

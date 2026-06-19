@@ -6,7 +6,6 @@ module Treasury
     STATUSES = %w[active closed].freeze
 
     belongs_to :savings_product, class_name: "Treasury::SavingsProduct"
-    belongs_to :depositor, polymorphic: true
     belongs_to :liability_account, class_name: "Accounting::Account", optional: true
     belongs_to :interest_expense_account, class_name: "Accounting::Account", optional: true
     has_many :transactions, class_name: "Treasury::SavingsTransaction", dependent: :restrict_with_error
@@ -32,8 +31,23 @@ module Treasury
       liability_account&.balance || Money.new(0, "PHP")
     end
 
+    def depositor
+      @depositor ||= Treasury::DepositorResolver.resolve(depositor_type, depositor_id)
+    end
+
+    def depositor=(record)
+      self.depositor_type = record.class.model_name.name
+      self.depositor_id = record.id
+      @depositor = record
+    end
+
     def depositor_name
       depositor.respond_to?(:name) ? depositor.name : depositor.to_s
+    end
+
+    def reload(*args)
+      @depositor = nil
+      super
     end
 
     private
