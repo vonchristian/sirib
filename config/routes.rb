@@ -12,6 +12,23 @@ Rails.application.routes.draw do
   constraints(SubdomainPresent) do
     root "dashboard#index"
 
+    # Member Portal — prefixed with /portal
+    scope :portal, module: :portal, as: :portal do
+      resource :session, only: %i[new create destroy], controller: "sessions"
+      scope :mfa, controller: "mfa", as: :mfa do
+        get :challenge
+        post :verify
+      end
+
+      scope :enrollment, controller: "enrollment", as: :enrollment do
+        get ":token", action: :show, as: :start
+        post "", action: :complete
+      end
+
+      get "dashboard", to: "dashboard#index"
+      resources :announcements, only: %i[index show]
+    end
+
     # Auth
     resource :session
     resources :passwords, param: :token
@@ -31,6 +48,9 @@ Rails.application.routes.draw do
 
     # App routes
     resources :members, only: [:index, :show, :new, :create] do
+      member do
+        post :toggle_portal_access
+      end
       resource :transaction, only: [:new, :create], controller: "member_transactions" do
         post :preview
       end

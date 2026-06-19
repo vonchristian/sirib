@@ -26,6 +26,23 @@ class MembersController < ApplicationController
     @loan_applications = Lending::LoanApplication.where(member: @member).order(created_at: :desc)
   end
 
+  def toggle_portal_access
+    @member = Membership::Member.find(params[:member_id] || params[:id])
+    enabled = params[:enabled].to_s == "true"
+
+    @member.toggle_portal_access!(enabled: enabled)
+
+    respond_to do |format|
+      format.html { redirect_to member_path(@member), notice: enabled ? "Portal access enabled." : "Portal access suspended." }
+      format.turbo_stream { redirect_to member_path(@member), notice: enabled ? "Portal access enabled." : "Portal access suspended." }
+    end
+  rescue ActiveRecord::RecordInvalid => e
+    respond_to do |format|
+      format.html { redirect_to member_path(@member), alert: "Failed to update portal access: #{e.message}" }
+      format.turbo_stream { redirect_to member_path(@member), alert: "Failed to update portal access: #{e.message}" }
+    end
+  end
+
   def new
     @member = Membership::Member.new
     @member.build_address
