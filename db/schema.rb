@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_20_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_20_140000) do
   create_schema "tenant_asenso_cooperative"
   create_schema "tenant_bagong_bukas"
   create_schema "tenant_kasaganaan_cooperative"
@@ -706,6 +706,71 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_000000) do
     t.index ["uuid"], name: "index_membership_applications_on_uuid", unique: true
   end
 
+  create_table "messaging_channels", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "enabled", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_messaging_channels_on_name", unique: true
+  end
+
+  create_table "messaging_message_deliveries", force: :cascade do |t|
+    t.bigint "message_id", null: false
+    t.bigint "channel_id", null: false
+    t.bigint "provider_id"
+    t.string "status", default: "queued", null: false
+    t.integer "attempts_count", default: 0
+    t.text "last_error"
+    t.string "provider_message_id"
+    t.datetime "sent_at"
+    t.datetime "delivered_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel_id"], name: "index_messaging_message_deliveries_on_channel_id"
+    t.index ["message_id", "channel_id"], name: "idx_on_message_id_channel_id_c8b01fc529"
+    t.index ["message_id"], name: "index_messaging_message_deliveries_on_message_id"
+    t.index ["provider_id"], name: "index_messaging_message_deliveries_on_provider_id"
+    t.index ["status"], name: "index_messaging_message_deliveries_on_status"
+  end
+
+  create_table "messaging_messages", force: :cascade do |t|
+    t.string "message_type", null: false
+    t.string "recipient_type", null: false
+    t.bigint "recipient_id", null: false
+    t.jsonb "payload", default: {}
+    t.string "status", default: "pending", null: false
+    t.datetime "scheduled_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_type"], name: "index_messaging_messages_on_message_type"
+    t.index ["recipient_type", "recipient_id"], name: "index_messaging_messages_on_recipient_type_and_recipient_id"
+    t.index ["status"], name: "index_messaging_messages_on_status"
+  end
+
+  create_table "messaging_provider_webhooks", force: :cascade do |t|
+    t.bigint "provider_id", null: false
+    t.string "event_type", null: false
+    t.jsonb "payload", default: {}
+    t.datetime "processed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_type"], name: "index_messaging_provider_webhooks_on_event_type"
+    t.index ["provider_id", "event_type"], name: "idx_on_provider_id_event_type_114a5f5c88", unique: true
+    t.index ["provider_id"], name: "index_messaging_provider_webhooks_on_provider_id"
+  end
+
+  create_table "messaging_providers", force: :cascade do |t|
+    t.bigint "channel_id", null: false
+    t.string "name", null: false
+    t.jsonb "config", default: {}
+    t.boolean "enabled", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel_id", "name"], name: "index_messaging_providers_on_channel_id_and_name", unique: true
+    t.index ["channel_id"], name: "index_messaging_providers_on_channel_id"
+    t.index ["enabled"], name: "index_messaging_providers_on_enabled"
+  end
+
   create_table "mfa_attempt_logs", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "action", null: false
@@ -1039,6 +1104,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_000000) do
   add_foreign_key "member_addresses", "members"
   add_foreign_key "member_identifications", "members"
   add_foreign_key "membership_applications", "cooperatives"
+  add_foreign_key "messaging_message_deliveries", "messaging_channels", column: "channel_id"
+  add_foreign_key "messaging_message_deliveries", "messaging_messages", column: "message_id"
+  add_foreign_key "messaging_message_deliveries", "messaging_providers", column: "provider_id"
+  add_foreign_key "messaging_provider_webhooks", "messaging_providers", column: "provider_id"
+  add_foreign_key "messaging_providers", "messaging_channels", column: "channel_id"
   add_foreign_key "mfa_attempt_logs", "users"
   add_foreign_key "portal_announcements", "cooperatives"
   add_foreign_key "portal_announcements", "users", column: "author_id"

@@ -211,6 +211,15 @@ Rails.application.routes.draw do
 
       get "searches/branches", to: "searches#branches"
       get "searches/users", to: "searches#users"
+
+      namespace :messaging do
+        resources :messages, only: [:index, :show]
+        resources :channels, only: [:index, :show, :update] do
+          resources :providers, only: [:index, :new, :create, :show, :edit, :update, :destroy]
+        end
+      end
     end
+
+    post "messaging/webhooks/receive", to: "messaging/webhooks#receive", as: :messaging_webhooks_receive
   end
 end
