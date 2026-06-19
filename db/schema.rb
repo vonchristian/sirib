@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_19_014431) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_20_000000) do
+  create_schema "tenant_asenso_cooperative"
+  create_schema "tenant_bagong_bukas"
+  create_schema "tenant_kasaganaan_cooperative"
+  create_schema "tenant_liwanag_cooperative"
+  create_schema "tenant_main_cooperative"
+  create_schema "tenant_masaganang_ani"
+  create_schema "tenant_pagkakaisa_cooperative"
+  create_schema "tenant_sama_sama_cooperative"
+  create_schema "tenant_samahang_magsasaka"
+  create_schema "tenant_tulay_ng_pag_asa"
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -654,7 +665,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_19_014431) do
     t.string "email_address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "member_identifier"
+    t.string "password_digest"
+    t.string "otp_secret"
+    t.boolean "otp_enabled", default: false, null: false
+    t.datetime "otp_verified_at"
+    t.datetime "last_login_at"
+    t.string "portal_status", default: "inactive", null: false
     t.index ["email_address"], name: "index_members_on_email_address", unique: true
+    t.index ["member_identifier"], name: "index_members_on_member_identifier", unique: true
   end
 
   create_table "membership_applications", force: :cascade do |t|
@@ -702,6 +721,47 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_19_014431) do
     t.index ["created_at"], name: "index_mfa_attempt_logs_on_created_at"
     t.index ["user_id", "created_at"], name: "index_mfa_attempt_logs_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_mfa_attempt_logs_on_user_id"
+  end
+
+  create_table "portal_announcements", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.string "title", null: false
+    t.text "body", null: false
+    t.string "status", default: "draft", null: false
+    t.datetime "published_at"
+    t.bigint "author_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_portal_announcements_on_author_id"
+    t.index ["cooperative_id"], name: "index_portal_announcements_on_cooperative_id"
+    t.index ["published_at"], name: "index_portal_announcements_on_published_at"
+    t.index ["status"], name: "index_portal_announcements_on_status"
+  end
+
+  create_table "portal_enrollment_tokens", force: :cascade do |t|
+    t.bigint "member_id", null: false
+    t.string "token", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["member_id"], name: "index_portal_enrollment_tokens_on_member_id"
+    t.index ["token"], name: "index_portal_enrollment_tokens_on_token", unique: true
+  end
+
+  create_table "portal_sessions", force: :cascade do |t|
+    t.bigint "member_id", null: false
+    t.string "ip_address"
+    t.text "user_agent"
+    t.datetime "revoked_at"
+    t.datetime "last_activity_at"
+    t.datetime "mfa_verified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_activity_at"], name: "index_portal_sessions_on_last_activity_at"
+    t.index ["member_id", "revoked_at"], name: "index_portal_sessions_member_id_revoked_at"
+    t.index ["member_id"], name: "index_portal_sessions_on_member_id"
+    t.index ["revoked_at"], name: "index_portal_sessions_on_revoked_at"
   end
 
   create_table "running_balances", force: :cascade do |t|
@@ -980,6 +1040,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_19_014431) do
   add_foreign_key "member_identifications", "members"
   add_foreign_key "membership_applications", "cooperatives"
   add_foreign_key "mfa_attempt_logs", "users"
+  add_foreign_key "portal_announcements", "cooperatives"
+  add_foreign_key "portal_announcements", "users", column: "author_id"
+  add_foreign_key "portal_enrollment_tokens", "members"
+  add_foreign_key "portal_sessions", "members"
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "ledgers"
   add_foreign_key "sessions", "users"

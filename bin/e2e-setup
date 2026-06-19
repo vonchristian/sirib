@@ -293,6 +293,58 @@ Tenant::SchemaManager.within_schema(schema) do
   if bm_role && mkt_branch && !Management::RoleAssignment.exists?(user: bm_user, role: bm_role)
     Management::RoleAssignment.create!(user: bm_user, role: bm_role, branch: mkt_branch)
   end
+
+  # ── MEMBER PORTAL E2E TEST DATA ─────────────────────────────────────────
+  portal_member = Membership::Member.find_or_create_by!(first_name: "Portal", last_name: "User") do |m|
+    m.middle_name = "M"
+    m.gender = "male"
+    m.civil_status = "single"
+    m.birth_date = Date.new(1990, 1, 15)
+    m.mobile_number = "09170000001"
+    m.email_address = "portal@example.com"
+    m.identifications_attributes = [ { id_type: "BIR", id_number: "BIR-PORTAL-001" } ]
+  end
+  portal_member.update!(
+    member_identifier: "MBR-PORTAL-001",
+    password: "password123",
+    otp_secret: nil,
+    otp_enabled: false,
+    portal_status: "active"
+  )
+
+  pending_member = Membership::Member.find_or_create_by!(first_name: "Pending", last_name: "Enrollee") do |m|
+    m.middle_name = "E"
+    m.gender = "female"
+    m.civil_status = "married"
+    m.birth_date = Date.new(1992, 6, 20)
+    m.mobile_number = "09170000002"
+    m.email_address = "pending@example.com"
+    m.identifications_attributes = [ { id_type: "BIR", id_number: "BIR-PENDING-001" } ]
+  end
+  pending_member.update!(
+    member_identifier: "MBR-PENDING-001",
+    password_digest: nil,
+    otp_secret: nil,
+    otp_enabled: false,
+    portal_status: "inactive"
+  )
+  Identity::EnrollmentService.create_enrollment(pending_member)
+
+  Portal::Announcement.find_or_create_by!(title: "Welcome to the Member Portal") do |a|
+    a.body = "We are pleased to announce the launch of our new member portal. You can now view your savings, share capital, and loan information online."
+    a.status = "published"
+    a.published_at = Time.current
+    a.cooperative = cooperative
+    a.author = test_user
+  end
+
+  Portal::Announcement.find_or_create_by!(title: "Quarterly Dividend Declaration") do |a|
+    a.body = "The board has declared a 3% dividend for all common shareholders for the current quarter. Dividends will be credited to your share capital accounts by end of month."
+    a.status = "published"
+    a.published_at = 1.day.ago
+    a.cooperative = cooperative
+    a.author = test_user
+  end
 end
 
 puts "E2E setup complete for #{cooperative.subdomain}.#{cooperative.subdomain}"

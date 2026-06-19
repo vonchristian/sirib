@@ -14,8 +14,9 @@ class ApproveMembershipApplication
       create_identifications(member)
       attach_signature(member)
       attach_profile_image(member)
+      enrollment_token = Identity::EnrollmentService.create_enrollment(member)
       @application.update!(status: "approved")
-      member
+      { member: member, enrollment_token: enrollment_token }
     end
   end
 

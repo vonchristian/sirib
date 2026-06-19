@@ -1,0 +1,265 @@
+PRD: Messaging & Communication System (Core Banking Platform)
+1. Overview
+
+Build a banking-grade messaging system that handles all communication in the platform (email + Facebook Messenger initially).
+
+It is a domain-driven, event-based system responsible for:
+
+onboarding messages
+security notifications
+administrative alerts
+
+All messages are:
+
+persisted first
+asynchronously delivered
+fully auditable
+provider-agnostic
+2. Goals
+Primary Goals
+Centralize all system communications
+Remove direct email/messenger calls from business logic
+Ensure reliable delivery with retries
+Provide full audit trail per message lifecycle
+Support multiple channels (Email, Messenger)
+Channels in Scope
+Email
+Facebook Messenger
+3. Non-Goals
+SMS (future phase)
+WhatsApp
+Marketing campaigns
+Real-time chat system
+UI email editor
+4. Core Principles
+Messaging is a domain action, not a side effect
+Message must always be persisted before delivery
+Delivery is asynchronous and retryable
+External providers are unreliable sources of truth
+Webhooks are required for final delivery state reconciliation
+5. Domain Model
+5.1 Message (Intent Layer)
+
+Represents WHAT needs to be communicated.
+
+Message
+- id
+- message_type (member_activation, password_reset, block_notice)
+- recipient_type
+- recipient_id
+- payload (jsonb)
+
+- status (pending, processing, completed, failed)
+
+- scheduled_at
+- created_at
+Responsibility
+Business intent
+Channel-agnostic
+Immutable after creation (conceptually)
+5.2 MessageDelivery (Execution Layer)
+
+Represents per-channel delivery attempt.
+
+MessageDelivery
+- id
+- message_id
+- channel_id
+
+- status (queued, sent, delivered, failed, retrying)
+
+- attempts_count
+- last_error
+
+- provider_message_id
+
+- sent_at
+- delivered_at
+
+- created_at
+Responsibility
+Tracks actual delivery lifecycle
+Supports retries and failure handling
+Links Message → Channel → Provider execution
+5.3 Channel (Medium Layer)
+
+Represents communication medium.
+
+Channel
+- id
+- name (email | messenger)
+
+- enabled (boolean)
+
+- created_at
+- updated_at
+Responsibility
+Defines communication medium
+Enables/disables entire channel globally
+Business-level routing control
+5.4 Provider (Execution Layer)
+
+Represents external delivery service.
+
+Provider
+- id
+- name (sendgrid | ses | facebook)
+
+- channel_id
+
+- config (jsonb) # encrypted / vault-referenced
+
+- enabled (boolean)
+
+- created_at
+- updated_at
+Responsibility
+Handles actual delivery to external systems
+Is pluggable per channel
+Can be swapped without code changes
+5.5 ProviderWebhook (Reconciliation Layer)
+ProviderWebhook
+- id
+- provider_id
+
+- event_type (delivered, failed, bounced, read)
+
+- payload (jsonb)
+
+- processed_at
+
+- created_at
+Responsibility
+Receives external delivery events
+Updates MessageDelivery state
+Ensures truth reconciliation
+6. System Architecture Flow
+Business Event (e.g. Enable Access)
+        ↓
+Message created (intent)
+        ↓
+MessageDelivery created per channel
+        ↓
+Channel selected (email/messenger)
+        ↓
+Provider resolved dynamically
+        ↓
+External delivery executed
+        ↓
+Webhook updates final status
+        ↓
+Message status updated
+7. Core Services
+7.1 MessageDispatcher (Entry Point)
+MessageDispatcher.call(
+  type: "member_activation",
+  recipient: member,
+  payload: { token: "abc123" },
+  channels: [:email, :messenger]
+)
+Responsibility
+Creates Message
+Creates MessageDeliveries
+Triggers async processing
+7.2 DeliveryProcessor (Worker Logic)
+class DeliveryProcessor
+  def self.call(delivery)
+    channel = Channel.find(delivery.channel_id)
+    provider = Provider.find_by!(channel_id: channel.id, enabled: true)
+
+    case provider.name
+    when "sendgrid"
+      SendgridProvider.send(delivery)
+    when "ses"
+      SesProvider.send(delivery)
+    when "facebook"
+      FacebookProvider.send(delivery)
+    end
+
+    delivery.update!(status: :sent, sent_at: Time.current)
+  rescue => e
+    delivery.update!(status: :failed, last_error: e.message)
+  end
+end
+7.3 ProviderResolver (optional abstraction helper)
+
+Used to avoid logic duplication.
+
+7.4 WebhookProcessor
+WebhookProcessor.call(payload)
+Responsibility
+Match provider event → MessageDelivery
+Update delivery status
+Ensure idempotency
+8. Business Flows
+8.1 Member Activation
+Message created
+Email + Messenger delivery triggered
+Member receives activation link
+8.2 Password Reset
+Message created
+Email only delivery
+Tokenized link used
+8.3 Account Block
+Message created
+Email + Messenger sent
+Audit logged
+9. Business Rules
+Messages must be persisted before sending
+MessageDelivery is created per channel
+Each delivery must have exactly one provider
+Providers are swappable without code changes
+Channel can be globally disabled
+Failed deliveries must be tracked
+10. State Machines
+Message
+pending → processing → completed / failed
+MessageDelivery
+queued → sent → delivered / failed → retrying
+11. Reliability Requirements
+At-least-once delivery
+Retry on failure (Solid Queue)
+No silent failures
+Webhook-based reconciliation required
+Idempotent webhook processing
+12. Security Requirements
+Provider credentials encrypted or vault-referenced
+Webhook signatures verified
+Payloads must not expose sensitive banking secrets
+No direct provider calls in business logic
+13. Observability
+
+System must support:
+
+message traceability
+delivery status per channel
+provider failure tracking
+full lifecycle audit
+14. Extensibility
+
+System is designed to easily support:
+
+SMS channel (future)
+WhatsApp channel (future)
+multi-provider failover per channel
+message replay tools
+admin messaging dashboard
+15. Success Criteria
+100% communication goes through Messaging system
+No direct email/messenger calls in app code
+Provider can be swapped without code changes
+All messages are traceable end-to-end
+Delivery failures are observable and retryable
+Final Summary
+
+You now have a:
+
+banking-grade, event-driven, multi-channel messaging infrastructure with provider abstraction and full auditability
+
+Core structure:
+
+Message = intent
+MessageDelivery = execution
+Channel = medium
+Provider = external delivery engine
+Webhook = truth reconciliation

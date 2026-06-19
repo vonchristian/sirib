@@ -20,7 +20,47 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
 
     admin_user = User.find_by(cooperative: coop, role: :manager)
 
-    # ── 3. Equity products & accounts ──────────────────────────────────
+    # ── 3. Portal setup for members ─────────────────────────────────────
+    admin_user_for_portal = admin_user || User.find_by(cooperative: coop, role: :manager)
+    members_with_portal = 0
+    Membership::Member.find_each.with_index do |member, idx|
+      next if member.password_digest.present?
+
+      member.update!(
+        member_identifier: "MBR-#{coop.subdomain.upcase}-#{format('%04d', idx + 1)}",
+        password: "password123",
+        portal_status: "active"
+      )
+      members_with_portal += 1
+    end
+
+    puts "    Portal enabled for #{members_with_portal} members" if members_with_portal > 0
+
+    # Portal announcements
+    unless Portal::Announcement.exists?(cooperative: coop)
+      announcements = [
+        { title: "Welcome to the Member Portal!",
+          body: "We are excited to launch our new member portal. You can now view your savings, share capital, loan balances, and repayment schedules online anytime. This is your window into your financial journey with #{coop.name}." },
+        { title: "Quarterly Dividend Declaration",
+          body: "The Board of Directors has approved a 3% dividend for all common shareholders for this quarter. Dividends will be credited to your share capital accounts by the end of the month." },
+        { title: "Annual General Meeting Announcement",
+          body: "The Annual General Meeting will be held on December 15th at the cooperative hall. All members are encouraged to attend. Election of new board members will take place." }
+      ]
+
+      announcements.each do |attrs|
+        Portal::Announcement.create!(
+          cooperative: coop,
+          title: attrs[:title],
+          body: attrs[:body],
+          status: "published",
+          published_at: [ 1.day.ago, 1.week.ago, 2.weeks.ago ][announcements.index(attrs)],
+          author: admin_user_for_portal || User.where(cooperative: coop).first!
+        )
+      end
+      puts "    Portal announcements created for #{coop.name}"
+    end
+
+    # ── 4. Equity products & accounts ──────────────────────────────────
     unless Equity::Product.exists?
       common = Equity::Product.create!(
         product_code: "COMMON",
@@ -79,7 +119,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       )
     end
 
-    # ── 4. Loan applications & loans ───────────────────────────────────
+    # ── 5. Loan applications & loans ───────────────────────────────────
     loan_products = Lending::LoanProduct.where(name: [ "Regular Salary Loan", "Emergency Loan", "Educational Loan" ]).to_a
 
     if loan_products.any? && Lending::LoanApplication.count < 3
@@ -132,7 +172,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       end
     end
 
-    # ── 5. Savings accounts ────────────────────────────────────────────
+    # ── 6. Savings accounts ────────────────────────────────────────────
     regular_savings = Treasury::SavingsProduct.find_by(name: "Regular Savings")
     if regular_savings
       members.each_with_index do |member, i|
@@ -172,7 +212,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       end
     end
 
-    # ── 6. Time deposits ───────────────────────────────────────────────
+    # ── 7. Time deposits ───────────────────────────────────────────────
     td_product = Treasury::TimeDepositProduct.find_or_create_by!(name: "Regular Time Deposit") do |p|
       p.description = "Standard 30-day time deposit with competitive interest"
       p.minimum_deposit_cents = 5_000_00
@@ -198,7 +238,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       end
     end
 
-    # ── 7. Additional journal entries ──────────────────────────────────
+    # ── 8. Additional journal entries ──────────────────────────────────
     cash_on_hand = Accounting::Account.find_by(account_code: "11110")
     interest_income = Accounting::Account.find_by(account_code: "40110")
     salaries_expense = Accounting::Account.find_by(account_code: "60010")
@@ -243,7 +283,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       )
     end
 
-    # ── 8. Branch performance snapshots ────────────────────────────────
+    # ── 9. Branch performance snapshots ────────────────────────────────
     branches = Management::Branch.all.to_a
     branch_perf_templates = [
       { loan_portfolio_cents: 8_500_000_00, savings_balance_cents: 3_200_000_00, delinquency_rate: 2.1,
@@ -273,7 +313,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       end
     end
 
-    # ── 9. Role assignments for per-coop users ─────────────────────────
+    # ── 10. Role assignments for per-coop users ─────────────────────────
     coop_users = User.where(cooperative: coop).to_a
     branch = branches.first
 
@@ -294,7 +334,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       Management::RoleAssignment.find_or_create_by!(user: user, role: role, branch: branch)
     end
 
-    # ── 10. Risk indicators ────────────────────────────────────────────
+    # ── 11. Risk indicators ────────────────────────────────────────────
     risk_data = [
       { type: "credit_risk_delinquency", value: 3.5, threshold: 5.0, status: :elevated, branch: nil },
       { type: "liquidity_ratio", value: 0.35, threshold: 0.2, status: :normal, branch: nil },
@@ -318,7 +358,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       end
     end
 
-    # ── 11. System health snapshots ────────────────────────────────────
+    # ── 12. System health snapshots ────────────────────────────────────
     health_metrics = [
       { name: "transaction_throughput", value: 142.5, unit: "tps" },
       { name: "queue_depth", value: 8, unit: "jobs" },
@@ -341,7 +381,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       end
     end
 
-    # ── 12. Alerts ─────────────────────────────────────────────────────
+    # ── 13. Alerts ─────────────────────────────────────────────────────
     alert_templates = [
       { alert_type: "loan_delinquency", severity: :warning,
         title: "Delinquency rate alert",
@@ -363,7 +403,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       end
     end
 
-    # ── 13. Configurations ─────────────────────────────────────────────
+    # ── 14. Configurations ─────────────────────────────────────────────
     {
       "loan_default_interest_rate" => { value: 1.5, unit: "percent" },
       "savings_base_interest_rate" => { value: 0.25, unit: "percent" },
@@ -378,7 +418,7 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
       end
     end
 
-    # ── 14. Audit logs ─────────────────────────────────────────────────
+    # ── 15. Audit logs ─────────────────────────────────────────────────
     unless Management::AuditLog.exists?
       gm_user = coop_users.find { |u| u.role == "manager" } || admin_user
 
