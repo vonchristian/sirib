@@ -1,10 +1,30 @@
+COOPERATIVES_COUNT = 10
+
+puts "=" * 60
+puts "SIRIB Cooperative Banking System — Seed"
+puts "=" * 60
+
+# Seed shared data in public schema
+puts "\nPhase 1: Shared schema (public)"
 require_relative "seeds/chart_of_accounts"
-require_relative "seeds/sample_entries"
-require_relative "seeds/members"
-require_relative "seeds/loan_products"
-require_relative "seeds/savings_products"
+
+# Provision tenant schemas
+puts "\nPhase 2: Tenant schemas"
+require_relative "seeds/cooperatives"
+
+# Create users per cooperative
+puts "\nPhase 3: Users"
 require_relative "seeds/users"
-require_relative "seeds/cooperative"
-require_relative "seeds/management" if defined?(Management)
-require_relative "seeds/demo_data" if defined?(Management) && Management::Branch.exists? && !Rails.env.test?
-require_relative "seeds/demo_rich_data" if !Rails.env.test? && Membership::Member.count < 100
+
+if !Rails.env.test?
+  puts "\nPhase 4: Demo data per cooperative"
+  require_relative "seeds/demo_data"
+  require_relative "seeds/demo_rich_data" if Cooperative.provisioned.count < 3
+end
+
+puts ""
+puts "=" * 60
+puts "Seed complete"
+puts "  Cooperatives: #{Cooperative.count}"
+puts "  Users: #{User.count}"
+puts "=" * 60

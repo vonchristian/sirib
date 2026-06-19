@@ -2,307 +2,297 @@
 ENV["RAILS_ENV"] = "test"
 require_relative "../config/environment"
 
-User.find_or_create_by!(email_address: "test@example.com") do |user|
-  user.password = "password123"
-  user.role = :manager
-end
-User.find_by(email_address: "test@example.com")&.update!(role: :manager)
+cooperative = Cooperative.find_by!(subdomain: "main")
+schema = cooperative.schema_name
 
-# Create admin user for identity tests & auth setup
-admin_user = User.find_or_initialize_by(email_address: "admin@example.com")
-admin_user.assign_attributes(password: "password123", role: :manager, status: "active", otp_enabled: false, otp_secret: nil, otp_verified_at: nil)
-admin_user.employee_id ||= SecureRandom.hex(4).upcase
-admin_user.save!
+puts "E2E setup for #{cooperative.name} (#{schema})"
 
-# Seed time deposit product
-Treasury::TimeDepositProduct.find_or_create_by!(name: "30-Day Time Deposit") do |p|
-  p.minimum_deposit_cents = 1_000_00
-  p.interest_rate = 0.0350
-  p.term_in_days = 30
-  p.status = "active"
-end
-
-# Seed accounting accounts for treasury journal entries
-cash_ledger = Accounting::Ledger.find_or_create_by!(account_code: "11100") do |l|
-  l.name = "Cash"
-  l.account_type = "asset"
+# Create test users associated with the cooperative
+def create_e2e_user(email:, password: "password123", role: :manager, cooperative:, full_name: nil)
+  user = User.find_or_initialize_by(email_address: email)
+  user.assign_attributes(
+    password: password,
+    role: role,
+    status: "active",
+    cooperative: cooperative,
+    otp_enabled: false,
+    otp_secret: nil,
+    otp_verified_at: nil,
+    full_name: full_name || email.split("@").first.titleize
+  )
+  user.employee_id ||= SecureRandom.hex(4).upcase
+  user.save!
+  user
 end
 
-deposit_ledger = Accounting::Ledger.find_or_create_by!(account_code: "21100") do |l|
-  l.name = "Deposit Liabilities"
-  l.account_type = "liability"
-end
+test_user   = create_e2e_user(email: "test@example.com", cooperative: cooperative)
+admin_user  = create_e2e_user(email: "admin@example.com", cooperative: cooperative)
+teller_user = create_e2e_user(email: "teller@example.com", cooperative: cooperative, full_name: "Juan Teller")
+bm_user     = create_e2e_user(email: "branch_manager@example.com", cooperative: cooperative, full_name: "Maria Manager")
 
-Accounting::Account.find_or_create_by!(account_code: "11110") do |a|
-  a.name = "Cash on Hand"
-  a.account_type = "asset"
-  a.ledger = cash_ledger
-end
+puts "  Users: 4 created/updated for #{cooperative.subdomain}"
 
-Accounting::Account.find_or_create_by!(account_code: "21120") do |a|
-  a.name = "Time Deposits"
-  a.account_type = "liability"
-  a.ledger = deposit_ledger
-end
-
-# Seed members for loan application wizard test
-members_seeded = 0
-20.times do |i|
-  first = %w[Maria Juan Elena Jose Ana Pedro Sofia Carlos Luz Ramon Isabel Antonio Carmen Victor Lorna Danilo Gloria Fernando Rosario Miguel][i]
-  last  = %w[Cruz Reyes Villanueva Mercado Dimagiba Santos Gonzales Yulo Macapagal Alcantara Samson Lopez Natividad Mendoza Fernandez Rivera Romero Ramos Castillo Angeles][i]
-  unless Membership::Member.exists?(first_name: first, last_name: last)
-    Membership::Member.create!(
-      first_name: first,
-      last_name: last,
-      middle_name: "M",
-      gender: i.even? ? "female" : "male",
-      civil_status: %w[single married married single widowed married single married married divorced married single widowed married single married divorced single married single][i],
-      birth_date: Date.new(1980 + (i % 20), 1 + (i % 12), 1 + (i % 28)),
-      mobile_number: "0917#{format('%07d', i)}",
-      identifications_attributes: [ { id_type: "BIR", id_number: "BIR-#{format('%09d', i)}" } ]
-    )
+# Everything below is tenant-scoped — run within the cooperative's schema
+Tenant::SchemaManager.within_schema(schema) do
+  # Seed time deposit product
+  Treasury::TimeDepositProduct.find_or_create_by!(name: "30-Day Time Deposit") do |p|
+    p.minimum_deposit_cents = 1_000_00
+    p.interest_rate = 0.0350
+    p.term_in_days = 30
+    p.status = "active"
   end
-  members_seeded += 1
-end
 
-# Seed loan products
-products = [
-  { name: "Regular Salary Loan",    interest_rate: 1.5,  interest_calculation: "declining_balance", max_term_months: 24, requires_collateral: false },
-  { name: "Emergency Loan",         interest_rate: 2.0,  interest_calculation: "declining_balance", max_term_months: 6,  requires_collateral: false },
-  { name: "Educational Loan",       interest_rate: 1.0,  interest_calculation: "straight_line",     max_term_months: 36, requires_collateral: false },
-]
-products.each do |attrs|
-  Lending::LoanProduct.find_or_create_by!(name: attrs[:name]) do |p|
-    p.assign_attributes(attrs)
+  # Seed accounting accounts for treasury journal entries
+  cash_ledger = Accounting::Ledger.find_or_create_by!(account_code: "11100") do |l|
+    l.name = "Cash"
+    l.account_type = "asset"
   end
-end
 
-# Seed charges on loan products
-charges_by_product = {
-  "Regular Salary Loan" => [{ name: "Service Fee", charge_type: "percentage", value: 2.0 }, { name: "Application Fee", charge_type: "fixed", value: 200 }],
-  "Emergency Loan"      => [{ name: "Service Fee", charge_type: "percentage", value: 3.0 }, { name: "Processing Fee",  charge_type: "fixed", value: 150 }],
-  "Educational Loan"    => [{ name: "Service Fee", charge_type: "percentage", value: 1.5 }, { name: "Application Fee", charge_type: "fixed", value: 250 }],
-}
-charges_by_product.each do |product_name, product_charges|
-  product = Lending::LoanProduct.find_by(name: product_name)
-  next unless product
-  product_charges.each do |charge_attrs|
-    product.loan_charges.find_or_create_by!(name: charge_attrs[:name]) do |c|
-      c.assign_attributes(charge_attrs)
+  deposit_ledger = Accounting::Ledger.find_or_create_by!(account_code: "21100") do |l|
+    l.name = "Deposit Liabilities"
+    l.account_type = "liability"
+  end
+
+  Accounting::Account.find_or_create_by!(account_code: "11110") do |a|
+    a.name = "Cash on Hand"
+    a.account_type = "asset"
+    a.ledger = cash_ledger
+  end
+
+  Accounting::Account.find_or_create_by!(account_code: "21120") do |a|
+    a.name = "Time Deposits"
+    a.account_type = "liability"
+    a.ledger = deposit_ledger
+  end
+
+  # Seed members for loan application wizard test
+  members_seeded = 0
+  20.times do |i|
+    first = %w[Maria Juan Elena Jose Ana Pedro Sofia Carlos Luz Ramon Isabel Antonio Carmen Victor Lorna Danilo Gloria Fernando Rosario Miguel][i]
+    last  = %w[Cruz Reyes Villanueva Mercado Dimagiba Santos Gonzales Yulo Macapagal Alcantara Samson Lopez Natividad Mendoza Fernandez Rivera Romero Ramos Castillo Angeles][i]
+    unless Membership::Member.exists?(first_name: first, last_name: last)
+      Membership::Member.create!(
+        first_name: first,
+        last_name: last,
+        middle_name: "M",
+        gender: i.even? ? "female" : "male",
+        civil_status: %w[single married married single widowed married single married married divorced married single widowed married single married divorced single married single][i],
+        birth_date: Date.new(1980 + (i % 20), 1 + (i % 12), 1 + (i % 28)),
+        mobile_number: "0917#{format('%07d', i)}",
+        identifications_attributes: [ { id_type: "BIR", id_number: "BIR-#{format('%09d', i)}" } ]
+      )
+    end
+    members_seeded += 1
+  end
+
+  # Seed charges on existing loan products
+  charges_by_product = {
+    "Regular Salary Loan" => [{ name: "Service Fee", charge_type: "percentage", value: 2.0 }, { name: "Application Fee", charge_type: "fixed", value: 200 }],
+    "Emergency Loan"      => [{ name: "Service Fee", charge_type: "percentage", value: 3.0 }, { name: "Processing Fee",  charge_type: "fixed", value: 150 }],
+    "Educational Loan"    => [{ name: "Service Fee", charge_type: "percentage", value: 1.5 }, { name: "Application Fee", charge_type: "fixed", value: 250 }],
+  }
+  charges_by_product.each do |product_name, product_charges|
+    product = Lending::LoanProduct.find_by(name: product_name)
+    next unless product
+    product_charges.each do |charge_attrs|
+      product.loan_charges.find_or_create_by!(name: charge_attrs[:name]) do |c|
+        c.assign_attributes(charge_attrs)
+      end
     end
   end
-end
 
-puts "Seeded: #{members_seeded} members, #{products.length} loan products"
+  # Seed savings products with ledger references
+  savings_ledger = Accounting::Ledger.find_or_create_by!(account_code: "21100") do |l|
+    l.name = "Deposit Liabilities"
+    l.account_type = "liability"
+  end
 
-# Seed savings products
-savings_ledger = Accounting::Ledger.find_or_create_by!(account_code: "21100") do |l|
-  l.name = "Deposit Liabilities"
-  l.account_type = "liability"
-end
+  expense_ledger = Accounting::Ledger.find_or_create_by!(account_code: "61100") do |l|
+    l.name = "Interest Expense"
+    l.account_type = "expense"
+  end
 
-expense_ledger = Accounting::Ledger.find_or_create_by!(account_code: "61100") do |l|
-  l.name = "Interest Expense"
-  l.account_type = "expense"
-end
+  savings_product = Treasury::SavingsProduct.find_or_create_by!(name: "Regular Savings") do |p|
+    p.description = "Standard savings account"
+    p.liability_ledger = savings_ledger
+    p.interest_expense_ledger = expense_ledger
+  end
+  savings_product.interest_rates.find_or_create_by!(current: true) { |ir| ir.rate = 0.0025 }
 
-savings_product = Treasury::SavingsProduct.find_or_create_by!(name: "Regular Savings") do |p|
-  p.description = "Standard savings account"
-  p.liability_ledger = savings_ledger
-  p.interest_expense_ledger = expense_ledger
-end
-savings_product.interest_rates.find_or_create_by!(current: true) { |ir| ir.rate = 0.0025 }
+  # Create cash account for test user (user model is in public schema)
+  cash_account = Accounting::Account.find_or_create_by!(account_code: "11110") do |a|
+    cash_ledger = Accounting::Ledger.find_or_create_by!(account_code: "11100") { |l| l.name = "Cash"; l.account_type = "asset" }
+    a.name = "Cash on Hand"
+    a.account_type = "asset"
+    a.ledger = cash_ledger
+  end
+  Accounting::CashAccount.find_or_create_by!(user: test_user, account: cash_account)
 
-# Create cash account for test user
-test_user = User.find_by!(email_address: "test@example.com")
-cash_account = Accounting::Account.find_or_create_by!(account_code: "11110") do |a|
-  cash_ledger = Accounting::Ledger.find_or_create_by!(account_code: "11100") { |l| l.name = "Cash"; l.account_type = "asset" }
-  a.name = "Cash on Hand"
-  a.account_type = "asset"
-  a.ledger = cash_ledger
-end
-Accounting::CashAccount.find_or_create_by!(user: test_user, account: cash_account)
+  # Seed share capital products
+  Equity::Product.find_or_create_by!(product_code: "COMMON") do |p|
+    p.name = "Common Shares"
+    p.description = "Standard common shares for member ownership"
+    p.share_type = :common
+    p.status = "active"
+    p.price_per_share_cents = 100_00
+    p.minimum_required_shares = 50
+    p.maximum_allowed_shares = 500
+    p.minimum_initial_purchase = 10
+    p.allow_fractional_shares = false
+    p.redeemable = true
+    p.dividend_eligible = true
+    p.voting_rights = true
+  end
 
-# Seed share capital products
-share_capital_product = Equity::Product.find_or_create_by!(product_code: "COMMON") do |p|
-  p.name = "Common Shares"
-  p.description = "Standard common shares for member ownership"
-  p.share_type = :common
-  p.status = "active"
-  p.price_per_share_cents = 100_00
-  p.minimum_required_shares = 50
-  p.maximum_allowed_shares = 500
-  p.minimum_initial_purchase = 10
-  p.allow_fractional_shares = false
-  p.redeemable = true
-  p.dividend_eligible = true
-  p.voting_rights = true
-end
+  Equity::Product.find_or_create_by!(product_code: "PREF") do |p|
+    p.name = "Preferred Shares"
+    p.description = "Preferred shares with dividend priority"
+    p.share_type = :preferred
+    p.status = "active"
+    p.price_per_share_cents = 150_00
+    p.minimum_required_shares = 25
+    p.maximum_allowed_shares = 300
+    p.minimum_initial_purchase = 5
+    p.allow_fractional_shares = false
+    p.redeemable = true
+    p.dividend_eligible = true
+    p.voting_rights = false
+  end
 
-Equity::Product.find_or_create_by!(product_code: "PREF") do |p|
-  p.name = "Preferred Shares"
-  p.description = "Preferred shares with dividend priority"
-  p.share_type = :preferred
-  p.status = "active"
-  p.price_per_share_cents = 150_00
-  p.minimum_required_shares = 25
-  p.maximum_allowed_shares = 300
-  p.minimum_initial_purchase = 5
-  p.allow_fractional_shares = false
-  p.redeemable = true
-  p.dividend_eligible = true
-  p.voting_rights = false
-end
+  # Create cash session for admin user
+  admin_account = admin_user.cash_accounts.includes(:account).first&.account
+  if admin_account
+    Treasury::CashSession.find_or_create_by!(
+      user: admin_user,
+      cash_account: admin_account,
+      date: Date.current
+    ) do |s|
+      s.opened_at = Time.current - 4.hours
+      s.status = "open"
+      s.beginning_balance_cents = 1_035_000
+    end
+  end
 
-# Create cash session for admin user (used by cash_count e2e tests)
-admin_user = User.find_by!(email_address: "admin@example.com")
-admin_account = admin_user.cash_accounts.includes(:account).first&.account
-if admin_account
-  Treasury::CashSession.find_or_create_by!(
-    user: admin_user,
-    cash_account: admin_account,
-    date: Date.current
-  ) do |s|
-    s.opened_at = Time.current - 4.hours
-    s.status = "open"
-    s.beginning_balance_cents = 1_035_000 # ₱10,350.00 in centavos
+  # ── MANAGEMENT E2E TEST DATA ───────────────────────────────────────────
+  # Management roles, permissions, branches, departments, etc. are seeded by
+  # db/seeds/management.rb (runs during provisioning). This section adds
+  # demo-style data needed for full E2E coverage.
+
+  # Ensure admin user gets management role assignments
+  admin_role = Management::Role.find_by(code: "system_admin")
+  hq_branch = Management::Branch.find_by(code: "HQ")
+  if admin_role && hq_branch && !Management::RoleAssignment.exists?(user: admin_user, role: admin_role)
+    Management::RoleAssignment.create!(user: admin_user, role: admin_role, branch: hq_branch)
+  end
+
+  # Create branch performance snapshots
+  perf_data = [
+    { branch_code: "HQ", metrics: { loan_portfolio_cents: 8_500_000_00, savings_balance_cents: 3_200_000_00, delinquency_rate: 2.1, collection_efficiency: 95.3, cash_flow_position_cents: 4_100_000_00, estimated_profitability_cents: 1_200_000_00, total_members: 45 } },
+    { branch_code: "MKT", metrics: { loan_portfolio_cents: 5_200_000_00, savings_balance_cents: 2_800_000_00, delinquency_rate: 3.8, collection_efficiency: 91.7, cash_flow_position_cents: 2_300_000_00, estimated_profitability_cents: 780_000_00, total_members: 32 } },
+    { branch_code: "QC", metrics: { loan_portfolio_cents: 3_800_000_00, savings_balance_cents: 1_900_000_00, delinquency_rate: 5.2, collection_efficiency: 88.4, cash_flow_position_cents: 1_600_000_00, estimated_profitability_cents: 520_000_00, total_members: 28 } }
+  ]
+  perf_data.each do |data|
+    branch = Management::Branch.find_by(code: data[:branch_code])
+    next unless branch
+    Management::BranchPerformanceSnapshot.find_or_create_by!(branch: branch, snapshot_date: Date.current) do |s|
+      s.metrics = data[:metrics]
+    end
+  end
+
+  # Create risk indicators
+  risk_data = [
+    { type: "credit_risk_delinquency", value: 3.5, threshold: 5.0, status: :elevated, branch: nil },
+    { type: "liquidity_ratio", value: 0.35, threshold: 0.2, status: :normal, branch: nil },
+    { type: "portfolio_at_risk", value: 4.2, threshold: 5.0, status: :elevated, branch: nil },
+    { type: "credit_risk_delinquency", value: 2.1, threshold: 5.0, status: :normal, branch_code: "HQ" },
+    { type: "credit_risk_delinquency", value: 5.2, threshold: 5.0, status: :critical, branch_code: "QC" },
+  ]
+  risk_data.each do |data|
+    branch = data[:branch_code] ? Management::Branch.find_by(code: data[:branch_code]) : nil
+    Management::RiskIndicator.find_or_create_by!(indicator_type: data[:type], branch: branch, as_of_date: Date.current) do |r|
+      r.value = data[:value]
+      r.threshold = data[:threshold]
+      r.status = data[:status]
+    end
+  end
+
+  # Create system health snapshots
+  health_metrics = [
+    { name: "transaction_throughput", value: 142.5, unit: "tps", status: :healthy },
+    { name: "queue_depth", value: 8, unit: "jobs", status: :healthy },
+    { name: "error_rate", value: 0.5, unit: "percent", status: :healthy },
+    { name: "memory_usage_mb", value: 456, unit: "MB", status: :healthy },
+  ]
+  health_metrics.each do |m|
+    Management::SystemHealthSnapshot.find_or_create_by!(metric_name: m[:name], captured_at: Time.current.beginning_of_hour) do |s|
+      s.value = m[:value]
+      s.unit = m[:unit]
+      s.status = m[:status]
+    end
+  end
+
+  # Create alerts
+  alerts = [
+    { alert_type: "loan_delinquency", severity: :warning, title: "QC Branch delinquency rate exceeded 5%", message: "QC delinquency rate is at 5.2%.", source: "risk_monitoring" },
+    { alert_type: "cash_shortage", severity: :critical, title: "Low cash balance in Makati Branch", message: "MKT cash on hand is below minimum.", source: "system" },
+    { alert_type: "system_health", severity: :warning, title: "High memory usage detected", message: "Memory usage at 85%.", source: "system_health" },
+  ]
+  alerts.each do |attrs|
+    Management::Alert.find_or_create_by!(alert_type: attrs[:alert_type], title: attrs[:title]) do |a|
+      a.severity = attrs[:severity]
+      a.message = attrs[:message]
+      a.source = attrs[:source]
+      a.status = :active
+    end
+  end
+
+  # Create configurations
+  configs = {
+    "loan_default_interest_rate" => { value: { rate: 1.5, unit: "percent" } },
+    "savings_base_interest_rate" => { value: { rate: 0.25, unit: "percent" } },
+    "late_payment_penalty_rate" => { value: { rate: 3.0, unit: "percent" } },
+  }
+  configs.each do |key, val|
+    Management::Configuration.find_or_create_by!(key: key) do |c|
+      c.value = val[:value]
+      c.status = :active
+      c.changed_by = admin_user
+    end
+  end
+
+  # Create audit logs
+  unless Management::AuditLog.exists?
+    first_policy = Management::Policy.first
+    [
+      { action: "user_login", auditable: admin_user },
+      { action: "policy_created", auditable: first_policy },
+      { action: "configuration_updated", auditable: Management::Configuration.first },
+    ].each_with_index do |attrs, i|
+      Management::AuditLog.create!(
+        auditable: attrs[:auditable],
+        action: attrs[:action],
+        actor: admin_user,
+        actor_role: "system_admin",
+        ip_address: "192.168.1.#{100 + i}",
+        user_agent: "E2E Test",
+        before_state: {},
+        after_state: {},
+        created_at: (3 - i).hours.ago
+      )
+    end
+  end
+
+  # ── IDENTITY LAYER TEST DATA ──────────────────────────────────────────
+  teller_role = Management::Role.find_by(code: "teller")
+  mkt_branch = Management::Branch.find_by(code: "MKT")
+  if teller_role && mkt_branch && !Management::RoleAssignment.exists?(user: teller_user, role: teller_role)
+    Management::RoleAssignment.create!(user: teller_user, role: teller_role, branch: mkt_branch)
+  end
+
+  bm_role = Management::Role.find_by(code: "branch_manager")
+  if bm_role && mkt_branch && !Management::RoleAssignment.exists?(user: bm_user, role: bm_role)
+    Management::RoleAssignment.create!(user: bm_user, role: bm_role, branch: mkt_branch)
   end
 end
 
-# ── MANAGEMENT E2E TEST DATA ───────────────────────────────────────────
-# Management roles, permissions, branches, departments, policies, and
-# approval workflows are created by db/seeds/management.rb (runs in test env).
-# This section adds the demo-style data needed for full E2E coverage.
-
-# Ensure admin user gets management role assignments for all pages
-admin_role = Management::Role.find_by(code: "system_admin")
-hq_branch = Management::Branch.find_by(code: "HQ")
-if admin_role && hq_branch && !Management::RoleAssignment.exists?(user: admin_user, role: admin_role)
-  Management::RoleAssignment.create!(user: admin_user, role: admin_role, branch: hq_branch)
-end
-
-# Create branch performance snapshots
-perf_data = [
-  { branch_code: "HQ", metrics: { loan_portfolio_cents: 8_500_000_00, savings_balance_cents: 3_200_000_00, delinquency_rate: 2.1, collection_efficiency: 95.3, cash_flow_position_cents: 4_100_000_00, estimated_profitability_cents: 1_200_000_00, total_members: 45 } },
-  { branch_code: "MKT", metrics: { loan_portfolio_cents: 5_200_000_00, savings_balance_cents: 2_800_000_00, delinquency_rate: 3.8, collection_efficiency: 91.7, cash_flow_position_cents: 2_300_000_00, estimated_profitability_cents: 780_000_00, total_members: 32 } },
-  { branch_code: "QC", metrics: { loan_portfolio_cents: 3_800_000_00, savings_balance_cents: 1_900_000_00, delinquency_rate: 5.2, collection_efficiency: 88.4, cash_flow_position_cents: 1_600_000_00, estimated_profitability_cents: 520_000_00, total_members: 28 } }
-]
-perf_data.each do |data|
-  branch = Management::Branch.find_by(code: data[:branch_code])
-  next unless branch
-  Management::BranchPerformanceSnapshot.find_or_create_by!(branch: branch, snapshot_date: Date.current) do |s|
-    s.metrics = data[:metrics]
-  end
-end
-
-# Create risk indicators
-risk_data = [
-  { type: "credit_risk_delinquency", value: 3.5, threshold: 5.0, status: :elevated, branch: nil },
-  { type: "liquidity_ratio", value: 0.35, threshold: 0.2, status: :normal, branch: nil },
-  { type: "portfolio_at_risk", value: 4.2, threshold: 5.0, status: :elevated, branch: nil },
-  { type: "credit_risk_delinquency", value: 2.1, threshold: 5.0, status: :normal, branch_code: "HQ" },
-  { type: "credit_risk_delinquency", value: 5.2, threshold: 5.0, status: :critical, branch_code: "QC" },
-]
-risk_data.each do |data|
-  branch = data[:branch_code] ? Management::Branch.find_by(code: data[:branch_code]) : nil
-  Management::RiskIndicator.find_or_create_by!(indicator_type: data[:type], branch: branch, as_of_date: Date.current) do |r|
-    r.value = data[:value]
-    r.threshold = data[:threshold]
-    r.status = data[:status]
-  end
-end
-
-# Create system health snapshots
-health_metrics = [
-  { name: "transaction_throughput", value: 142.5, unit: "tps", status: :healthy },
-  { name: "queue_depth", value: 8, unit: "jobs", status: :healthy },
-  { name: "error_rate", value: 0.5, unit: "percent", status: :healthy },
-  { name: "memory_usage_mb", value: 456, unit: "MB", status: :healthy },
-]
-health_metrics.each do |m|
-  Management::SystemHealthSnapshot.find_or_create_by!(metric_name: m[:name], captured_at: Time.current.beginning_of_hour) do |s|
-    s.value = m[:value]
-    s.unit = m[:unit]
-    s.status = m[:status]
-  end
-end
-
-# Create alerts
-alerts = [
-  { alert_type: "loan_delinquency", severity: :warning, title: "QC Branch delinquency rate exceeded 5%", message: "QC delinquency rate is at 5.2%.", source: "risk_monitoring" },
-  { alert_type: "cash_shortage", severity: :critical, title: "Low cash balance in Makati Branch", message: "MKT cash on hand is below minimum.", source: "system" },
-  { alert_type: "system_health", severity: :warning, title: "High memory usage detected", message: "Memory usage at 85%.", source: "system_health" },
-]
-alerts.each do |attrs|
-  Management::Alert.find_or_create_by!(alert_type: attrs[:alert_type], title: attrs[:title]) do |a|
-    a.severity = attrs[:severity]
-    a.message = attrs[:message]
-    a.source = attrs[:source]
-    a.status = :active
-  end
-end
-
-# Create configurations
-configs = {
-  "loan_default_interest_rate" => { value: { rate: 1.5, unit: "percent" } },
-  "savings_base_interest_rate" => { value: { rate: 0.25, unit: "percent" } },
-  "late_payment_penalty_rate" => { value: { rate: 3.0, unit: "percent" } },
-}
-configs.each do |key, val|
-  Management::Configuration.find_or_create_by!(key: key) do |c|
-    c.value = val[:value]
-    c.status = :active
-    c.changed_by = admin_user
-  end
-end
-
-# Create audit logs
-unless Management::AuditLog.exists?
-  gm_role = Management::Role.find_by(code: "general_manager")
-  first_policy = Management::Policy.first
-  [
-    { action: "user_login", auditable: admin_user },
-    { action: "policy_created", auditable: first_policy },
-    { action: "configuration_updated", auditable: Management::Configuration.first },
-  ].each_with_index do |attrs, i|
-    Management::AuditLog.create!(
-      auditable: attrs[:auditable],
-      action: attrs[:action],
-      actor: admin_user,
-      actor_role: "system_admin",
-      ip_address: "192.168.1.#{100 + i}",
-      user_agent: "E2E Test",
-      before_state: {},
-      after_state: {},
-      created_at: (3 - i).hours.ago
-    )
-  end
-end
-
-# ── IDENTITY LAYER TEST DATA ────────────────────────────────────────────
-# Create a teller user for RBAC tests
-teller_user = User.find_or_create_by!(email_address: "teller@example.com") do |u|
-  u.password = "password123"
-  u.role = :manager
-  u.full_name = "Juan Teller"
-end
-
-teller_role = Management::Role.find_by(code: "teller")
-mkt_branch = Management::Branch.find_by(code: "MKT")
-if teller_role && mkt_branch && !Management::RoleAssignment.exists?(user: teller_user, role: teller_role)
-  Management::RoleAssignment.create!(user: teller_user, role: teller_role, branch: mkt_branch)
-end
-
-# Create a branch manager for branch isolation tests
-bm_user = User.find_or_create_by!(email_address: "branch_manager@example.com") do |u|
-  u.password = "password123"
-  u.role = :manager
-  u.full_name = "Maria Manager"
-end
-
-bm_role = Management::Role.find_by(code: "branch_manager")
-if bm_role && mkt_branch && !Management::RoleAssignment.exists?(user: bm_user, role: bm_role)
-  Management::RoleAssignment.create!(user: bm_user, role: bm_role, branch: mkt_branch)
-end
-
-puts "E2E setup complete: #{Treasury::SavingsProduct.count} savings products, #{Equity::Product.count} share capital products, cash account created"
+puts "E2E setup complete for #{cooperative.subdomain}.#{cooperative.subdomain}"

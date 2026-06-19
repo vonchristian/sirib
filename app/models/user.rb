@@ -2,6 +2,7 @@ class User < ApplicationRecord
   IDENTITY_STATUSES = %w[active suspended terminated].freeze
 
   has_secure_password
+  belongs_to :cooperative, optional: false
   has_many :sessions, dependent: :destroy
   has_many :cash_accounts, class_name: "Accounting::CashAccount", dependent: :destroy
   has_many :cash_sessions, class_name: "Treasury::CashSession", dependent: :destroy

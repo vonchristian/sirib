@@ -5,5 +5,6 @@ FactoryBot.define do
     email_address
     password { "password123" }
     role { :manager }
+    cooperative
   end
 end

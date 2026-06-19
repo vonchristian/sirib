@@ -36,6 +36,10 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
+  # Allow lvh.me for subdomain-based E2E tests
+  config.hosts << /.*\.lvh\.me/
+  config.hosts << "lvh.me"
+
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 

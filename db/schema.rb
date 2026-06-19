@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_19_014429) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_19_014431) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -101,6 +101,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_19_014429) do
     t.string "contact_number"
     t.string "registration_number"
     t.bigint "vault_account_id"
+    t.string "schema_name"
+    t.string "subdomain"
+    t.string "status", default: "inactive", null: false
+    t.string "tenant_name"
+    t.datetime "provisioned_at"
+    t.string "locale", default: "en"
+    t.string "timezone", default: "UTC"
+    t.index ["schema_name"], name: "index_cooperatives_on_schema_name", unique: true
+    t.index ["subdomain"], name: "index_cooperatives_on_subdomain", unique: true
     t.index ["vault_account_id"], name: "index_cooperatives_on_vault_account_id"
   end
 
@@ -901,6 +910,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_19_014429) do
     t.string "full_name"
     t.string "status"
     t.jsonb "permission_overrides"
+    t.bigint "cooperative_id", null: false
+    t.index ["cooperative_id"], name: "index_users_on_cooperative_id"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["employee_id"], name: "index_users_on_employee_id", unique: true
   end
@@ -989,4 +1000,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_19_014429) do
   add_foreign_key "treasury_vouchers", "entries"
   add_foreign_key "treasury_vouchers", "treasury_cash_sessions", column: "cash_session_id"
   add_foreign_key "trusted_devices", "users"
+  add_foreign_key "users", "cooperatives"
 end

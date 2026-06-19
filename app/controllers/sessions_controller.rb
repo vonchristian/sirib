@@ -38,7 +38,7 @@ class SessionsController < ApplicationController
         start_new_session_for user
         Current.session.verify_mfa!
         Mfa::TotpService.log_attempt(user, action: "login_trusted_device", success: true, ip_address: request.remote_ip, user_agent: request.user_agent)
-        redirect_to after_authentication_url && return
+        redirect_to(after_authentication_url) && return
       end
 
       session[:mfa_user_id] = user.id

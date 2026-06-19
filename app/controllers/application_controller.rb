@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  include TenantContext
   include Pagy::Backend
 
   before_action :set_current_cash_session
