@@ -25,3 +25,4 @@ application.register("rail", RailController)
 
 import SidebarController from "controllers/sidebar_controller"
 application.register("sidebar", SidebarController)
+

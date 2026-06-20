@@ -15,7 +15,7 @@
         </ul>
       </div>
     <% end %>
-    <div><%= f.label :file, "Statement File", class: "input-label" %><%= f.file_field :file, required: true, accept: ".csv,.pdf,.png,.jpg,.jpeg", class: "input" %><p class="text-xs text-text-tertiary mt-1">CSV preferred for best results</p></div>
+    <div><%= f.label :file, "Statement File", class: "input-label" %><%= f.file_field :file, required: true, accept: ".csv,.pdf,.png,.jpg,.jpeg", class: "input" %><p class="text-xs text-text-tertiary mt-1">CSV or PDF recommended</p></div>
     <div><%= f.label :document_type, class: "input-label" %><%= f.select :document_type, options_for_select([["Statement", "statement"], ["Export", "export"], ["Passbook Scan", "passbook_scan"]], @document.document_type), {}, class: "input" %></div>
     <div class="grid grid-cols-2 gap-4">
       <div><%= f.label :period_start, class: "input-label" %><%= f.date_field :period_start, required: true, class: "input" %></div>

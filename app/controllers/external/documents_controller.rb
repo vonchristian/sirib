@@ -3,7 +3,7 @@ module External
     before_action { set_active_nav }
     before_action :set_bank
     before_action :set_account
-    before_action :set_document, only: [:show, :destroy]
+    before_action :set_document, only: [:show, :retry, :destroy]
 
     def index
       @documents = @account.documents.order(created_at: :desc).with_attached_file
@@ -27,6 +27,14 @@ module External
     end
 
     def show
+      @transactions = @document.transactions.by_date_desc
+    end
+
+    def retry
+      @document.update!(processing_status: :pending, error_message: nil)
+      External::ParseBankDocumentJob.perform_later(@document)
+      redirect_to external_bank_account_document_path(@bank, @account, @document),
+                  notice: "Document is being reprocessed."
     end
 
     def destroy

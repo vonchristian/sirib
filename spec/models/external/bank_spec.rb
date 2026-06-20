@@ -5,6 +5,7 @@ RSpec.describe External::Bank do
     it { is_expected.to have_many(:accounts).dependent(:destroy) }
     it { is_expected.to belong_to(:cash_on_hand_ledger).class_name("Accounting::Ledger").optional }
     it { is_expected.to belong_to(:interest_income_ledger).class_name("Accounting::Ledger").optional }
+    it { is_expected.to belong_to(:cash_on_hand_account).class_name("Accounting::Account").optional }
   end
 
   describe "validations" do
@@ -31,16 +32,16 @@ RSpec.describe External::Bank do
   end
 
   describe "#create_tracking_accounts" do
-    it "creates cash and interest ledgers" do
+    it "creates cash and interest ledgers plus cash account" do
       cash_ledger = Accounting::Ledger.find_or_create_by!(
         name: "Cash in Bank",
-        account_code: "11000",
+        account_code: "11130",
         account_type: :asset
       )
 
       interest_parent = Accounting::Ledger.find_or_create_by!(
-        name: "Interest Income",
-        account_code: "41000",
+        name: "Income from Credit Operations",
+        account_code: "40100",
         account_type: :revenue
       )
 
@@ -48,6 +49,7 @@ RSpec.describe External::Bank do
       bank.reload
 
       expect(bank.cash_on_hand_ledger).to be_present
+      expect(bank.cash_on_hand_account).to be_present
       expect(bank.interest_income_ledger).to be_present
       expect(bank.cash_on_hand_ledger.parent).to eq(cash_ledger)
       expect(bank.interest_income_ledger.parent).to eq(interest_parent)

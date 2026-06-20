@@ -14,6 +14,7 @@
     </div>
     <div class="flex items-center gap-2">
       <%= link_to "Upload Statement", new_external_bank_account_document_path(@bank, @account), class: "btn-ghost" %>
+      <%= button_to "Interest Earned Template", external_bank_account_entry_template_path(@bank, @account), method: :post, class: "btn-ghost cursor-pointer" %>
       <%= link_to "Reconcile", external_bank_account_reconciliation_path(@bank, @account), class: "btn-primary" %>
     </div>
   </div>

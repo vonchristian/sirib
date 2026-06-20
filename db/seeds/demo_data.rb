@@ -440,6 +440,95 @@ Cooperative.active.provisioned.order(:name).each_with_index do |coop, idx|
         )
       end
     end
+
+    # ── 16. External banks and bank accounts ────────────────────────────
+    unless External::Bank.exists?
+      demo_banks = [
+        {
+          name: "Philippine National Bank",
+          code: "PNB",
+          country: "PH",
+          accounts: [
+            { account_name: "PNB Savings Account", account_type: "savings", currency: "PHP", account_number_encrypted: "1234567890123456" },
+            { account_name: "PNB Checking Account", account_type: "checking", currency: "PHP", account_number_encrypted: "2345678901234567" }
+          ]
+        },
+        {
+          name: "Land Bank of the Philippines",
+          code: "LBP",
+          country: "PH",
+          accounts: [
+            { account_name: "LBP Main Account", account_type: "checking", currency: "PHP", account_number_encrypted: "3456789012345678" }
+          ]
+        },
+        {
+          name: "Bank of the Philippine Islands",
+          code: "BPI",
+          country: "PH",
+          accounts: [
+            { account_name: "BPI Corporate Savings", account_type: "savings", currency: "PHP", account_number_encrypted: "4567890123456789" }
+          ]
+        }
+      ]
+
+      demo_banks.each do |bank_attrs|
+        accounts = bank_attrs.delete(:accounts)
+        bank = External::Bank.create!(bank_attrs)
+        puts "    Bank created: #{bank.name}"
+
+        accounts.each do |acct_attrs|
+          account = bank.accounts.create!(acct_attrs)
+          puts "      Account created: #{account.account_name} → Interest Earned template ready"
+        end
+      end
+    end
+
+    # ── 17. Entry templates (standalone, not tied to external accounts) ─
+    unless Accounting::EntryTemplate.exists?
+      cash_account = Accounting::Account.find_by(account_code: "11110")
+      interest_income = Accounting::Account.find_by(account_code: "40110")
+
+      if cash_account && interest_income
+        Accounting::EntryTemplate.create!(
+          name: "Interest Income Accrual",
+          description: "Monthly accrual of interest income from loan portfolio",
+          lines_attributes: {
+            "0" => { account_id: Accounting::Account.find_by(account_code: "11210")&.id || cash_account.id, direction: "debit", amount_mode: "variable", sequence_index: 1 },
+            "1" => { account_id: interest_income.id, direction: "credit", amount_mode: "variable", sequence_index: 2 }
+          }
+        )
+        puts "    Entry template created: Interest Income Accrual"
+      end
+
+      salaries_expense = Accounting::Account.find_by(account_code: "60010")
+      bank_acct = Accounting::Account.find_by(account_code: "11131")
+
+      if salaries_expense && bank_acct
+        Accounting::EntryTemplate.create!(
+          name: "Monthly Salary Disbursement",
+          description: "Monthly payroll — debit salary expense, credit bank account",
+          lines_attributes: {
+            "0" => { account_id: salaries_expense.id, direction: "debit", amount_mode: "fixed", fixed_amount: 250_000, sequence_index: 1 },
+            "1" => { account_id: bank_acct.id, direction: "credit", amount_mode: "fixed", fixed_amount: 250_000, sequence_index: 2 }
+          }
+        )
+        puts "    Entry template created: Monthly Salary Disbursement"
+      end
+
+      rent_expense = Accounting::Account.find_by(account_code: "60090")
+
+      if rent_expense && bank_acct
+        Accounting::EntryTemplate.create!(
+          name: "Monthly Rent Payment",
+          description: "Monthly office rent — debit rent expense, credit bank account",
+          lines_attributes: {
+            "0" => { account_id: rent_expense.id, direction: "debit", amount_mode: "fixed", fixed_amount: 50_000, sequence_index: 1 },
+            "1" => { account_id: bank_acct.id, direction: "credit", amount_mode: "fixed", fixed_amount: 50_000, sequence_index: 2 }
+          }
+        )
+        puts "    Entry template created: Monthly Rent Payment"
+      end
+    end
   end
 end
 

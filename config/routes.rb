@@ -84,9 +84,11 @@ Rails.application.routes.draw do
       get "balance_sheet", to: "balance_sheet#index"
       get "income_statement", to: "income_statement#index"
       get "cash_flow", to: "cash_flow#index"
+      get "trial_balance", to: "trial_balance#index"
       get "chart_of_accounts", to: "chart_of_accounts#index"
       resources :entries, only: [:index, :new, :create, :show]
       get "accounts/search", to: "accounts#search"
+      resources :accounts, only: [:show], controller: "accounts"
     end
 
     namespace :treasury do
@@ -149,14 +151,20 @@ Rails.application.routes.draw do
     end
 
     namespace :external do
+      resources :accounts, only: [:index, :new, :create], controller: "accounts"
       resources :banks do
         resources :accounts do
-          resources :documents, only: [:index, :show, :new, :create, :destroy]
+          resources :documents, only: [:index, :show, :new, :create, :destroy] do
+            member do
+              post :retry
+            end
+          end
           resource :reconciliation, only: [:show], controller: "reconciliation" do
             post :allocate
             post :confirm_allocation
             post :reject_allocation
           end
+          resource :entry_template, only: [:create], controller: "entry_templates"
         end
       end
     end
@@ -215,6 +223,13 @@ Rails.application.routes.draw do
       resources :alerts, only: [:index, :show] do
         member do
           post :resolve
+        end
+      end
+
+      resources :entry_templates do
+        member do
+          post :preview
+          post :execute
         end
       end
 

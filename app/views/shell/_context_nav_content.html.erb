@@ -9,7 +9,7 @@
     when /\A\/equity/ then "equity"
     when /\A\/members/, /\A\/applications/ then "members"
     when /\A\/treasury/ then "treasury"
-    when /\A\/accounting/ then "accounting"
+    when /\A\/accounting/, /\A\/external/ then "accounting"
     when /\A\/reports/, "/dashboard/reports" then "reports"
     when /\A\/management/ then "management"
     else "members"
@@ -123,6 +123,7 @@
       <%= render "shell/sidebar_link", path: "/accounting/income_statement", label: "Income Statement", icon: "trending-up", current_path: current_path %>
       <%= render "shell/sidebar_link", path: "/accounting/cash_flow", label: "Cash Flow", icon: "arrows-right-left", current_path: current_path %>
       <%= render "shell/sidebar_link", path: "/accounting/trial_balance", label: "Trial Balance", icon: "table-cells", current_path: current_path %>
+      <%= render "shell/sidebar_link", path: "/external/accounts", label: "External Bank Accounts", icon: "building-office", current_path: current_path %>
     </div>
   <% end %>
 
@@ -158,7 +159,14 @@
       <%= render "shell/sidebar_link", path: "/management/configurations", label: "Configurations", icon: "cog", current_path: current_path %>
       <%= render "shell/sidebar_link", path: "/management/alerts", label: "Alerts", icon: "bell", current_path: current_path %>
       <%= render "shell/sidebar_link", path: "/management/audit_logs", label: "Audit Log", icon: "clipboard-document-list", current_path: current_path %>
+      <%= render "shell/sidebar_link", path: "/management/entry_templates", label: "Entry Templates", icon: "document-text", current_path: current_path %>
       <%= render "shell/sidebar_link", path: "/management/settings", label: "System Settings", icon: "adjustments", current_path: current_path %>
+      <div class="my-2 mx-3" style="height: 1px; background: var(--border-color);"></div>
+      <div class="px-3 py-1">
+        <span class="text-[9px] font-semibold uppercase tracking-wider" style="color: var(--text-muted);">External Banking</span>
+      </div>
+      <%= render "shell/sidebar_link", path: "/external/banks", label: "Banks", icon: "building-office", current_path: current_path %>
+      <%= render "shell/sidebar_link", path: "/external/accounts", label: "Bank Accounts", icon: "wallet", current_path: current_path %>
     </div>
   <% end %>
 </div>

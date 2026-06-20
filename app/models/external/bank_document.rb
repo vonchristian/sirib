@@ -4,6 +4,7 @@ module External
 
     belongs_to :account, class_name: "External::BankAccount", foreign_key: :external_bank_account_id
 
+    has_many :transactions, class_name: "External::BankTransaction", foreign_key: :external_bank_document_id, dependent: :nullify
     has_one_attached :file
 
     enum :document_type, { statement: "statement", export: "export", passbook_scan: "passbook_scan" }, default: :statement

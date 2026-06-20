@@ -1,17 +1,21 @@
-<% content_for :page_title, "Accounts — #{@bank.name}" %>
+<% content_for :page_title, @bank ? "Accounts — #{@bank.name}" : "External Bank Accounts" %>
 <div class="animate-fade-in">
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-xl font-semibold text-text-primary">Accounts</h1>
-      <p class="text-sm text-text-tertiary mt-0.5"><%= @bank.name %></p>
+      <h1 class="text-xl font-semibold text-text-primary"><%= @bank ? "Accounts" : "External Bank Accounts" %></h1>
+      <p class="text-sm text-text-tertiary mt-0.5"><%= @bank ? @bank.name : "Manage external bank account entry templates" %></p>
     </div>
-    <%= link_to "Add Account", new_external_bank_account_path(@bank), class: "btn-primary" %>
+    <% if @bank %>
+      <%= link_to "Add Account", new_external_bank_account_path(@bank), class: "btn-primary" %>
+    <% end %>
+    <%= link_to "Add Account", @bank ? new_external_bank_account_path(@bank) : new_external_account_path, class: "btn-primary" %>
   </div>
   <% if @accounts.any? %>
     <div class="table-container">
       <table class="table">
         <thead>
           <tr>
+            <% unless @bank %><th>Bank</th><% end %>
             <th>Account Name</th>
             <th>Account Number</th>
             <th>Type</th>
@@ -24,14 +28,15 @@
         <tbody>
           <% @accounts.each do |account| %>
             <tr>
-              <td><%= link_to account.account_name, external_bank_account_path(@bank, account), class: "font-medium text-text-primary hover:text-primary" %></td>
+              <% unless @bank %><td><%= account.bank_name %></td><% end %>
+              <td><%= link_to account.account_name, external_bank_account_path(account.bank, account), class: "font-medium text-text-primary hover:text-primary" %></td>
               <td class="font-mono text-sm"><%= account.account_number_encrypted&.last(4)&.rjust(16, "*") || "****" %></td>
               <td><%= account.account_type.titleize %></td>
               <td><%= account.currency %></td>
               <td class="font-mono"><%= number_to_currency(account.current_balance.to_f, unit: "") %> <%= account.currency %></td>
               <td><span class="badge <%= account.status == 'active' ? 'badge-success' : 'badge-warning' %> capitalize"><%= account.status %></span></td>
               <td class="text-right">
-                <%= link_to "View", external_bank_account_path(@bank, account), class: "btn-ghost text-xs" %>
+                <%= link_to "View", external_bank_account_path(account.bank, account), class: "btn-ghost text-xs" %>
               </td>
             </tr>
           <% end %>
@@ -40,8 +45,10 @@
     </div>
   <% else %>
     <div class="rounded-lg border-2 border-dashed border-border bg-surface-alt px-6 py-16 text-center">
-      <p class="text-sm text-text-tertiary mb-4">No accounts yet for this bank</p>
-      <%= link_to "Add Account", new_external_bank_account_path(@bank), class: "btn-primary" %>
+      <p class="text-sm text-text-tertiary mb-4"><%= @bank ? "No accounts yet for this bank" : "No external bank accounts yet" %></p>
+      <% if @bank %>
+        <%= link_to "Add Account", new_external_bank_account_path(@bank), class: "btn-primary" %>
+      <% end %>
     </div>
   <% end %>
 </div>

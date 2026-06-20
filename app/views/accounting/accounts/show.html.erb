@@ -1,0 +1,123 @@
+<% content_for :page_title, @account.name %>
+<% content_for :page_subtitle, "#{@account.account_code} — #{@account.ledger.name}" %>
+
+<% content_for :head do %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-semibold text-text-primary"><%= @account.name %></h1>
+      <p class="text-sm text-text-tertiary mt-0.5"><%= @account.account_code %> — <%= @account.ledger.name %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+    <div class="card p-4">
+      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Account Type</p>
+      <p class="text-sm font-semibold text-text-primary capitalize"><%= @account.account_type %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Ledger</p>
+      <p class="text-sm font-semibold text-text-primary"><%= @account.ledger.name %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Normal Balance</p>
+      <p class="text-sm font-semibold text-text-primary"><%= @account.normal_credit_balance? ? "Credit" : "Debit" %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Contra Account</p>
+      <p class="text-sm font-semibold text-text-primary"><%= @account.contra? ? "Yes" : "No" %></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div data-controller="tabs">
+      <div class="flex gap-6 border-b border-border px-6" role="tablist">
+        <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="entries" class="pb-3 pt-4 text-sm font-medium border-b-2 border-primary text-primary transition-colors">Entries</button>
+        <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="details" class="pb-3 pt-4 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Details</button>
+      </div>
+
+      <div data-tabs-target="panel" id="tab-entries">
+        <% if @entries.any? %>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Reference</th>
+                <th>Description</th>
+                <th class="text-right">Debit</th>
+                <th class="text-right">Credit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @entries.each do |entry| %>
+                <% entry_lines = entry.amount_lines.select { |l| l.account_id == @account.id } %>
+                <tr class="hover:bg-surface-alt/50 cursor-pointer" data-href="<%= accounting_entry_path(entry) %>" data-action="click->sidebar#navigate">
+                  <td class="whitespace-nowrap"><%= entry.posted_at.strftime("%b %d, %Y") %></td>
+                  <td class="font-mono text-xs"><%= entry.reference_number %></td>
+                  <td class="max-w-xs truncate"><%= entry.description %></td>
+                  <td class="text-right font-mono text-danger">
+                    <% debits = entry_lines.select(&:debit?) %>
+                    <%= debits.any? ? Money.new(debits.sum(&:amount_cents), "PHP").format : "—" %>
+                  </td>
+                  <td class="text-right font-mono text-success">
+                    <% credits = entry_lines.select(&:credit?) %>
+                    <%= credits.any? ? Money.new(credits.sum(&:amount_cents), "PHP").format : "—" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+          <div class="px-6 py-3 border-t border-border">
+            <%= link_to "View all entries →", accounting_entries_path(account_id: @account.id), class: "text-xs text-primary hover:text-primary/80 transition-colors" %>
+          </div>
+        <% else %>
+          <div class="p-8 text-center">
+            <p class="text-sm text-text-tertiary">No entries for this account</p>
+          </div>
+        <% end %>
+      </div>
+
+      <div data-tabs-target="panel" id="tab-details" class="hidden">
+        <div class="p-6">
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Account Code</dt>
+              <dd class="mt-1 text-sm font-mono text-text-primary"><%= @account.account_code %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Account Name</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @account.name %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Account Type</dt>
+              <dd class="mt-1 text-sm capitalize text-text-primary"><%= @account.account_type %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Ledger</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @account.ledger.name %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Normal Balance</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @account.normal_credit_balance? ? "Credit" : "Debit" %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Contra Account</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @account.contra? ? "Yes" : "No" %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Created</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @account.created_at.strftime("%b %d, %Y") %></dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Updated</dt>
+              <dd class="mt-1 text-sm text-text-primary"><%= @account.updated_at.strftime("%b %d, %Y") %></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

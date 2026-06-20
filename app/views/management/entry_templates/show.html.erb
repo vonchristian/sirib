@@ -1,0 +1,74 @@
+<% content_for :page_title, @template.name %>
+<% content_for :page_subtitle, "Journal Entry Template" %>
+
+<div class="flex items-center justify-end gap-2 mb-6">
+  <%= link_to "Edit", edit_management_entry_template_path(@template), class: "rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors" %>
+  <%= link_to "Back", management_entry_templates_path, class: "rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors" %>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 space-y-6">
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-800 p-6">
+      <h2 class="text-sm font-semibold text-text-primary mb-1"><%= @template.name %></h2>
+      <p class="text-xs text-text-tertiary mb-4"><%= @template.description.presence || "No description" %></p>
+
+      <div class="flex items-center gap-4 text-xs text-text-tertiary mb-4">
+        <span>Status: <span class="<%= @template.is_active? ? 'text-positive' : 'text-text-secondary' %>"><%= @template.is_active? ? "Active" : "Inactive" %></span></span>
+        <span>Mirrors entry: <span class="text-text-primary"><%= @template.entry ? "##{@template.entry.id}" : "None" %></span></span>
+      </div>
+
+      <h3 class="text-xs font-semibold text-text-primary uppercase tracking-wider mb-3">Template Lines</h3>
+      <div class="overflow-hidden rounded-lg border border-border">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-surface-alt text-left text-xs text-text-tertiary uppercase tracking-wider">
+              <th class="px-4 py-2 font-medium">#</th>
+              <th class="px-4 py-2 font-medium">Account</th>
+              <th class="px-4 py-2 font-medium">Direction</th>
+              <th class="px-4 py-2 font-medium">Mode</th>
+              <th class="px-4 py-2 font-medium text-right">Fixed Amount</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border">
+            <% @lines.each do |line| %>
+              <tr class="hover:bg-surface-alt transition-colors">
+                <td class="px-4 py-2 text-text-tertiary"><%= line.sequence_index %></td>
+                <td class="px-4 py-2 text-text-primary"><%= line.account.name %></td>
+                <td class="px-4 py-2">
+                  <span class="<%= line.debit? ? 'text-danger' : 'text-success' %>"><%= line.direction.titleize %></span>
+                </td>
+                <td class="px-4 py-2">
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs <%= line.variable? ? 'bg-accent-dim text-primary' : 'bg-surface-alt text-text-secondary' %>">
+                    <%= line.amount_mode.titleize %>
+                  </span>
+                </td>
+                <td class="px-4 py-2 text-right font-mono text-text-primary"><%= line.fixed? ? number_to_currency(line.fixed_amount, unit: "") : "—" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-border bg-surface dark:border-gray-800 p-6">
+      <h3 class="text-sm font-semibold text-text-primary mb-3">Execute Template</h3>
+      <p class="text-xs text-text-tertiary mb-4">Enter an amount to preview and post this template.</p>
+
+      <%= form_tag preview_management_entry_template_path(@template), method: :post, class: "space-y-3", data: { turbo_frame: "preview" } do %>
+        <div class="flex items-end gap-3">
+          <div>
+            <%= label_tag :amount, "Amount", class: "block text-xs font-medium text-text-secondary mb-1" %>
+            <%= number_field_tag :amount, nil, step: 0.01, min: 0.01, required: true, class: "w-48 rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+          </div>
+          <div><%= submit_tag "Preview", class: "rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %></div>
+        </div>
+      <% end %>
+
+      <%= turbo_frame_tag "preview" do %>
+        <div class="mt-4 p-4 rounded-lg bg-surface-alt text-center text-xs text-text-tertiary">
+          Enter an amount and click Preview to see the generated entry.
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

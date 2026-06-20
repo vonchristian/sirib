@@ -17,6 +17,8 @@ module External
 
     scope :active, -> { where(status: :active) }
 
+    after_create :create_tracking_accounts, :create_interest_earned_template
+
     delegate :name, to: :bank, prefix: true
 
     def current_balance_money
@@ -63,11 +65,24 @@ module External
 
     private
 
+    def create_interest_earned_template
+      return unless cash_on_hand_account_id && interest_income_account_id
+
+      Accounting::EntryTemplate.create!(
+        name: "Interest Earned — #{account_name}",
+        lines_attributes: {
+          "0" => { account_id: cash_on_hand_account_id, direction: "debit", amount_mode: "variable", sequence_index: 1 },
+          "1" => { account_id: interest_income_account_id, direction: "credit", amount_mode: "variable", sequence_index: 2 }
+        }
+      )
+    end
+
     def account_number_display
       return "N/A" if account_number_encrypted.blank?
 
-      masked = account_number_encrypted.gsub(/[a-z0-9]/i, "*")
-      masked.last(4).rjust(16, "*")
+      raw = account_number_encrypted.to_s
+      last4 = raw.last(4)
+      "*" * [raw.length - 4, 0].max + last4
     end
   end
 end

@@ -1,10 +1,23 @@
 <div class="card p-6 sm:p-8">
-  <%= form_with model: @account, url: @account.persisted? ? external_bank_account_path(@bank, @account) : external_bank_accounts_path(@bank), class: "space-y-6" do |f| %>
+  <% url = if @account.persisted?
+    external_bank_account_path(@bank, @account)
+  elsif @bank
+    external_bank_accounts_path(@bank)
+  else
+    external_accounts_path
+  end %>
+  <%= form_with model: @account, url: url, class: "space-y-6" do |f| %>
     <% if @account.errors.any? %>
       <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger">
         <ul class="list-inside list-disc">
           <% @account.errors.each do |error| %><li><%= error.full_message %></li><% end %>
         </ul>
+      </div>
+    <% end %>
+    <% unless @bank %>
+      <div>
+        <%= f.label :external_bank_id, "Bank", class: "input-label" %>
+        <%= f.collection_select :external_bank_id, @banks, :id, :name, { include_blank: "Select bank" }, required: true, class: "input" %>
       </div>
     <% end %>
     <div><%= f.label :account_name, class: "input-label" %><%= f.text_field :account_name, required: true, class: "input" %></div>
@@ -13,7 +26,7 @@
     <div><%= f.label :currency, class: "input-label" %><%= f.text_field :currency, value: @account.currency.presence || "PHP", class: "input w-24" %></div>
     <div><%= f.label :status, class: "input-label" %><%= f.select :status, options_for_select([["Active", "active"], ["Inactive", "inactive"]], @account.status), {}, class: "input" %></div>
     <div class="flex items-center justify-between pt-4 border-t border-border">
-      <%= link_to "Cancel", @account.persisted? ? external_bank_account_path(@bank, @account) : external_bank_accounts_path(@bank), class: "btn-ghost text-xs" %>
+      <%= link_to "Cancel", @account.persisted? ? external_bank_account_path(@bank, @account) : (@bank ? external_bank_accounts_path(@bank) : external_accounts_path), class: "btn-ghost text-xs" %>
       <%= f.submit @account.persisted? ? "Update Account" : "Create Account", class: "btn-primary text-xs" %>
     </div>
   <% end %>

@@ -4,6 +4,10 @@ module Accounting
 
     def index
       entries = Accounting::Entry.order(posted_at: :desc, id: :desc)
+      if params[:account_id].present?
+        @account = Accounting::Account.find(params[:account_id])
+        entries = entries.joins(:amount_lines).where(amount_lines: { account_id: @account.id })
+      end
       entries = entries.search(params[:q]) if params[:q].present?
       entries = entries.up_to(params[:to_date].to_date) if params[:to_date].present?
       entries = entries.from_date(params[:from_date].to_date) if params[:from_date].present?

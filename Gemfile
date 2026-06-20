@@ -84,4 +84,5 @@ group :test do
 end
 
 gem "csv"
+gem "pdf-reader", "~> 2.0"
 gem "grover", ">= 1.1"

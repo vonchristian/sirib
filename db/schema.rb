@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_21_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_21_000005) do
   create_schema "tenant_asenso_cooperative"
   create_schema "tenant_bagong_bukas"
   create_schema "tenant_kasaganaan_cooperative"
@@ -130,6 +130,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_21_000000) do
     t.datetime "posted_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "total_amount_cents", precision: 20, scale: 4
     t.index ["posted_at"], name: "index_entries_on_posted_at"
     t.index ["reference_number"], name: "index_entries_on_reference_number", unique: true
   end
@@ -281,6 +282,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_21_000000) do
     t.bigint "interest_income_ledger_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "cash_on_hand_account_id"
+    t.index ["cash_on_hand_account_id"], name: "index_external_banks_on_cash_on_hand_account_id"
     t.index ["code"], name: "index_external_banks_on_code"
     t.index ["name"], name: "index_external_banks_on_name"
     t.index ["status"], name: "index_external_banks_on_status"

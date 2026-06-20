@@ -1,6 +1,15 @@
 module Accounting
   class AccountsController < ApplicationController
-    layout false
+    layout "shell"
+
+    def show
+      @account = Accounting::Account.includes(:ledger).find(params[:id])
+      @entries = Accounting::Entry.joins(:amount_lines)
+        .where(amount_lines: { account_id: @account.id })
+        .includes(amount_lines: :account)
+        .order(posted_at: :desc, id: :desc)
+        .limit(50)
+    end
 
     def search
       query = params[:q]
