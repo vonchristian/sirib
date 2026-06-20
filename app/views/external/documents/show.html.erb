@@ -1,0 +1,35 @@
+<% content_for :page_title, @document.file.filename.to_s %>
+<% content_for :breadcrumbs do %>
+  <nav class="flex items-center gap-2 text-sm mb-4">
+    <%= link_to "Documents", external_bank_account_documents_path(@bank, @account), class: "text-text-tertiary hover:text-text-primary" %>
+    <span class="text-text-tertiary">/</span>
+    <span class="text-text-primary"><%= @document.file.filename %></span>
+  </nav>
+<% end %>
+<div class="animate-fade-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-semibold text-text-primary"><%= @document.file.filename %></h1>
+      <p class="text-sm text-text-tertiary mt-0.5">Uploaded <%= time_ago_in_words(@document.created_at) %> ago</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+    <div class="card p-4"><p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Account</p><p class="text-sm font-semibold text-text-primary"><%= @account.account_name %></p></div>
+    <div class="card p-4"><p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Type</p><span class="badge capitalize"><%= @document.document_type %></span></div>
+    <div class="card p-4"><p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Period</p><p class="text-sm font-semibold text-text-primary"><%= @document.period %></p></div>
+    <div class="card p-4">
+      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Status</p>
+      <% sc = case @document.processing_status; when "parsed" then "badge-success"; when "failed" then "badge-danger"; when "processing" then "badge-warning"; else "badge-secondary"; end %>
+      <span class="badge <%= sc %> capitalize"><%= @document.processing_status %></span>
+      <% if @document.error_message.present? %><p class="text-xs text-danger mt-1"><%= @document.error_message %></p><% end %>
+    </div>
+  </div>
+  <% if @document.file.attached? %>
+    <div class="card p-4 mb-6">
+      <div class="flex items-center justify-between">
+        <div><p class="text-sm font-medium text-text-primary"><%= @document.file.filename %></p><p class="text-xs text-text-tertiary"><%= number_to_human_size(@document.file.byte_size) %></p></div>
+        <%= link_to "Download", rails_blob_path(@document.file, disposition: "attachment"), class: "btn-primary text-xs" %>
+      </div>
+    </div>
+  <% end %>
+</div>

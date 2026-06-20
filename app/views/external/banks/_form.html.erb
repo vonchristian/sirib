@@ -1,0 +1,19 @@
+<div class="card p-6 sm:p-8">
+  <%= form_with model: @bank, class: "space-y-6" do |f| %>
+    <% if @bank.errors.any? %>
+      <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger">
+        <ul class="list-inside list-disc">
+          <% @bank.errors.each do |error| %><li><%= error.full_message %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div><%= f.label :name, class: "input-label" %><%= f.text_field :name, required: true, placeholder: "e.g. Bank of the Philippines", class: "input" %></div>
+    <div><%= f.label :code, class: "input-label" %><%= f.text_field :code, placeholder: "e.g. BOP", class: "input" %></div>
+    <div><%= f.label :country, class: "input-label" %><%= f.text_field :country, required: true, class: "input" %></div>
+    <div><%= f.label :status, class: "input-label" %><%= f.select :status, options_for_select([["Active", "active"], ["Inactive", "inactive"]], @bank.status), {}, class: "input" %></div>
+    <div class="flex items-center justify-between pt-4 border-t border-border">
+      <%= link_to "Cancel", @bank.persisted? ? external_bank_path(@bank) : external_banks_path, class: "btn-ghost text-xs" %>
+      <%= f.submit @bank.persisted? ? "Update Bank" : "Create Bank", class: "btn-primary text-xs" %>
+    </div>
+  <% end %>
+</div>

@@ -6,7 +6,7 @@ module Accounting
     pg_search_scope :search, against: [:description, :reference_number],
       using: { tsearch: { prefix: true, dictionary: "english" }, trigram: { threshold: 0.3 } }
 
-    has_many :amount_lines, dependent: :restrict_with_error
+    has_many :amount_lines, dependent: :restrict_with_error, autosave: true
     has_many :accounts, through: :amount_lines
 
     validates :reference_number, presence: true, uniqueness: true

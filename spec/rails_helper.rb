@@ -29,7 +29,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each, type: :request) do
-    host! "main.sirib.test"
+    host! "main.lvh.me"
   end
 
   config.before(:each) do

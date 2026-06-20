@@ -148,6 +148,19 @@ Rails.application.routes.draw do
       get "searches/loan_products", to: "searches#loan_products"
     end
 
+    namespace :external do
+      resources :banks do
+        resources :accounts do
+          resources :documents, only: [:index, :show, :new, :create, :destroy]
+          resource :reconciliation, only: [:show], controller: "reconciliation" do
+            post :allocate
+            post :confirm_allocation
+            post :reject_allocation
+          end
+        end
+      end
+    end
+
     namespace :equity, path: :equity do
       resources :products
       resources :accounts, only: [:index, :new, :create, :show] do

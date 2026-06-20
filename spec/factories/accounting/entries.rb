@@ -6,11 +6,10 @@ FactoryBot.define do
     reference_number { generate(:entry_reference_number) }
     posted_at { Time.zone.now }
 
-    # Use after_create instead to properly build the associated records
-    after(:create) do |entry|
-      account = create(:accounting_account)
-      create(:accounting_amount_line, entry:, account:, amount_type: "debit", amount_cents: 1000, amount_currency: "PHP")
-      create(:accounting_amount_line, entry:, account:, amount_type: "credit", amount_cents: 1000, amount_currency: "PHP")
+    after(:build) do |entry|
+      account = build(:accounting_account)
+      entry.amount_lines << build(:accounting_amount_line, entry: entry, account: account, amount_type: "debit", amount_cents: 1000, amount_currency: "PHP")
+      entry.amount_lines << build(:accounting_amount_line, entry: entry, account: account, amount_type: "credit", amount_cents: 1000, amount_currency: "PHP")
     end
   end
 end

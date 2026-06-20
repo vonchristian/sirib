@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_20_140000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_21_000000) do
   create_schema "tenant_asenso_cooperative"
   create_schema "tenant_bagong_bukas"
   create_schema "tenant_kasaganaan_cooperative"
@@ -196,6 +196,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_140000) do
     t.index ["entry_id"], name: "index_equity_transactions_on_entry_id"
     t.index ["reference_number"], name: "index_equity_transactions_on_reference_number", unique: true
     t.index ["share_capital_account_id"], name: "index_equity_transactions_on_share_capital_account_id"
+  end
+
+  create_table "external_bank_accounts", force: :cascade do |t|
+    t.bigint "external_bank_id", null: false
+    t.string "account_name", null: false
+    t.text "account_number_encrypted"
+    t.string "account_type", null: false
+    t.string "currency", default: "PHP", null: false
+    t.decimal "current_balance", precision: 20, scale: 4, default: "0.0"
+    t.decimal "current_balance_cents", precision: 20, scale: 4, default: "0.0"
+    t.string "current_balance_currency", limit: 3, default: "PHP", null: false
+    t.datetime "last_synced_at"
+    t.string "status", default: "active", null: false
+    t.bigint "cash_on_hand_account_id"
+    t.bigint "interest_income_account_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_bank_id"], name: "index_external_bank_accounts_on_external_bank_id"
+    t.index ["status"], name: "index_external_bank_accounts_on_status"
+  end
+
+  create_table "external_bank_documents", force: :cascade do |t|
+    t.bigint "external_bank_account_id", null: false
+    t.string "document_type", default: "statement", null: false
+    t.date "period_start"
+    t.date "period_end"
+    t.string "processing_status", default: "pending", null: false
+    t.jsonb "metadata", default: {}
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_bank_account_id"], name: "index_external_bank_documents_on_external_bank_account_id"
+    t.index ["processing_status"], name: "index_external_bank_documents_on_processing_status"
+  end
+
+  create_table "external_bank_transaction_allocations", force: :cascade do |t|
+    t.bigint "external_bank_transaction_id", null: false
+    t.bigint "journal_entry_id"
+    t.decimal "allocated_amount", precision: 20, scale: 4, null: false
+    t.decimal "allocated_amount_cents", precision: 20, scale: 4, null: false
+    t.string "allocated_amount_currency", limit: 3, default: "PHP", null: false
+    t.string "status", default: "suggested", null: false
+    t.decimal "confidence_score", precision: 5, scale: 4
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_external_bank_transaction_allocations_on_created_by_id"
+    t.index ["external_bank_transaction_id"], name: "idx_on_external_bank_transaction_id_be9fd773f0"
+    t.index ["journal_entry_id"], name: "idx_on_journal_entry_id_313b3a4665"
+    t.index ["status"], name: "index_external_bank_transaction_allocations_on_status"
+  end
+
+  create_table "external_bank_transactions", force: :cascade do |t|
+    t.bigint "external_bank_account_id", null: false
+    t.bigint "external_bank_document_id"
+    t.date "transaction_date", null: false
+    t.text "description", null: false
+    t.string "reference_number"
+    t.decimal "amount", precision: 20, scale: 4, null: false
+    t.decimal "amount_cents", precision: 20, scale: 4, null: false
+    t.string "amount_currency", limit: 3, default: "PHP", null: false
+    t.string "direction", null: false
+    t.decimal "running_balance", precision: 20, scale: 4
+    t.decimal "running_balance_cents", precision: 20, scale: 4
+    t.string "running_balance_currency", limit: 3, default: "PHP"
+    t.string "hash_signature", null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_bank_account_id", "transaction_date"], name: "idx_ext_bank_tx_on_account_date"
+    t.index ["external_bank_account_id"], name: "index_external_bank_transactions_on_external_bank_account_id"
+    t.index ["external_bank_document_id"], name: "index_external_bank_transactions_on_external_bank_document_id"
+    t.index ["hash_signature"], name: "index_external_bank_transactions_on_hash_signature", unique: true
+    t.index ["transaction_date"], name: "index_external_bank_transactions_on_transaction_date"
+  end
+
+  create_table "external_banks", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "code"
+    t.string "country", default: "Philippines", null: false
+    t.string "status", default: "active", null: false
+    t.bigint "cash_on_hand_ledger_id"
+    t.bigint "interest_income_ledger_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_external_banks_on_code"
+    t.index ["name"], name: "index_external_banks_on_name"
+    t.index ["status"], name: "index_external_banks_on_status"
   end
 
   create_table "ledgers", force: :cascade do |t|
@@ -1057,6 +1145,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_140000) do
   add_foreign_key "equity_transactions", "accounts", column: "cash_account_id"
   add_foreign_key "equity_transactions", "entries"
   add_foreign_key "equity_transactions", "equity_accounts", column: "share_capital_account_id"
+  add_foreign_key "external_bank_accounts", "external_banks"
+  add_foreign_key "external_bank_documents", "external_bank_accounts"
+  add_foreign_key "external_bank_transaction_allocations", "entries", column: "journal_entry_id"
+  add_foreign_key "external_bank_transaction_allocations", "external_bank_transactions"
+  add_foreign_key "external_bank_transaction_allocations", "users", column: "created_by_id"
+  add_foreign_key "external_bank_transactions", "external_bank_accounts"
+  add_foreign_key "external_bank_transactions", "external_bank_documents"
   add_foreign_key "loan_applications", "cooperatives"
   add_foreign_key "loan_applications", "loan_products"
   add_foreign_key "loan_applications", "members"

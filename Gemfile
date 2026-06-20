@@ -83,4 +83,5 @@ group :test do
   gem "simplecov", require: false
 end
 
+gem "csv"
 gem "grover", ">= 1.1"

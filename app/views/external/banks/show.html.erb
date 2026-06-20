@@ -1,0 +1,70 @@
+<% content_for :page_title, @bank.name %>
+<% content_for :breadcrumbs do %>
+  <nav class="flex items-center gap-2 text-sm mb-4">
+    <%= link_to "Banks", external_banks_path, class: "text-text-tertiary hover:text-text-primary" %>
+    <span class="text-text-tertiary">/</span>
+    <span class="text-text-primary"><%= @bank.name %></span>
+  </nav>
+<% end %>
+<div class="animate-fade-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-semibold text-text-primary"><%= @bank.name %></h1>
+      <p class="text-sm text-text-tertiary mt-0.5"><%= @bank.country %></p>
+    </div>
+    <div class="flex items-center gap-2">
+      <%= link_to "Edit", edit_external_bank_path(@bank), class: "btn-ghost" %>
+      <%= link_to "Add Account", new_external_bank_account_path(@bank), class: "btn-primary" %>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="card p-4">
+      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Status</p>
+      <span class="badge <%= @bank.status == 'active' ? 'badge-success' : 'badge-warning' %> capitalize"><%= @bank.status %></span>
+    </div>
+    <div class="card p-4">
+      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Accounts</p>
+      <p class="text-lg font-semibold text-text-primary"><%= @bank.accounts.count %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Country</p>
+      <p class="text-lg font-semibold text-text-primary"><%= @bank.country %></p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="p-4 border-b border-border"><h2 class="text-sm font-semibold text-text-primary">Accounts</h2></div>
+    <% if @accounts.any? %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Account Name</th>
+            <th>Account Number</th>
+            <th>Currency</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @accounts.each do |account| %>
+            <tr>
+              <td><%= link_to account.account_name, external_bank_account_path(@bank, account), class: "font-medium text-text-primary hover:text-primary" %></td>
+              <td class="font-mono text-sm"><%= account.account_number_encrypted&.last(4)&.rjust(16, "*") || "****" %></td>
+              <td><%= account.currency %></td>
+              <td class="font-mono"><%= number_to_currency(account.current_balance.to_f, unit: "") %> <%= account.currency %></td>
+              <td><span class="badge <%= account.status == 'active' ? 'badge-success' : 'badge-warning' %> capitalize"><%= account.status %></span></td>
+              <td class="text-right">
+                <%= link_to "Reconcile", external_bank_account_reconciliation_path(@bank, account), class: "btn-ghost text-xs" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="p-8 text-center">
+        <p class="text-sm text-text-tertiary mb-3">No accounts yet</p>
+        <%= link_to "Add Account", new_external_bank_account_path(@bank), class: "btn-primary text-xs" %>
+      </div>
+    <% end %>
+  </div>
+</div>

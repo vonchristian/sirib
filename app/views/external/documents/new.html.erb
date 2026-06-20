@@ -1,0 +1,29 @@
+<% content_for :page_title, "Upload Statement" %>
+<% content_for :breadcrumbs do %>
+  <nav class="flex items-center gap-2 text-sm mb-4">
+    <%= link_to "Documents", external_bank_account_documents_path(@bank, @account), class: "text-text-tertiary hover:text-text-primary" %>
+    <span class="text-text-tertiary">/</span>
+    <span class="text-text-primary">Upload</span>
+  </nav>
+<% end %>
+<div class="card p-6 sm:p-8">
+  <%= form_with model: @document, url: external_bank_account_documents_path(@bank, @account), class: "space-y-6" do |f| %>
+    <% if @document.errors.any? %>
+      <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger">
+        <ul class="list-inside list-disc">
+          <% @document.errors.each do |error| %><li><%= error.full_message %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div><%= f.label :file, "Statement File", class: "input-label" %><%= f.file_field :file, required: true, accept: ".csv,.pdf,.png,.jpg,.jpeg", class: "input" %><p class="text-xs text-text-tertiary mt-1">CSV preferred for best results</p></div>
+    <div><%= f.label :document_type, class: "input-label" %><%= f.select :document_type, options_for_select([["Statement", "statement"], ["Export", "export"], ["Passbook Scan", "passbook_scan"]], @document.document_type), {}, class: "input" %></div>
+    <div class="grid grid-cols-2 gap-4">
+      <div><%= f.label :period_start, class: "input-label" %><%= f.date_field :period_start, required: true, class: "input" %></div>
+      <div><%= f.label :period_end, class: "input-label" %><%= f.date_field :period_end, required: true, class: "input" %></div>
+    </div>
+    <div class="flex items-center justify-between pt-4 border-t border-border">
+      <%= link_to "Cancel", external_bank_account_documents_path(@bank, @account), class: "btn-ghost text-xs" %>
+      <%= f.submit "Upload & Process", class: "btn-primary text-xs" %>
+    </div>
+  <% end %>
+</div>
