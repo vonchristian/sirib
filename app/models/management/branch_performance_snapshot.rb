@@ -1,6 +1,7 @@
 module Management
   class BranchPerformanceSnapshot < ApplicationRecord
     self.table_name = "management_branch_performance_snapshots"
+    include CooperativeScoped
 
     belongs_to :branch, class_name: "Management::Branch"
 

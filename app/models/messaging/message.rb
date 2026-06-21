@@ -1,6 +1,7 @@
 module Messaging
   class Message < ApplicationRecord
     self.table_name = "messaging_messages"
+    include CooperativeScoped
 
     has_many :deliveries, class_name: "Messaging::MessageDelivery", dependent: :destroy
 

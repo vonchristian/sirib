@@ -1,16 +1,18 @@
 module Accounting
   class Ledger < ApplicationRecord
     self.table_name = "ledgers"
+    include CooperativeScoped
 
     has_ancestry
 
     has_many :accounts, dependent: :restrict_with_error
     has_many :running_balances, dependent: :restrict_with_error
 
-    enum :account_type, Accounting::ACCOUNT_TYPES
+    attribute :account_type, :string
+    enum :account_type, { asset: "asset", equity: "equity", liability: "liability", revenue: "revenue", expense: "expense" }
 
     validates :name, presence: true
-    validates :account_code, presence: true, uniqueness: true
+    validates :account_code, presence: true, uniqueness: { scope: :cooperative_id }
     validates :account_type, presence: true
 
     def balance(to_date: Date.current)

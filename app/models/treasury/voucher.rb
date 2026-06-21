@@ -1,6 +1,7 @@
 module Treasury
   class Voucher < ApplicationRecord
     self.table_name = "treasury_vouchers"
+    include CooperativeScoped
 
     belongs_to :cash_session, class_name: "Treasury::CashSession"
     belongs_to :cash_account, class_name: "Accounting::Account"
@@ -8,7 +9,7 @@ module Treasury
     belongs_to :counterparty, polymorphic: true, optional: true
     belongs_to :transactable, polymorphic: true, optional: true
 
-    validates :voucher_number, presence: true, uniqueness: true
+    validates :voucher_number, presence: true, uniqueness: { scope: :cooperative_id }
     validates :amount_cents, presence: true, numericality: { greater_than: 0 }
     validates :category, presence: true
     validates :status, inclusion: { in: %w[pending posted cancelled] }

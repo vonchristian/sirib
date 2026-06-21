@@ -1,6 +1,7 @@
 module Management
   class Policy < ApplicationRecord
     self.table_name = "management_policies"
+    include CooperativeScoped
 
     belongs_to :created_by, class_name: "User", optional: true
     belongs_to :approved_by, class_name: "User", optional: true
@@ -9,7 +10,7 @@ module Management
     has_many :rules, class_name: "Management::PolicyRule", dependent: :destroy
 
     validates :name, :code, :category, presence: true
-    validates :code, uniqueness: true
+    validates :code, uniqueness: { scope: :cooperative_id }
 
     enum :status, { draft: "draft", active: "active", inactive: "inactive" }
 

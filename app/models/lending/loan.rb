@@ -1,6 +1,7 @@
 module Lending
   class Loan < ApplicationRecord
     self.table_name = "loans"
+    include CooperativeScoped
 
     belongs_to :loan_application
     belongs_to :member, class_name: "Membership::Member"
@@ -13,7 +14,7 @@ module Lending
     validates :term_months, numericality: { greater_than: 0 }
     validates :outstanding_principal_cents, numericality: { greater_than_or_equal_to: 0 }
     validates :status, inclusion: { in: %w[active paid defaulted written_off] }
-    validates :reference_number, uniqueness: true
+    validates :reference_number, uniqueness: { scope: :cooperative_id }
 
     before_validation :assign_reference_number, on: :create
 

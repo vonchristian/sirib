@@ -1,6 +1,7 @@
 module Management
   class Department < ApplicationRecord
     self.table_name = "management_departments"
+    include CooperativeScoped
 
     belongs_to :branch, class_name: "Management::Branch"
     has_many :teams, class_name: "Management::Team", dependent: :destroy

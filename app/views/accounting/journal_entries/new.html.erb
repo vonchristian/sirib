@@ -1,0 +1,31 @@
+<% content_for :page_title, "New Journal Entry" %>
+<% content_for :page_subtitle, "Post a template-driven journal entry" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="rounded-lg border border-border bg-surface p-6">
+    <h3 class="text-sm font-semibold text-text-primary mb-4">Select Template</h3>
+
+    <%= form_tag preview_accounting_journal_entries_path, method: :post, class: "space-y-4", data: { turbo_frame: "preview" } do %>
+      <div>
+        <%= label_tag :template_id, "Entry Template", class: "block text-xs font-medium text-text-secondary mb-1" %>
+        <%= select_tag :template_id, options_from_collection_for_select(@templates, :id, :name, params[:template_id]),
+             prompt: "Select a template...",
+             class: "w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+      </div>
+
+      <div>
+        <%= label_tag :amount, "Amount", class: "block text-xs font-medium text-text-secondary mb-1" %>
+        <%= number_field_tag :amount, params[:amount], step: 0.01, min: 0.01, required: true,
+             class: "w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %>
+      </div>
+
+      <%= submit_tag "Preview", class: "rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %>
+    <% end %>
+
+    <%= turbo_frame_tag "preview" do %>
+      <div class="mt-4 p-4 rounded-lg bg-surface-alt text-center text-xs text-text-tertiary">
+        Select a template, enter an amount, and click Preview.
+      </div>
+    <% end %>
+  </div>
+</div>

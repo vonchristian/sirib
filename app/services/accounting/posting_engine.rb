@@ -1,0 +1,44 @@
+module Accounting
+  class PostingEngine
+    attr_reader :template, :input, :actor, :entry
+
+    def initialize(template:, input: {}, actor: nil)
+      @template = template
+      @input = input.with_indifferent_access
+      @actor = actor
+      @entry = nil
+    end
+
+    def preview
+      TemplateResolver.new(@template, @input).resolve_lines
+    end
+
+    def post!
+      Accounting::Entry.transaction do
+        build_entry
+        @entry.save!
+        Accounting::UpdateRunningBalancesJob.perform_later(@entry)
+        @template.update!(entry: @entry)
+        @entry
+      end
+    end
+
+    private
+
+    def build_entry
+      resolver = TemplateResolver.new(@template, @input)
+
+      @entry = Accounting::Entry.build(
+        description: build_description,
+        posted_at: Time.current,
+        debits: resolver.resolve_debits.map { |l| { account: l[:account], amount: l[:amount_cents] } },
+        credits: resolver.resolve_credits.map { |l| { account: l[:account], amount: l[:amount_cents] } }
+      )
+      @entry.total_amount_cents = @entry.amount_lines.sum(&:amount_cents)
+    end
+
+    def build_description
+      "#{@template.name} — #{Time.current.strftime("%b %d, %Y %H:%M")}"
+    end
+  end
+end

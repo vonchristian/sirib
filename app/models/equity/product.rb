@@ -1,13 +1,14 @@
 module Equity
   class Product < ApplicationRecord
     self.table_name = "equity_products"
+    include CooperativeScoped
 
     SHARE_TYPES = { common: 0, preferred: 1, other: 2 }.freeze
 
     has_many :share_capital_accounts, class_name: "Equity::Account", foreign_key: :share_product_id, dependent: :restrict_with_error
     belongs_to :equity_ledger, class_name: "Accounting::Ledger", optional: true
 
-    validates :product_code, presence: true, uniqueness: true
+    validates :product_code, presence: true, uniqueness: { scope: :cooperative_id }
     validates :name, presence: true
     validates :status, inclusion: { in: %w[active inactive] }
     validates :price_per_share_cents, numericality: { greater_than: 0 }
@@ -45,12 +46,13 @@ module Equity
       self.equity_ledger = Accounting::Ledger.create!(
         name: "#{name} - Share Capital",
         account_type: :equity,
-        account_code: next_code_for_type(:equity)
+        account_code: next_code_for_type(:equity),
+        cooperative: cooperative
       )
     end
 
     def next_code_for_type(account_type)
-      max = Accounting::Ledger.where(account_type: account_type).maximum(:account_code)
+      max = Accounting::Ledger.where(account_type: account_type, cooperative: cooperative).maximum(:account_code)
       if max
         format("%05d", max.to_i + 1)
       else

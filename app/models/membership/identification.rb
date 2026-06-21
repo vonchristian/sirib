@@ -1,6 +1,7 @@
 module Membership
   class Identification < ApplicationRecord
     self.table_name = "member_identifications"
+    include CooperativeScoped
 
     ID_TYPES = %w[
       BIR National_ID Passport Drivers_License

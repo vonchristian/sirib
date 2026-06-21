@@ -1,5 +1,5 @@
 class ApplicationJob < ActiveJob::Base
-  include TenantJob
+  include CooperativeJob
 
   # Automatically retry jobs that encountered a deadlock
   # retry_on ActiveRecord::Deadlocked

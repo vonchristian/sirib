@@ -1,6 +1,7 @@
 module External
   class BankTransaction < ApplicationRecord
     self.table_name = "external_bank_transactions"
+    include CooperativeScoped
 
     belongs_to :account, class_name: "External::BankAccount", foreign_key: :external_bank_account_id
     belongs_to :document, class_name: "External::BankDocument", foreign_key: :external_bank_document_id, optional: true

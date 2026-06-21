@@ -1,6 +1,7 @@
 module Management
   class AlertSubscription < ApplicationRecord
     self.table_name = "management_alert_subscriptions"
+    include CooperativeScoped
 
     belongs_to :user
 

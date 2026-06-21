@@ -1,6 +1,7 @@
 module Treasury
   class TimeDepositProduct < ApplicationRecord
     self.table_name = "treasury_time_deposit_products"
+    include CooperativeScoped
 
     monetize :minimum_deposit_cents
 

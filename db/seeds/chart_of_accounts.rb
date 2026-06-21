@@ -319,7 +319,7 @@ ledger_cache = {}
 
 LEDGERS.each do |code_prefix, attrs|
   account_code = attrs[:code] || "#{code_prefix}00"
-  ledger = Accounting::Ledger.find_or_create_by!(account_code: account_code) do |l|
+  ledger = Accounting::Ledger.find_or_create_by!(account_code: account_code, cooperative: @coop) do |l|
     l.name = attrs[:name]
     l.account_type = attrs[:type]
   end
@@ -339,7 +339,7 @@ ACCOUNTS.each do |attrs|
   acct_type = account_type_for(attrs[:code])
   is_contra = contra?(attrs[:name])
 
-  Accounting::Account.find_or_create_by!(account_code: attrs[:code]) do |a|
+  Accounting::Account.find_or_create_by!(account_code: attrs[:code], cooperative: @coop) do |a|
     a.name = attrs[:name]
     a.ledger = ledger
     a.account_type = acct_type
@@ -347,5 +347,5 @@ ACCOUNTS.each do |attrs|
   end
 end
 
-puts "  → #{LEDGERS.size} ledgers created"
-puts "  → #{ACCOUNTS.size} accounts created"
+puts "  → #{LEDGERS.size} ledgers created for #{@coop.name}"
+puts "  → #{ACCOUNTS.size} accounts created for #{@coop.name}"

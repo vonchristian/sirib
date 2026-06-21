@@ -1,6 +1,7 @@
 module Messaging
   class MessageDelivery < ApplicationRecord
     self.table_name = "messaging_message_deliveries"
+    include CooperativeScoped
 
     belongs_to :message, class_name: "Messaging::Message"
     belongs_to :channel, class_name: "Messaging::Channel"

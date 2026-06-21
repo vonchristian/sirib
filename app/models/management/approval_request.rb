@@ -1,6 +1,7 @@
 module Management
   class ApprovalRequest < ApplicationRecord
     self.table_name = "management_approval_requests"
+    include CooperativeScoped
 
     belongs_to :requestable, polymorphic: true
     belongs_to :workflow, class_name: "Management::ApprovalWorkflow"

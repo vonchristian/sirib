@@ -1,4 +1,6 @@
 class Portal::EnrollmentToken < ApplicationRecord
+  include CooperativeScoped
+
   TOKEN_LIFETIME = 48.hours
 
   belongs_to :member, class_name: "Membership::Member"

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Member do
+RSpec.describe Membership::Member do
   describe "validations" do
     it { is_expected.to validate_presence_of(:first_name) }
     it { is_expected.to validate_presence_of(:last_name) }

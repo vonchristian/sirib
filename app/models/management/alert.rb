@@ -1,6 +1,7 @@
 module Management
   class Alert < ApplicationRecord
     self.table_name = "management_alerts"
+    include CooperativeScoped
 
     belongs_to :triggered_by, polymorphic: true, optional: true
     belongs_to :resolved_by, class_name: "User", optional: true

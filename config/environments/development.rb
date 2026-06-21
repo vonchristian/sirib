@@ -39,12 +39,13 @@ Rails.application.configure do
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
 
-  # Allow lvh.me and subdomains for tenant routing
+  # Allow localhost for development
   config.hosts << /.*\.lvh\.me/
   config.hosts << "lvh.me"
+  config.hosts << "localhost"
 
   # Mailers need an explicit host (no request context). Controllers/views use the request's host automatically.
-  config.action_mailer.default_url_options = { host: "lvh.me", port: 3000 }
+  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

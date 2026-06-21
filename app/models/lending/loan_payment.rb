@@ -1,6 +1,7 @@
 module Lending
   class LoanPayment < ApplicationRecord
     self.table_name = "loan_payments"
+    include CooperativeScoped
 
     monetize :amount_cents
     monetize :principal_cents
@@ -10,7 +11,7 @@ module Lending
     belongs_to :loan
     belongs_to :entry, class_name: "Accounting::Entry", optional: true
 
-    validates :reference_number, presence: true, uniqueness: true
+    validates :reference_number, presence: true, uniqueness: { scope: :cooperative_id }
     validates :amount_cents, numericality: { greater_than: 0 }
     validates :principal_cents, numericality: { greater_than_or_equal_to: 0 }
     validates :interest_cents, numericality: { greater_than_or_equal_to: 0 }

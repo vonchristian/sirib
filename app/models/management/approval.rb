@@ -1,6 +1,7 @@
 module Management
   class Approval < ApplicationRecord
     self.table_name = "management_approvals"
+    include CooperativeScoped
 
     belongs_to :approval_request, class_name: "Management::ApprovalRequest", touch: true
     belongs_to :step, class_name: "Management::ApprovalWorkflowStep"

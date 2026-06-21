@@ -1,6 +1,7 @@
 module Accounting
   class CashAccount < ApplicationRecord
     self.table_name = "accounting_cash_accounts"
+    include CooperativeScoped
 
     belongs_to :user
     belongs_to :account

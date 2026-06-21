@@ -1,6 +1,7 @@
 module Messaging
   class ProviderWebhook < ApplicationRecord
     self.table_name = "messaging_provider_webhooks"
+    include CooperativeScoped
 
     belongs_to :provider, class_name: "Messaging::Provider"
 

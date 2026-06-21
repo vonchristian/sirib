@@ -1,6 +1,6 @@
 # Savings products
-liability_ledger = Accounting::Ledger.find_by(account_code: "21100")
-expense_ledger = Accounting::Ledger.find_by(account_code: "60230") || Accounting::Ledger.where(account_type: :expense).first
+liability_ledger = Accounting::Ledger.find_by(account_code: "21100", cooperative: @coop)
+expense_ledger = Accounting::Ledger.find_by(account_code: "60230", cooperative: @coop) || Accounting::Ledger.where(account_type: :expense, cooperative: @coop).first
 
 savings_products = [
   { name: "Regular Savings", description: "Standard savings account with competitive interest" },
@@ -9,13 +9,13 @@ savings_products = [
 ]
 
 savings_products.each do |attrs|
-  product = Treasury::SavingsProduct.find_or_create_by!(name: attrs[:name]) do |p|
+  product = Treasury::SavingsProduct.find_or_create_by!(name: attrs[:name], cooperative: @coop) do |p|
     p.description = attrs[:description]
     p.liability_ledger = liability_ledger
     p.interest_expense_ledger = expense_ledger
   end
 
-  product.interest_rates.find_or_create_by!(current: true) do |ir|
+  product.interest_rates.find_or_create_by!(current: true, cooperative: @coop) do |ir|
     ir.rate = 0.0025
   end
 end

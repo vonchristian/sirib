@@ -1,6 +1,7 @@
 module Accounting
   class RunningBalance < ApplicationRecord
     self.table_name = "running_balances"
+    include CooperativeScoped
 
     monetize :balance_cents
 

@@ -1,6 +1,7 @@
 module Accounting
   class EntryTemplateLine < ApplicationRecord
     self.table_name = "entry_template_lines"
+    include CooperativeScoped
 
     belongs_to :entry_template, class_name: "Accounting::EntryTemplate"
     belongs_to :account, class_name: "Accounting::Account"
@@ -18,5 +19,16 @@ module Accounting
     scope :credits, -> { where(direction: :credit) }
     scope :variable, -> { where(amount_mode: :variable) }
     scope :fixed, -> { where(amount_mode: :fixed) }
+
+     def resolve_amount_cents(input_amount)
+      case amount_mode
+      when "fixed"
+        (fixed_amount * 100).round
+      when "variable"
+        (input_amount.to_d * 100).round
+      else
+        0
+      end
+    end
   end
 end

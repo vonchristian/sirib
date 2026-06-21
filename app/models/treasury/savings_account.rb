@@ -1,6 +1,7 @@
 module Treasury
   class SavingsAccount < ApplicationRecord
     self.table_name = "treasury_savings_accounts"
+    include CooperativeScoped
 
     ACCOUNT_TYPES = { personal: 0, business: 1 }.freeze
     STATUSES = %w[active closed].freeze
@@ -12,7 +13,7 @@ module Treasury
 
     validates :account_type, presence: true
     validates :status, inclusion: { in: STATUSES }
-    validates :account_number, presence: true, uniqueness: true
+    validates :account_number, presence: true, uniqueness: { scope: :cooperative_id }
 
     enum :account_type, ACCOUNT_TYPES
 
@@ -70,7 +71,8 @@ module Treasury
         self.liability_account ||= savings_product.liability_ledger.accounts.create!(
           name: "#{savings_product.name} Savings - #{depositor_name}",
           account_type: :liability,
-          account_code: next_account_code(savings_product.liability_ledger)
+          account_code: next_account_code(savings_product.liability_ledger),
+          cooperative: cooperative
         )
       end
 
@@ -78,7 +80,8 @@ module Treasury
         self.interest_expense_account ||= savings_product.interest_expense_ledger.accounts.create!(
           name: "#{savings_product.name} Interest Expense - #{depositor_name}",
           account_type: :expense,
-          account_code: next_account_code(savings_product.interest_expense_ledger)
+          account_code: next_account_code(savings_product.interest_expense_ledger),
+          cooperative: cooperative
         )
       end
     end

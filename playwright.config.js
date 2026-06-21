@@ -27,7 +27,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'ENFORCE_TENANT_CONTEXT=true RAILS_ENV=test bin/rails db:drop db:create db:schema:load db:seed 2>&1 && bin/e2e-setup && ENFORCE_TENANT_CONTEXT=true bin/rails server -e test -p 3000',
+    command: 'RAILS_ENV=test bin/rails db:drop db:create db:migrate db:seed 2>&1 && bin/e2e-setup && bin/rails server -e test -p 3000',
     url: 'http://localhost:3000/up',
     reuseExistingServer: !process.env.CI,
     timeout: 30000,

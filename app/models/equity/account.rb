@@ -1,6 +1,7 @@
 module Equity
   class Account < ApplicationRecord
     self.table_name = "equity_accounts"
+    include CooperativeScoped
 
     STATUSES = %w[active closed].freeze
 
@@ -9,7 +10,7 @@ module Equity
     belongs_to :equity_account, class_name: "Accounting::Account", optional: true
     has_many :transactions, class_name: "Equity::Transaction", foreign_key: :share_capital_account_id, dependent: :restrict_with_error
 
-    validates :account_number, presence: true, uniqueness: true
+    validates :account_number, presence: true, uniqueness: { scope: :cooperative_id }
     validates :status, inclusion: { in: STATUSES }
     validates :shares_owned, numericality: { greater_than_or_equal_to: 0 }
     validates :paid_up_shares, numericality: { greater_than_or_equal_to: 0 }
@@ -65,11 +66,13 @@ module Equity
 
     def assign_equity_account
       return unless share_product&.equity_ledger
+      return unless self.class.column_names.include?("equity_account_id")
 
       self.equity_account ||= share_product.equity_ledger.accounts.create!(
         name: "#{member_name} - #{share_product.name}",
         account_type: :equity,
-        account_code: next_account_code(share_product.equity_ledger)
+        account_code: next_account_code(share_product.equity_ledger),
+        cooperative: cooperative
       )
     end
 

@@ -1,6 +1,7 @@
 module Membership
   class Member < ApplicationRecord
     self.table_name = "members"
+    include CooperativeScoped
 
     include PgSearch::Model
 

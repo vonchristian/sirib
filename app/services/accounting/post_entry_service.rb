@@ -3,6 +3,7 @@ module Accounting
     string :description
     string :reference_number, default: nil
     time :posted_at, default: nil
+    object :cooperative, class: Cooperative, default: nil
     array :debits, default: [] do
       hash do
         object :account, class: Accounting::Account
@@ -22,7 +23,8 @@ module Accounting
         reference_number: reference_number,
         posted_at: posted_at,
         debits: debits,
-        credits: credits
+        credits: credits,
+        cooperative: cooperative
       )
 
       Accounting::Entry.transaction do
@@ -44,6 +46,7 @@ module Accounting
           as_of_date: posted_date
         )
         balance.ledger = account.ledger
+        balance.cooperative = cooperative if cooperative
         balance.balance_cents = account.balance(to_date: posted_date).cents
         balance.save!
       end
@@ -54,6 +57,7 @@ module Accounting
           account_id: nil,
           as_of_date: posted_date
         )
+        balance.cooperative = cooperative if cooperative
         balance.balance_cents = ledger.balance(to_date: posted_date)
         balance.save!
       end

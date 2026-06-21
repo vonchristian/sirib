@@ -1,6 +1,7 @@
 module Treasury
   class SavingsProductInterestRate < ApplicationRecord
     self.table_name = "treasury_savings_product_interest_rates"
+    include CooperativeScoped
 
     belongs_to :savings_product, class_name: "Treasury::SavingsProduct"
 

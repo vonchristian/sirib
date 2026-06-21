@@ -1,6 +1,7 @@
 module External
   class BankAccount < ApplicationRecord
     self.table_name = "external_bank_accounts"
+    include CooperativeScoped
 
     belongs_to :bank, class_name: "External::Bank", foreign_key: :external_bank_id
     belongs_to :cash_on_hand_account, class_name: "Accounting::Account", foreign_key: :cash_on_hand_account_id, optional: true
@@ -46,14 +47,16 @@ module External
           name: "#{account_name} - #{account_number_display}",
           account_code: "#{bank.cash_on_hand_ledger.account_code}#{id.to_s.rjust(4, '0')}",
           account_type: :asset,
-          ledger: bank.cash_on_hand_ledger
+          ledger: bank.cash_on_hand_ledger,
+          cooperative: cooperative
         )
 
         interest_account = Accounting::Account.create!(
           name: "#{account_name} - Interest Income",
           account_code: "#{bank.interest_income_ledger.account_code}#{id.to_s.rjust(4, '0')}",
           account_type: :revenue,
-          ledger: bank.interest_income_ledger
+          ledger: bank.interest_income_ledger,
+          cooperative: cooperative
         )
 
         update!(
@@ -70,9 +73,10 @@ module External
 
       Accounting::EntryTemplate.create!(
         name: "Interest Earned — #{account_name}",
+        cooperative: cooperative,
         lines_attributes: {
-          "0" => { account_id: cash_on_hand_account_id, direction: "debit", amount_mode: "variable", sequence_index: 1 },
-          "1" => { account_id: interest_income_account_id, direction: "credit", amount_mode: "variable", sequence_index: 2 }
+          "0" => { account_id: cash_on_hand_account_id, direction: "debit", amount_mode: "variable", sequence_index: 1, cooperative_id: cooperative_id },
+          "1" => { account_id: interest_income_account_id, direction: "credit", amount_mode: "variable", sequence_index: 2, cooperative_id: cooperative_id }
         }
       )
     end

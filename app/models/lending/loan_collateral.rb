@@ -1,6 +1,7 @@
 module Lending
   class LoanCollateral < ApplicationRecord
     self.table_name = "loan_collaterals"
+    include CooperativeScoped
 
     belongs_to :loan_application
     has_many_attached :images

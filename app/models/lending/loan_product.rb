@@ -1,6 +1,7 @@
 module Lending
   class LoanProduct < ApplicationRecord
     self.table_name = "loan_products"
+    include CooperativeScoped
 
     has_many :loan_applications, dependent: :restrict_with_error
     has_many :loans, dependent: :restrict_with_error

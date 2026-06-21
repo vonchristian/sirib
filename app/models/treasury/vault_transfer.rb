@@ -1,6 +1,7 @@
 module Treasury
   class VaultTransfer < ApplicationRecord
     self.table_name = "treasury_vault_transfers"
+    include CooperativeScoped
 
     belongs_to :cash_session, class_name: "Treasury::CashSession"
     belongs_to :approved_by, class_name: "User", optional: true

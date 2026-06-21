@@ -36,7 +36,8 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
-  # Allow lvh.me for subdomain-based E2E tests
+  # Allow localhost and lvh.me for tests
+  config.hosts << "localhost"
   config.hosts << /.*\.lvh\.me/
   config.hosts << "lvh.me"
 

@@ -1,6 +1,7 @@
 module Management
   class AuditLog < ApplicationRecord
     self.table_name = "management_audit_logs"
+    include CooperativeScoped
 
     belongs_to :actor, class_name: "User", optional: true
     belongs_to :branch, class_name: "Management::Branch", optional: true

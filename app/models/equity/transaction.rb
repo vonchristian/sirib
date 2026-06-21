@@ -1,6 +1,7 @@
 module Equity
   class Transaction < ApplicationRecord
     self.table_name = "equity_transactions"
+    include CooperativeScoped
 
     TRANSACTION_TYPES = { purchase: 0, redemption: 1, transfer: 2, dividend: 3 }.freeze
     STATUSES = %w[completed reversed].freeze
@@ -13,7 +14,7 @@ module Equity
     validates :shares, presence: true, numericality: { greater_than: 0 }
     validates :price_per_share_cents, presence: true, numericality: { greater_than: 0 }
     validates :total_amount_cents, presence: true, numericality: { greater_than: 0 }
-    validates :reference_number, presence: true, uniqueness: true
+    validates :reference_number, presence: true, uniqueness: { scope: :cooperative_id }
     validates :status, inclusion: { in: STATUSES }
     validates :posted_at, presence: true
 

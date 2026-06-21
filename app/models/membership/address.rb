@@ -1,6 +1,7 @@
 module Membership
   class Address < ApplicationRecord
     self.table_name = "member_addresses"
+    include CooperativeScoped
 
     belongs_to :member, class_name: "Membership::Member"
 

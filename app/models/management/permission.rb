@@ -1,11 +1,12 @@
 module Management
   class Permission < ApplicationRecord
     self.table_name = "management_permissions"
+    include CooperativeScoped
 
     has_many :role_permissions, class_name: "Management::RolePermission", dependent: :destroy
     has_many :roles, through: :role_permissions, class_name: "Management::Role"
 
     validates :action, :subject, presence: true
-    validates :action, uniqueness: { scope: :subject }
+    validates :action, uniqueness: { scope: [:subject, :cooperative_id] }
   end
 end

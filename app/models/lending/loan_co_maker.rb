@@ -1,6 +1,7 @@
 module Lending
   class LoanCoMaker < ApplicationRecord
     self.table_name = "loan_co_makers"
+    include CooperativeScoped
 
     belongs_to :loan_application
     belongs_to :member, class_name: "Membership::Member"

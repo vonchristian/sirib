@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authentication
-  include TenantContext
+  include CooperativeContext
   include Pagy::Backend
 
   before_action :set_current_cash_session

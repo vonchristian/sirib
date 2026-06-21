@@ -1,6 +1,7 @@
 module External
   class Bank < ApplicationRecord
     self.table_name = "external_banks"
+    include CooperativeScoped
 
     has_many :accounts, class_name: "External::BankAccount", foreign_key: :external_bank_id, dependent: :destroy
     belongs_to :cash_on_hand_ledger, class_name: "Accounting::Ledger", foreign_key: :cash_on_hand_ledger_id, optional: true
@@ -27,21 +28,24 @@ module External
           name: "#{name} - Cash on Hand",
           account_code: "1#{code.presence || name.first(3).upcase}00",
           account_type: :asset,
-          parent: cash_in_bank_ledger
+          parent: cash_in_bank_ledger,
+          cooperative: cooperative
         )
 
         interest_ledger = Accounting::Ledger.create!(
           name: "#{name} - Interest Income",
           account_code: "4#{code.presence || name.first(3).upcase}00",
           account_type: :revenue,
-          parent: Accounting::Ledger.find_by(account_code: "40100")
+          parent: Accounting::Ledger.find_by(account_code: "40100"),
+          cooperative: cooperative
         )
 
         acct = Accounting::Account.create!(
           name: "#{name} - Cash on Hand",
           account_code: "1#{code.presence || name.first(3).upcase}01",
           account_type: :asset,
-          ledger: cash_ledger
+          ledger: cash_ledger,
+          cooperative: cooperative
         )
 
         update!(

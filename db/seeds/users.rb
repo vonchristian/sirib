@@ -11,7 +11,7 @@ USER_ROSTER = {
 
 total = 0
 Cooperative.active.order(:name).find_each do |coop|
-  subdomain_key = coop.subdomain.underscore
+  subdomain_key = coop.name.parameterize
 
   USER_ROSTER.each do |role_key, attrs|
     email = "#{role_key}_#{subdomain_key}@sirib.ph"
@@ -26,14 +26,6 @@ Cooperative.active.order(:name).find_each do |coop|
       cooperative: coop
     )
     total += 1
-  end
-end
-
-# Link cash accounts for admin users
-cash_on_hand = Accounting::Account.find_by(account_code: "11110")
-if cash_on_hand
-  User.where(role: :manager).find_each do |user|
-    Accounting::CashAccount.find_or_create_by!(user: user, account: cash_on_hand)
   end
 end
 

@@ -1,6 +1,7 @@
 module Treasury
   class SavingsProduct < ApplicationRecord
     self.table_name = "treasury_savings_products"
+    include CooperativeScoped
 
     has_many :interest_rates, class_name: "Treasury::SavingsProductInterestRate", dependent: :destroy
     has_many :savings_accounts, class_name: "Treasury::SavingsAccount", dependent: :restrict_with_error
@@ -27,13 +28,15 @@ module Treasury
       self.liability_ledger ||= Accounting::Ledger.create!(
         name: "#{name} - Deposit Liabilities",
         account_type: :liability,
-        account_code: next_code_for_type(:liability)
+        account_code: next_code_for_type(:liability),
+        cooperative: cooperative
       )
 
       self.interest_expense_ledger ||= Accounting::Ledger.create!(
         name: "#{name} - Interest Expense",
         account_type: :expense,
-        account_code: next_code_for_type(:expense)
+        account_code: next_code_for_type(:expense),
+        cooperative: cooperative
       )
     end
 

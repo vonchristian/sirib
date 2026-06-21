@@ -1,6 +1,7 @@
 module Lending
   class LoanRepaymentSchedule < ApplicationRecord
     self.table_name = "loan_repayment_schedules"
+    include CooperativeScoped
 
     belongs_to :loan_application
 

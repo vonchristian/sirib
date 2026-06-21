@@ -12,7 +12,7 @@ module Management
     has_many :risk_indicators, class_name: "Management::RiskIndicator"
 
     validates :name, :code, presence: true
-    validates :code, uniqueness: true
+    validates :code, uniqueness: { scope: :cooperative_id }
 
     enum :status, { active: "active", inactive: "inactive" }
 

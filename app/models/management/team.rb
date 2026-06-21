@@ -1,6 +1,7 @@
 module Management
   class Team < ApplicationRecord
     self.table_name = "management_teams"
+    include CooperativeScoped
 
     belongs_to :department, class_name: "Management::Department"
 

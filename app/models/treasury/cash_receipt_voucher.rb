@@ -1,5 +1,7 @@
 module Treasury
   class CashReceiptVoucher < Voucher
+    include CooperativeScoped
+
     def post_entry!(credit_account:)
       validate_posting!
       entry = Accounting::PostEntryService.run!(

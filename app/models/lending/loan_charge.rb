@@ -1,6 +1,7 @@
 module Lending
   class LoanCharge < ApplicationRecord
     self.table_name = "loan_charges"
+    include CooperativeScoped
 
     belongs_to :loan_product
 

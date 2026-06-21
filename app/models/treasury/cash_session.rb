@@ -1,6 +1,7 @@
 module Treasury
   class CashSession < ApplicationRecord
     self.table_name = "treasury_cash_sessions"
+    include CooperativeScoped
 
     belongs_to :user
     belongs_to :cash_account, class_name: "Accounting::Account"

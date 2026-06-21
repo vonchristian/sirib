@@ -15,6 +15,6 @@ class Portal::AnnouncementsController < Portal::BaseController
   end
 
   def current_cooperative
-    Current.tenant
+    Current.cooperative
   end
 end

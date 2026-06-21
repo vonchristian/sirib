@@ -1,6 +1,7 @@
 module Messaging
   class Provider < ApplicationRecord
     self.table_name = "messaging_providers"
+    include CooperativeScoped
 
     belongs_to :channel, class_name: "Messaging::Channel"
     has_many :message_deliveries, class_name: "Messaging::MessageDelivery", dependent: :restrict_with_error

@@ -7,7 +7,9 @@ module Management
     hash :changes, default: {}
 
     def execute
+      cooperative = Current.cooperative || actor&.cooperative
       Management::AuditLog.create!(
+        cooperative: cooperative,
         auditable: auditable,
         action: action,
         actor: actor,

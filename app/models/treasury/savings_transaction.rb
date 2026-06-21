@@ -1,6 +1,7 @@
 module Treasury
   class SavingsTransaction < ApplicationRecord
     self.table_name = "treasury_savings_transactions"
+    include CooperativeScoped
 
     TRANSACTION_TYPES = { deposit: 0, withdraw: 1 }.freeze
     STATUSES = %w[pending completed failed].freeze
@@ -11,7 +12,7 @@ module Treasury
 
     validates :transaction_type, presence: true
     validates :amount_cents, presence: true, numericality: { greater_than: 0 }
-    validates :reference_number, presence: true, uniqueness: true
+    validates :reference_number, presence: true, uniqueness: { scope: :cooperative_id }
     validates :status, inclusion: { in: STATUSES }
     validates :posted_at, presence: true
 

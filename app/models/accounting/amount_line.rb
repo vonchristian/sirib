@@ -1,6 +1,7 @@
 module Accounting
   class AmountLine < ApplicationRecord
     self.table_name = "amount_lines"
+    include CooperativeScoped
 
     belongs_to :entry, inverse_of: :amount_lines
     belongs_to :account, inverse_of: :amount_lines

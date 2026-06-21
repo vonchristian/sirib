@@ -1,4 +1,6 @@
 class Portal::Session < ApplicationRecord
+  include CooperativeScoped
+
   STEP_UP_DURATION = 15.minutes
 
   belongs_to :member, class_name: "Membership::Member"

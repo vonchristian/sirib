@@ -34,14 +34,14 @@ products = [
 ]
 
 products.each do |attrs|
-  product = Lending::LoanProduct.find_or_create_by!(name: attrs[:name]) do |p|
+  product = Lending::LoanProduct.find_or_create_by!(name: attrs[:name], cooperative: @coop) do |p|
     p.assign_attributes(attrs)
   end
 
   next unless (product_charges = charges_by_product[product.name])
 
   product_charges.each do |charge_attrs|
-    product.loan_charges.find_or_create_by!(name: charge_attrs[:name]) do |c|
+    product.loan_charges.find_or_create_by!(name: charge_attrs[:name], cooperative: @coop) do |c|
       c.assign_attributes(charge_attrs)
     end
   end

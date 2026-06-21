@@ -2,6 +2,7 @@ module Accounting
   class Account < ApplicationRecord
     include PgSearch::Model
     self.table_name = "accounts"
+    include CooperativeScoped
 
     pg_search_scope :search, against: [ :name, :account_code ],
       using: { tsearch: { prefix: true }, trigram: { threshold: 0.3 } }
@@ -19,10 +20,11 @@ module Accounting
     has_many :running_balances, dependent: :restrict_with_error
     has_many :cash_accounts, class_name: "Accounting::CashAccount", dependent: :destroy
 
-    enum :account_type, Accounting::ACCOUNT_TYPES
+    attribute :account_type, :string
+    enum :account_type, { asset: "asset", equity: "equity", liability: "liability", revenue: "revenue", expense: "expense" }, validate: false
 
     validates :name, presence: true
-    validates :account_code, presence: true, uniqueness: true
+    validates :account_code, presence: true, uniqueness: { scope: :cooperative_id }
     validates :account_type, presence: true
 
     scope :contra, -> { where(contra: true) }

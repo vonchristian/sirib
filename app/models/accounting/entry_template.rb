@@ -1,6 +1,7 @@
 module Accounting
   class EntryTemplate < ApplicationRecord
     self.table_name = "entry_templates"
+    include CooperativeScoped
 
     belongs_to :entry, class_name: "Accounting::Entry", optional: true
     has_many :lines, class_name: "Accounting::EntryTemplateLine", dependent: :destroy

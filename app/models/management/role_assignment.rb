@@ -1,6 +1,7 @@
 module Management
   class RoleAssignment < ApplicationRecord
     self.table_name = "management_role_assignments"
+    include CooperativeScoped
 
     belongs_to :user
     belongs_to :role, class_name: "Management::Role"

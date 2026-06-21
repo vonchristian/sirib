@@ -1,6 +1,7 @@
 module Management
   class PolicyRule < ApplicationRecord
     self.table_name = "management_policy_rules"
+    include CooperativeScoped
 
     belongs_to :policy, class_name: "Management::Policy", touch: true
 
