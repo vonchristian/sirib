@@ -21,6 +21,10 @@ module Lending
     scope :active, -> { where(status: "active") }
     scope :for_disbursement, -> { where(status: "active", disbursed_at: nil) }
 
+    def active?
+      status == "active"
+    end
+
     def disbursed?
       disbursed_at.present?
     end

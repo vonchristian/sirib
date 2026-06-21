@@ -2,6 +2,19 @@ module Treasury
   class SearchesController < ApplicationController
     layout false
 
+    def members
+      query = params[:q]
+      @members = if query.present?
+        Membership::Member
+          .order(:last_name)
+          .search(query)
+          .limit(15)
+      else
+        Membership::Member.none
+      end
+      render partial: "treasury/searches/members", locals: { members: @members }
+    end
+
     def savings_accounts
       query = params[:q]
       @accounts = if query.present?

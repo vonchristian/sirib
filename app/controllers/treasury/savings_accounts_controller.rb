@@ -7,7 +7,7 @@ module Treasury
     end
 
     def new
-      @account = Treasury::SavingsAccount.new
+      @account = Treasury::SavingsAccount.new(depositor_id: params[:depositor_id])
       @products = Treasury::SavingsProduct.active.by_name
     end
 
@@ -64,8 +64,8 @@ module Treasury
         return
       end
 
-      @debits = [{ account: @cash_account, amount: @amount }]
-      @credits = [{ account: @account.liability_account, amount: @amount }]
+      @debits = [ { account: @cash_account, amount: @amount } ]
+      @credits = [ { account: @account.liability_account, amount: @amount } ]
     end
 
     def confirm_deposit
@@ -137,8 +137,8 @@ module Treasury
         return
       end
 
-      @debits = [{ account: @account.liability_account, amount: @amount }]
-      @credits = [{ account: @cash_account, amount: @amount }]
+      @debits = [ { account: @account.liability_account, amount: @amount } ]
+      @credits = [ { account: @cash_account, amount: @amount } ]
     end
 
     def confirm_withdraw
@@ -175,6 +175,14 @@ module Treasury
       else
         redirect_to withdraw_treasury_savings_account_path(@account), alert: outcome.errors.join(", ")
       end
+    end
+
+    def taken_products
+      member_id = params[:member_id]
+      product_ids = Treasury::SavingsAccount.where(depositor_id: member_id, depositor_type: "Member")
+        .active
+        .pluck(:savings_product_id)
+      render json: { taken_product_ids: product_ids }
     end
 
     private

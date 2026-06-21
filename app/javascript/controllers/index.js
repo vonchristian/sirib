@@ -26,3 +26,6 @@ application.register("rail", RailController)
 import SidebarController from "controllers/sidebar_controller"
 application.register("sidebar", SidebarController)
 
+import MemberAutocompleteController from "controllers/member_autocomplete_controller"
+application.register("member-autocomplete", MemberAutocompleteController)
+

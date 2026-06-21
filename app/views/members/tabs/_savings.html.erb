@@ -1,0 +1,49 @@
+<div class="space-y-6">
+  <% if savings_summary[:accounts].any? %>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-header-title">Savings Accounts</h3>
+        <%= link_to "View all", treasury_savings_accounts_path, class: "text-xs font-medium text-primary hover:text-primary-700" %>
+      </div>
+      <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Account #</th>
+              <th>Product</th>
+              <th>Status</th>
+              <th class="text-right">Available Balance</th>
+              <th>Last Transaction</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody data-controller="clickable-row">
+            <% savings_summary[:accounts].each do |acct| %>
+              <tr data-clickable-row-target="row" data-href="<%= treasury_savings_account_path(acct) %>" class="cursor-pointer">
+                <td class="font-medium text-text-primary"><%= acct.account_number %></td>
+                <td class="text-text-secondary"><%= acct.savings_product.name %></td>
+                <td>
+                  <span class="badge <%= acct.active? ? 'badge-success' : 'badge-warning' %>"><%= acct.status %></span>
+                </td>
+                <td class="font-medium tabular-nums text-right"><%= acct.balance.format %></td>
+                <td class="text-text-secondary"><%= acct.transactions.by_latest.first&.posted_at&.strftime("%b %d, %Y") || "—" %></td>
+                <td class="text-right"><%= link_to "View", treasury_savings_account_path(acct), class: "text-xs font-medium text-primary hover:text-primary-700" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <div class="card-body text-center">
+      <%= link_to new_treasury_savings_account_path(depositor_id: @member.id), class: "btn btn-primary", data: { turbo_frame: "_top" } do %>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Open Savings Account
+      <% end %>
+    </div>
+  </div>
+</div>

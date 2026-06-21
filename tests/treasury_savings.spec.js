@@ -1,11 +1,20 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
 
-const openAccount = async (page) => {
+const openAccount = async (page, memberName = 'Maria Santos Cruz') => {
   await page.goto('/treasury/savings_accounts/new');
-  await page.getByLabel(/Savings Product/i).selectOption({ index: 1 });
-  await page.getByLabel(/Member/i).selectOption({ index: 1 });
-  await page.getByLabel(/Account Type/i).selectOption('Personal');
+
+  // Search and select member via autocomplete
+  await page.getByPlaceholder(/Search member/i).fill(memberName.split(' ')[0]);
+  await page.getByText(memberName).first().waitFor({ timeout: 5000 });
+  await page.getByText(memberName).first().click();
+
+  // Select savings product (first radio)
+  await page.locator('label').filter({ hasText: /Regular Savings/ }).first().click();
+
+  // Select account type (Personal Savings)
+  await page.locator('label').filter({ hasText: /Personal Savings/ }).click();
+
   await page.getByRole('button', { name: /Open Account/i }).click();
   await expect(page.getByText('Savings account opened.')).toBeVisible();
 };
@@ -34,7 +43,7 @@ test.describe('Treasury Savings', () => {
     });
 
     test('deposit transaction', async ({ page }) => {
-      await openAccount(page);
+      await openAccount(page, 'Juan Dela Reyes');
 
       await page.getByRole('link', { name: /Deposit/ }).click();
       await expect(page).toHaveURL(/\/deposit$/);
@@ -50,7 +59,7 @@ test.describe('Treasury Savings', () => {
     });
 
     test('withdraw transaction', async ({ page }) => {
-      await openAccount(page);
+      await openAccount(page, 'Elena Garcia Villanueva');
 
       await page.getByRole('link', { name: /Deposit/ }).click();
       await page.getByPlaceholder('0.00').fill('50000');
@@ -72,7 +81,7 @@ test.describe('Treasury Savings', () => {
     });
 
     test('validates insufficient balance on withdraw', async ({ page }) => {
-      await openAccount(page);
+      await openAccount(page, 'Ana Luna Dimagiba');
 
       await page.getByRole('link', { name: /Withdraw/ }).click();
       await page.getByPlaceholder('0.00').fill('5000');
@@ -82,7 +91,7 @@ test.describe('Treasury Savings', () => {
     });
 
     test('cancels deposit at preview stage', async ({ page }) => {
-      await openAccount(page);
+      await openAccount(page, 'Pedro M. Santos');
 
       await page.getByRole('link', { name: /Deposit/ }).click();
       await page.getByPlaceholder('0.00').fill('5000');
@@ -92,7 +101,7 @@ test.describe('Treasury Savings', () => {
     });
 
     test('edits deposit amount from preview', async ({ page }) => {
-      await openAccount(page);
+      await openAccount(page, 'Sofia C. Gonzales');
 
       await page.getByRole('link', { name: /Deposit/ }).click();
       await page.getByPlaceholder('0.00').fill('5000');

@@ -1,0 +1,52 @@
+<div class="space-y-6">
+  <% if @time_deposits.any? %>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-header-title">Time Deposits</h3>
+        <%= link_to "View all", treasury_time_deposits_path, class: "text-xs font-medium text-primary hover:text-primary-700" %>
+      </div>
+      <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Certificate</th>
+              <th>Product</th>
+              <th class="text-right">Principal</th>
+              <th class="text-right">Interest Rate</th>
+              <th>Start Date</th>
+              <th>Maturity Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody data-controller="clickable-row">
+            <% @time_deposits.each do |td| %>
+              <tr data-clickable-row-target="row" data-href="<%= treasury_time_deposit_path(td) %>" class="cursor-pointer">
+                <td class="font-mono text-text-primary"><%= td.id %></td>
+                <td class="text-text-secondary"><%= td.time_deposit_product.name %></td>
+                <td class="font-medium tabular-nums text-right text-text-primary"><%= Money.new(td.amount_cents, "PHP").format %></td>
+                <td class="tabular-nums text-right text-text-secondary"><%= number_to_percentage(td.interest_rate * 100, precision: 1) %></td>
+                <td class="text-text-secondary"><%= td.created_at.strftime("%b %d, %Y") %></td>
+                <td class="text-text-secondary"><%= td.matured_on&.strftime("%b %d, %Y") || "—" %></td>
+                <td>
+                  <span class="badge <%= td.active? ? 'badge-success' : td.status == 'pending' ? 'badge-warning' : 'badge-primary' %>"><%= td.status %></span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="card">
+      <div class="card-body text-center">
+        <p class="text-sm text-text-tertiary mb-4">No time deposits.</p>
+        <%= link_to new_treasury_time_deposit_path, class: "btn btn-primary" do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Open Time Deposit
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

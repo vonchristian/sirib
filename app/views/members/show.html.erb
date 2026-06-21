@@ -2,369 +2,43 @@
 <% content_for :page_subtitle, "Member profile" %>
 
 <div class="animate-fade-in space-y-6">
-  <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
-    <div class="flex items-center gap-4">
-      <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-primary-50 text-lg font-semibold text-primary dark:bg-primary-900/30 dark:text-primary-300 overflow-hidden">
-        <% if @member.profile_image.attached? %>
-          <%= image_tag @member.profile_image, class: "h-full w-full object-cover" %>
-        <% else %>
-          <%= "#{@member.first_name.first}#{@member.last_name.first}" %>
+  <nav class="flex items-center gap-2 text-sm text-text-tertiary">
+    <%= link_to "Members", members_path, class: "hover:text-text-primary transition-colors" %>
+    <span>/</span>
+    <span class="text-text-primary font-medium"><%= @member.name %></span>
+  </nav>
+
+  <%= render "members/components/member_header", member: @member %>
+
+  <%= render "members/components/summary_cards", summary: @summary %>
+
+  <div data-controller="member-tabs" class="space-y-6">
+    <div class="flex gap-6 border-b border-border" role="tablist">
+      <% { overview: "Overview", savings: "Savings", time_deposits: "Time Deposits",
+          loans: "Loans", share_capital: "Share Capital", settings: "Settings" }.each do |key, label| %>
+        <%= link_to member_path(@member, tab: key),
+          class: "pb-3 text-sm font-medium transition-colors border-b-2 #{params[:tab] == key.to_s || (key == :overview && params[:tab].blank?) ? 'border-primary text-primary' : 'border-transparent text-text-tertiary hover:text-text-secondary'}",
+          data: { "member-tabs-target": "tab", tab: key, turbo_frame: "member-tab-content", turbo_action: "advance" } do %>
+          <%= label %>
         <% end %>
-      </div>
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2 flex-wrap">
-          <h1 class="text-lg font-semibold text-text-primary dark:text-white"><%= @member.name %></h1>
-          <span class="rounded-full bg-surface-alt px-2 py-0.5 text-[11px] font-medium text-text-tertiary capitalize"><%= @member.gender %> · <%= @member.civil_status %></span>
-        </div>
-        <p class="text-sm text-text-tertiary mt-0.5">
-          <%= @member.mobile_number %>
-          <% if @member.email_address.present? %> · <%= @member.email_address %><% end %>
-          <% if @member.address %> · <%= @member.address.city %><% end %>
-        </p>
-      </div>
-      <div class="flex items-center gap-2 flex-shrink-0">
-        <%= link_to "New Transaction", new_member_transaction_path(@member), class: "rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700 transition-colors" %>
-        <%= link_to "Edit", "#", class: "rounded-md border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-4">
-    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
-      <p class="text-[11px] font-medium uppercase tracking-wider text-text-tertiary">Savings Accounts</p>
-      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @savings_accounts.count %></p>
-      <p class="text-xs text-text-tertiary mt-0.5"><%= @savings_accounts.active.count %> active</p>
-    </div>
-    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
-      <p class="text-[11px] font-medium uppercase tracking-wider text-text-tertiary">Time Deposits</p>
-      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @time_deposits.count %></p>
-      <p class="text-xs text-text-tertiary mt-0.5"><%= @time_deposits.select(&:active?).size %> active</p>
-    </div>
-    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
-      <p class="text-[11px] font-medium uppercase tracking-wider text-text-tertiary">Loans</p>
-      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @loans.count %></p>
-      <p class="text-xs text-text-tertiary mt-0.5"><%= @loans.select(&:disbursed?).size %> disbursed</p>
-    </div>
-    <div class="rounded-lg border border-border bg-surface p-4 dark:border-gray-700 dark:bg-gray-900">
-      <p class="text-[11px] font-medium uppercase tracking-wider text-text-tertiary">Loan Applications</p>
-      <p class="text-xl font-semibold text-text-primary tabular-nums mt-1"><%= @loan_applications.size %></p>
-      <p class="text-xs text-text-tertiary mt-0.5"><%= @loan_applications.select(&:submitted?).size %> pending</p>
-    </div>
-  </div>
-
-  <div data-controller="tabs" class="space-y-6">
-    <div class="flex gap-6 border-b border-border dark:border-gray-700" role="tablist">
-      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="savings" class="pb-3 text-sm font-medium border-b-2 border-primary text-primary transition-colors">Savings</button>
-      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="deposits" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Time Deposits</button>
-      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="loans" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Loans</button>
-      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="profile" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Profile</button>
-      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="settings" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Settings</button>
+      <% end %>
     </div>
 
-    <div data-tabs-target="panel" id="tab-savings" class="space-y-6 max-w-3xl">
-      <% if @savings_accounts.any? %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
-          <div class="flex items-center justify-between border-b border-border px-5 py-3.5 dark:border-gray-700">
-            <h3 class="text-sm font-semibold text-text-primary dark:text-white">Savings Accounts</h3>
-            <%= link_to "View all", treasury_savings_accounts_path, class: "text-xs font-medium text-primary hover:text-primary-700 dark:text-primary-400" %>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-              <thead>
-                <tr class="bg-surface-alt dark:bg-gray-800/50">
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Account #</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Product</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Balance</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Status</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-border dark:divide-gray-800">
-                <% @savings_accounts.each do |acct| %>
-                  <tr class="hover:bg-surface-alt dark:hover:bg-gray-800/30 transition-colors">
-                    <td class="px-4 py-2.5 text-sm font-medium text-text-primary"><%= acct.account_number %></td>
-                    <td class="px-4 py-2.5 text-sm text-text-secondary"><%= acct.savings_product.name %></td>
-                    <td class="px-4 py-2.5 text-sm font-medium tabular-nums text-right text-text-primary"><%= acct.balance.format %></td>
-                    <td class="px-4 py-2.5">
-                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium <%= acct.active? ? 'bg-positive-50 text-positive' : 'bg-surface-alt text-text-tertiary' %>"><%= acct.status %></span>
-                    </td>
-                    <td class="px-4 py-2.5 text-right"><%= link_to "View", treasury_savings_account_path(acct), class: "text-xs font-medium text-primary hover:text-primary-700" %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <%= turbo_frame_tag "member-tab-content" do %>
+      <% case params[:tab] %>
+      <% when "savings" %>
+        <%= render "members/tabs/savings", savings_summary: @savings_summary %>
+      <% when "time_deposits" %>
+        <%= render "members/tabs/time_deposits" %>
+      <% when "loans" %>
+        <%= render "members/tabs/loans" %>
+      <% when "share_capital" %>
+        <%= render "members/tabs/share_capital" %>
+      <% when "settings" %>
+        <%= render "members/tabs/settings" %>
       <% else %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
-          <p class="text-sm text-text-tertiary italic text-center">No savings accounts yet.</p>
-        </div>
+        <%= render "members/tabs/overview", summary: @summary, recent_activity: @recent_activity %>
       <% end %>
-    </div>
-
-    <div data-tabs-target="panel" id="tab-deposits" class="hidden space-y-6 max-w-3xl">
-      <% if @time_deposits.any? %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
-          <div class="flex items-center justify-between border-b border-border px-5 py-3.5 dark:border-gray-700">
-            <h3 class="text-sm font-semibold text-text-primary dark:text-white">Time Deposits</h3>
-            <%= link_to "View all", treasury_time_deposits_path, class: "text-xs font-medium text-primary hover:text-primary-700 dark:text-primary-400" %>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-              <thead>
-                <tr class="bg-surface-alt dark:bg-gray-800/50">
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Reference</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Product</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Amount</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Rate</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Matures</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Status</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-border dark:divide-gray-800">
-                <% @time_deposits.each do |td| %>
-                  <tr class="hover:bg-surface-alt dark:hover:bg-gray-800/30 transition-colors">
-                    <td class="px-4 py-2.5 text-sm font-mono text-text-primary"><%= td.id %></td>
-                    <td class="px-4 py-2.5 text-sm text-text-secondary"><%= td.time_deposit_product.name %></td>
-                    <td class="px-4 py-2.5 text-sm font-medium tabular-nums text-right text-text-primary"><%= Money.new(td.amount_cents, "PHP").format %></td>
-                    <td class="px-4 py-2.5 text-sm tabular-nums text-right text-text-secondary"><%= number_to_percentage(td.interest_rate * 100, precision: 1) %></td>
-                    <td class="px-4 py-2.5 text-sm text-text-secondary"><%= td.matured_on&.strftime("%b %d, %Y") || "—" %></td>
-                    <td class="px-4 py-2.5">
-                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium <%= td.active? ? 'bg-positive-50 text-positive' : td.pending? ? 'bg-warning-50 text-warning' : 'bg-surface-alt text-text-tertiary' %>"><%= td.status %></span>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      <% else %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
-          <p class="text-sm text-text-tertiary italic text-center">No time deposits yet.</p>
-        </div>
-      <% end %>
-    </div>
-
-    <div data-tabs-target="panel" id="tab-loans" class="hidden space-y-6 max-w-3xl">
-      <% if @loans.any? %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
-          <div class="flex items-center justify-between border-b border-border px-5 py-3.5 dark:border-gray-700">
-            <h3 class="text-sm font-semibold text-text-primary dark:text-white">Loans</h3>
-            <%= link_to "View all", loans_loans_path, class: "text-xs font-medium text-primary hover:text-primary-700 dark:text-primary-400" %>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-              <thead>
-                <tr class="bg-surface-alt dark:bg-gray-800/50">
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Reference</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Product</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Principal</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Outstanding</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Disbursed</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Status</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-border dark:divide-gray-800">
-                <% @loans.each do |loan| %>
-                  <tr class="hover:bg-surface-alt dark:hover:bg-gray-800/30 transition-colors">
-                    <td class="px-4 py-2.5 text-sm font-mono text-text-primary"><%= loan.reference_number %></td>
-                    <td class="px-4 py-2.5 text-sm text-text-secondary"><%= loan.loan_product.name %></td>
-                    <td class="px-4 py-2.5 text-sm font-medium tabular-nums text-right text-text-primary"><%= Money.new(loan.principal_cents, "PHP").format %></td>
-                    <td class="px-4 py-2.5 text-sm tabular-nums text-right text-text-secondary"><%= Money.new(loan.outstanding_principal_cents, "PHP").format %></td>
-                    <td class="px-4 py-2.5 text-sm text-text-secondary"><%= loan.disbursed_at&.strftime("%b %d, %Y") || "—" %></td>
-                    <td class="px-4 py-2.5">
-                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium <%= loan.active? ? 'bg-positive-50 text-positive' : 'bg-surface-alt text-text-tertiary' %>"><%= loan.status %></span>
-                    </td>
-                    <td class="px-4 py-2.5 text-right"><%= link_to "View", "#", class: "text-xs font-medium text-primary hover:text-primary-700" %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      <% end %>
-
-      <% if @loan_applications.any? %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
-          <div class="flex items-center justify-between border-b border-border px-5 py-3.5 dark:border-gray-700">
-            <h3 class="text-sm font-semibold text-text-primary dark:text-white">Loan Applications</h3>
-            <%= link_to "View all", loans_applications_path, class: "text-xs font-medium text-primary hover:text-primary-700 dark:text-primary-400" %>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-              <thead>
-                <tr class="bg-surface-alt dark:bg-gray-800/50">
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Reference</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Product</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Amount</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Status</th>
-                  <th class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Created</th>
-                  <th class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-border dark:divide-gray-800">
-                <% @loan_applications.each do |app| %>
-                  <tr class="hover:bg-surface-alt dark:hover:bg-gray-800/30 transition-colors">
-                    <td class="px-4 py-2.5 text-sm font-mono text-text-primary"><%= app.reference_number || app.uuid.first(8).upcase %></td>
-                    <td class="px-4 py-2.5 text-sm text-text-secondary"><%= app.loan_product&.name || "—" %></td>
-                    <td class="px-4 py-2.5 text-sm font-medium tabular-nums text-right text-text-primary"><%= app.amount_cents ? Money.new(app.amount_cents, "PHP").format : "—" %></td>
-                    <td class="px-4 py-2.5">
-                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= case app.status; when 'draft' then 'bg-warning-50 text-warning'; when 'submitted' then 'bg-primary-50 text-primary'; when 'approved' then 'bg-positive-50 text-positive'; when 'rejected' then 'bg-danger-50 text-danger'; else 'bg-surface-alt text-text-tertiary'; end %>"><%= app.status %></span>
-                    </td>
-                    <td class="px-4 py-2.5 text-sm text-text-secondary"><%= app.created_at.strftime("%b %d, %Y") %></td>
-                    <td class="px-4 py-2.5 text-right">
-                      <% if app.draft? %>
-                        <%= link_to "Resume", edit_loans_application_path(app.uuid), class: "text-xs font-medium text-primary hover:text-primary-700" %>
-                      <% else %>
-                        <%= link_to "View", loans_application_path(app.uuid), class: "text-xs font-medium text-primary hover:text-primary-700" %>
-                      <% end %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      <% end %>
-
-      <% if @loans.none? && @loan_applications.none? %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
-          <p class="text-sm text-text-tertiary italic text-center">No loans or applications yet.</p>
-        </div>
-      <% end %>
-    </div>
-
-    <div data-tabs-target="panel" id="tab-profile" class="hidden space-y-6 max-w-3xl">
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-3">Personal Details</h3>
-          <dl class="space-y-2.5 text-sm">
-            <div class="flex justify-between">
-              <dt class="text-text-tertiary">Birth Date</dt>
-              <dd class="text-text-primary font-medium"><%= @member.birth_date.strftime("%b %d, %Y") %> (<%= ((Date.current - @member.birth_date) / 365).to_i %> yrs)</dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-text-tertiary">Mobile</dt>
-              <dd class="text-text-primary font-medium"><%= @member.mobile_number %></dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-text-tertiary">Email</dt>
-              <dd class="text-text-primary font-medium"><%= @member.email_address || "—" %></dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-text-tertiary">Gender</dt>
-              <dd class="text-text-primary font-medium capitalize"><%= @member.gender %></dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-text-tertiary">Civil Status</dt>
-              <dd class="text-text-primary font-medium capitalize"><%= @member.civil_status %></dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-text-tertiary">Member Since</dt>
-              <dd class="text-text-primary font-medium"><%= @member.created_at.strftime("%b %d, %Y") %></dd>
-            </div>
-          </dl>
-        </div>
-
-        <% if @member.address %>
-          <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
-            <h3 class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-3">Address</h3>
-            <p class="text-sm text-text-primary"><%= @member.address.house_street %></p>
-            <p class="text-sm text-text-secondary"><%= [@member.address.barangay, @member.address.city].compact.join(", ") %></p>
-            <p class="text-sm text-text-secondary"><%= [@member.address.province, @member.address.region].compact.join(", ") %></p>
-            <p class="text-sm text-text-secondary"><%= @member.address.zip_code %></p>
-          </div>
-        <% end %>
-      </div>
-
-      <% if @member.identifications.any? %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-3">Identifications</h3>
-          <div class="space-y-2">
-            <% @member.identifications.each do |id| %>
-              <div class="flex items-center justify-between rounded-md border border-border bg-surface-alt px-3 py-2 dark:border-gray-700 dark:bg-gray-800/50">
-                <div>
-                  <p class="text-sm font-medium text-text-primary"><%= id.id_type.titleize %></p>
-                  <p class="text-xs text-text-tertiary"><%= id.id_number %></p>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <span class="inline-flex items-center rounded-full bg-primary-50 px-1.5 py-0.5 text-[10px] font-medium text-primary">Verified</span>
-                  <% if id.file.attached? %>
-                    <%= link_to "View", url_for(id.file), target: "_blank", class: "text-xs font-medium text-primary hover:text-primary-700" %>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-
-      <% if @member.signatures.attached? %>
-        <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-3">Signature Specimens</h3>
-          <div class="grid grid-cols-3 gap-2">
-            <% @member.signatures.each do |sig| %>
-              <%= image_tag sig, class: "h-14 w-full rounded border border-border object-contain bg-white dark:border-gray-700" %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-
-      </div>
-    </div>
-
-    <div data-tabs-target="panel" id="tab-settings" class="hidden space-y-6 max-w-3xl">
-      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-4">Online Portal Access</h3>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-text-primary">Member Portal Access</p>
-            <p class="text-xs text-text-tertiary mt-0.5">Allow this member to access the online member portal</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <% if @member.portal_active? %>
-              <span class="inline-flex items-center rounded-full bg-positive-50 px-2 py-0.5 text-xs font-medium text-positive">Active</span>
-            <% elsif @member.portal_suspended? %>
-              <span class="inline-flex items-center rounded-full bg-danger-50 px-2 py-0.5 text-xs font-medium text-danger">Suspended</span>
-            <% else %>
-              <span class="inline-flex items-center rounded-full bg-surface-alt px-2 py-0.5 text-xs font-medium text-text-tertiary">Inactive</span>
-            <% end %>
-            <%= button_to toggle_portal_access_member_path(@member, enabled: !@member.portal_active?),
-              method: :post,
-              data: { turbo_confirm: @member.portal_active? ? "Suspend portal access for this member?" : "Enable portal access for this member?" },
-              class: "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 #{@member.portal_active? ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700'}" do %>
-              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm <%= @member.portal_active? ? 'translate-x-6' : 'translate-x-1' %>"></span>
-            <% end %>
-          </div>
-        </div>
-
-        <% if @member.portal_active? && @member.portal_enrollment_tokens.valid.any? %>
-          <div class="mt-4 rounded-md bg-primary-50 border border-primary-100 dark:bg-primary-900/20 dark:border-primary-800 p-3">
-            <p class="text-xs text-primary font-medium">Enrollment link sent</p>
-            <p class="text-xs text-primary-700 dark:text-primary-300 mt-0.5">Member can enroll using their email or member ID.</p>
-          </div>
-        <% elsif @member.portal_active? && !@member.portal_enabled? %>
-          <div class="mt-4 rounded-md bg-warning-50 border border-warning-100 dark:bg-warning-900/20 dark:border-warning-800 p-3">
-            <p class="text-xs text-warning font-medium">Pending enrollment</p>
-            <p class="text-xs text-warning-700 dark:text-warning-300 mt-0.5">Member hasn't completed portal registration yet.</p>
-          </div>
-        <% elsif !@member.portal_active? && @member.portal_enrollment_tokens.valid.any? %>
-          <div class="mt-4 rounded-md bg-surface-alt border border-border dark:bg-gray-800 dark:border-gray-700 p-3">
-            <p class="text-xs text-text-tertiary">Enrollment token available but portal access is disabled.</p>
-          </div>
-        <% end %>
-      </div>
-
-      <div class="rounded-lg border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-5">
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-3">Profile Settings</h3>
-        <div class="space-y-1.5">
-          <%= link_to "Edit Profile", "#", class: "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-surface-alt transition-colors" %>
-          <%= link_to "Upload ID", "#", class: "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-surface-alt transition-colors" %>
-          <%= link_to "Update Address", "#", class: "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-surface-alt transition-colors" %>
-          <%= link_to "Change Signature", "#", class: "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-surface-alt transition-colors" %>
-        </div>
-      </div>
-    </div>
+    <% end %>
   </div>
 </div>

@@ -38,15 +38,22 @@ Rails.application.routes.draw do
   end
 
   # App routes
-  resources :members, only: [:index, :show, :new, :create] do
+  resources :members, only: [ :index, :show, :new, :create, :edit, :update ] do
     member do
       post :toggle_portal_access
+      post :deactivate
+      get :tab_overview
+      get :tab_savings
+      get :tab_time_deposits
+      get :tab_loans
+      get :tab_share_capital
+      get :tab_settings
     end
-    resource :transaction, only: [:new, :create], controller: "member_transactions" do
+    resource :transaction, only: [ :new, :create ], controller: "member_transactions" do
       post :preview
     end
   end
-  resources :membership_applications, only: [:index, :new, :show], param: :uuid do
+  resources :membership_applications, only: [ :index, :new, :show ], param: :uuid do
     member do
       get :edit
       patch :update
@@ -77,8 +84,8 @@ Rails.application.routes.draw do
     get "cash_flow", to: "cash_flow#index"
     get "trial_balance", to: "trial_balance#index"
     get "chart_of_accounts", to: "chart_of_accounts#index"
-    resources :entries, only: [:index, :new, :create, :show]
-    resources :journal_entries, only: [:index, :new, :create, :show] do
+    resources :entries, only: [ :index, :new, :create, :show ]
+    resources :journal_entries, only: [ :index, :new, :create, :show ] do
       collection do
         post :preview
         get :saved_filters
@@ -90,35 +97,38 @@ Rails.application.routes.draw do
         post :reverse
       end
     end
-    resources :entry_templates, only: [:index]
+    resources :entry_templates, only: [ :index ]
     get "accounts/search", to: "accounts#search"
-    resources :accounts, only: [:show], controller: "accounts"
+    resources :accounts, only: [ :show ], controller: "accounts"
   end
 
   namespace :treasury do
-    resources :cash_sessions, only: [:index, :show] do
-      resources :closings, only: [:new, :create], controller: "cash_sessions/closings"
+    resources :cash_sessions, only: [ :index, :show ] do
+      resources :closings, only: [ :new, :create ], controller: "cash_sessions/closings"
       member do
         get :download_pdf
         post :receive_from_vault
         post :return_to_vault
       end
     end
-    resources :deposits, only: [:index, :new, :create, :show]
+    resources :deposits, only: [ :index, :new, :create, :show ]
     resources :time_deposit_products
-    resources :time_deposits, only: [:index, :new, :create, :show] do
+    resources :time_deposits, only: [ :index, :new, :create, :show ] do
       collection do
         post :preview
       end
     end
-    resources :loans, only: [:index], controller: "loans" do
+    resources :loans, only: [ :index ], controller: "loans" do
       member do
         post :disburse
         get :voucher
       end
     end
     resources :savings_products
-    resources :savings_accounts, only: [:index, :new, :create, :show] do
+    resources :savings_accounts, only: [ :index, :new, :create, :show ] do
+      collection do
+        get :taken_products
+      end
       member do
         get :deposit
         post :preview_deposit
@@ -128,12 +138,13 @@ Rails.application.routes.draw do
         post :confirm_withdraw
       end
     end
-    resources :vault_transfers, only: [:index] do
+    resources :vault_transfers, only: [ :index ] do
       member do
         post :approve
         post :reject
       end
     end
+    get "searches/members", to: "searches#members"
     get "searches/savings_accounts", to: "searches#savings_accounts"
   end
 
@@ -147,35 +158,35 @@ Rails.application.routes.draw do
         get :download_pdf
       end
     end
-    resources :loans, only: [:index, :show] do
-      resources :payments, only: [:create]
+    resources :loans, only: [ :index, :show ] do
+      resources :payments, only: [ :create ]
     end
     get "searches/members", to: "searches#members"
     get "searches/loan_products", to: "searches#loan_products"
   end
 
   namespace :external do
-    resources :accounts, only: [:index, :new, :create], controller: "accounts"
+    resources :accounts, only: [ :index, :new, :create ], controller: "accounts"
     resources :banks do
       resources :accounts do
-        resources :documents, only: [:index, :show, :new, :create, :destroy] do
+        resources :documents, only: [ :index, :show, :new, :create, :destroy ] do
           member do
             post :retry
           end
         end
-        resource :reconciliation, only: [:show], controller: "reconciliation" do
+        resource :reconciliation, only: [ :show ], controller: "reconciliation" do
           post :allocate
           post :confirm_allocation
           post :reject_allocation
         end
-        resource :entry_template, only: [:create], controller: "entry_templates"
+        resource :entry_template, only: [ :create ], controller: "entry_templates"
       end
     end
   end
 
   namespace :equity, path: :equity do
     resources :products
-    resources :accounts, only: [:index, :new, :create, :show] do
+    resources :accounts, only: [ :index, :new, :create, :show ] do
       member do
         get :buy
         post :preview_buy
@@ -191,14 +202,14 @@ Rails.application.routes.draw do
     get "risk_monitoring", to: "risk_monitoring#index"
     get "system_health", to: "system_health#index"
 
-    resources :branches, except: [:destroy]
-    resources :departments, except: [:destroy]
-    resources :teams, except: [:destroy]
+    resources :branches, except: [ :destroy ]
+    resources :departments, except: [ :destroy ]
+    resources :teams, except: [ :destroy ]
 
-    resources :roles, only: [:index, :show, :new, :create, :edit, :update]
-    resources :permissions, only: [:index, :show]
-    resources :users, only: [:index, :show, :edit, :update] do
-      resources :role_assignments, only: [:new, :create, :destroy], controller: "user_role_assignments"
+    resources :roles, only: [ :index, :show, :new, :create, :edit, :update ]
+    resources :permissions, only: [ :index, :show ]
+    resources :users, only: [ :index, :show, :edit, :update ] do
+      resources :role_assignments, only: [ :new, :create, :destroy ], controller: "user_role_assignments"
     end
 
     resources :policies do
@@ -209,7 +220,7 @@ Rails.application.routes.draw do
     end
 
     resources :approval_workflows do
-      resources :approval_requests, only: [:index, :show] do
+      resources :approval_requests, only: [ :index, :show ] do
         member do
           post :approve
           post :reject
@@ -217,14 +228,14 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :configurations, only: [:index, :new, :create, :show, :edit, :update] do
+    resources :configurations, only: [ :index, :new, :create, :show, :edit, :update ] do
       member do
         post :approve
         post :activate
       end
     end
 
-    resources :alerts, only: [:index, :show] do
+    resources :alerts, only: [ :index, :show ] do
       member do
         post :resolve
       end
@@ -237,7 +248,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :audit_logs, only: [:index, :show]
+    resources :audit_logs, only: [ :index, :show ]
 
     get "settings", to: "settings#index"
 
@@ -245,9 +256,9 @@ Rails.application.routes.draw do
     get "searches/users", to: "searches#users"
 
     namespace :messaging do
-      resources :messages, only: [:index, :show]
-      resources :channels, only: [:index, :show, :update] do
-        resources :providers, only: [:index, :new, :create, :show, :edit, :update, :destroy]
+      resources :messages, only: [ :index, :show ]
+      resources :channels, only: [ :index, :show, :update ] do
+        resources :providers, only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
       end
     end
   end

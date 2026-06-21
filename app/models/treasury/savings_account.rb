@@ -6,6 +6,8 @@ module Treasury
     ACCOUNT_TYPES = { personal: 0, business: 1 }.freeze
     STATUSES = %w[active closed].freeze
 
+    attribute :status, default: "active"
+
     belongs_to :savings_product, class_name: "Treasury::SavingsProduct"
     belongs_to :liability_account, class_name: "Accounting::Account", optional: true
     belongs_to :interest_expense_account, class_name: "Accounting::Account", optional: true
@@ -68,31 +70,44 @@ module Treasury
       return unless savings_product
 
       if savings_product.liability_ledger
-        self.liability_account ||= savings_product.liability_ledger.accounts.create!(
+        self.liability_account = savings_product.liability_ledger.accounts.create(
           name: "#{savings_product.name} Savings - #{depositor_name}",
           account_type: :liability,
           account_code: next_account_code(savings_product.liability_ledger),
           cooperative: cooperative
         )
+        unless liability_account.persisted?
+          Rails.logger.error "[SavingsAccount] Failed to create liability account: #{liability_account.errors.full_messages.join(', ')}"
+          errors.add(:base, "Liability account: #{liability_account.errors.full_messages.join(', ')}")
+          throw :abort
+        end
       end
 
       if savings_product.interest_expense_ledger
-        self.interest_expense_account ||= savings_product.interest_expense_ledger.accounts.create!(
+        self.interest_expense_account = savings_product.interest_expense_ledger.accounts.create(
           name: "#{savings_product.name} Interest Expense - #{depositor_name}",
           account_type: :expense,
           account_code: next_account_code(savings_product.interest_expense_ledger),
           cooperative: cooperative
         )
+        unless interest_expense_account.persisted?
+          Rails.logger.error "[SavingsAccount] Failed to create interest expense account: #{interest_expense_account.errors.full_messages.join(', ')}"
+          errors.add(:base, "Interest expense account: #{interest_expense_account.errors.full_messages.join(', ')}")
+          throw :abort
+        end
       end
     end
 
     def next_account_code(ledger)
-      max = ledger.accounts.pluck(:account_code).map(&:to_i).max
-      if max
-        format('%05d', max + 1)
+      codes = ledger.accounts.where(cooperative_id: cooperative_id).pluck(:account_code)
+      max = codes.map(&:to_i).max
+      result = if max
+        format("%05d", max + 1)
       else
         "#{ledger.account_code}001"
       end
+      Rails.logger.debug "[SavingsAccount] next_account_code ledger=#{ledger.account_code} existing=#{codes.inspect} result=#{result}"
+      result
     end
   end
 end

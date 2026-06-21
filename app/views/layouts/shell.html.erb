@@ -67,17 +67,17 @@
       .font-mono {
         font-family: 'JetBrains Mono', monospace;
       }
-      .bg-primary { background: var(--bg-primary); }
-      .bg-secondary { background: var(--bg-secondary); }
-      .bg-tertiary { background: var(--bg-tertiary); }
-      .border-default { border-color: var(--border-color); }
-      .border-active { border-color: var(--border-active); }
-      .text-accent { color: var(--accent); }
-      .bg-accent { background: var(--accent); }
-      .bg-accent-dim { background: var(--accent-dim); }
-      .text-primary { color: var(--text-primary); }
-      .text-secondary { color: var(--text-secondary); }
-      .text-muted { color: var(--text-muted); }
+      [data-shell-chrome] .bg-primary { background: var(--bg-primary); }
+      [data-shell-chrome] .bg-secondary { background: var(--bg-secondary); }
+      [data-shell-chrome] .bg-tertiary { background: var(--bg-tertiary); }
+      [data-shell-chrome] .border-default { border-color: var(--border-color); }
+      [data-shell-chrome] .border-active { border-color: var(--border-active); }
+      [data-shell-chrome] .text-accent { color: var(--accent); }
+      [data-shell-chrome] .bg-accent { background: var(--accent); }
+      [data-shell-chrome] .bg-accent-dim { background: var(--accent-dim); }
+      [data-shell-chrome] .text-primary { color: var(--text-primary); }
+      [data-shell-chrome] .text-secondary { color: var(--text-secondary); }
+      [data-shell-chrome] .text-muted { color: var(--text-muted); }
       [data-rail-section] { display: none; }
       [data-rail-section].active { display: block; }
       .rail-tooltip {
@@ -161,7 +161,7 @@
       <!-- Primary Rail -->
       <div class="flex flex-col flex-shrink-0 lg:flex relative"
            style="width: var(--rail-width); background: var(--bg-secondary); border-right: 1px solid var(--border-color);"
-           data-sidebar-target="rail">
+           data-sidebar-target="rail" data-shell-chrome>
         <!-- Logo -->
         <div class="flex items-center justify-center h-16 flex-shrink-0 relative">
           <div class="relative">
@@ -216,7 +216,7 @@
 <!-- Secondary Context Nav -->
       <div class="flex flex-col flex-shrink-0"
            style="width: var(--context-width); min-width: var(--context-width); background: var(--bg-secondary); border-right: 1px solid var(--border-color); transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out, opacity 0.2s ease-in-out;"
-           data-sidebar-target="contextNav">
+           data-sidebar-target="contextNav" data-shell-chrome>
         <!-- Context Header -->
         <div class="flex items-center h-14 px-4 relative" style="border-bottom: 1px solid var(--border-color);">
           <div class="w-1 h-4 rounded-full mr-3" style="background: var(--accent); box-shadow: 0 0 8px var(--accent);"></div>
@@ -283,7 +283,7 @@
       <!-- AI Sidebar -->
       <div class="flex-shrink-0 flex flex-col relative overflow-hidden"
           style="background: var(--bg-secondary); border-left: 1px solid var(--border-color); width: 0;"
-          data-ai-sidebar-target="sidebar">
+          data-ai-sidebar-target="sidebar" data-shell-chrome>
         <div class="absolute inset-0 opacity-5 pointer-events-none" style="background: linear-gradient(180deg, var(--accent) 0%, transparent 50%);"></div>
         <%= render "shell/ai_sidebar" %>
       </div>
@@ -297,9 +297,9 @@
     </div>
 
     <!-- Mobile Sidebar -->
-    <div data-sidebar-target="mobileSidebar"
-         class="fixed inset-y-0 left-0 z-50 flex transition-transform duration-300 ease-out -translate-x-full lg:hidden">
-      <div class="flex flex-col h-full" style="width: var(--rail-width); background: var(--bg-secondary); border-right: 1px solid var(--border-color);">
+      <div data-sidebar-target="mobileSidebar"
+           class="fixed inset-y-0 left-0 z-50 flex transition-transform duration-300 ease-out -translate-x-full lg:hidden" data-shell-chrome>
+        <div class="flex flex-col h-full" style="width: var(--rail-width); background: var(--bg-secondary); border-right: 1px solid var(--border-color);">
         <div class="flex items-center justify-center h-16 flex-shrink-0 relative">
           <div class="flex h-10 w-10 items-center justify-center" style="background: linear-gradient(135deg, var(--accent) 0%, #0099cc 100%); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);">
             <svg class="h-5 w-5 text-white" viewBox="0 0 40 40" fill="none">
