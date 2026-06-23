@@ -118,6 +118,7 @@
         </svg>
         <span class="text-[10px] font-semibold uppercase tracking-wider" style="color: var(--text-muted);">Accounting</span>
       </div>
+      <%= render "shell/sidebar_link", path: "/accounting/chart_of_accounts", label: "Chart of Accounts", icon: "book-open", current_path: current_path %>
       <%= render "shell/sidebar_link", path: "/accounting/entries", label: "Journal Entries", icon: "document-text", current_path: current_path %>
       <%= render "shell/sidebar_link", path: "/accounting/balance_sheet", label: "Balance Sheet", icon: "scale", current_path: current_path %>
       <%= render "shell/sidebar_link", path: "/accounting/income_statement", label: "Income Statement", icon: "trending-up", current_path: current_path %>

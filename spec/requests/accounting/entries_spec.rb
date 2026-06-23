@@ -7,32 +7,6 @@ RSpec.describe "Accounting::Entries" do
     post session_path, params: { email_address: user.email_address, password: "secret123" }
   end
 
-  describe "GET /accounting/entries" do
-    it "renders the index page" do
-      get accounting_entries_path
-      expect(response).to have_http_status(:ok)
-    end
-
-    it "filters by search query" do
-      create(:accounting_entry, description: "Special entry")
-      get accounting_entries_path, params: { q: "Special" }
-      expect(response).to have_http_status(:ok)
-    end
-
-    it "filters by date range" do
-      create(:accounting_entry, posted_at: 5.days.ago)
-      get accounting_entries_path, params: { from_date: 3.days.ago.to_date.to_s, to_date: Date.current.to_s }
-      expect(response).to have_http_status(:ok)
-    end
-
-    it "responds with CSV" do
-      create(:accounting_entry)
-      get accounting_entries_path, params: { format: :csv }
-      expect(response).to have_http_status(:ok)
-      expect(response.headers["Content-Disposition"]).to include(".csv")
-    end
-  end
-
   describe "GET /accounting/entries/new" do
     it "renders the new entry page" do
       get new_accounting_entry_path
@@ -60,7 +34,7 @@ RSpec.describe "Accounting::Entries" do
 
     it "redirects to the entry on success" do
       post accounting_entries_path, params: { entry: entry_params }
-      expect(response).to redirect_to(accounting_entry_path(Accounting::Entry.last))
+      expect(response).to redirect_to(accounting_journal_entry_path(Accounting::Entry.last))
     end
 
     it "enqueues running balance update job" do
@@ -80,14 +54,6 @@ RSpec.describe "Accounting::Entries" do
         post accounting_entries_path, params: { entry: params }
         expect(response).to have_http_status(:unprocessable_entity)
       end
-    end
-  end
-
-  describe "GET /accounting/entries/:id" do
-    it "shows the entry" do
-      entry = create(:accounting_entry)
-      get accounting_entry_path(entry)
-      expect(response).to have_http_status(:ok)
     end
   end
 end

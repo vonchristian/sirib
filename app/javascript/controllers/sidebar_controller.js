@@ -119,7 +119,7 @@ export default class extends Controller {
       equity: "/equity/capital",
       members: "/members",
       treasury: "/treasury/cash_sessions",
-      accounting: "/accounting/entries",
+      accounting: "/accounting/journal_entries",
       reports: "/dashboard/reports",
       management: "/management/dashboard"
     }

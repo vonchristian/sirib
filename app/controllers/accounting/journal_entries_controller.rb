@@ -4,7 +4,7 @@ module Accounting
 
     def index
       @filters = build_filters
-      @query_service = JournalEntryQueryService.new(@filters)
+      @query_service = JournalEntryQueryService.new(**@filters)
       @entries = @query_service.call
 
       @pagy, @entries = pagy(@entries, limit: 25)

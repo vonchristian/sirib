@@ -128,8 +128,8 @@ test.describe('Journal Entry Search', () => {
   test('search journal entry by reference number', async ({ page }) => {
     await page.goto('/accounting/journal_entries');
 
-    await page.fill('[data-testid="search-box"]', 'JV-2026');
-    await page.press('[data-testid="search-box"]', 'Enter');
+    await page.fill('input[placeholder="Search entries..."]', 'JV-2026');
+    await page.press('input[placeholder="Search entries..."]', 'Enter');
 
     await page.waitForLoadState('networkidle');
   });
@@ -137,14 +137,14 @@ test.describe('Journal Entry Search', () => {
   test('search box is visible on index page', async ({ page }) => {
     await page.goto('/accounting/journal_entries');
 
-    await expect(page.locator('[data-testid="search-box"]')).toBeVisible();
+    await expect(page.locator('input[placeholder="Search entries..."]')).toBeVisible();
   });
 
   test('empty search shows all entries', async ({ page }) => {
     await page.goto('/accounting/journal_entries');
 
-    await page.fill('[data-testid="search-box"]', '');
-    await page.press('[data-testid="search-box"]', 'Enter');
+    await page.fill('input[placeholder="Search entries..."]', '');
+    await page.press('input[placeholder="Search entries..."]', 'Enter');
 
     await expect(page.locator('[data-testid="journal-row"]').first()).toBeVisible({ timeout: 10000 });
   });

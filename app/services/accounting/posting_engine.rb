@@ -28,13 +28,17 @@ module Accounting
     def build_entry
       resolver = TemplateResolver.new(@template, @input)
 
+      accounts = resolver.resolve_debits.map { |l| l[:account] } + resolver.resolve_credits.map { |l| l[:account] }
+      accounts.each do |account|
+        AccountStatusService.new(account: account).can_post!
+      end
+
       @entry = Accounting::Entry.build(
         description: build_description,
         posted_at: Time.current,
         debits: resolver.resolve_debits.map { |l| { account: l[:account], amount: l[:amount_cents] } },
         credits: resolver.resolve_credits.map { |l| { account: l[:account], amount: l[:amount_cents] } }
       )
-      @entry.total_amount_cents = @entry.amount_lines.sum(&:amount_cents)
     end
 
     def build_description

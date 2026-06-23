@@ -76,7 +76,7 @@
       </div>
 
       <div class="px-6 py-4 flex items-center justify-end gap-3">
-        <%= link_to "Cancel", accounting_entries_path, class: "rounded-md border border-border px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-alt transition-colors dark:border-gray-600 dark:text-gray-400" %>
+        <%= link_to "Cancel", accounting_journal_entries_path, class: "rounded-md border border-border px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-alt transition-colors dark:border-gray-600 dark:text-gray-400" %>
         <%= submit_tag "Create Entry", data: { disable_with: "Saving..." }, class: "rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-600 transition-colors cursor-pointer" %>
       </div>
     <% end %>

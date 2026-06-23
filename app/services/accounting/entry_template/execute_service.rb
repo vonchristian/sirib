@@ -54,9 +54,7 @@ module Accounting
           posted_at: Time.current,
           debits: debit_inputs,
           credits: credit_inputs
-        ).tap do |entry|
-          entry.total_amount_cents = total_amount_cents
-        end
+        )
       end
 
       def debit_inputs

@@ -1,0 +1,109 @@
+<% filters_active = [ :from_date, :to_date, :quick_range, :debit_only, :credit_only, :amount_min, :amount_max, :reference_number, :description, :entry_type, :source_module ].any? { |k| params[k].present? } %>
+
+<%= form_tag accounting_account_path(@account), method: :get, data: { turbo_frame: "account_ledger", controller: "account-filter", action: "change->account-filter#submit" }, class: "space-y-3" do %>
+  <%= hidden_field_tag :sort, params[:sort] %>
+
+  <div class="rounded-lg border border-border bg-surface p-4" data-testid="filter-panel">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-[10px] font-semibold text-text-primary uppercase tracking-wider">Filters</h3>
+      <% if filters_active %>
+        <%= link_to "Clear all", accounting_account_path(@account), class: "text-[10px] text-primary hover:text-primary/80 transition-colors", data: { turbo_frame: "account_ledger" } %>
+      <% end %>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <%# Quick Date Ranges %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Quick Date</label>
+        <select name="quick_range" class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+          <option value="">All time</option>
+          <option value="today" <%= "selected" if params[:quick_range] == "today" %>>Today</option>
+          <option value="this_week" <%= "selected" if params[:quick_range] == "this_week" %>>This Week</option>
+          <option value="this_month" <%= "selected" if params[:quick_range] == "this_month" %>>This Month</option>
+          <option value="last_month" <%= "selected" if params[:quick_range] == "last_month" %>>Last Month</option>
+          <option value="this_quarter" <%= "selected" if params[:quick_range] == "this_quarter" %>>This Quarter</option>
+          <option value="year_to_date" <%= "selected" if params[:quick_range] == "year_to_date" %>>Year to Date</option>
+        </select>
+      </div>
+
+      <%# From Date %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">From Date</label>
+        <input type="date" name="from_date" value="<%= params[:from_date] %>" class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+      </div>
+
+      <%# To Date %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">To Date</label>
+        <input type="date" name="to_date" value="<%= params[:to_date] %>" class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+      </div>
+
+      <%# Entry Type %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Entry Type</label>
+        <select name="entry_type" class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+          <option value="">All types</option>
+          <option value="manual_entry" <%= "selected" if params[:entry_type] == "manual_entry" %>>Manual</option>
+          <option value="system_entry" <%= "selected" if params[:entry_type] == "system_entry" %>>System</option>
+          <option value="interest_entry" <%= "selected" if params[:entry_type] == "interest_entry" %>>Interest</option>
+          <option value="fees_entry" <%= "selected" if params[:entry_type] == "fees_entry" %>>Fees</option>
+          <option value="reversal_entry" <%= "selected" if params[:entry_type] == "reversal_entry" %>>Reversal</option>
+          <option value="adjustment_entry" <%= "selected" if params[:entry_type] == "adjustment_entry" %>>Adjustment</option>
+        </select>
+      </div>
+
+      <%# Source Module %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Source Module</label>
+        <select name="source_module" class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+          <option value="">All sources</option>
+          <option value="source_manual" <%= "selected" if params[:source_module] == "source_manual" %>>Manual</option>
+          <option value="source_loans" <%= "selected" if params[:source_module] == "source_loans" %>>Loans</option>
+          <option value="source_deposits" <%= "selected" if params[:source_module] == "source_deposits" %>>Deposits</option>
+          <option value="source_external_banking" <%= "selected" if params[:source_module] == "source_external_banking" %>>External Banking</option>
+          <option value="source_treasury" <%= "selected" if params[:source_module] == "source_treasury" %>>Treasury</option>
+          <option value="source_equity" <%= "selected" if params[:source_module] == "source_equity" %>>Equity</option>
+        </select>
+      </div>
+
+      <%# Debit/Credit filter %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Direction</label>
+        <select name="direction" class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+          <option value="">All</option>
+          <option value="debit" <%= "selected" if params[:debit_only] == "1" %>>Debit only</option>
+          <option value="credit" <%= "selected" if params[:credit_only] == "1" %>>Credit only</option>
+        </select>
+      </div>
+
+      <%# Amount Min %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Min Amount (₱)</label>
+        <input type="number" name="amount_min" value="<%= params[:amount_min] %>" step="0.01" min="0" placeholder="0.00" class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none font-mono">
+      </div>
+
+      <%# Amount Max %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Max Amount (₱)</label>
+        <input type="number" name="amount_max" value="<%= params[:amount_max] %>" step="0.01" min="0" placeholder="0.00" class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none font-mono">
+      </div>
+
+      <%# Reference Number %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Reference #</label>
+        <input type="text" name="reference_number" value="<%= params[:reference_number] %>" placeholder="Search ref..." class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+      </div>
+
+      <%# Description %>
+      <div>
+        <label class="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Description</label>
+        <input type="text" name="description" value="<%= params[:description] %>" placeholder="Search memo..." class="w-full rounded-md border border-border bg-surface-alt py-1.5 px-2 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+      <%= submit_tag "Apply Filters", name: nil, class: "rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary/80 transition-colors cursor-pointer" %>
+      <%= link_to "Reset", accounting_account_path(@account), class: "text-xs text-text-tertiary hover:text-text-secondary transition-colors", data: { turbo_frame: "account_ledger" } %>
+    </div>
+  </div>
+<% end %>

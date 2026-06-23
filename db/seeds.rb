@@ -17,6 +17,12 @@ unless Rails.env.test?
   require_relative "seeds/demo_data"
 end
 
+unless Rails.env.test?
+  puts "\nPhase 4: Year-long audit trail"
+  require_relative "seeds/audit_trail"
+  run_year_long_audit_trail
+end
+
 puts ""
 puts "=" * 60
 puts "Seed complete"

@@ -71,7 +71,7 @@ test.describe('Journal Entry', () => {
 
       await page.locator('input[type="submit"]').press('Enter');
 
-      await expect(page).toHaveURL(/\/accounting\/entries\/\d+/);
+      await expect(page).toHaveURL(/\/accounting\/journal_entries\/\d+/);
       await expect(page.locator('text=Entry created successfully')).toBeVisible();
     });
 
@@ -107,9 +107,9 @@ test.describe('Journal Entry', () => {
     });
 
     test('New Entry button on index page navigates to the form', async ({ page }) => {
-      await page.goto('/accounting/entries');
+      await page.goto('/accounting/journal_entries');
       await page.getByText('New Entry').click();
-      await expect(page).toHaveURL(/\/accounting\/entries\/new/);
+      await expect(page).toHaveURL(/\/accounting\/journal_entries\/new/);
       await expect(page.locator('textarea[name="entry[description]"]')).toBeVisible();
     });
   });

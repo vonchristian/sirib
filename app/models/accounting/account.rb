@@ -21,7 +21,11 @@ module Accounting
     has_many :cash_accounts, class_name: "Accounting::CashAccount", dependent: :destroy
 
     attribute :account_type, :string
+    attribute :status, :string, default: "active"
+    attribute :postable, :boolean, default: true
+
     enum :account_type, { asset: "asset", equity: "equity", liability: "liability", revenue: "revenue", expense: "expense" }, validate: false
+    enum :status, { active: "active", inactive: "inactive" }, default: :active, validate: false
 
     validates :name, presence: true
     validates :account_code, presence: true, uniqueness: { scope: :cooperative_id }
@@ -29,6 +33,8 @@ module Accounting
 
     scope :contra, -> { where(contra: true) }
     scope :non_contra, -> { where(contra: false) }
+    scope :postable, -> { where(postable: true) }
+    scope :non_postable, -> { where(postable: false) }
 
     scope :cash_accounts_for, ->(user) {
       where(id: user.cash_accounts.select(:account_id))
@@ -36,6 +42,14 @@ module Accounting
 
     def normal_credit_balance?
       NORMAL_CREDIT_BALANCE[account_type]
+    end
+
+    def postable?
+      postable
+    end
+
+    def active?
+      status == "active"
     end
 
     def balance(from_date: nil, to_date: nil, to_time: nil)

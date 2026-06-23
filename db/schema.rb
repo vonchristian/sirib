@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_21_000011) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -38,9 +38,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_21_000011) do
     t.enum "account_type", null: false, enum_type: "account_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status"
+    t.boolean "postable"
+    t.uuid "created_by_id"
+    t.uuid "modified_by_id"
     t.index ["cooperative_id", "account_code"], name: "index_accounts_on_cooperative_id_and_account_code", unique: true
     t.index ["cooperative_id"], name: "index_accounts_on_cooperative_id"
     t.index ["ledger_id"], name: "index_accounts_on_ledger_id"
+    t.index ["postable"], name: "index_accounts_on_postable"
+    t.index ["status"], name: "index_accounts_on_status"
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|

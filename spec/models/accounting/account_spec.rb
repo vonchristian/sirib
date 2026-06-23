@@ -24,6 +24,46 @@ RSpec.describe Accounting::Account do
                      revenue: "revenue", expense: "expense")
         .backed_by_column_of_type(:enum)
     end
+
+    it "defines status enum" do
+      expect(account).to define_enum_for(:status)
+        .with_values(active: "active", inactive: "inactive")
+        .backed_by_column_of_type(:string)
+    end
+  end
+
+  describe "default attributes" do
+    it "defaults status to active" do
+      expect(build(:accounting_account).status).to eq("active")
+    end
+
+    it "defaults postable to true" do
+      expect(build(:accounting_account).postable).to be true
+    end
+  end
+
+  describe "#active?" do
+    it "returns true when status is active" do
+      account = build(:accounting_account, status: :active)
+      expect(account.active?).to be true
+    end
+
+    it "returns false when status is inactive" do
+      account = build(:accounting_account, status: :inactive)
+      expect(account.active?).to be false
+    end
+  end
+
+  describe "#postable?" do
+    it "returns true when postable is true" do
+      account = build(:accounting_account, postable: true)
+      expect(account.postable?).to be true
+    end
+
+    it "returns false when postable is false" do
+      account = build(:accounting_account, postable: false)
+      expect(account.postable?).to be false
+    end
   end
 
   describe "scopes" do
@@ -36,6 +76,19 @@ RSpec.describe Accounting::Account do
 
     it "returns non-contra accounts" do
       expect(described_class.non_contra).to contain_exactly(non_contra_account)
+    end
+  end
+
+  describe "postable scopes" do
+    let!(:postable_account) { create(:accounting_account, postable: true) }
+    let!(:non_postable_account) { create(:accounting_account, postable: false) }
+
+    it "returns postable accounts" do
+      expect(described_class.postable).to contain_exactly(postable_account)
+    end
+
+    it "returns non-postable accounts" do
+      expect(described_class.non_postable).to contain_exactly(non_postable_account)
     end
   end
 

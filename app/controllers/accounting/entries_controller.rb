@@ -2,31 +2,6 @@ module Accounting
   class EntriesController < ApplicationController
     layout "shell"
 
-    def index
-      entries = Accounting::Entry.order(posted_at: :desc, id: :desc)
-      if params[:account_id].present?
-        @account = Accounting::Account.find(params[:account_id])
-        entries = entries.joins(:amount_lines).where(amount_lines: { account_id: @account.id })
-      end
-      entries = entries.search(params[:q]) if params[:q].present?
-      entries = entries.up_to(params[:to_date].to_date) if params[:to_date].present?
-      entries = entries.from_date(params[:from_date].to_date) if params[:from_date].present?
-
-      respond_to do |format|
-        format.html do
-          @pagy, @entries = pagy(entries, limit: 25)
-        end
-        format.csv do
-          @entries = entries.includes(amount_lines: :account)
-          headers["Content-Disposition"] = "attachment; filename=\"journal_entries_#{Date.current}.csv\""
-        end
-      end
-    end
-
-    def show
-      @entry = Accounting::Entry.includes(amount_lines: :account).find(params[:id])
-    end
-
     def new
       @entry = Accounting::Entry.new
     end
@@ -43,7 +18,7 @@ module Accounting
 
       if @entry.save
         Accounting::UpdateRunningBalancesJob.perform_later(@entry)
-        redirect_to accounting_entry_path(@entry), notice: "Entry created successfully."
+        redirect_to accounting_journal_entry_path(@entry), notice: "Entry created successfully."
       else
         render :new, status: :unprocessable_entity
       end

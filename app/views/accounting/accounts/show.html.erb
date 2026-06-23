@@ -5,119 +5,224 @@
   <meta name="turbo-cache-control" content="no-cache">
 <% end %>
 
-<div class="space-y-6">
-  <div class="flex items-center justify-between">
-    <div>
+<%= render "shared/breadcrumbs" %>
+<% content_for :breadcrumbs do %>
+  Chart of Accounts | <%= @account.account_code %>
+<% end %>
+
+<div class="space-y-6" data-controller="tabs">
+  <%# Account Header %>
+  <div class="flex items-start justify-between flex-wrap gap-4" data-testid="account-header">
+    <div class="min-w-0">
       <h1 class="text-xl font-semibold text-text-primary"><%= @account.name %></h1>
-      <p class="text-sm text-text-tertiary mt-0.5"><%= @account.account_code %> — <%= @account.ledger.name %></p>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-    <div class="card p-4">
-      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Account Type</p>
-      <p class="text-sm font-semibold text-text-primary capitalize"><%= @account.account_type %></p>
-    </div>
-    <div class="card p-4">
-      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Ledger</p>
-      <p class="text-sm font-semibold text-text-primary"><%= @account.ledger.name %></p>
-    </div>
-    <div class="card p-4">
-      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Normal Balance</p>
-      <p class="text-sm font-semibold text-text-primary"><%= @account.normal_credit_balance? ? "Credit" : "Debit" %></p>
-    </div>
-    <div class="card p-4">
-      <p class="text-xs text-text-tertiary uppercase tracking-wider mb-1">Contra Account</p>
-      <p class="text-sm font-semibold text-text-primary"><%= @account.contra? ? "Yes" : "No" %></p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div data-controller="tabs">
-      <div class="flex gap-6 border-b border-border px-6" role="tablist">
-        <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="entries" class="pb-3 pt-4 text-sm font-medium border-b-2 border-primary text-primary transition-colors">Entries</button>
-        <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="details" class="pb-3 pt-4 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Details</button>
-      </div>
-
-      <div data-tabs-target="panel" id="tab-entries">
-        <% if @entries.any? %>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Reference</th>
-                <th>Description</th>
-                <th class="text-right">Debit</th>
-                <th class="text-right">Credit</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @entries.each do |entry| %>
-                <% entry_lines = entry.amount_lines.select { |l| l.account_id == @account.id } %>
-                <tr class="hover:bg-surface-alt/50 cursor-pointer" data-href="<%= accounting_entry_path(entry) %>" data-action="click->sidebar#navigate">
-                  <td class="whitespace-nowrap"><%= entry.posted_at.strftime("%b %d, %Y") %></td>
-                  <td class="font-mono text-xs"><%= entry.reference_number %></td>
-                  <td class="max-w-xs truncate"><%= entry.description %></td>
-                  <td class="text-right font-mono text-danger">
-                    <% debits = entry_lines.select(&:debit?) %>
-                    <%= debits.any? ? Money.new(debits.sum(&:amount_cents), "PHP").format : "—" %>
-                  </td>
-                  <td class="text-right font-mono text-success">
-                    <% credits = entry_lines.select(&:credit?) %>
-                    <%= credits.any? ? Money.new(credits.sum(&:amount_cents), "PHP").format : "—" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-          <div class="px-6 py-3 border-t border-border">
-            <%= link_to "View all entries →", accounting_entries_path(account_id: @account.id), class: "text-xs text-primary hover:text-primary/80 transition-colors" %>
-          </div>
-        <% else %>
-          <div class="p-8 text-center">
-            <p class="text-sm text-text-tertiary">No entries for this account</p>
-          </div>
+      <p class="text-sm text-text-tertiary mt-0.5">
+        <span class="font-mono"><%= @account.account_code %></span>
+        <span class="mx-1.5">&middot;</span>
+        <%= @account.ledger.name %>
+        <span class="mx-1.5">&middot;</span>
+        <span class="capitalize"><%= @account.account_type %></span>
+        <span class="mx-1.5">&middot;</span>
+        Normal: <%= @account.normal_credit_balance? ? "Credit" : "Debit" %>
+        <% if @account.contra? %>
+          <span class="ml-1.5 px-1.5 py-0.5 rounded-sm text-[10px] font-medium bg-amber-500/10 text-amber-500" data-testid="contra-badge">Contra</span>
         <% end %>
+      </p>
+    </div>
+    <div class="flex items-center gap-3 flex-shrink-0">
+      <div class="px-3 py-1.5 rounded-lg border border-border bg-surface text-right">
+        <p class="text-[10px] text-text-tertiary uppercase tracking-wider">Current Balance</p>
+        <p class="text-base font-semibold font-mono text-text-primary"><%= @account.balance.format %></p>
       </div>
+    </div>
+  </div>
 
-      <div data-tabs-target="panel" id="tab-details" class="hidden">
-        <div class="p-6">
-          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-            <div>
-              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Account Code</dt>
-              <dd class="mt-1 text-sm font-mono text-text-primary"><%= @account.account_code %></dd>
+  <% if !@status_service.can_post? %>
+    <div class="rounded-lg border border-amber-500/20 bg-amber-500/10 p-4 flex items-start gap-3" data-testid="posting-restriction-alert">
+      <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+      </svg>
+      <div>
+        <p class="text-sm font-medium text-amber-500">Posting Restricted</p>
+        <p class="text-xs text-amber-500/80 mt-0.5"><%= @status_service.status_reason %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Tab Navigation %>
+  <div class="border-b border-border">
+    <nav class="flex gap-6 -mb-px">
+      <button type="button"
+              data-tabs-target="tab"
+              data-tab="overview"
+              data-action="click->tabs#activate"
+              class="py-2.5 text-xs font-medium border-b-2 border-primary text-primary transition-colors">
+        Overview
+      </button>
+      <button type="button"
+              data-tabs-target="tab"
+              data-tab="transactions"
+              data-action="click->tabs#activate"
+              class="py-2.5 text-xs font-medium border-b-2 border-transparent text-text-tertiary hover:text-text-secondary transition-colors">
+        Transactions
+      </button>
+      <button type="button"
+              data-tabs-target="tab"
+              data-tab="audit"
+              data-action="click->tabs#activate"
+              class="py-2.5 text-xs font-medium border-b-2 border-transparent text-text-tertiary hover:text-text-secondary transition-colors">
+        Audit Trail
+      </button>
+    </nav>
+  </div>
+
+  <%# Tab: Overview %>
+  <div id="tab-overview" data-tabs-target="panel">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <%= render "accounting/accounts/balance_snapshot", summary: @summary %>
+      <div class="space-y-4">
+        <div class="rounded-lg border border-border bg-surface p-4">
+          <h3 class="text-[10px] font-semibold text-text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/>
+            </svg>
+            Account Details
+          </h3>
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Account Code</span>
+              <span class="text-xs font-mono text-text-secondary font-medium"><%= @account.account_code %></span>
             </div>
-            <div>
-              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Account Name</dt>
-              <dd class="mt-1 text-sm text-text-primary"><%= @account.name %></dd>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Ledger</span>
+              <span class="text-xs text-text-secondary font-medium"><%= @account.ledger.name %></span>
             </div>
-            <div>
-              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Account Type</dt>
-              <dd class="mt-1 text-sm capitalize text-text-primary"><%= @account.account_type %></dd>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Type</span>
+              <span class="text-xs capitalize text-text-secondary font-medium"><%= @account.account_type %></span>
             </div>
-            <div>
-              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Ledger</dt>
-              <dd class="mt-1 text-sm text-text-primary"><%= @account.ledger.name %></dd>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Normal Balance</span>
+              <span class="text-xs text-text-secondary font-medium"><%= @account.normal_credit_balance? ? "Credit" : "Debit" %></span>
             </div>
-            <div>
-              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Normal Balance</dt>
-              <dd class="mt-1 text-sm text-text-primary"><%= @account.normal_credit_balance? ? "Credit" : "Debit" %></dd>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Contra</span>
+              <span class="text-xs text-text-secondary font-medium"><%= @account.contra? ? "Yes" : "No" %></span>
             </div>
-            <div>
-              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Contra Account</dt>
-              <dd class="mt-1 text-sm text-text-primary"><%= @account.contra? ? "Yes" : "No" %></dd>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Status</span>
+              <span class="text-xs font-medium <%= @account.active? ? "text-success" : "text-danger" %>" data-testid="account-status">
+                <%= @account.status&.capitalize || "Active" %>
+              </span>
             </div>
-            <div>
-              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Created</dt>
-              <dd class="mt-1 text-sm text-text-primary"><%= @account.created_at.strftime("%b %d, %Y") %></dd>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Postable</span>
+              <span class="text-xs font-medium <%= @account.postable? ? "text-success" : "text-danger" %>" data-testid="account-postable">
+                <%= @account.postable? ? "Yes" : "No" %>
+              </span>
             </div>
-            <div>
-              <dt class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Updated</dt>
-              <dd class="mt-1 text-sm text-text-primary"><%= @account.updated_at.strftime("%b %d, %Y") %></dd>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Created</span>
+              <span class="text-xs text-text-secondary font-medium"><%= l(@account.created_at, format: :long) %></span>
             </div>
-          </dl>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-text-tertiary">Last Updated</span>
+              <span class="text-xs text-text-secondary font-medium"><%= l(@account.updated_at, format: :long) %></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <%# Tab: Transactions %>
+  <div id="tab-transactions" data-tabs-target="panel" class="hidden">
+    <div class="space-y-4">
+      <%= render "accounting/accounts/filter_panel" %>
+
+      <%= turbo_frame_tag "account_ledger", data: { testid: "ledger-table" } do %>
+        <% if @ledger_lines.any? %>
+          <div class="rounded-lg border border-border bg-surface overflow-hidden" data-controller="clickable-row">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider">
+                    <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                      <%= sort_link_helper("Date", "posted_at", params) %>
+                    </th>
+                    <th class="px-3 py-2.5 font-medium">Entry #</th>
+                    <th class="px-3 py-2.5 font-medium">Description</th>
+                    <th class="px-3 py-2.5 font-medium text-right">Debit</th>
+                    <th class="px-3 py-2.5 font-medium text-right">Credit</th>
+                    <th class="px-3 py-2.5 font-medium text-right">Running Balance</th>
+                    <th class="px-3 py-2.5 font-medium">Source</th>
+                    <th class="px-3 py-2.5 font-medium">Posted By</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                  <% @ledger_lines.each do |line| %>
+                    <tr class="hover:bg-surface-alt/50 transition-colors cursor-pointer"
+                        data-clickable-row-target="row"
+                        data-href="<%= accounting_journal_entry_path(line.journal_entry_id) %>"
+                        tabindex="0"
+                        data-testid="ledger-row">
+                      <td class="px-3 py-2.5 whitespace-nowrap text-sm text-text-secondary font-mono">
+                        <%= l(line.date, format: :ledger) %>
+                      </td>
+                      <td class="px-3 py-2.5 font-mono text-sm text-text-primary">
+                        <%= link_to line.entry_number, accounting_journal_entry_path(line.journal_entry_id),
+                                    class: "text-primary hover:text-primary/80 transition-colors",
+                                    data: { action: "click->clickable-row#ignore" } %>
+                      </td>
+                      <td class="px-3 py-2.5 text-sm text-text-secondary max-w-[200px] truncate" title="<%= line.memo %>">
+                        <%= line.memo %>
+                      </td>
+                      <td class="px-3 py-2.5 text-right font-mono text-sm text-danger whitespace-nowrap">
+                        <%= line.debit.positive? ? line.debit.format : "—" %>
+                      </td>
+                      <td class="px-3 py-2.5 text-right font-mono text-sm text-success whitespace-nowrap">
+                        <%= line.credit.positive? ? line.credit.format : "—" %>
+                      </td>
+                      <td class="px-3 py-2.5 text-right font-mono text-sm text-text-primary font-semibold whitespace-nowrap">
+                        <%= line.running_balance.format %>
+                      </td>
+                      <td class="px-3 py-2.5 text-sm text-text-tertiary">
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium <%= entry_type_class(line.entry_type) %>">
+                          <%= line.source_type %>
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-sm text-text-tertiary">
+                        <%= line.posted_by %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-4">
+            <div class="text-xs text-text-tertiary">
+              <%= pagy_info(@pagy) %>
+            </div>
+            <%= render "shared/pagination", pagy: @pagy %>
+          </div>
+        <% else %>
+          <div class="rounded-lg border border-border bg-surface p-8 text-center" data-testid="empty-state">
+            <svg class="w-12 h-12 text-text-tertiary mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+            </svg>
+            <p class="text-sm font-medium text-text-primary">No ledger activity</p>
+            <p class="text-xs text-text-tertiary mt-1">This account has no transactions. Try adjusting your filters or check back later.</p>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Tab: Audit Trail %>
+  <div id="tab-audit" data-tabs-target="panel" class="hidden">
+    <%= render "accounting/accounts/audit_trail", account: @account %>
+  </div>
 </div>
+
+

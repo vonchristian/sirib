@@ -3,10 +3,10 @@
 
 <div class="flex gap-6 h-full" data-controller="journal-entries">
   <%= render "accounting/journal_entries/filter_panel",
-               branches: branches,
-               accounts: accounts,
-               users: users,
-               saved_filters: saved_filters %>
+               branches: @branches,
+               accounts: @accounts,
+               users: @users,
+               saved_filters: @saved_filters %>
 
   <div class="flex-1 min-w-0 flex flex-col">
     <div class="flex items-center justify-between mb-4">
@@ -121,7 +121,7 @@
 
       <div class="mt-4 flex items-center justify-between">
         <div class="text-xs text-text-tertiary">
-          <%= page_entries_info(@pagy) if defined?(@pagy) %>
+          <%= pagy_info(@pagy) if defined?(@pagy) %>
         </div>
         <%= render "shared/pagination", pagy: @pagy if defined?(@pagy) %>
       </div>
@@ -131,25 +131,3 @@
   <%= turbo_frame_tag "entry_detail", class: "w-96 flex-shrink-0" %>
 </div>
 
-<%# Helper methods for status classes %>
-<% def status_class(status) %>
-  <% case status %>
-  <% when "posted" then "bg-green-100 text-green-800" %>
-  <% when "pending" then "bg-yellow-100 text-yellow-800" %>
-  <% when "reversed" then "bg-red-100 text-red-800" %>
-  <% else "bg-gray-100 text-gray-800" %>
-  <% end %>
-<% end %>
-
-<%# Helper methods for entry type classes %>
-<% def entry_type_class(type) %>
-  <% case type %>
-  <% when "manual" then "bg-blue-100 text-blue-800" %>
-  <% when "system" then "bg-purple-100 text-purple-800" %>
-  <% when "interest" then "bg-amber-100 text-amber-800" %>
-  <% when "fees" then "bg-orange-100 text-orange-800" %>
-  <% when "reversal" then "bg-red-100 text-red-800" %>
-  <% when "adjustment" then "bg-indigo-100 text-indigo-800" %>
-  <% else "bg-gray-100 text-gray-800" %>
-  <% end %>
-<% end %>

@@ -84,7 +84,9 @@ Rails.application.routes.draw do
     get "cash_flow", to: "cash_flow#index"
     get "trial_balance", to: "trial_balance#index"
     get "chart_of_accounts", to: "chart_of_accounts#index"
-    resources :entries, only: [ :index, :new, :create, :show ]
+    get "chart_of_accounts/search", to: "chart_of_accounts#search", as: :search_chart_of_accounts
+    get "chart_of_accounts/accounts", to: "chart_of_accounts#accounts", as: :accounts_chart_of_accounts
+    resources :entries, only: [ :new, :create ]
     resources :journal_entries, only: [ :index, :new, :create, :show ] do
       collection do
         post :preview
@@ -99,7 +101,11 @@ Rails.application.routes.draw do
     end
     resources :entry_templates, only: [ :index ]
     get "accounts/search", to: "accounts#search"
-    resources :accounts, only: [ :show ], controller: "accounts"
+    resources :accounts, only: [ :show ], controller: "accounts" do
+      collection do
+        get :audit_entries
+      end
+    end
   end
 
   namespace :treasury do
