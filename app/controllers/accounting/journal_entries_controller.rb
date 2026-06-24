@@ -4,14 +4,14 @@ module Accounting
 
     def index
       @filters = build_filters
-      @query_service = JournalEntryQueryService.new(**@filters)
+      @query_service = JournalEntryQueryService.new(cooperative: Current.cooperative, **@filters)
       @entries = @query_service.call
 
       @pagy, @entries = pagy(@entries, limit: 25)
 
       @branches = Management::Branch.active.order(:name) if Entry.column_names.include?("branch_id")
-      @accounts = Accounting::Account.order(:name).limit(100)
-      @users = User.order(:full_name).limit(50)
+      @accounts = Accounting::Account.by_cooperative(Current.cooperative).order(:name).limit(100)
+      @users = User.where(cooperative_id: Current.cooperative.id).order(:full_name).limit(50)
       @saved_filters = SavedFilterService.new(user: Current.user).list(filter_type: "journal_entry")
 
       respond_to do |format|
@@ -31,8 +31,8 @@ module Accounting
     end
 
     def show
-      @entry = Accounting::Entry.includes(amount_lines: :account).find(params[:id])
-      @entry_template = Accounting::EntryTemplate.find_by(entry_id: @entry.id)
+      @entry = Accounting::Entry.by_cooperative(Current.cooperative).includes(amount_lines: :account).find(params[:id])
+      @entry_template = Accounting::EntryTemplate.by_cooperative(Current.cooperative).find_by(entry_id: @entry.id)
 
       respond_to do |format|
         format.html
@@ -41,13 +41,13 @@ module Accounting
     end
 
     def new
-      @templates = Accounting::EntryTemplate.active.order(:name)
+      @templates = Accounting::EntryTemplate.by_cooperative(Current.cooperative).active.order(:name)
       @preview_lines = []
       @branches = Management::Branch.active.order(:name) if Entry.column_names.include?("branch_id")
     end
 
     def preview
-      @template = Accounting::EntryTemplate.find(params[:template_id])
+      @template = Accounting::EntryTemplate.by_cooperative(Current.cooperative).find(params[:template_id])
       engine = PostingEngine.new(template: @template, input: { amount: params[:amount] })
       @preview_lines = engine.preview
 
@@ -57,7 +57,7 @@ module Accounting
     end
 
     def create
-      @template = Accounting::EntryTemplate.find(params[:template_id])
+      @template = Accounting::EntryTemplate.by_cooperative(Current.cooperative).find(params[:template_id])
       engine = PostingEngine.new(template: @template, input: { amount: params[:amount] }, actor: Current.user)
       @entry = engine.post!
 
@@ -72,7 +72,8 @@ module Accounting
       @search_service = JournalEntrySearchService.new(
         query: params[:q],
         account_id: params[:account_id],
-        member_id: params[:member_id]
+        member_id: params[:member_id],
+        cooperative: Current.cooperative
       )
       @entries = @search_service.call
 
@@ -113,7 +114,7 @@ module Accounting
     end
 
     def reverse
-      @entry = Accounting::Entry.find(params[:id])
+      @entry = Accounting::Entry.by_cooperative(Current.cooperative).find(params[:id])
 
       if @entry.reverse!(reversed_by: Current.user)
         redirect_to accounting_journal_entry_path(@entry), notice: "Entry reversed successfully."

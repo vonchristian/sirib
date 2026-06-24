@@ -28,12 +28,16 @@ module Accounting
     date :from_date
     date :to_date
     object :user, class: User
+    object :cooperative, class: Cooperative, default: nil
 
     def execute
-      @end_amounts = AccountBalance::RunningBalance.new(to_date: to_date).load_amounts
-      @start_amounts = AccountBalance::RunningBalance.new(to_date: from_date - 1.day).load_amounts
+      coop = cooperative
 
-      @cash_accounts = Account.cash_accounts_for(user).non_contra.to_a
+      @end_amounts = AccountBalance::RunningBalance.new(to_date: to_date, cooperative: coop).load_amounts
+      @start_amounts = AccountBalance::RunningBalance.new(to_date: from_date - 1.day, cooperative: coop).load_amounts
+
+      scope = coop ? Account.by_cooperative(coop) : Account
+      @cash_accounts = scope.cash_accounts_for(user).non_contra.to_a
       @cash_ids = @cash_accounts.map(&:id)
 
       sections = build_sections
@@ -53,8 +57,10 @@ module Accounting
 
     def build_sections
       SECTIONS.map do |section|
-        ledger_ids = section[:ledgers].call.pluck(:id)
-        accounts = Account.non_contra
+        ledger_scope = cooperative ? Ledger.by_cooperative(cooperative) : Ledger
+        ledger_ids = ledger_scope.merge(section[:ledgers].call).pluck(:id)
+        account_scope = cooperative ? Account.by_cooperative(cooperative) : Account
+        accounts = account_scope.non_contra
           .where.not(id: @cash_ids)
           .where(ledger_id: ledger_ids)
           .includes(:ledger)

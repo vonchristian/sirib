@@ -1,10 +1,11 @@
 module Accounting
   class JournalReportService
-    def initialize(start_date:, end_date:, branch_id: nil, account_id: nil, report_type: :trial_balance)
+    def initialize(start_date:, end_date:, branch_id: nil, account_id: nil, cooperative: nil, report_type: :trial_balance)
       @start_date = start_date
       @end_date = end_date
       @branch_id = branch_id
       @account_id = account_id
+      @cooperative = cooperative
       @report_type = report_type
     end
 
@@ -42,21 +43,22 @@ module Accounting
 
     private
 
-    attr_reader :start_date, :end_date, :branch_id, :account_id, :report_type
+    attr_reader :start_date, :end_date, :branch_id, :account_id, :cooperative, :report_type
 
     def date_range
       { start_date: start_date, end_date: end_date }
     end
 
     def base_scope
-      scope = Accounting::Entry.posted.date_range(start_date, end_date)
+      scope = Accounting::Entry.by_cooperative(cooperative).posted.date_range(start_date, end_date) if cooperative
+      scope ||= Accounting::Entry.posted.date_range(start_date, end_date)
       scope = scope.by_branch(branch_id) if branch_id.present?
       scope = scope.by_account(account_id) if account_id.present?
       scope
     end
 
     def generate_trial_balance
-      accounts_scope = Accounting::Account.all
+      accounts_scope = cooperative ? Accounting::Account.by_cooperative(cooperative) : Accounting::Account.all
       accounts_scope = accounts_scope.joins(:ledger).where(accounting_ledgers: { branch_id: branch_id }) if branch_id.present?
 
       accounts = accounts_scope.order(:account_code).to_a
@@ -119,7 +121,11 @@ module Accounting
       grand_total_credits = 0
 
       if account_id.present?
-        account = Accounting::Account.find(account_id)
+        account = if cooperative
+                    Accounting::Account.by_cooperative(cooperative).find(account_id)
+                  else
+                    Accounting::Account.find(account_id)
+                  end
         account_entries = Accounting::Entry.by_account(account_id)
                                           .posted
                                           .date_range(start_date, end_date)
@@ -150,7 +156,8 @@ module Accounting
           total_credits: grand_total_credits
         }
       else
-        Accounting::Account.order(:account_code).each do |account|
+        acct_scope = cooperative ? Accounting::Account.by_cooperative(cooperative) : Accounting::Account
+        acct_scope.order(:account_code).each do |account|
           account_entries = account.entries.posted.date_range(start_date, end_date).order(posted_at: :asc).to_a
           next if account_entries.empty?
 

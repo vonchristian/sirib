@@ -3,7 +3,7 @@ module Accounting
     layout "shell"
 
     def index
-      @templates = Accounting::EntryTemplate.active.order(:name)
+      @templates = Accounting::EntryTemplate.by_cooperative(Current.cooperative).active.order(:name)
       @pagy, @templates = pagy(@templates)
     end
   end

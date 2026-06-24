@@ -1,13 +1,18 @@
 module Accounting
   class TrialBalanceService < ActiveInteraction::Base
     date :as_of, default: Date.current
+    object :cooperative, class: Cooperative, default: nil
 
     NORMAL_DEBIT_TYPES = %w[asset expense].freeze
 
     def execute
       rows = aggregate_amounts
 
-      accounts = Account.where(id: rows.map { |r| r["account_id"] }).includes(:ledger).index_by(&:id)
+      accounts = if cooperative
+                   Account.by_cooperative(cooperative).where(id: rows.map { |r| r["account_id"] }).includes(:ledger).index_by(&:id)
+                 else
+                   Account.where(id: rows.map { |r| r["account_id"] }).includes(:ledger).index_by(&:id)
+                 end
 
       account_lines = rows.map do |row|
         account = accounts[row["account_id"].to_i]
@@ -45,8 +50,11 @@ module Accounting
     private
 
     def aggregate_amounts
-      AmountLine.connection.select_all(
-        AmountLine
+      base = AmountLine
+      base = base.by_cooperative(cooperative) if cooperative
+
+      base.connection.select_all(
+        base
           .joins(:entry)
           .merge(Entry.up_to(as_of))
           .select(
@@ -56,7 +64,7 @@ module Accounting
           )
           .group("amount_lines.account_id")
           .to_sql
-      ).to_a
+      )
     end
   end
 end

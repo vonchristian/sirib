@@ -43,7 +43,7 @@ module Accounting
       lines.each do |line|
         next if line[:account_id].blank?
 
-        account = Accounting::Account.find(line[:account_id])
+        account = Accounting::Account.by_cooperative(Current.cooperative).find(line[:account_id])
 
         case line[:direction]
         when "debit"

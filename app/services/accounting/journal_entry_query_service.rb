@@ -1,9 +1,10 @@
 module Accounting
   class JournalEntryQueryService
-    def initialize(start_date: nil, end_date: nil, branch_id: nil, account_id: nil,
+    def initialize(cooperative:, start_date: nil, end_date: nil, branch_id: nil, account_id: nil,
                    entry_type: nil, status: nil, source_module: nil, amount_min: nil,
                    amount_max: nil, reference_number: nil, created_by_id: nil,
                    template_id: nil, has_attachments: nil, inter_branch: nil)
+      @cooperative = cooperative
       @start_date = start_date
       @end_date = end_date
       @branch_id = branch_id
@@ -21,7 +22,7 @@ module Accounting
     end
 
     def call
-      scope = Accounting::Entry.all
+      scope = Accounting::Entry.by_cooperative(@cooperative)
 
       scope = apply_date_filter(scope)
       scope = apply_branch_filter(scope)
@@ -41,7 +42,7 @@ module Accounting
 
     private
 
-    attr_reader :start_date, :end_date, :branch_id, :account_id, :entry_type,
+    attr_reader :cooperative, :start_date, :end_date, :branch_id, :account_id, :entry_type,
                 :status, :source_module, :amount_min, :amount_max,
                 :reference_number, :created_by_id, :template_id,
                 :has_attachments, :inter_branch

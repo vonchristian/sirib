@@ -3,7 +3,7 @@ module Accounting
     layout "shell"
 
     def show
-      @account = Accounting::Account.includes(:ledger).find(params[:id])
+      @account = Accounting::Account.by_cooperative(Current.cooperative).includes(:ledger).find(params[:id])
       @status_service = Accounting::AccountStatusService.new(account: @account)
       @query_service = Accounting::LedgerQueryService.new(
         account: @account,
@@ -17,6 +17,7 @@ module Accounting
       @summary = @query_service.summary
 
       entry_scope = Accounting::Entry
+        .by_cooperative(Current.cooperative)
         .where(id: @account.amount_lines.select(:entry_id).distinct)
         .includes(:created_by)
         .order(posted_at: :desc)
@@ -26,8 +27,9 @@ module Accounting
     end
 
     def audit_entries
-      account = Accounting::Account.includes(:ledger).find(params[:id])
+      account = Accounting::Account.by_cooperative(Current.cooperative).includes(:ledger).find(params[:id])
       entry_scope = Accounting::Entry
+        .by_cooperative(Current.cooperative)
         .where(id: account.amount_lines.select(:entry_id).distinct)
         .includes(:created_by)
         .order(posted_at: :desc)
@@ -40,7 +42,7 @@ module Accounting
     def search
       query = params[:q]
       @accounts = if query.present?
-        Accounting::Account.search(query).includes(:ledger).order(:account_code).limit(20)
+        Accounting::Account.by_cooperative(Current.cooperative).search(query).includes(:ledger).order(:account_code).limit(20)
       else
         Accounting::Account.none
       end

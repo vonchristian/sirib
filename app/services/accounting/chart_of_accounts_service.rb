@@ -32,7 +32,7 @@ module Accounting
       scope = Accounting::Account.where(cooperative: cooperative).includes(:ledger)
 
       if ledger_id.present?
-        ledger = Accounting::Ledger.find(ledger_id)
+        ledger = Accounting::Ledger.by_cooperative(cooperative).find(ledger_id)
         descendant_ids = ledger.subtree_ids
         scope = scope.where(ledger_id: descendant_ids)
       end
@@ -51,9 +51,10 @@ module Accounting
     end
 
     def account_inspector(account_id)
-      account = Accounting::Account.includes(:ledger).find(account_id)
+      account = Accounting::Account.by_cooperative(cooperative).includes(:ledger).find(account_id)
 
       recent_lines = Accounting::AmountLine
+        .by_cooperative(cooperative)
         .joins(:entry)
         .includes(entry: :created_by)
         .where(account_id: account_id)

@@ -4,7 +4,7 @@ module Accounting
 
     def index
       @as_of_date = parse_date(params[:as_of_date]) || Date.current
-      @result = Accounting::TrialBalanceService.run!(as_of: @as_of_date)
+      @result = Accounting::TrialBalanceService.run!(as_of: @as_of_date, cooperative: Current.cooperative)
     end
 
     private

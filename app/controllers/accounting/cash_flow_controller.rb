@@ -9,7 +9,8 @@ module Accounting
       result = Accounting::CashFlowStatement.run!(
         from_date: @from_date,
         to_date: @to_date,
-        user: Current.session.user
+        user: Current.session.user,
+        cooperative: Current.cooperative
       )
 
       @report = result[:sections]

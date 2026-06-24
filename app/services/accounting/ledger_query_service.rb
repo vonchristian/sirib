@@ -10,6 +10,7 @@ module Accounting
 
     def scope
       s = Accounting::AmountLine
+        .by_cooperative(account.cooperative)
         .joins(:entry)
         .includes(entry: :created_by)
         .where(account_id: account.id)
@@ -111,6 +112,7 @@ module Accounting
 
     def summary
       s = Accounting::AmountLine
+        .by_cooperative(account.cooperative)
         .joins(:entry)
         .where(account_id: account.id)
 

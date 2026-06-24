@@ -15,8 +15,8 @@ module Accounting
       @comparison = params[:comparison].presence_in(%w[none prior_period prior_quarter prior_year]) || "none"
       @compare_date = compute_compare_date
 
-      @amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @as_of_date).load_amounts
-      @compare_amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @compare_date).load_amounts if @compare_date
+      @amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @as_of_date, cooperative: Current.cooperative).load_amounts
+      @compare_amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @compare_date, cooperative: Current.cooperative).load_amounts if @compare_date
 
       @report = build_report
     end
@@ -39,7 +39,7 @@ module Accounting
 
     def build_report
       TYPE_ORDER.filter_map do |type|
-        groups = Accounting::Ledger.where(account_type: type)
+        groups = Accounting::Ledger.by_cooperative(Current.cooperative).where(account_type: type)
           .roots
           .includes(:accounts)
           .order(:account_code)
