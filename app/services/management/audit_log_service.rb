@@ -8,7 +8,7 @@ module Management
 
     def execute
       cooperative = Current.cooperative || actor&.cooperative
-      Management::AuditLog.create!(
+      record = Management::AuditLog.create!(
         cooperative: cooperative,
         auditable: auditable,
         action: action,
@@ -23,6 +23,36 @@ module Management
         config_version: metadata[:config_version],
         created_at: Time.current
       )
+
+      publish_event(record, cooperative)
+      record
+    end
+
+    private
+
+    def publish_event(record, cooperative)
+      event_name = case action
+      when "login_success" then Security::EventBus::EVENTS[:login_success]
+      when "login_blocked" then Security::EventBus::EVENTS[:login_blocked]
+      when "logout" then Security::EventBus::EVENTS[:logout]
+      when "create" then Security::EventBus::EVENTS[:audit_create]
+      when "update" then Security::EventBus::EVENTS[:audit_update]
+      when "destroy" then Security::EventBus::EVENTS[:audit_destroy]
+      when "account_locked" then Security::EventBus::EVENTS[:account_locked]
+      when "suspicious_activity" then Security::EventBus::EVENTS[:suspicious_activity]
+      end
+
+      return unless event_name
+
+      ActiveSupport::Notifications.instrument(event_name, {
+        audit_log_id: record.id,
+        action: action,
+        user_id: actor&.id,
+        cooperative: cooperative,
+        ip: record.ip_address,
+        auditable_type: record.auditable_type,
+        auditable_id: record.auditable_id
+      }.merge(metadata))
     end
   end
 end

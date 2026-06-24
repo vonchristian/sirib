@@ -23,9 +23,15 @@ unless Rails.env.test?
   run_year_long_audit_trail
 end
 
+puts "\nPhase 5: Security configuration"
+require_relative "seeds/security"
+
 puts ""
 puts "=" * 60
 puts "Seed complete"
 puts "  Cooperatives: #{Cooperative.count}"
 puts "  Users: #{User.count}"
+puts "  Password Policies: #{Security::PasswordPolicy.count}"
+puts "  Fraud Rules: #{Fraud::Rule.count}"
+puts "  Compliance Controls: #{Compliance::Control.count}"
 puts "=" * 60

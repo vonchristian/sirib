@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_24_002310) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -100,6 +100,36 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "used_at"], name: "index_backup_codes_on_user_id_and_used_at"
     t.index ["user_id"], name: "index_backup_codes_on_user_id"
+  end
+
+  create_table "compliance_controls", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.string "category"
+    t.string "frequency"
+    t.boolean "active"
+    t.jsonb "config"
+    t.bigint "cooperative_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_compliance_controls_on_cooperative_id"
+  end
+
+  create_table "compliance_evidences", force: :cascade do |t|
+    t.bigint "control_id", null: false
+    t.string "status"
+    t.string "evidence_type"
+    t.jsonb "metadata"
+    t.datetime "verified_at"
+    t.string "verified_by_type"
+    t.bigint "verified_by_id"
+    t.datetime "expires_at"
+    t.bigint "cooperative_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["control_id"], name: "index_compliance_evidences_on_control_id"
+    t.index ["cooperative_id"], name: "index_compliance_evidences_on_cooperative_id"
+    t.index ["verified_by_type", "verified_by_id"], name: "index_compliance_evidences_on_verified_by"
   end
 
   create_table "cooperatives", force: :cascade do |t|
@@ -347,6 +377,40 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
     t.index ["interest_income_ledger_id"], name: "index_external_banks_on_interest_income_ledger_id"
     t.index ["name"], name: "index_external_banks_on_name"
     t.index ["status"], name: "index_external_banks_on_status"
+  end
+
+  create_table "fraud_incidents", force: :cascade do |t|
+    t.bigint "rule_id", null: false
+    t.string "incident_type"
+    t.string "severity"
+    t.text "description"
+    t.jsonb "metadata"
+    t.string "actor_type", null: false
+    t.bigint "actor_id", null: false
+    t.datetime "resolved_at"
+    t.string "resolved_by_type"
+    t.bigint "resolved_by_id"
+    t.string "resolution"
+    t.bigint "cooperative_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_type", "actor_id"], name: "index_fraud_incidents_on_actor"
+    t.index ["cooperative_id"], name: "index_fraud_incidents_on_cooperative_id"
+    t.index ["resolved_by_type", "resolved_by_id"], name: "index_fraud_incidents_on_resolved_by"
+    t.index ["rule_id"], name: "index_fraud_incidents_on_rule_id"
+  end
+
+  create_table "fraud_rules", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.string "rule_type"
+    t.jsonb "config"
+    t.string "severity"
+    t.boolean "active"
+    t.bigint "cooperative_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_fraud_rules_on_cooperative_id"
   end
 
   create_table "ledgers", force: :cascade do |t|
@@ -1080,6 +1144,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
     t.index ["user_id"], name: "index_saved_filters_on_user_id"
   end
 
+  create_table "security_password_histories", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "password_digest"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_security_password_histories_on_created_at"
+    t.index ["user_id"], name: "index_security_password_histories_on_user_id"
+  end
+
+  create_table "security_password_policies", force: :cascade do |t|
+    t.string "name"
+    t.integer "min_length"
+    t.boolean "require_uppercase"
+    t.boolean "require_lowercase"
+    t.boolean "require_digits"
+    t.boolean "require_symbols"
+    t.integer "max_failed_attempts"
+    t.integer "lockout_duration"
+    t.integer "password_expiry_days"
+    t.integer "password_history_count"
+    t.bigint "cooperative_id", null: false
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_security_password_policies_on_cooperative_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -1291,6 +1382,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
     t.string "status"
     t.jsonb "permission_overrides"
     t.bigint "cooperative_id", null: false
+    t.integer "failed_attempts"
+    t.datetime "locked_at"
+    t.datetime "password_changed_at"
+    t.boolean "force_password_change"
+    t.string "last_login_ip"
+    t.datetime "last_seen_at"
+    t.string "last_device"
+    t.integer "session_version"
     t.index ["cooperative_id"], name: "index_users_on_cooperative_id"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["employee_id"], name: "index_users_on_employee_id", unique: true
@@ -1306,6 +1405,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
   add_foreign_key "amount_lines", "cooperatives"
   add_foreign_key "amount_lines", "entries"
   add_foreign_key "backup_codes", "users"
+  add_foreign_key "compliance_controls", "cooperatives"
+  add_foreign_key "compliance_evidences", "compliance_controls", column: "control_id"
+  add_foreign_key "compliance_evidences", "cooperatives"
   add_foreign_key "entries", "cooperatives"
   add_foreign_key "entry_template_lines", "cooperatives"
   add_foreign_key "entry_template_lines", "entry_templates"
@@ -1338,6 +1440,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
   add_foreign_key "external_banks", "cooperatives"
   add_foreign_key "external_banks", "ledgers", column: "cash_on_hand_ledger_id"
   add_foreign_key "external_banks", "ledgers", column: "interest_income_ledger_id"
+  add_foreign_key "fraud_incidents", "cooperatives"
+  add_foreign_key "fraud_incidents", "fraud_rules", column: "rule_id"
+  add_foreign_key "fraud_rules", "cooperatives"
   add_foreign_key "ledgers", "cooperatives"
   add_foreign_key "loan_applications", "cooperatives"
   add_foreign_key "loan_applications", "loan_products"
@@ -1436,6 +1541,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_061833) do
   add_foreign_key "running_balances", "ledgers"
   add_foreign_key "saved_filters", "cooperatives"
   add_foreign_key "saved_filters", "users"
+  add_foreign_key "security_password_histories", "users"
+  add_foreign_key "security_password_policies", "cooperatives"
   add_foreign_key "sessions", "users"
   add_foreign_key "treasury_cash_sessions", "accounts", column: "cash_account_id"
   add_foreign_key "treasury_cash_sessions", "cooperatives"

@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
+  get "health" => "health#show", as: :health_check
 
   root "dashboard#index"
 
@@ -255,6 +256,18 @@ Rails.application.routes.draw do
     end
 
     resources :audit_logs, only: [ :index, :show ]
+
+    resources :fraud_incidents, only: [ :index, :show ] do
+      member do
+        post :resolve
+      end
+    end
+
+    resources :compliance_controls, only: [ :index, :show ] do
+      resources :evidences, only: [ :index, :show ]
+    end
+
+    resources :password_policies, only: [ :index, :show, :new, :create, :edit, :update ]
 
     get "settings", to: "settings#index"
 

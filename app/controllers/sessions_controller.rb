@@ -13,6 +13,16 @@ class SessionsController < ApplicationController
       redirect_to(new_session_path, alert: "Try another email address or password.") && return
     end
 
+    if Security::AccountLockoutService.locked?(user)
+      remaining = Security::AccountLockoutService.remaining_lockout_time(user)
+      Management::AuditLogService.run!(
+        action: "login_blocked",
+        actor: user,
+        metadata: { reason: "account_locked", ip_address: request.remote_ip, remaining_seconds: remaining }
+      )
+      redirect_to(new_session_path, alert: "Account temporarily locked. Try again in #{remaining / 60} minutes.") && return
+    end
+
     unless user.status_active?
       Management::AuditLogService.run!(
         action: "login_blocked",
@@ -23,8 +33,13 @@ class SessionsController < ApplicationController
     end
 
     unless user.authenticate(params[:password])
+      Security::AccountLockoutService.record_failed_attempt!(user)
       redirect_to(new_session_path, alert: "Try another email address or password.") && return
     end
+
+    Security::AccountLockoutService.reset_failed_attempts!(user)
+    Security::SessionTrackingService.record_login!(user: user, ip_address: request.remote_ip, user_agent: request.user_agent)
+    Security::SessionTrackingService.enforce_concurrent_limit(user)
 
     Management::AuditLogService.run!(
       action: "login_success",

@@ -5,6 +5,7 @@ class Session < ApplicationRecord
 
   scope :active, -> { where(revoked_at: nil) }
   scope :expired, -> { where(arel_table[:revoked_at].lt(Time.current)).or(where(arel_table[:last_activity_at].lt(Identity::ContextResolver::IDLE_TIMEOUT.ago))) }
+  scope :older_than, ->(time) { where(arel_table[:created_at].lt(time)) }
 
   def active?
     revoked_at.nil?

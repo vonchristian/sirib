@@ -86,3 +86,7 @@ end
 gem "csv"
 gem "pdf-reader", "~> 2.0"
 gem "grover", ">= 1.1"
+
+# Security gems
+gem "rack-attack"
+gem "lograge", "~> 0.14"

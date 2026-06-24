@@ -47,7 +47,14 @@ module Authentication
       session_record = Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
       return nil unless session_record
 
-      resolver = Identity::ContextResolver.new(session_record.user)
+      user = session_record.user
+      if user.session_version_changed_since?(session_record)
+        session_record.revoke!
+        cookies.delete(:session_id)
+        return nil
+      end
+
+      resolver = Identity::ContextResolver.new(user)
       context = resolver.resolve_with_session(session: session_record)
 
       unless context[:session_valid]
@@ -56,7 +63,11 @@ module Authentication
         return nil
       end
 
-      Current.branch ||= session_record.user.role_assignments.active.first&.branch
+      if Security::PasswordHistoryService.needs_password_change?(user)
+        session[:must_change_password] = true
+      end
+
+      Current.branch ||= user.role_assignments.active.first&.branch
       session_record
     end
 

@@ -1,0 +1,48 @@
+<% content_for :page_title, "Password Policies" %>
+<% content_for :page_subtitle, "Authentication security rules" %>
+
+<div class="flex items-center justify-between mb-6">
+  <div></div>
+  <%= link_to "New Policy", new_management_password_policy_path, class: "rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors" %>
+</div>
+
+<div class="rounded-lg border border-border bg-surface dark:border-gray-800 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-border dark:border-gray-800 text-left text-xs text-text-tertiary uppercase tracking-wider">
+        <th class="px-5 py-3 font-medium">Name</th>
+        <th class="px-5 py-3 font-medium">Min Length</th>
+        <th class="px-5 py-3 font-medium">Expiry (Days)</th>
+        <th class="px-5 py-3 font-medium">Lockout</th>
+        <th class="px-5 py-3 font-medium">Status</th>
+        <th class="px-5 py-3 font-medium text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-border dark:divide-gray-800">
+      <% @policies.each do |policy| %>
+        <tr class="hover:bg-surface-alt transition-colors">
+          <td class="px-5 py-3 font-medium text-text-primary"><%= policy.name %></td>
+          <td class="px-5 py-3 text-text-secondary"><%= policy.min_length || "—" %></td>
+          <td class="px-5 py-3 text-text-secondary"><%= policy.password_expiry_days || "—" %></td>
+          <td class="px-5 py-3 text-text-secondary"><%= "#{policy.max_failed_attempts || "—"} / #{policy.lockout_duration || "—"}m" %></td>
+          <td class="px-5 py-3">
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= policy.active ? "bg-green-50 text-green-700" : "bg-gray-50 text-gray-500" %>">
+              <%= policy.active ? "Active" : "Inactive" %>
+            </span>
+          </td>
+          <td class="px-5 py-3 text-right">
+            <%= link_to "Edit", edit_management_password_policy_path(policy), class: "text-xs text-text-secondary hover:text-primary transition-colors" %> |
+            <%= link_to "View", management_password_policy_path(policy), class: "text-xs text-text-secondary hover:text-primary transition-colors" %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @policies.empty? %>
+        <tr><td colspan="6" class="px-5 py-8 text-center text-text-tertiary">No password policies found.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4">
+  <%= render "shared/pagination", pagy: @pagy if defined?(@pagy) %>
+</div>

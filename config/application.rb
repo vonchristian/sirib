@@ -26,5 +26,7 @@ module Sirib
 
     config.autoload_paths << Rails.root.join("app/middleware")
     config.autoload_paths << Rails.root.join("app/constraints")
+
+    config.middleware.use Rack::Attack
   end
 end

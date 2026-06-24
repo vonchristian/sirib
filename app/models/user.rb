@@ -12,6 +12,7 @@ class User < ApplicationRecord
   has_many :backup_codes, class_name: "Access::BackupCode", dependent: :destroy
   has_many :trusted_devices, class_name: "Access::TrustedDevice", dependent: :destroy
   has_many :mfa_attempt_logs, class_name: "Access::MfaAttemptLog", dependent: :destroy
+  has_many :password_histories, class_name: "Security::PasswordHistory", dependent: :destroy
 
   encrypts :otp_secret
 
@@ -40,7 +41,9 @@ class User < ApplicationRecord
 
   before_create :assign_employee_id
   before_create :set_default_status
+  before_create :set_password_changed_at
   after_update :revoke_sessions_if_suspended, if: -> { saved_change_to_status? && status == "suspended" }
+  after_update :track_password_change, if: -> { saved_change_to_password_digest? }
 
   def current_cash_session
     return nil unless cash_accounts.any?
@@ -75,6 +78,14 @@ class User < ApplicationRecord
     active?
   end
 
+  def session_version_changed_since?(session)
+    return false unless session_version.present? && session_version > 0
+    return false unless session.created_at.present?
+
+    session_version_updated_at = updated_at
+    session.created_at < session_version_updated_at
+  end
+
   def permission_overrides_for(action, subject)
     return nil unless permission_overrides.present?
 
@@ -98,5 +109,14 @@ class User < ApplicationRecord
 
   def revoke_sessions_if_suspended
     sessions.where(revoked_at: nil).update_all(revoked_at: Time.current)
+  end
+
+  def set_password_changed_at
+    self.password_changed_at ||= Time.current
+  end
+
+  def track_password_change
+    Security::PasswordHistoryService.record_password_change!(self)
+    update_columns(password_changed_at: Time.current)
   end
 end
