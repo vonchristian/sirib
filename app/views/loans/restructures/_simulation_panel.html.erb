@@ -1,0 +1,62 @@
+<% if simulation.present? %>
+  <div class="space-y-4">
+    <div class="grid grid-cols-2 gap-3">
+      <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-3">
+        <span class="text-xs text-text-tertiary">Old Monthly Payment</span>
+        <p class="text-lg font-bold text-text-primary"><%= number_to_currency(simulation[:old_monthly_payment].to_f, unit: "PHP ") %></p>
+      </div>
+      <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-3">
+        <span class="text-xs text-text-tertiary">New Monthly Payment</span>
+        <p class="text-lg font-bold <%= simulation[:payment_change].to_f < 0 ? 'text-positive' : 'text-danger' %>">
+          <%= number_to_currency(simulation[:new_monthly_payment].to_f, unit: "PHP ") %>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between rounded-lg bg-surface-alt dark:bg-gray-800/50 px-3 py-2">
+      <span class="text-xs text-text-tertiary">Difference</span>
+      <span class="text-sm font-medium <%= simulation[:payment_change].to_f < 0 ? 'text-positive' : 'text-danger' %>">
+        <%= simulation[:payment_change_pct] %>% (<%= number_to_currency(simulation[:payment_change].to_f.abs, unit: "PHP ") %>)
+      </span>
+    </div>
+
+    <div class="flex items-center justify-between rounded-lg bg-surface-alt dark:bg-gray-800/50 px-3 py-2">
+      <span class="text-xs text-text-tertiary">Total Interest Impact</span>
+      <span class="text-sm font-medium <%= simulation[:interest_impact].to_f < 0 ? 'text-positive' : simulation[:interest_impact].to_f > 0 ? 'text-danger' : 'text-text-primary' %>">
+        <%= number_to_currency(simulation[:interest_impact].to_f.abs, unit: "PHP ") %>
+        <%= simulation[:interest_impact].to_f < 0 ? 'saved' : simulation[:interest_impact].to_f > 0 ? 'increase' : 'unchanged' %>
+      </span>
+    </div>
+
+    <% if simulation[:payoff_amount].present? %>
+      <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 p-3">
+        <span class="text-xs text-text-tertiary">Payoff Amount</span>
+        <p class="text-lg font-bold text-text-primary"><%= number_to_currency(simulation[:payoff_amount].to_f, unit: "PHP ") %></p>
+        <% if simulation[:payoff_breakdown].present? %>
+          <div class="mt-1 space-y-0.5 text-xs text-text-tertiary">
+            <span>Principal: <%= number_to_currency(simulation[:payoff_breakdown][:outstanding_principal].to_f, unit: "PHP ") %></span>
+            <span>Interest: <%= number_to_currency(simulation[:payoff_breakdown][:accrued_interest].to_f, unit: "PHP ") %></span>
+            <span>Penalties: <%= number_to_currency(simulation[:payoff_breakdown][:penalties].to_f, unit: "PHP ") %></span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="flex items-center justify-between rounded-lg bg-surface-alt dark:bg-gray-800/50 px-3 py-2">
+      <span class="text-xs text-text-tertiary">New Term</span>
+      <span class="text-sm font-medium text-text-primary"><%= simulation[:new_term_months] %> months</span>
+    </div>
+
+    <div class="flex items-center justify-between rounded-lg bg-surface-alt dark:bg-gray-800/50 px-3 py-2">
+      <span class="text-xs text-text-tertiary">New Interest Rate</span>
+      <span class="text-sm font-medium text-text-primary"><%= simulation[:new_interest_rate] %>%</span>
+    </div>
+  </div>
+<% else %>
+  <div class="text-center py-8">
+    <svg class="w-10 h-10 mx-auto text-text-tertiary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/>
+    </svg>
+    <p class="text-sm text-text-tertiary italic">Fill in the proposed changes to see simulation.</p>
+  </div>
+<% end %>

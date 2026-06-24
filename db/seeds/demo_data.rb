@@ -613,6 +613,9 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
       puts "    Entry template created: Monthly Rent Payment"
     end
   end
+
+  # ── 10. Restructure cases ──────────────────────────────────────────
+  load_per_coop_seed(coop, "restructures")
 end
 
 puts "\n✅ Demo data seeded for #{Cooperative.active.count} cooperatives"

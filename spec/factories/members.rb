@@ -1,5 +1,8 @@
 FactoryBot.define do
+  sequence(:member_id_number) { |n| "BIR-#{n.to_s.rjust(9, '0')}" }
+
   factory :member, class: "Membership::Member" do
+    cooperative
     first_name { "Juan" }
     middle_name { "Santos" }
     last_name { "Dela Cruz" }
@@ -10,13 +13,18 @@ FactoryBot.define do
 
     after(:build) do |member|
       member.build_address(
+        cooperative: member.cooperative,
         house_street: "123 Rizal St",
         barangay: "Barangay 1",
         city: "Manila",
         province: "Metro Manila",
         region: "NCR"
       )
-      member.identifications.build(id_type: "BIR", id_number: "BIR-123-456-789")
+      member.identifications.build(
+        cooperative: member.cooperative,
+        id_type: "BIR",
+        id_number: generate(:member_id_number)
+      )
     end
   end
 end

@@ -1,0 +1,99 @@
+<% content_for :page_title, "New #{@restructure_type.titleize} Restructure" %>
+<% content_for :page_subtitle, @loan.member.name %>
+
+<div class="animate-fade-in max-w-6xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-lg font-semibold text-text-primary dark:text-white"><%= @restructure_type.titleize %> Restructure</h2>
+      <p class="text-sm text-text-tertiary mt-1">Loan <%= @loan.reference_number %> — Outstanding: <%= number_to_currency(@loan.outstanding_principal_cents.to_f / 100, unit: "PHP ") %></p>
+    </div>
+    <%= link_to "Back", restructure_loans_loan_path(@loan), class: "btn-ghost text-sm" %>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+      <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Proposed Changes</h3>
+
+      <%= form_with model: @case, url: loans_restructures_path, local: true, data: { controller: "restructure-form", action: "change->restructure-form#scheduleSimulation" } do |f| %>
+        <%= f.hidden_field :restructure_type, value: @restructure_type %>
+        <%= f.hidden_field :loan_id, value: @loan.id %>
+
+        <div class="space-y-4">
+          <% if @restructure_type == "modification" || @restructure_type == "hybrid" %>
+            <div>
+              <%= f.label "proposed_changes[interest_rate]", "Interest Rate (%)", class: "field-label" %>
+              <%= f.number_field "proposed_changes[interest_rate]", value: @case.proposed_changes["interest_rate"] || @loan.interest_rate, step: 0.01, min: 0.1, max: 100, class: "field-input", data: { "restructure-form-target": "interestRate" } %>
+            </div>
+
+            <div>
+              <%= f.label "proposed_changes[term_months]", "Term (months)", class: "field-label" %>
+              <%= f.number_field "proposed_changes[term_months]", value: @case.proposed_changes["term_months"] || @loan.term_months, min: 1, max: 120, class: "field-input", data: { "restructure-form-target": "termMonths" } %>
+            </div>
+          <% end %>
+
+          <% if @restructure_type == "modification" %>
+            <div>
+              <%= f.label "proposed_changes[grace_period_months]", "Grace Period (months)", class: "field-label" %>
+              <%= f.number_field "proposed_changes[grace_period_months]", value: @case.proposed_changes["grace_period_months"] || 0, min: 0, max: 12, class: "field-input", data: { "restructure-form-target": "gracePeriod" } %>
+            </div>
+          <% end %>
+
+          <% if @restructure_type == "refinance" %>
+            <div>
+              <%= f.label "proposed_changes[interest_rate]", "New Interest Rate (%)", class: "field-label" %>
+              <%= f.number_field "proposed_changes[interest_rate]", value: @case.proposed_changes["interest_rate"] || @loan.interest_rate, step: 0.01, min: 0.1, max: 100, class: "field-input", data: { "restructure-form-target": "interestRate" } %>
+            </div>
+
+            <div>
+              <%= f.label "proposed_changes[term_months]", "New Term (months)", class: "field-label" %>
+              <%= f.number_field "proposed_changes[term_months]", value: @case.proposed_changes["term_months"] || @loan.term_months, min: 1, max: 120, class: "field-input", data: { "restructure-form-target": "termMonths" } %>
+            </div>
+          <% end %>
+
+          <% if @restructure_type == "hybrid" %>
+            <div>
+              <%= f.label "proposed_changes[arrears_cents]", "Arrears to Capitalize (cents)", class: "field-label" %>
+              <%= f.number_field "proposed_changes[arrears_cents]", value: @case.proposed_changes["arrears_cents"] || 0, min: 0, step: 100, class: "field-input", data: { "restructure-form-target": "arrears" } %>
+            </div>
+
+            <div>
+              <%= f.label "proposed_changes[partial_payoff_cents]", "Partial Payoff (cents)", class: "field-label" %>
+              <%= f.number_field "proposed_changes[partial_payoff_cents]", value: @case.proposed_changes["partial_payoff_cents"] || 0, min: 0, step: 100, class: "field-input", data: { "restructure-form-target": "partialPayoff" } %>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <%= f.check_box "proposed_changes[new_loan]", {}, "true", "false" %>
+              <%= f.label "proposed_changes[new_loan]", "Create new loan", class: "text-sm text-text-primary" %>
+            </div>
+          <% end %>
+
+          <div>
+            <%= f.label :notes, "Notes", class: "field-label" %>
+            <%= f.text_area :notes, rows: 3, class: "field-input", placeholder: "Reason for restructure..." %>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <%= f.submit "Create Restructure Case", class: "btn-primary" %>
+            <%= link_to "Cancel", restructure_loans_loan_path(@loan), class: "btn-ghost" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="space-y-4">
+      <div id="simulation-panel" class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+        <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Simulation Preview</h3>
+        <div id="simulation-content">
+          <%= render partial: "loans/restructures/simulation_panel", locals: { simulation: @simulation } %>
+        </div>
+      </div>
+
+      <div id="approval-preview" class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+        <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-4">Required Approvals</h3>
+        <div id="approval-content">
+          <p class="text-sm text-text-tertiary italic">Preview will appear after simulation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

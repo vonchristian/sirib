@@ -167,7 +167,23 @@ Rails.application.routes.draw do
     end
     resources :loans, only: [ :index, :show ] do
       resources :payments, only: [ :create ]
+      member do
+        get :restructure
+        get :timeline
+      end
     end
+    resources :restructures, only: [ :new, :create, :show ] do
+      member do
+        post :submit
+        post :approve
+        post :reject
+        post :execute
+      end
+      collection do
+        post :simulate
+      end
+    end
+    resources :restructure_cases, only: [ :index, :show ], controller: "restructure_cases"
     get "searches/members", to: "searches#members"
     get "searches/loan_products", to: "searches#loan_products"
   end
@@ -270,6 +286,13 @@ Rails.application.routes.draw do
     resources :password_policies, only: [ :index, :show, :new, :create, :edit, :update ]
 
     get "settings", to: "settings#index"
+
+    resources :restructures, only: [ :index, :show ], controller: "restructures" do
+      member do
+        post :approve
+        post :reject
+      end
+    end
 
     get "searches/branches", to: "searches#branches"
     get "searches/users", to: "searches#users"

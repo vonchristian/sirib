@@ -11,11 +11,27 @@
           when 'active' then 'bg-primary-50 text-primary ring-primary/20'
           when 'paid' then 'bg-positive-50 text-positive ring-positive/20'
           when 'defaulted' then 'bg-danger-50 text-danger ring-danger/20'
+          when 'refinanced' then 'bg-positive-50 text-positive ring-positive/20'
+          when 'modified' then 'bg-primary-50 text-primary ring-primary/20'
+          when 'hybrid_restructured' then 'bg-purple-50 text-purple-500 ring-purple-500/20'
+          when 'restructure_requested' then 'bg-amber-50 text-amber-500 ring-amber-500/20'
+          when 'under_review' then 'bg-amber-50 text-amber-500 ring-amber-500/20'
           end %>">
-          <%= @loan.status %>
+          <%= @loan.status.titleize %>
         </span>
         <span class="text-xs text-text-tertiary"><%= @loan.disbursed_at ? "Disbursed #{@loan.disbursed_at.strftime('%b %d, %Y')}" : "Not yet disbursed" %></span>
+        <% if @loan.restructures_count > 0 %>
+          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-text-tertiary">
+            <%= @loan.restructures_count %>/<%= @loan.max_restructures %> restructures
+          </span>
+        <% end %>
       </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <% if @loan.restructurable? %>
+        <%= link_to "Restructure", restructure_loans_loan_path(@loan), class: "btn-secondary text-sm" %>
+      <% end %>
+      <%= link_to "Timeline", timeline_loans_loan_path(@loan), class: "btn-ghost text-sm" %>
     </div>
   </div>
 
@@ -24,6 +40,7 @@
       <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="details" class="pb-3 text-sm font-medium border-b-2 border-primary text-primary transition-colors">Details</button>
       <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="schedule" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Schedule</button>
       <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="payments" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Payments</button>
+      <button type="button" data-tabs-target="tab" data-action="tabs#activate" data-tab="restructures" class="pb-3 text-sm font-medium text-text-tertiary hover:text-text-secondary border-b-2 border-transparent transition-colors">Restructures</button>
     </div>
 
     <div class="mt-6">
@@ -158,6 +175,70 @@
               <p class="text-sm text-text-tertiary italic">No payments recorded yet.</p>
             <% end %>
           </div>
+        </div>
+      </div>
+
+      <div data-tabs-target="panel" id="tab-restructures" class="hidden">
+        <div class="space-y-4">
+          <% if @loan.restructurable? %>
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-semibold text-text-primary dark:text-white">Restructure Cases</h4>
+              <%= link_to "New Restructure", restructure_loans_loan_path(@loan), class: "btn-primary text-sm" %>
+            </div>
+          <% end %>
+
+          <% if @restructure_cases.any? %>
+            <div class="space-y-2">
+              <% @restructure_cases.each do |c| %>
+                <div class="rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 px-4 py-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
+                        <%= c.modification? ? 'bg-primary-50 text-primary' : c.refinance? ? 'bg-positive-50 text-positive' : 'bg-purple-50 text-purple-500' %>">
+                        <%= c.restructure_type %>
+                      </span>
+                      <span class="text-sm font-medium text-text-primary">Case ##{c.id}</span>
+                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
+                        <%= case c.status
+                        when 'draft' then 'bg-gray-100 text-text-tertiary'
+                        when 'submitted', 'under_review' then 'bg-amber-50 text-amber-500'
+                        when 'approved' then 'bg-primary-50 text-primary'
+                        when 'rejected' then 'bg-danger-50 text-danger'
+                        when 'executed' then 'bg-positive-50 text-positive'
+                        end %>">
+                        <%= c.status %>
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs text-text-tertiary"><%= c.created_at.strftime("%b %d, %Y") %></span>
+                      <%= link_to "View", loans_restructure_path(c), class: "text-xs font-medium text-primary hover:text-primary-700" %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-sm text-text-tertiary italic">No restructure cases for this loan.</p>
+          <% end %>
+
+          <% if @linked_loans.any? %>
+            <div class="mt-6">
+              <h4 class="text-sm font-semibold text-text-primary dark:text-white mb-3">Linked Loans</h4>
+              <div class="space-y-2">
+                <% @linked_loans.each do |linked| %>
+                  <%= link_to loans_loan_path(linked), class: "block rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 px-4 py-3 hover:border-primary/50 transition-colors" do %>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm font-medium text-text-primary"><%= linked.reference_number %></span>
+                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
+                        <%= linked.status == 'active' ? 'bg-primary-50 text-primary' : 'bg-gray-100 text-text-tertiary' %>">
+                        <%= linked.status %>
+                      </span>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

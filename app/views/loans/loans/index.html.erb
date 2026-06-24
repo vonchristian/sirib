@@ -2,6 +2,25 @@
 <% content_for :page_subtitle, "Manage active loans" %>
 
 <div class="animate-fade-in">
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-4">
+      <span class="text-xs text-text-tertiary uppercase tracking-wider">Active</span>
+      <p class="text-2xl font-bold text-primary mt-1"><%= @active_count %></p>
+    </div>
+    <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-4">
+      <span class="text-xs text-text-tertiary uppercase tracking-wider">Restructured</span>
+      <p class="text-2xl font-bold text-purple-500 mt-1"><%= @restructured_count %></p>
+    </div>
+    <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-4">
+      <span class="text-xs text-text-tertiary uppercase tracking-wider">Defaulted</span>
+      <p class="text-2xl font-bold text-danger mt-1"><%= @defaulted_count %></p>
+    </div>
+    <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-4">
+      <span class="text-xs text-text-tertiary uppercase tracking-wider">Total</span>
+      <p class="text-2xl font-bold text-text-primary mt-1"><%= @total_count %></p>
+    </div>
+  </div>
+
   <div class="mb-4 flex items-center justify-between">
     <span class="text-sm text-text-secondary"><%= @loans.size %> loan(s)</span>
   </div>
@@ -36,9 +55,14 @@
                   when 'active' then 'bg-primary-50 text-primary'
                   when 'paid' then 'bg-positive-50 text-positive'
                   when 'defaulted' then 'bg-danger-50 text-danger'
+                  when 'refinanced' then 'bg-positive-50 text-positive'
+                  when 'modified' then 'bg-primary-50 text-primary'
+                  when 'hybrid_restructured' then 'bg-purple-50 text-purple-500'
+                  when 'restructure_requested' then 'bg-amber-50 text-amber-500'
+                  when 'under_review' then 'bg-amber-50 text-amber-500'
                   else 'bg-gray-100 text-text-tertiary'
                   end %>">
-                  <%= loan.status %>
+                  <%= loan.status.titleize %>
                 </span>
               </td>
               <td class="px-4 py-3 text-right">

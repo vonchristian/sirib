@@ -1,0 +1,121 @@
+<% content_for :page_title, "Loan Timeline ##{@loan.reference_number}" %>
+<% content_for :page_subtitle, @loan.member.name %>
+
+<div class="animate-fade-in max-w-5xl mx-auto space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-text-primary dark:text-white">Loan History Timeline</h2>
+      <p class="text-sm text-text-tertiary mt-1"><%= @loan.reference_number %></p>
+    </div>
+    <%= link_to "Back to Loan", loans_loan_path(@loan), class: "btn-ghost text-sm" %>
+  </div>
+
+  <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+    <div class="flow-root">
+      <ul class="-mb-8">
+        <% @events.each_with_index do |event, index| %>
+          <li>
+            <div class="relative pb-8">
+              <% unless index == @events.length - 1 %>
+                <div class="absolute left-4 top-4 -bottom-8 w-0.5 bg-border dark:bg-gray-700" aria-hidden="true"></div>
+              <% end %>
+              <div class="relative flex items-start gap-4">
+                <div class="relative flex h-8 w-8 items-center justify-center rounded-full
+                  <%= case event.event_type
+                  when /approved/ then 'bg-positive-50 text-positive'
+                  when /rejected/ then 'bg-danger-50 text-danger'
+                  when /completed/ then 'bg-primary-50 text-primary'
+                  when /submitted/, /requested/ then 'bg-amber-50 text-amber-500'
+                  else 'bg-gray-100 text-text-tertiary'
+                  end %>">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <% if event.event_type.include?("approved") %>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                    <% elsif event.event_type.include?("rejected") %>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    <% elsif event.event_type.include?("completed") || event.event_type.include?("executed") %>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                    <% else %>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                    <% end %>
+                  </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm font-medium text-text-primary">
+                      <%= event.event_type.titleize %>
+                    </p>
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
+                      <%= event.status == 'completed' ? 'bg-positive-50 text-positive' : event.status == 'failed' ? 'bg-danger-50 text-danger' : 'bg-gray-100 text-text-tertiary' %>">
+                      <%= event.status %>
+                    </span>
+                  </div>
+                  <% if event.metadata.present? %>
+                    <div class="mt-1 text-xs text-text-tertiary space-y-0.5">
+                      <% event.metadata.each do |key, value| %>
+                        <span class="block"><%= key.to_s.titleize %>: <%= value.is_a?(Hash) ? value.to_json : value %></span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                  <p class="mt-1 text-xs text-text-tertiary"><%= time_ago_in_words(event.created_at) %> ago</p>
+                </div>
+              </div>
+            </div>
+          </li>
+        <% end %>
+
+        <% if @events.empty? %>
+          <li class="text-center py-8">
+            <p class="text-sm text-text-tertiary italic">No events recorded yet.</p>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <% if @schedules.any? %>
+    <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+      <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-3">Schedule Versions</h3>
+      <div class="space-y-2">
+        <% @schedules.each do |schedule| %>
+          <div class="flex items-center justify-between rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 px-4 py-3">
+            <div>
+              <span class="text-sm font-medium text-text-primary">Version <%= schedule.version %></span>
+              <span class="text-xs text-text-tertiary ml-2"><%= pluralize(schedule.schedule_data&.length || 0, "installment") %></span>
+            </div>
+            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
+              <%= schedule.active? ? 'bg-positive-50 text-positive' : 'bg-gray-100 text-text-tertiary' %>">
+              <%= schedule.status %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @links.any? %>
+    <div class="rounded-xl border border-border bg-surface dark:border-gray-700 dark:bg-gray-900 p-6">
+      <h3 class="text-sm font-semibold text-text-primary dark:text-white mb-3">Loan Links</h3>
+      <div class="space-y-2">
+        <% @links.each do |link| %>
+          <div class="flex items-center justify-between rounded-lg border border-border bg-surface-alt dark:border-gray-700 dark:bg-gray-800/50 px-4 py-3">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
+                <%= link.link_type == 'refinance' ? 'bg-positive-50 text-positive' : link.link_type == 'modification' ? 'bg-primary-50 text-primary' : 'bg-purple-50 text-purple-500' %>">
+                <%= link.link_type %>
+              </span>
+              <span class="text-sm text-text-primary">
+                <%= link.link_type == 'refinance' || link.link_type == 'hybrid' ? "Loan ##{link.to_loan.reference_number}" : "Self-link" %>
+              </span>
+            </div>
+            <span class="text-xs text-text-tertiary">
+              <% if link.amount_cents > 0 %>
+                <%= number_to_currency(link.amount_cents.to_f / 100, unit: "PHP ") %>
+              <% end %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

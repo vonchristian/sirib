@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_24_002310) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_24_101755) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -494,6 +494,41 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_002310) do
     t.index ["loan_application_id"], name: "index_loan_collaterals_on_loan_application_id"
   end
 
+  create_table "loan_events", force: :cascade do |t|
+    t.bigint "loan_id", null: false
+    t.string "actor_type", null: false
+    t.bigint "actor_id", null: false
+    t.string "event_type", null: false
+    t.string "status", default: "completed", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "cooperative_id"
+    t.index ["actor_type", "actor_id"], name: "index_loan_events_on_actor"
+    t.index ["cooperative_id"], name: "index_loan_events_on_cooperative_id"
+    t.index ["loan_id", "created_at"], name: "index_loan_events_on_loan_id_and_created_at"
+    t.index ["loan_id", "event_type"], name: "index_loan_events_on_loan_id_and_event_type"
+    t.index ["loan_id"], name: "index_loan_events_on_loan_id"
+  end
+
+  create_table "loan_links", force: :cascade do |t|
+    t.bigint "from_loan_id", null: false
+    t.bigint "to_loan_id", null: false
+    t.string "link_type", null: false
+    t.decimal "amount_cents", precision: 20, scale: 2, default: "0.0", null: false
+    t.string "amount_currency", default: "PHP", null: false
+    t.text "reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "cooperative_id"
+    t.index ["cooperative_id"], name: "index_loan_links_on_cooperative_id"
+    t.index ["from_loan_id", "link_type"], name: "index_loan_links_on_from_loan_id_and_link_type"
+    t.index ["from_loan_id", "to_loan_id"], name: "index_loan_links_on_from_loan_id_and_to_loan_id", unique: true
+    t.index ["from_loan_id"], name: "index_loan_links_on_from_loan_id"
+    t.index ["to_loan_id", "link_type"], name: "index_loan_links_on_to_loan_id_and_link_type"
+    t.index ["to_loan_id"], name: "index_loan_links_on_to_loan_id"
+  end
+
   create_table "loan_payments", force: :cascade do |t|
     t.bigint "cooperative_id", null: false
     t.bigint "loan_id", null: false
@@ -546,6 +581,48 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_002310) do
     t.index ["loan_application_id"], name: "index_loan_repayment_schedules_on_loan_application_id"
   end
 
+  create_table "loan_restructure_cases", force: :cascade do |t|
+    t.bigint "loan_id", null: false
+    t.bigint "new_loan_id"
+    t.string "restructure_type", null: false
+    t.string "status", default: "draft", null: false
+    t.jsonb "proposed_changes", default: {}, null: false
+    t.jsonb "simulation_data", default: {}
+    t.decimal "arrears_cents", precision: 20, scale: 2, default: "0.0", null: false
+    t.string "arrears_currency", default: "PHP", null: false
+    t.text "notes"
+    t.bigint "requested_by_id"
+    t.bigint "approved_by_id"
+    t.datetime "submitted_at"
+    t.datetime "reviewed_at"
+    t.datetime "executed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "cooperative_id"
+    t.index ["approved_by_id"], name: "index_loan_restructure_cases_on_approved_by_id"
+    t.index ["cooperative_id"], name: "index_loan_restructure_cases_on_cooperative_id"
+    t.index ["loan_id", "restructure_type"], name: "index_loan_restructure_cases_on_loan_id_and_restructure_type"
+    t.index ["loan_id", "status"], name: "index_loan_restructure_cases_on_loan_id_and_status"
+    t.index ["loan_id"], name: "index_loan_restructure_cases_on_loan_id"
+    t.index ["new_loan_id"], name: "index_loan_restructure_cases_on_new_loan_id"
+    t.index ["requested_by_id"], name: "index_loan_restructure_cases_on_requested_by_id"
+  end
+
+  create_table "loan_schedules", force: :cascade do |t|
+    t.bigint "loan_id", null: false
+    t.integer "version", default: 1, null: false
+    t.string "status", default: "active", null: false
+    t.jsonb "schedule_data", default: [], null: false
+    t.datetime "superseded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "cooperative_id"
+    t.index ["cooperative_id"], name: "index_loan_schedules_on_cooperative_id"
+    t.index ["loan_id", "status"], name: "index_loan_schedules_on_loan_id_and_status"
+    t.index ["loan_id", "version"], name: "index_loan_schedules_on_loan_id_and_version", unique: true
+    t.index ["loan_id"], name: "index_loan_schedules_on_loan_id"
+  end
+
   create_table "loans", force: :cascade do |t|
     t.bigint "cooperative_id", null: false
     t.bigint "loan_application_id", null: false
@@ -563,6 +640,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_002310) do
     t.string "reference_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "restructures_count", default: 0, null: false
+    t.integer "max_restructures", default: 2, null: false
     t.index ["cooperative_id"], name: "index_loans_on_cooperative_id"
     t.index ["loan_application_id"], name: "index_loans_on_loan_application_id"
     t.index ["loan_product_id"], name: "index_loans_on_loan_product_id"
@@ -1454,12 +1533,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_002310) do
   add_foreign_key "loan_co_makers", "members"
   add_foreign_key "loan_collaterals", "cooperatives"
   add_foreign_key "loan_collaterals", "loan_applications"
+  add_foreign_key "loan_events", "cooperatives"
+  add_foreign_key "loan_events", "loans"
+  add_foreign_key "loan_links", "cooperatives"
+  add_foreign_key "loan_links", "loans", column: "from_loan_id"
+  add_foreign_key "loan_links", "loans", column: "to_loan_id"
   add_foreign_key "loan_payments", "cooperatives"
   add_foreign_key "loan_payments", "entries"
   add_foreign_key "loan_payments", "loans"
   add_foreign_key "loan_products", "cooperatives"
   add_foreign_key "loan_repayment_schedules", "cooperatives"
   add_foreign_key "loan_repayment_schedules", "loan_applications"
+  add_foreign_key "loan_restructure_cases", "cooperatives"
+  add_foreign_key "loan_restructure_cases", "loans"
+  add_foreign_key "loan_restructure_cases", "loans", column: "new_loan_id"
+  add_foreign_key "loan_restructure_cases", "users", column: "approved_by_id"
+  add_foreign_key "loan_restructure_cases", "users", column: "requested_by_id"
+  add_foreign_key "loan_schedules", "cooperatives"
+  add_foreign_key "loan_schedules", "loans"
   add_foreign_key "loans", "cooperatives"
   add_foreign_key "loans", "loan_applications"
   add_foreign_key "loans", "loan_products"
