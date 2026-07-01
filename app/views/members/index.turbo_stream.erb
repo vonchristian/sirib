@@ -1,7 +1,1 @@
-<%= turbo_stream.update "members-tbody" do %>
-  <%= render "table_body", members: @members, query: params[:q] %>
-<% end %>
-
-<%= turbo_stream.update "members-count" do %>
-  <%= pluralize(@members.count, "member") %> found
-<% end %>
+<%= turbo_stream.update"members-tbody" do %> <%= render"table_body", members: @members, query: params[:q] %> <% end %> <%= turbo_stream.update"members-count" do %> <%= pluralize(@members.count,"member") %> found <% end %>

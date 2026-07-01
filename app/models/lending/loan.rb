@@ -25,6 +25,7 @@ module Lending
     validates :reference_number, uniqueness: { scope: :cooperative_id }
 
     before_validation :assign_reference_number, on: :create
+    after_commit :recalculate_aging_on_status_change, on: [ :update ], if: :saved_change_to_status?
 
     scope :active, -> { where(status: "active") }
     scope :paid, -> { where(status: "paid") }
@@ -77,6 +78,10 @@ module Lending
     end
 
     private
+
+    def recalculate_aging_on_status_change
+      Lending::AgingCalculationService.call(loan: self)
+    end
 
     def assign_reference_number
       return if reference_number.present?

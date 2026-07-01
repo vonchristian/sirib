@@ -2,7 +2,7 @@ module Treasury
   class TimeDepositProductsController < ApplicationController
     layout "shell"
 
-    before_action :set_product, only: [:show, :edit, :update, :destroy]
+    before_action :set_product, only: [ :show, :edit, :update, :destroy ]
 
     def index
       @products = Treasury::TimeDepositProduct.by_term

@@ -1,6 +1,6 @@
 module Management
   class PoliciesController < BaseController
-    before_action :set_policy, only: [:show, :edit, :update, :activate, :deactivate]
+    before_action :set_policy, only: [ :show, :edit, :update, :activate, :deactivate ]
 
     def index
       @policies = Management::Policy.by_category
@@ -55,7 +55,7 @@ module Management
 
     def policy_params
       params.require(:management_policy).permit(:name, :code, :category, :description, :status, :target_entity_type, :target_entity_id,
-        rules_attributes: [:id, :field, :operator, :value, :effect, :_destroy])
+        rules_attributes: [ :id, :field, :operator, :value, :effect, :_destroy ])
     end
   end
 end

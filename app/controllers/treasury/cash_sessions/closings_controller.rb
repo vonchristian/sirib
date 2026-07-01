@@ -15,7 +15,7 @@ module Treasury
         { amount: 25,      label: "0.25" },
         { amount: 10,      label: "0.10" },
         { amount: 5,       label: "0.05" },
-        { amount: 1,       label: "0.01" },
+        { amount: 1,       label: "0.01" }
       ].freeze
 
       def new

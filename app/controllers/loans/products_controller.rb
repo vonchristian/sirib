@@ -1,7 +1,7 @@
 module Loans
   class ProductsController < ApplicationController
     layout "shell"
-    before_action :set_product, only: [:show, :edit, :update, :destroy]
+    before_action :set_product, only: [ :show, :edit, :update, :destroy ]
 
     def index
       @products = Lending::LoanProduct.order(:name)
@@ -49,7 +49,7 @@ module Loans
 
     def product_params
       params.require(:loan_product).permit(:name, :description, :interest_rate, :interest_calculation, :max_term_months, :requires_collateral, :status,
-        loan_charges_attributes: [:id, :name, :charge_type, :value, :_destroy])
+        loan_charges_attributes: [ :id, :name, :charge_type, :value, :_destroy ])
     end
   end
 end

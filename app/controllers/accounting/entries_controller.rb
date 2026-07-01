@@ -27,15 +27,15 @@ module Accounting
     private
 
     def entry_params
-      params.require(:entry).permit(:description, :posted_at, amount_lines_attributes: [:account_id, :direction, :amount_cents])
+      params.require(:entry).permit(:description, :posted_at, amount_lines_attributes: [ :account_id, :direction, :amount_cents ])
     end
 
     def parse_lines
       lines = params.dig(:entry, :amount_lines_attributes)
-      return [[], []] unless lines
+      return [ [], [] ] unless lines
 
       lines = lines.values if lines.is_a?(ActionController::Parameters)
-      lines = [lines] unless lines.is_a?(Array)
+      lines = [ lines ] unless lines.is_a?(Array)
 
       debits = []
       credits = []
@@ -53,7 +53,7 @@ module Accounting
         end
       end
 
-      [debits, credits]
+      [ debits, credits ]
     end
   end
 end

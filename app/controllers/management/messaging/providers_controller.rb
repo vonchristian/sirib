@@ -5,7 +5,7 @@ module Management
 
       before_action :require_permission!, subject: "messaging_providers"
       before_action :set_channel
-      before_action :set_provider, only: [:show, :edit, :update, :destroy]
+      before_action :set_provider, only: [ :show, :edit, :update, :destroy ]
 
       def index
         providers = @channel.providers

@@ -12,18 +12,21 @@ require_relative "seeds/cooperatives"
 puts "\nPhase 2: Users"
 require_relative "seeds/users"
 
+puts "\nPhase 3: Loan aging groups"
+require_relative "seeds/loan_aging_groups"
+
 unless Rails.env.test?
-  puts "\nPhase 3: Demo data"
+  puts "\nPhase 4: Demo data"
   require_relative "seeds/demo_data"
 end
 
 unless Rails.env.test?
-  puts "\nPhase 4: Year-long audit trail"
+  puts "\nPhase 5: Year-long audit trail"
   require_relative "seeds/audit_trail"
   run_year_long_audit_trail
 end
 
-puts "\nPhase 5: Security configuration"
+puts "\nPhase 6: Security configuration"
 require_relative "seeds/security"
 
 puts ""

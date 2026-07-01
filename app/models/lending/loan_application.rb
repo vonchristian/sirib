@@ -52,7 +52,7 @@ module Lending
       status == "approved"
     end
 
-    STEP_LABELS = ["Loan Details", "Income Sources", "Co-Makers", "Collaterals", "Schedule"].freeze
+    STEP_LABELS = [ "Loan Details", "Income Sources", "Co-Makers", "Collaterals", "Schedule" ].freeze
 
     def step_valid?(step)
       case step

@@ -32,3 +32,6 @@ application.register("chart-of-accounts", ChartOfAccountsController)
 import MemberAutocompleteController from "controllers/member_autocomplete_controller"
 application.register("member-autocomplete", MemberAutocompleteController)
 
+import RestructureFormController from "controllers/restructure_form_controller"
+application.register("restructure-form", RestructureFormController)
+

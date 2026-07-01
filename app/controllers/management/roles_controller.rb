@@ -1,6 +1,6 @@
 module Management
   class RolesController < BaseController
-    before_action :set_role, only: [:show, :edit, :update]
+    before_action :set_role, only: [ :show, :edit, :update ]
 
     def index
       @pagy, @roles = pagy(Management::Role.by_rank)

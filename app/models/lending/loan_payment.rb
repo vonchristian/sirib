@@ -21,7 +21,13 @@ module Lending
     before_validation :assign_reference_number, on: :create
     validate :allocation_equals_amount
 
+    after_commit :recalculate_loan_aging, on: [ :create, :update ]
+
     private
+
+    def recalculate_loan_aging
+      Lending::AgingCalculationService.call(loan: loan)
+    end
 
     def assign_reference_number
       return if reference_number.present?

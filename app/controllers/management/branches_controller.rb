@@ -1,6 +1,6 @@
 module Management
   class BranchesController < BaseController
-    before_action :set_branch, only: [:show, :edit, :update]
+    before_action :set_branch, only: [ :show, :edit, :update ]
 
     def index
       @pagy, @branches = pagy(

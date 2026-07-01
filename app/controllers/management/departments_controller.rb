@@ -1,6 +1,6 @@
 module Management
   class DepartmentsController < BaseController
-    before_action :set_department, only: [:show, :edit, :update]
+    before_action :set_department, only: [ :show, :edit, :update ]
 
     def index
       @departments = Management::Department.by_name

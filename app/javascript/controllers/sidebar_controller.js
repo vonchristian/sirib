@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["rail", "contextNav", "contextNavContent", "contextTitle", "backdrop", "mobileSidebar", "userMenu"]
+  static targets = ["rail", "contextNav", "contextNavContent", "contextTitle", "backdrop", "sidebar", "mobileSidebar", "userMenu"]
 
   connect() {
     this._applyTheme()
@@ -21,7 +21,6 @@ export default class extends Controller {
     const saved = localStorage.getItem("sidebar_minimized")
     if (saved === "true") {
       this.element.dataset.sidebarMinimizedValue = "true"
-      this._applyMinimizedState(true)
     }
   }
 
@@ -87,18 +86,7 @@ export default class extends Controller {
       maximizeIcon.classList.toggle("hidden", !isMinimized)
     }
 
-    const contextNav = this.element.querySelector("[data-sidebar-target='contextNav']")
-    if (contextNav) {
-      if (isMinimized) {
-        contextNav.style.width = "0"
-        contextNav.style.minWidth = "0"
-        contextNav.style.opacity = "0"
-      } else {
-        contextNav.style.width = ""
-        contextNav.style.minWidth = ""
-        contextNav.style.opacity = "1"
-      }
-    }
+    document.documentElement.classList.toggle("sidebar-minimized", isMinimized)
   }
 
   minimize() {
@@ -159,7 +147,7 @@ export default class extends Controller {
   }
 
   toggleMobile() {
-    const mobile = this.mobileSidebarTarget
+    const mobile = this.hasMobileSidebarTarget ? this.mobileSidebarTarget : (this.hasSidebarTarget ? this.sidebarTarget : null)
     const backdrop = this.backdropTarget
 
     if (!mobile || !backdrop) return
@@ -175,6 +163,14 @@ export default class extends Controller {
     }
   }
 
+  close() {
+    this.closeMobile()
+  }
+
+  toggle() {
+    this.toggleMobile()
+  }
+
   toggleUserMenu() {
     const menu = this.element.querySelector("[data-sidebar-target='userMenu']")
     if (menu) {
@@ -183,7 +179,7 @@ export default class extends Controller {
   }
 
   closeMobile() {
-    const mobile = this.mobileSidebarTarget
+    const mobile = this.hasMobileSidebarTarget ? this.mobileSidebarTarget : (this.hasSidebarTarget ? this.sidebarTarget : null)
     const backdrop = this.backdropTarget
 
     if (mobile) {

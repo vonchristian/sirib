@@ -81,8 +81,8 @@ module Treasury
       "share_capital_purchase" => "Share Capital Purchases",
       "member_transaction" => "Member Transactions",
       "loan_payment" => "Loan Payments",
-      "time_deposit" => "Time Deposits",
+      "time_deposit" => "Time Deposits"
     }[cat] || cat.titleize
   end
-end
+  end
 end

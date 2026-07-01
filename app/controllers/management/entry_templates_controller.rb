@@ -1,6 +1,6 @@
 module Management
   class EntryTemplatesController < BaseController
-    before_action :set_template, only: [:show, :edit, :update, :preview, :execute]
+    before_action :set_template, only: [ :show, :edit, :update, :preview, :execute ]
 
     def index
       @templates = Accounting::EntryTemplate.order(created_at: :desc)
@@ -68,7 +68,7 @@ module Management
 
     def template_params
       params.require(:accounting_entry_template).permit(:name, :description, :is_active,
-        lines_attributes: [:id, :account_id, :direction, :amount_mode, :fixed_amount, :sequence_index, :_destroy])
+        lines_attributes: [ :id, :account_id, :direction, :amount_mode, :fixed_amount, :sequence_index, :_destroy ])
     end
   end
 end

@@ -188,6 +188,10 @@ Rails.application.routes.draw do
     get "searches/loan_products", to: "searches#loan_products"
   end
 
+  namespace :lending do
+    get "loan_aging", to: "loan_aging#index"
+  end
+
   namespace :external do
     resources :accounts, only: [ :index, :new, :create ], controller: "accounts"
     resources :banks do
@@ -301,6 +305,30 @@ Rails.application.routes.draw do
       resources :messages, only: [ :index, :show ]
       resources :channels, only: [ :index, :show, :update ] do
         resources :providers, only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
+      end
+    end
+
+    namespace :ai do
+      get "dashboard", to: "dashboard#index"
+
+      resources :observations, only: [ :index, :show ] do
+        member do
+          post :resolve
+        end
+      end
+
+      resources :recommendations, only: [ :index, :show ] do
+        member do
+          post :acknowledge
+          post :dismiss
+          post :complete
+        end
+      end
+
+      resources :digests, only: [ :index, :show ] do
+        collection do
+          get :latest
+        end
       end
     end
   end

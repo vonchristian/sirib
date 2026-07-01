@@ -1,7 +1,7 @@
 module Management
   class UsersController < BaseController
-    before_action :set_user, only: [:show, :edit, :update]
-    before_action :require_admin, only: [:edit, :update]
+    before_action :set_user, only: [ :show, :edit, :update ]
+    before_action :require_admin, only: [ :edit, :update ]
 
     def index
       @pagy, @users = pagy(

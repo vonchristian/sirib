@@ -3,7 +3,7 @@ module External
     before_action { set_active_nav }
     before_action :set_bank
     before_action :set_account
-    before_action :set_document, only: [:show, :retry, :destroy]
+    before_action :set_document, only: [ :show, :retry, :destroy ]
 
     def index
       @documents = @account.documents.order(created_at: :desc).with_attached_file

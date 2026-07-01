@@ -62,7 +62,7 @@ unless Management::Role.where(cooperative: @coop).exists?
   roles.each { |attrs| Management::Role.create!(attrs.merge(cooperative: @coop)) }
 end
 
-subjects = %w[member loan savings time_deposit share_capital treasury accounting branch policy configuration approval_workflow alert audit_log user role report system]
+subjects = %w[member loan savings time_deposit share_capital treasury accounting branch policy configuration approval_workflow alert audit_log user role report system ai_dashboard]
 actions = %w[view create update delete approve reject configure export]
 
 subjects.each do |subject|
@@ -86,7 +86,7 @@ role_permissions = {
     export: [:report]
   },
   "branch_manager" => {
-    view: [:member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :report],
+    view: [:member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :report, :ai_dashboard],
     create: [:member, :loan],
     update: [:member, :loan, :branch],
     approve: [:loan],
@@ -259,6 +259,17 @@ unless Management::Policy.where(cooperative: @coop).exists?
     { field: "balance", operator: "gte", value: "500", effect: :allow, cooperative: @coop },
     { field: "balance", operator: "lt", value: "500", effect: :deny, cooperative: @coop }
   ])
+end
+
+unless Ai::Agent.where(cooperative: @coop).exists?
+  Ai::Agent.create!(
+    name: "Branch Manager AI",
+    description: "Monitors branch operations, detects issues, and generates daily digests with recommendations.",
+    enabled: true,
+    schedule: "daily",
+    cooperative: @coop
+  )
+  puts "  AI Agent created: Branch Manager AI"
 end
 
 puts "  Management seeded: branches, departments, roles, permissions, workflows, policies"

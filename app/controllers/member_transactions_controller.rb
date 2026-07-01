@@ -32,7 +32,7 @@ class MemberTransactionsController < ApplicationController
     end
 
     @total_amount = Money.new(@items.sum { |i| i[:amount_cents] }, "PHP")
-    @debits = [{ account: @cash_account.name, amount: @total_amount.format }]
+    @debits = [ { account: @cash_account.name, amount: @total_amount.format } ]
     @credits = @items.map { |i| { account: i[:credit_account_name], amount: Money.new(i[:amount_cents], "PHP").format } }
 
     render :new

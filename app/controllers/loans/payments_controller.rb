@@ -23,7 +23,7 @@ module Loans
 
       if @payment.save
         new_outstanding = @loan.outstanding_principal_cents - @payment.principal_cents
-        @loan.update!(outstanding_principal_cents: [new_outstanding, 0].max)
+        @loan.update!(outstanding_principal_cents: [ new_outstanding, 0 ].max)
         @loan.update!(status: "paid") if @loan.outstanding_principal_cents <= 0
         redirect_to loans_loan_path(@loan), notice: "Payment recorded. Allocated: #{@payment.principal_cents} principal, #{@payment.interest_cents} interest, #{@payment.penalty_cents} penalties."
       else

@@ -2,7 +2,7 @@ module External
   class AccountsController < BaseController
     before_action { set_active_nav }
     before_action :set_bank, unless: -> { params[:bank_id].blank? && %w[index new create].include?(action_name) }
-    before_action :set_account, only: [:show, :edit, :update, :destroy]
+    before_action :set_account, only: [ :show, :edit, :update, :destroy ]
 
     def index
       if @bank

@@ -1,6 +1,6 @@
 module Management
   class TeamsController < BaseController
-    before_action :set_team, only: [:show, :edit, :update]
+    before_action :set_team, only: [ :show, :edit, :update ]
 
     def index
       @teams = Management::Team.all

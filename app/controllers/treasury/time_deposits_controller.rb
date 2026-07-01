@@ -2,7 +2,7 @@ module Treasury
   class TimeDepositsController < ApplicationController
     layout "shell"
 
-    before_action :set_products, only: [:new, :preview]
+    before_action :set_products, only: [ :new, :preview ]
 
     def index
       @deposits = Treasury::TimeDeposit.where(depositor_id: Current.user.id, depositor_type: "User").by_latest

@@ -1,6 +1,6 @@
 module Management
   class ApprovalWorkflowsController < BaseController
-    before_action :set_workflow, only: [:show, :edit, :update]
+    before_action :set_workflow, only: [ :show, :edit, :update ]
 
     def index
       @pagy, @workflows = pagy(Management::ApprovalWorkflow.includes(:steps).order(:name))
@@ -43,7 +43,7 @@ module Management
 
     def workflow_params
       params.require(:management_approval_workflow).permit(:name, :code, :category, :description,
-        steps_attributes: [:id, :sequence, :approver_role_id, :approver_user_id, :threshold_cents_min, :threshold_cents_max, :_destroy])
+        steps_attributes: [ :id, :sequence, :approver_role_id, :approver_user_id, :threshold_cents_min, :threshold_cents_max, :_destroy ])
     end
   end
 end

@@ -1,7 +1,7 @@
 module Equity
   class ProductsController < ApplicationController
     layout "shell"
-    before_action :set_product, only: [:show, :edit, :update, :destroy]
+    before_action :set_product, only: [ :show, :edit, :update, :destroy ]
 
     def index
       @products = Equity::Product.by_name

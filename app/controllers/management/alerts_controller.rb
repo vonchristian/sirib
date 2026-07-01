@@ -1,6 +1,6 @@
 module Management
   class AlertsController < BaseController
-    before_action :set_alert, only: [:show, :resolve]
+    before_action :set_alert, only: [ :show, :resolve ]
 
     def index
       @alerts = Management::Alert.by_severity

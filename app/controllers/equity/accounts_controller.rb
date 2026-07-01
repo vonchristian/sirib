@@ -95,8 +95,8 @@ module Equity
       @amount_input = params[:amount]
       @total_amount = Money.new(@shares * price_cents, "PHP")
 
-      @debits = [{ account: @cash_account.name, amount: @total_amount.format }]
-      @credits = [{ account: @account.equity_account&.name || "Share Capital Equity", amount: @total_amount.format }]
+      @debits = [ { account: @cash_account.name, amount: @total_amount.format } ]
+      @credits = [ { account: @account.equity_account&.name || "Share Capital Equity", amount: @total_amount.format } ]
 
       render :buy
     end

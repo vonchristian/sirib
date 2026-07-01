@@ -173,11 +173,45 @@ if admin_account
 end
 
 # ── MANAGEMENT E2E TEST DATA ───────────────────────────────────────────
+# Ensure E2E cooperative has at least one branch
+hq_branch = Management::Branch.find_or_create_by!(code: "HQ", cooperative: cooperative) do |b|
+  b.name = "HQ Branch"
+  b.address = "123 Main Street"
+  b.status = "active"
+end
+puts "  Branch: #{hq_branch.name}"
+
+unless Management::Role.where(cooperative: cooperative).exists?
+  roles_data = [
+    { name: "Board Member", code: "board_member", description: "Board of Directors member with governance authority", rank: 90 },
+    { name: "General Manager", code: "general_manager", description: "Full operational oversight authority", rank: 80 },
+    { name: "Branch Manager", code: "branch_manager", description: "Branch-level control and performance monitoring", rank: 70 },
+    { name: "Loan Officer", code: "loan_officer", description: "Loan origination and processing", rank: 40 },
+    { name: "Teller", code: "teller", description: "Cash handling and customer transactions", rank: 30 },
+    { name: "Accountant", code: "accountant", description: "Financial record keeping and reporting", rank: 50 },
+    { name: "Auditor", code: "auditor", description: "Read-only access across all modules for auditing", rank: 60 },
+    { name: "System Admin", code: "system_admin", description: "System configuration and administration", rank: 99 }
+  ]
+  roles_data.each { |attrs| Management::Role.create!(attrs.merge(cooperative: cooperative)) }
+  subjects = %w[member loan savings time_deposit share_capital treasury accounting branch policy configuration approval_workflow alert audit_log user role report system ai_dashboard]
+  actions = %w[view create update delete approve reject configure export]
+  subjects.each do |subject|
+    actions.each do |action|
+      Management::Permission.find_or_create_by!(action: action, subject: subject, cooperative: cooperative)
+    end
+  end
+  Management::Role.all.each do |role|
+    Management::Permission.where(cooperative: cooperative).find_each do |perm|
+      Management::RolePermission.find_or_create_by!(role: role, permission: perm)
+    end
+  end
+  puts "  Roles, permissions, and role permissions: created"
+end
+
 # Ensure admin user gets management role assignments
 admin_role = Management::Role.find_by(code: "system_admin")
-hq_branch = Management::Branch.find_by(code: "HQ")
 if admin_role && hq_branch && !Management::RoleAssignment.exists?(user: admin_user, role: admin_role)
-  Management::RoleAssignment.create!(user: admin_user, role: admin_role, branch: hq_branch)
+  Management::RoleAssignment.create!(user: admin_user, role: admin_role, branch: hq_branch, cooperative: cooperative, active_from: Date.current)
 end
 
 # Create branch performance snapshots
@@ -281,12 +315,12 @@ end
 teller_role = Management::Role.find_by(code: "teller")
 mkt_branch = Management::Branch.find_by(code: "MKT")
 if teller_role && mkt_branch && !Management::RoleAssignment.exists?(user: teller_user, role: teller_role)
-  Management::RoleAssignment.create!(user: teller_user, role: teller_role, branch: mkt_branch)
+  Management::RoleAssignment.create!(user: teller_user, role: teller_role, branch: mkt_branch, cooperative: cooperative, active_from: Date.current)
 end
 
 bm_role = Management::Role.find_by(code: "branch_manager")
 if bm_role && mkt_branch && !Management::RoleAssignment.exists?(user: bm_user, role: bm_role)
-  Management::RoleAssignment.create!(user: bm_user, role: bm_role, branch: mkt_branch)
+  Management::RoleAssignment.create!(user: bm_user, role: bm_role, branch: mkt_branch, cooperative: cooperative, active_from: Date.current)
 end
 
 # ── MEMBER PORTAL E2E TEST DATA ─────────────────────────────────────────
@@ -340,6 +374,62 @@ Portal::Announcement.find_or_create_by!(title: "Quarterly Dividend Declaration")
   a.cooperative = cooperative
   a.author = test_user
 end
+  # ── AI AGENT E2E TEST DATA ────────────────────────────────────────
+  seeded_observations = []
+  observation_data = [
+    { category: "collections", severity: "critical", title: "High delinquency rate in HQ Branch", summary: "Delinquency rate exceeds 5% threshold. Immediate collection action required.", detected_at: 2.hours.ago },
+    { category: "liquidity", severity: "high", title: "Low cash position detected", summary: "Cash position is below the minimum reserve requirement.", detected_at: 4.hours.ago },
+    { category: "operations", severity: "medium", title: "Staff overtime increasing", summary: "Staff overtime has increased 20% this week across teller operations.", detected_at: 6.hours.ago },
+    { category: "membership", severity: "low", title: "New member applications pending", summary: "5 new member applications pending review for more than 3 days.", detected_at: 1.day.ago },
+    { category: "compliance", severity: "critical", title: "Overdue compliance report", summary: "Monthly compliance report for regulatory submission is overdue.", detected_at: 3.hours.ago },
+  ]
+  observation_data.each do |data|
+    obs = ::Ai::Observation.find_or_create_by!(title: data[:title], branch: hq_branch) do |o|
+      o.category = data[:category]
+      o.severity = data[:severity]
+      o.summary = data[:summary]
+      o.detected_at = data[:detected_at]
+    end
+    seeded_observations << obs
+  end
+  puts "  AI Observations: #{seeded_observations.size} created"
+
+  seeded_recommendations = []
+  recommendation_data = [
+    { priority: "critical", title: "Initiate special collection drive", summary: "Launch a targeted collection drive for accounts over 30 days past due.", action_text: "Schedule collection drive with branch managers", status: "open", confidence_score: 0.92, observation_index: 0 },
+    { priority: "high", title: "Review cash reserve policy", summary: "Current cash reserves are insufficient for projected member withdrawals.", action_text: "Review and adjust cash reserve thresholds", status: "open", confidence_score: 0.85, observation_index: 1 },
+    { priority: "medium", title: "Optimize teller scheduling", summary: "Adjust teller schedules to reduce overtime costs while maintaining service levels.", status: "acknowledged", confidence_score: 0.78, observation_index: 2 },
+    { priority: "low", title: "Process pending applications", summary: "Assign staff to process the 5 pending membership applications.", status: "dismissed", confidence_score: 0.65, observation_index: 3 },
+    { priority: "critical", title: "File compliance report immediately", summary: "Prepare and submit the monthly compliance report to regulatory body.", status: "completed", confidence_score: 0.95, observation_index: 4 },
+  ]
+  recommendation_data.each do |data|
+    rec = ::Ai::Recommendation.find_or_create_by!(title: data[:title], branch: hq_branch) do |r|
+      r.priority = data[:priority]
+      r.summary = data[:summary]
+      r.action_text = data[:action_text]
+      r.status = data[:status]
+      r.confidence_score = data[:confidence_score]
+      r.observation = seeded_observations[data[:observation_index]]
+    end
+    seeded_recommendations << rec
+  end
+  puts "  AI Recommendations: #{seeded_recommendations.size} created"
+
+  ::Ai::Digest.find_or_create_by!(generated_at: Date.current.midnight + 6.hours, branch: hq_branch) do |d|
+    d.summary = "Branch operations summary for today. Cash position is below threshold. Delinquency rate requires attention. Staff overtime is within acceptable limits."
+    d.risk_summary = "High: Cash position below minimum. Medium: Delinquency rate elevated. Low: Staff overtime."
+    d.observation_count = seeded_observations.size
+    d.recommendation_count = seeded_recommendations.size
+  end
+  puts "  AI Digest: created for today"
+
+  # Ensure admin_user has ai_dashboard permission
+  ai_perm = Management::Permission.find_by(action: "view", subject: "ai_dashboard")
+  if admin_role && ai_perm && !Management::RolePermission.exists?(role: admin_role, permission: ai_perm)
+    Management::RolePermission.create!(role: admin_role, permission: ai_perm)
+  end
+  puts "  AI Dashboard permission: assigned to system_admin"
 end
 
+puts ""
 puts "E2E setup complete for #{cooperative.name}"

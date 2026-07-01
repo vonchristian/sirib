@@ -11,6 +11,8 @@ module Membership
       @_model_name ||= ActiveModel::Name.new(self, nil, "Member")
     end
 
+    belongs_to :branch, class_name: "Management::Branch", optional: true
+
     has_one :address, class_name: "Membership::Address", dependent: :destroy
     has_many :identifications, class_name: "Membership::Identification", dependent: :destroy
     has_many_attached :signatures

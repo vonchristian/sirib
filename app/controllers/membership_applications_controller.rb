@@ -75,8 +75,8 @@ class MembershipApplicationsController < ApplicationController
       :mobile_number, :email_address,
       :house_street, :barangay, :city, :province, :region, :zip_code,
       :signature_specimens, :profile_images, :sources_of_income, :current_step,
-      identifications: [:id_type, :id_number, :front_image, :back_image],
-      sources_of_income: [:source_type, :monthly_income]
+      identifications: [ :id_type, :id_number, :front_image, :back_image ],
+      sources_of_income: [ :source_type, :monthly_income ]
     )
   end
 end

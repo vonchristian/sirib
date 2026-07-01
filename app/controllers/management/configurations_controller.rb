@@ -1,6 +1,6 @@
 module Management
   class ConfigurationsController < BaseController
-    before_action :set_configuration, only: [:show, :edit, :update, :approve, :activate]
+    before_action :set_configuration, only: [ :show, :edit, :update, :approve, :activate ]
 
     def index
       @pagy, @configurations = pagy(Management::Configuration.order(:key))

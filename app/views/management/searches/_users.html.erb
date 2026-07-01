@@ -1,8 +1,1 @@
-<% users.each do |user| %>
-  <div class="px-3 py-2 hover:bg-surface-alt cursor-pointer text-sm text-text-primary" data-search-result data-id="<%= user.id %>" data-name="<%= user.email_address %>">
-    <%= user.email_address %>
-  </div>
-<% end %>
-<% if users.empty? %>
-  <div class="px-3 py-2 text-sm text-text-tertiary">No users found.</div>
-<% end %>
+<% users.each do |user| %> <div class="px-3 py-2 hover:bg-surface-alt cursor-pointer text-sm text-text-primary" data-search-result data-id="<%= user.id %>" data-name="<%= user.email_address %>"> <%= user.email_address %> </div> <% end %> <% if users.empty? %> <div class="px-3 py-2 text-sm text-text-tertiary">No users found.</div> <% end %> 

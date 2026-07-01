@@ -1,7 +1,7 @@
 module Treasury
   class SavingsProductsController < ApplicationController
     layout "shell"
-    before_action :set_product, only: [:show, :edit, :update, :destroy]
+    before_action :set_product, only: [ :show, :edit, :update, :destroy ]
 
     def index
       @products = Treasury::SavingsProduct.by_name
@@ -53,7 +53,7 @@ module Treasury
 
     def product_params
       params.require(:treasury_savings_product).permit(:name, :description, :status,
-        interest_rates_attributes: [:id, :rate, :current, :_destroy])
+        interest_rates_attributes: [ :id, :rate, :current, :_destroy ])
     end
   end
 end

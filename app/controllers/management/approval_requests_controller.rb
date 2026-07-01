@@ -1,7 +1,7 @@
 module Management
   class ApprovalRequestsController < BaseController
     before_action :set_workflow
-    before_action :set_approval_request, only: [:show, :approve, :reject]
+    before_action :set_approval_request, only: [ :show, :approve, :reject ]
 
     def index
       @approval_requests = @workflow.approval_requests.includes(:requested_by).order(created_at: :desc)

@@ -1,7 +1,7 @@
 module External
   class BanksController < BaseController
     before_action { set_active_nav }
-    before_action :set_bank, only: [:show, :edit, :update, :destroy]
+    before_action :set_bank, only: [ :show, :edit, :update, :destroy ]
 
     def index
       @banks = External::Bank.all

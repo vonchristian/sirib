@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_24_101755) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_25_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,105 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_101755) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_agent_runs", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.bigint "agent_id", null: false
+    t.bigint "branch_id"
+    t.datetime "started_at", null: false
+    t.datetime "completed_at"
+    t.string "status", default: "running", null: false
+    t.integer "tokens_used", default: 0
+    t.integer "execution_time_ms", default: 0
+    t.jsonb "result", default: {}
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agent_id", "started_at"], name: "index_ai_agent_runs_on_agent_id_and_started_at"
+    t.index ["agent_id"], name: "index_ai_agent_runs_on_agent_id"
+    t.index ["branch_id"], name: "index_ai_agent_runs_on_branch_id"
+    t.index ["cooperative_id"], name: "index_ai_agent_runs_on_cooperative_id"
+    t.index ["status"], name: "index_ai_agent_runs_on_status"
+  end
+
+  create_table "ai_agents", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "enabled", default: true, null: false
+    t.string "schedule", default: "daily", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id", "name"], name: "index_ai_agents_on_cooperative_id_and_name", unique: true
+    t.index ["cooperative_id"], name: "index_ai_agents_on_cooperative_id"
+  end
+
+  create_table "ai_digests", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.bigint "branch_id", null: false
+    t.bigint "agent_run_id"
+    t.datetime "generated_at", null: false
+    t.text "summary"
+    t.text "risk_summary"
+    t.text "recommendations_summary"
+    t.jsonb "metrics", default: {}
+    t.integer "observation_count", default: 0
+    t.integer "recommendation_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agent_run_id"], name: "index_ai_digests_on_agent_run_id"
+    t.index ["branch_id", "generated_at"], name: "index_ai_digests_on_branch_id_and_generated_at"
+    t.index ["branch_id"], name: "index_ai_digests_on_branch_id"
+    t.index ["cooperative_id"], name: "index_ai_digests_on_cooperative_id"
+  end
+
+  create_table "ai_observations", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.bigint "branch_id", null: false
+    t.bigint "agent_run_id"
+    t.string "category", null: false
+    t.string "severity", default: "medium", null: false
+    t.string "title", null: false
+    t.text "summary"
+    t.jsonb "metadata", default: {}
+    t.datetime "detected_at", null: false
+    t.datetime "resolved_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agent_run_id"], name: "index_ai_observations_on_agent_run_id"
+    t.index ["branch_id", "detected_at"], name: "index_ai_observations_on_branch_id_and_detected_at"
+    t.index ["branch_id", "resolved_at"], name: "index_ai_observations_on_branch_id_and_resolved_at"
+    t.index ["branch_id"], name: "index_ai_observations_on_branch_id"
+    t.index ["category"], name: "index_ai_observations_on_category"
+    t.index ["cooperative_id"], name: "index_ai_observations_on_cooperative_id"
+    t.index ["severity"], name: "index_ai_observations_on_severity"
+  end
+
+  create_table "ai_recommendations", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.bigint "branch_id", null: false
+    t.bigint "observation_id"
+    t.bigint "agent_run_id"
+    t.string "priority", default: "medium", null: false
+    t.string "title", null: false
+    t.text "summary"
+    t.text "action_text"
+    t.decimal "confidence_score", default: "0.0"
+    t.string "status", default: "open", null: false
+    t.datetime "dismissed_at"
+    t.datetime "completed_at"
+    t.datetime "acknowledged_at"
+    t.bigint "acknowledged_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agent_run_id"], name: "index_ai_recommendations_on_agent_run_id"
+    t.index ["branch_id", "status"], name: "index_ai_recommendations_on_branch_id_and_status"
+    t.index ["branch_id"], name: "index_ai_recommendations_on_branch_id"
+    t.index ["cooperative_id"], name: "index_ai_recommendations_on_cooperative_id"
+    t.index ["observation_id"], name: "index_ai_recommendations_on_observation_id"
+    t.index ["priority"], name: "index_ai_recommendations_on_priority"
+    t.index ["status"], name: "index_ai_recommendations_on_status"
   end
 
   create_table "amount_lines", force: :cascade do |t|
@@ -425,6 +524,55 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_101755) do
     t.index ["ancestry"], name: "index_ledgers_on_ancestry"
     t.index ["cooperative_id", "account_code"], name: "index_ledgers_on_cooperative_id_and_account_code", unique: true
     t.index ["cooperative_id"], name: "index_ledgers_on_cooperative_id"
+  end
+
+  create_table "loan_aging_groups", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.string "name", null: false
+    t.integer "min_days", default: 0, null: false
+    t.integer "max_days"
+    t.integer "display_order", default: 0, null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id", "display_order"], name: "index_loan_aging_groups_on_cooperative_id_and_display_order"
+    t.index ["cooperative_id", "name"], name: "index_loan_aging_groups_on_cooperative_id_and_name", unique: true
+    t.index ["cooperative_id"], name: "index_loan_aging_groups_on_cooperative_id"
+  end
+
+  create_table "loan_aging_snapshots", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.bigint "loan_aging_group_id", null: false
+    t.date "snapshot_date", null: false
+    t.integer "loan_count", default: 0, null: false
+    t.integer "member_count", default: 0, null: false
+    t.decimal "principal_amount_cents", default: "0.0", null: false
+    t.decimal "interest_amount_cents", default: "0.0", null: false
+    t.decimal "total_exposure_cents", default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_loan_aging_snapshots_on_cooperative_id"
+    t.index ["snapshot_date", "loan_aging_group_id"], name: "idx_on_snapshot_date_loan_aging_group_id_0bac11c8fd", unique: true
+    t.index ["snapshot_date"], name: "index_loan_aging_snapshots_on_snapshot_date"
+  end
+
+  create_table "loan_agings", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.bigint "loan_id", null: false
+    t.bigint "loan_aging_group_id", null: false
+    t.integer "days_past_due", default: 0, null: false
+    t.date "oldest_unpaid_due_date"
+    t.decimal "outstanding_principal_cents", default: "0.0", null: false
+    t.decimal "outstanding_interest_cents", default: "0.0", null: false
+    t.decimal "penalty_amount_cents", default: "0.0", null: false
+    t.decimal "total_exposure_cents", default: "0.0", null: false
+    t.datetime "calculated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_loan_agings_on_cooperative_id"
+    t.index ["days_past_due"], name: "index_loan_agings_on_days_past_due"
+    t.index ["loan_aging_group_id"], name: "index_loan_agings_on_loan_aging_group_id"
+    t.index ["loan_id"], name: "index_loan_agings_on_loan_id", unique: true
   end
 
   create_table "loan_applications", force: :cascade do |t|
@@ -1019,6 +1167,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_101755) do
     t.string "portal_status", default: "inactive", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "branch_id"
+    t.index ["branch_id"], name: "index_members_on_branch_id"
     t.index ["cooperative_id"], name: "index_members_on_cooperative_id"
     t.index ["email_address"], name: "index_members_on_email_address", unique: true
     t.index ["member_identifier"], name: "index_members_on_member_identifier", unique: true
@@ -1480,6 +1630,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_101755) do
   add_foreign_key "accounts", "ledgers"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_agent_runs", "ai_agents", column: "agent_id"
+  add_foreign_key "ai_agent_runs", "cooperatives"
+  add_foreign_key "ai_agent_runs", "management_branches", column: "branch_id"
+  add_foreign_key "ai_agents", "cooperatives"
+  add_foreign_key "ai_digests", "ai_agent_runs", column: "agent_run_id"
+  add_foreign_key "ai_digests", "cooperatives"
+  add_foreign_key "ai_digests", "management_branches", column: "branch_id"
+  add_foreign_key "ai_observations", "ai_agent_runs", column: "agent_run_id"
+  add_foreign_key "ai_observations", "cooperatives"
+  add_foreign_key "ai_observations", "management_branches", column: "branch_id"
+  add_foreign_key "ai_recommendations", "ai_agent_runs", column: "agent_run_id"
+  add_foreign_key "ai_recommendations", "ai_observations", column: "observation_id"
+  add_foreign_key "ai_recommendations", "cooperatives"
+  add_foreign_key "ai_recommendations", "management_branches", column: "branch_id"
   add_foreign_key "amount_lines", "accounts"
   add_foreign_key "amount_lines", "cooperatives"
   add_foreign_key "amount_lines", "entries"
@@ -1523,6 +1687,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_101755) do
   add_foreign_key "fraud_incidents", "fraud_rules", column: "rule_id"
   add_foreign_key "fraud_rules", "cooperatives"
   add_foreign_key "ledgers", "cooperatives"
+  add_foreign_key "loan_aging_snapshots", "loan_aging_groups"
+  add_foreign_key "loan_agings", "loan_aging_groups"
+  add_foreign_key "loan_agings", "loans"
   add_foreign_key "loan_applications", "cooperatives"
   add_foreign_key "loan_applications", "loan_products"
   add_foreign_key "loan_applications", "members"
@@ -1609,6 +1776,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_101755) do
   add_foreign_key "member_identifications", "cooperatives"
   add_foreign_key "member_identifications", "members"
   add_foreign_key "members", "cooperatives"
+  add_foreign_key "members", "management_branches", column: "branch_id"
   add_foreign_key "membership_applications", "cooperatives"
   add_foreign_key "messaging_channels", "cooperatives"
   add_foreign_key "messaging_message_deliveries", "cooperatives"
