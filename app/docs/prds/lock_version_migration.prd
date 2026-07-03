@@ -1,0 +1,232 @@
+PRD: Add Optimistic Locking (lock_version) to All Financial Tables
+
+1. Overview
+
+No table in the entire schema has a `lock_version` column. This means ActiveRecord's optimistic locking is completely unavailable. While the concurrency locking PRD addresses pessimistic (`FOR UPDATE`) locking for high-contention operations, optimistic locking is needed for lower-contention scenarios: background jobs, admin updates, report generation, and long-running operations that cannot hold a row lock for their duration. Without `lock_version`, concurrent updates to the same record silently overwrite each other — the last write wins with no error, no retry, and no audit trail.
+
+2. Goals
+
+Add `lock_version` column to all financial tables and high-contention tables
+
+Enable `ActiveRecord::Base#optimistic_locking` for automatic stale-object detection
+
+Prevent silent lost-update scenarios on all table writes
+
+Provide consistent behavior: concurrent writes raise `ActiveRecord::StaleObjectError` instead of silently overwriting
+
+3. Non-Goals
+
+Add `lock_version` to purely reference/read-only tables (e.g., `cooperatives`, `management_branches`, `management_roles`)
+
+Replace pessimistic (`FOR UPDATE`) locking — optimistic and pessimistic locking serve different use cases
+
+Remove manual locking from high-contention paths (they stay pessimistic)
+
+Change existing validation or save patterns
+
+4. Current State Audit
+
+Tables without `lock_version` (all):
+
+| Table | Contention Risk | Scenario |
+|-------|----------------|----------|
+| `accounting_entries` | Medium | Concurrent reversal attempts race |
+| `accounting_amount_lines` | Medium | Concurrent entry posting to same entry |
+| `accounting_running_balances` | High | Concurrent balance updates for same account/date |
+| `loans` | High | Concurrent disbursement/restructure |
+| `loan_payments` | High | Concurrent payment recording |
+| `loan_schedules` | Low | Background payment posting |
+| `loan_events` | Low | Event recording (mostly append-only) |
+| `treasury_savings_accounts` | High | Concurrent deposit/withdraw |
+| `treasury_savings_transactions` | Medium | Transaction recording |
+| `treasury_cash_sessions` | High | Concurrent teller operations |
+| `equity_accounts` | Medium | Share purchases |
+| `equity_transactions` | Medium | Transaction recording |
+| `members` | Low | Profile updates |
+| `users` | Low | Password changes, profile updates |
+| `management_approval_requests` | Medium | Concurrent approval/rejection |
+| `management_configurations` | Low | Admin updates |
+
+Without `lock_version`, every update to these tables is susceptible to lost updates.
+
+5. Requirements
+
+5.1 Must-Have
+
+- `lock_version` column (`integer`, default `0`, null: false) on all financial tables
+- ActiveRecord optimistic locking enabled for all affected models
+- Background jobs that update financial records handle `ActiveRecord::StaleObjectError` with reload + retry
+- All call sites that perform `UPDATE` on financial records are reviewed for optimistic locking compatibility
+
+5.2 Nice-to-Have
+
+- `lock_version` added to all tables (not just financial) for consistency
+- Circuit breaker on retry for background jobs (max 3 retries then dead letter queue)
+- `lock_version` exposed in admin audit views for debugging
+
+6. Proposed Design
+
+6.1 Migration
+
+```ruby
+class AddLockVersionToFinancialTables < ActiveRecord::Migration[8.0]
+  def change
+    add_column :accounting_entries, :lock_version, :integer, default: 0, null: false
+    add_column :accounting_amount_lines, :lock_version, :integer, default: 0, null: false
+    add_column :accounting_running_balances, :lock_version, :integer, default: 0, null: false
+    add_column :loans, :lock_version, :integer, default: 0, null: false
+    add_column :loan_payments, :lock_version, :integer, default: 0, null: false
+    add_column :loan_schedules, :lock_version, :integer, default: 0, null: false
+    add_column :loan_events, :lock_version, :integer, default: 0, null: false
+    add_column :treasury_savings_accounts, :lock_version, :integer, default: 0, null: false
+    add_column :treasury_savings_transactions, :lock_version, :integer, default: 0, null: false
+    add_column :treasury_cash_sessions, :lock_version, :integer, default: 0, null: false
+    add_column :equity_accounts, :lock_version, :integer, default: 0, null: false
+    add_column :equity_transactions, :lock_version, :integer, default: 0, null: false
+    add_column :members, :lock_version, :integer, default: 0, null: false
+    add_column :management_approval_requests, :lock_version, :integer, default: 0, null: false
+  end
+end
+```
+
+6.2 Background Job Retry Pattern
+
+```ruby
+class ApplicationJob < ActiveJob::Base
+  # Override retry_on for stale object errors
+  retry_on ActiveRecord::StaleObjectError, wait: :exponentially_longer, attempts: 3 do |job, error|
+    job.retry_job if job.attempts < 3
+    # After 3 attempts, file to dead letter queue
+    Rails.logger.error("Job #{job.class} failed after 3 retries due to stale object: #{error.message}")
+  end
+end
+```
+
+6.3 Pessimistic + Optimistic Locking Coexistence
+
+- `Model.lock("FOR UPDATE").find(id)` uses pessimistic locking and does NOT increment `lock_version`
+- `model.save` (without `FOR UPDATE`) increments `lock_version` and raises `StaleObjectError` on conflict
+- Services using `FOR UPDATE` do not need the model to have a matching `lock_version` — both can coexist
+- `model.update!(...)` without `FOR UPDATE` will raise `StaleObjectError` if the record was modified since load
+
+7. Migration Plan
+
+- Run migration to add `lock_version` columns (zero-downtime — adding nullable column with default is fast)
+- Backfill `lock_version = 0` for all existing rows (default handles new rows; existing rows get 0 on first write — PostgreSQL default applies to new rows, existing rows need explicit update if they have NULL)
+- After migration, run: `UPDATE accounting_entries SET lock_version = 0 WHERE lock_version IS NULL` for each table
+- Update background jobs to handle `StaleObjectError`
+- No data migration needed beyond the backfill
+- Rollback: remove `lock_version` columns (no data loss)
+
+8. Risks & Mitigations
+
+Risk: Existing code that uses `save` without `lock_version` awareness will start raising `StaleObjectError`
+Mitigation: All code paths that update financial records must be reviewed. The migration itself doesn't change behavior — `lock_version` only takes effect when ActiveRecord loads a record with a value and tries to save it. Existing records loaded before the migration (without `lock_version` in the `SELECT`) will not have optimistic locking until they are reloaded after a deploy.
+
+Risk: Batch updates (`update_all`) bypass optimistic locking
+Mitigation: `update_all` does not increment `lock_version`. This is acceptable for bulk operations (e.g., nightly batch jobs) but those operations must be idempotent and not race with user-facing writes.
+
+Risk: Background jobs get stuck on `StaleObjectError` retry loops
+Mitigation: Max 3 retries with exponential backoff. After 3 failures, the job logs an error and stops. A monitoring alert fires on the error log.
+
+9. Definition of Done
+
+- `lock_version` column added to all 14 financial tables
+- Default value `0`, not null constraint
+- Backfill query run for existing rows
+- `ApplicationJob` includes `retry_on ActiveRecord::StaleObjectError` with exponential backoff
+- All financial models inherit `lock_version` behavior automatically (ActiveRecord default)
+- RSpec tests verify: concurrent save to same record raises `StaleObjectError`; background job retries on stale error
+- All existing tests pass with no new failures
+
+10. Codebase Implementation Details
+
+10.1 File Manifest
+
+- `db/migrate/*_add_lock_version_to_financial_tables.rb` — new migration
+- `app/jobs/application_job.rb` — add `retry_on ActiveRecord::StaleObjectError`
+- No model changes needed — ActiveRecord automatically uses `lock_version` when the column exists
+
+10.2 Existing Patterns to Follow
+
+- Migration: Follow `db/migrate/20260621000011_consolidate_tables.rb` pattern — reversible, `add_column` with defaults
+- Job retry: Follow `app/jobs/application_job.rb:6-9` pattern — `retry_on ActiveRecord::Deadlocked` (currently commented out)
+- Model conventions: All financial models already use `ActiveRecord::Base` — `lock_version` is automatic, no code changes needed
+
+10.3 Migration
+
+```ruby
+class AddLockVersionToFinancialTables < ActiveRecord::Migration[8.0]
+  def change
+    add_column :accounting_entries, :lock_version, :integer, default: 0, null: false
+    add_column :accounting_amount_lines, :lock_version, :integer, default: 0, null: false
+    add_column :accounting_running_balances, :lock_version, :integer, default: 0, null: false
+    add_column :loans, :lock_version, :integer, default: 0, null: false
+    add_column :loan_payments, :lock_version, :integer, default: 0, null: false
+    add_column :loan_schedules, :lock_version, :integer, default: 0, null: false
+    add_column :loan_events, :lock_version, :integer, default: 0, null: false
+    add_column :treasury_savings_accounts, :lock_version, :integer, default: 0, null: false
+    add_column :treasury_savings_transactions, :lock_version, :integer, default: 0, null: false
+    add_column :treasury_cash_sessions, :lock_version, :integer, default: 0, null: false
+    add_column :equity_accounts, :lock_version, :integer, default: 0, null: false
+    add_column :equity_transactions, :lock_version, :integer, default: 0, null: false
+    add_column :members, :lock_version, :integer, default: 0, null: false
+    add_column :management_approval_requests, :lock_version, :integer, default: 0, null: false
+  end
+end
+```
+
+10.4 Job Retry Pattern
+
+```ruby
+# app/jobs/application_job.rb
+class ApplicationJob < ActiveJob::Base
+  include CooperativeJob
+
+  retry_on ActiveRecord::Deadlocked, wait: :exponentially_longer, attempts: 3
+  retry_on ActiveRecord::StaleObjectError, wait: :exponentially_longer, attempts: 3 do |job, error|
+    # Log and dead-letter after 3 retries
+    Rails.logger.error("Job #{job.class} failed: stale object #{error.message}")
+  end
+end
+```
+
+10.5 Backfill for Existing Rows
+
+```sql
+-- Run in db/migrate or as a post-migration rake task
+UPDATE accounting_entries SET lock_version = 0 WHERE lock_version IS NULL;
+UPDATE accounting_amount_lines SET lock_version = 0 WHERE lock_version IS NULL;
+-- ... repeat for each table
+```
+
+10.6 Test Patterns
+
+```ruby
+RSpec.describe Accounting::Entry do
+  it "supports optimistic locking" do
+    e1 = create(:accounting_entry)
+    e2 = Accounting::Entry.find(e1.id)
+
+    e1.update!(description: "updated by A")
+
+    expect { e2.update!(description: "updated by B") }
+      .to raise_error(ActiveRecord::StaleObjectError)
+  end
+end
+```
+
+11. OpenCode Agent End Goal
+
+```
+[PASS] db/migrate/*_add_lock_version.rb exists and runs
+[PASS] lock_version added to all 14 financial tables with default 0 and NOT NULL
+[PASS] Backfill query exists (UPDATE ... SET lock_version = 0 WHERE lock_version IS NULL)
+[PASS] ApplicationJob has retry_on ActiveRecord::StaleObjectError with max 3 retries
+[PASS] bin/rspec spec/models/accounting/entry_spec.rb -- no failures
+[PASS] bin/rspec spec/models/lending/loan_spec.rb -- no failures
+[PASS] bin/rspec spec/models/treasury/cash_session_spec.rb -- no failures
+[PASS] Concurrent save raises StaleObjectError (verified by test)
+[PASS] bin/rubocop -- no offenses
+[PASS] All existing tests pass
+```

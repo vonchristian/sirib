@@ -1,0 +1,467 @@
+PRD: OLAP Strategy for Reporting Queries
+
+1. Overview
+
+All reporting queries — balance sheet, income statement, trial balance, loan aging, portfolio analytics — run directly against the OLTP database. As transaction volume grows, these queries will increasingly compete with customer-facing operations for database resources. A 10-year-old cooperative with 50,000 members, 500,000 journal entries, and 10,000 active loans will find that the trial balance query takes seconds instead of milliseconds, locking tables and degrading member-facing operations.
+
+The `docs/database_principles.md` (lines 706-721) prescribes a future OLAP strategy (ClickHouse or similar). This PRD defines the path: start with PostgreSQL materialized views today (zero new infrastructure), and design the query layer for future extraction to a dedicated OLAP system when volume demands it.
+
+2. Goals
+
+Isolate reporting queries from the OLTP write path
+
+Provide fast, consistent report data without table locks or query contention
+
+Design a reporting layer that can be extracted to a dedicated OLAP system (ClickHouse, PostgreSQL replica, or data warehouse) without rewriting application code
+
+Deliver reports from data that is at most 15 minutes stale (near-real-time for banking)
+
+3. Non-Goals
+
+Real-time reporting (sub-second latency on fresh data — not needed for batch reports)
+
+Replace the existing accounting query services (they become the materialized view query layer)
+
+Build a data warehouse (materialized views on PostgreSQL first; extraction to ClickHouse or similar is Phase 2)
+
+Implement metadata-driven reporting (each report has a dedicated view)
+
+4. Current State Audit
+
+Reporting queries that currently hit the OLTP directly:
+
+| Report | Query Pattern | Risk |
+|--------|---------------|------|
+| Trial Balance | Aggregates `amount_lines` by account with date filters | Full table scan on `amount_lines` |
+| Balance Sheet | Complex joins across accounts, entries, amount_lines | Heavy join on OLTP |
+| Income Statement | Revenue/expense aggregation by date range | Heavy aggregation on OLTP |
+| Cash Flow Statement | Multi-pass query over entries with classification | Complex query plan |
+| Loan Aging | Per-loan aging computation with payment history | Sequential scan on loans + payments |
+| Branch Performance | Multi-table aggregation per branch | Heavy OLTP read load |
+
+The `LedgerQueryService`, `TrialBalanceService`, and other reporting services use `AmountLine.joins(:entry).where(...)` — these queries will degrade as data grows.
+
+5. Requirements
+
+5.1 Must-Have
+
+- Materialized views for the top 5 reporting queries: trial balance, balance sheet, income statement, loan aging snapshot, branch performance
+- Each materialized view is refreshed on a schedule (every 15 minutes, or on demand after close of business)
+- Application code queries materialized views instead of live tables for reporting endpoints
+- Reporting controllers automatically use the materialized view when available, falling back to live queries if the view is stale
+- Refresh is non-blocking (`CONCURRENTLY`) to avoid locking the materialized view for reads
+
+5.2 Nice-to-Have
+
+- View refresh is triggered by business events (new entry posted triggers trial balance refresh for that branch only)
+- Historical snapshots are preserved (materialized view data is captured to a `report_snapshots` table at month-end for regulatory audit)
+- A dedicated read-only PostgreSQL replica for reporting (Phase 2)
+
+6. Proposed Design
+
+6.1 Materialized View Definitions
+
+```ruby
+# db/migrate/20260701000001_create_reporting_materialized_views.rb
+class CreateReportingMaterializedViews < ActiveRecord::Migration[8.0]
+  def up
+    # Trial balance materialized view
+    execute(<<~SQL)
+      CREATE MATERIALIZED VIEW reporting_trial_balances AS
+      SELECT
+        a.id AS account_id,
+        a.account_code,
+        a.name AS account_name,
+        a.account_type,
+        a.normal_credit_balance,
+        l.id AS ledger_id,
+        l.name AS ledger_name,
+        COALESCE(
+          SUM(CASE WHEN al.amount_type = 0 THEN al.amount_cents ELSE 0 END)
+          - SUM(CASE WHEN al.amount_type = 1 THEN al.amount_cents ELSE 0 END),
+          0
+        ) AS balance_cents,
+        COUNT(DISTINCT e.id) AS entry_count,
+        MAX(e.posted_at) AS last_activity_at
+      FROM accounting_accounts a
+      JOIN accounting_ledgers l ON l.id = a.ledger_id
+      LEFT JOIN accounting_amount_lines al ON al.account_id = a.id
+      LEFT JOIN accounting_entries e ON e.id = al.entry_id AND e.status = 'posted'
+      GROUP BY a.id, a.account_code, a.name, a.account_type, a.normal_credit_balance, l.id, l.name
+      ORDER BY a.account_code;
+    SQL
+
+    # Balance sheet materialized view
+    execute(<<~SQL)
+      CREATE MATERIALIZED VIEW reporting_balance_sheets AS
+      SELECT
+        COALESCE(SUM(CASE WHEN a.account_type = 'asset'
+          THEN (CASE WHEN al.amount_type = 0 THEN al.amount_cents ELSE -al.amount_cents END)
+          ELSE 0 END), 0) AS total_assets_cents,
+        COALESCE(SUM(CASE WHEN a.account_type = 'liability'
+          THEN (CASE WHEN al.amount_type = 1 THEN al.amount_cents ELSE -al.amount_cents END)
+          ELSE 0 END), 0) AS total_liabilities_cents,
+        COALESCE(SUM(CASE WHEN a.account_type = 'equity'
+          THEN (CASE WHEN al.amount_type = 1 THEN al.amount_cents ELSE -al.amount_cents END)
+          ELSE 0 END), 0) AS total_equity_cents,
+        CURRENT_DATE AS as_of_date
+      FROM accounting_accounts a
+      JOIN accounting_amount_lines al ON al.account_id = a.id
+      JOIN accounting_entries e ON e.id = al.entry_id AND e.status = 'posted';
+    SQL
+
+    # Loan aging materialized view
+    execute(<<~SQL)
+      CREATE MATERIALIZED VIEW reporting_loan_agings AS
+      SELECT
+        l.id AS loan_id,
+        l.loan_number,
+        m.id AS member_id,
+        CONCAT(m.last_name, ', ', m.first_name) AS member_name,
+        l.outstanding_principal_cents,
+        lp.last_payment_date,
+        CASE
+          WHEN lp.last_payment_date IS NULL THEN 'current'
+          WHEN lp.last_payment_date >= CURRENT_DATE - INTERVAL '30 days' THEN 'current'
+          WHEN lp.last_payment_date >= CURRENT_DATE - INTERVAL '60 days' THEN '30_days'
+          WHEN lp.last_payment_date >= CURRENT_DATE - INTERVAL '90 days' THEN '60_days'
+          ELSE '90_plus_days'
+        END AS aging_bucket,
+        CURRENT_DATE AS as_of_date
+      FROM loans l
+      JOIN members m ON m.id = l.member_id
+      LEFT JOIN (
+        SELECT loan_id, MAX(payment_date) AS last_payment_date
+        FROM loan_payments
+        GROUP BY loan_id
+      ) lp ON lp.loan_id = l.id
+      WHERE l.status IN ('active', 'disbursed');
+    SQL
+
+    # Add unique indexes for concurrent refresh
+    execute("CREATE UNIQUE INDEX idx_reporting_trial_balances ON reporting_trial_balances (account_id)")
+    execute("CREATE UNIQUE INDEX idx_reporting_balance_sheets ON reporting_balance_sheets (as_of_date)")
+    execute("CREATE UNIQUE INDEX idx_reporting_loan_agings ON reporting_loan_agings (loan_id)")
+  end
+
+  def down
+    execute("DROP MATERIALIZED VIEW IF EXISTS reporting_trial_balances")
+    execute("DROP MATERIALIZED VIEW IF EXISTS reporting_balance_sheets")
+    execute("DROP MATERIALIZED VIEW IF EXISTS reporting_loan_agings")
+  end
+end
+```
+
+6.2 Refresh Job
+
+```ruby
+# app/jobs/reporting/refresh_materialized_views_job.rb
+module Reporting
+  class RefreshMaterializedViewsJob < ApplicationJob
+    queue_as :default
+    repeating_at "every 15 minutes", timezone: "Asia/Manila"
+
+    def perform
+      # CONCURRENTLY requires a unique index on the materialized view
+      ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY reporting_trial_balances")
+      ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY reporting_balance_sheets")
+      ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY reporting_loan_agings")
+    end
+  end
+end
+```
+
+6.3 Application Query Layer
+
+```ruby
+# app/services/accounting/trial_balance_service.rb (updated excerpt)
+class Accounting::TrialBalanceService
+  def call(as_of_date: Date.current)
+    if use_materialized_view?
+      # Query materialized view
+      Reporting::TrialBalance.all
+    else
+      # Fallback to live query
+      legacy_trial_balance(as_of_date)
+    end
+  end
+
+  private
+
+  def use_materialized_view?
+    # Use materialized view unless view is older than 30 minutes
+    view_age = Reporting::TrialBalance.maximum(:last_activity_at)
+    view_age.nil? || view_age > 30.minutes.ago
+  end
+end
+```
+
+6.4 Models for Materialized Views
+
+```ruby
+# app/models/reporting/trial_balance.rb
+module Reporting
+  class TrialBalance < ApplicationRecord
+    self.table_name = "reporting_trial_balances"
+    self.primary_key = "account_id"
+
+    belongs_to :account, class_name: "Accounting::Account"
+    belongs_to :ledger, class_name: "Accounting::Ledger"
+
+    def readonly?
+      true
+    end
+  end
+end
+
+# app/models/reporting/balance_sheet.rb
+module Reporting
+  class BalanceSheet < ApplicationRecord
+    self.table_name = "reporting_balance_sheets"
+    self.primary_key = "as_of_date"
+
+    def readonly?
+      true
+    end
+  end
+end
+
+# app/models/reporting/loan_aging.rb
+module Reporting
+  class LoanAging < ApplicationRecord
+    self.table_name = "reporting_loan_agings"
+    self.primary_key = "loan_id"
+
+    def readonly?
+      true
+    end
+  end
+end
+```
+
+7. Migration Plan
+
+- Create `reporting_` models under `app/models/reporting/`
+- Run migration to create materialized views
+- Backfill: first refresh runs for all data (initial build, potentially slow)
+- Deploy query layer changes (reporting controllers use materialized views)
+- Schedule `RefreshMaterializedViewsJob` via Solid Queue recurring schedule
+- Monitor query performance before and after
+- Rollback: drop materialized views, remove models, revert query service changes
+
+8. Risks & Mitigations
+
+Risk: `REFRESH MATERIALIZED VIEW CONCURRENTLY` requires a unique index (added in migration) and acquires `SHARE UPDATE EXCLUSIVE` lock. If a refresh is still running when the next one starts, it will queue and potentially block.
+Mitigation: Monitor refresh job duration. If refresh takes >15 minutes, increase the interval. Use a single-job lock (e.g., `Sidekiq::Lock` or `GoodJob::Lock`) to prevent overlapping executions.
+
+Risk: Materialized view definition becomes invalid when the base schema changes (e.g., column rename on `amount_lines`)
+Mitigation: Materialized views are managed by migrations. Any schema change to underlying tables must be accompanied by updating and refreshing the materialized views.
+
+Risk: Materialized view data is up to 15 minutes stale — balance sheet queries may show stale data
+Mitigation: This is acceptable for a cooperative banking system. End-of-day reports use the end-of-day refresh. Intra-day reports show near-real-time data. If a controller needs live data, it falls back to the live query.
+
+9. Definition of Done
+
+- 3 materialized views created: `reporting_trial_balances`, `reporting_balance_sheets`, `reporting_loan_agings`
+- `RefreshMaterializedViewsJob` runs every 15 minutes via Solid Queue recurring schedule
+- Refresh uses `CONCURRENTLY` with unique indexes
+- `Reporting::TrialBalance`, `Reporting::BalanceSheet`, `Reporting::LoanAging` models exist
+- Trial balance, balance sheet, and loan aging controllers use materialized views when available
+- Fallback to live queries works when view is stale or unavailable
+- RSpec tests verify: materialized view returns correct data, fallback works, refresh is non-blocking
+- Query performance benchmark: trial balance query < 50ms on materialized view vs current performance
+- All existing tests pass with no new failures
+
+10. Codebase Implementation Details
+
+10.1 File Manifest
+
+- `db/migrate/*_create_reporting_materialized_views.rb` — new migration
+- `app/models/reporting/trial_balance.rb` — new read-only model
+- `app/models/reporting/balance_sheet.rb` — new read-only model
+- `app/models/reporting/loan_aging.rb` — new read-only model
+- `app/jobs/reporting/refresh_materialized_views_job.rb` — new recurring job
+- `app/services/accounting/trial_balance_service.rb` — update to use materialized view
+- `app/services/lending/aging_calculation_service.rb` — update to use materialized view
+
+10.2 Existing Patterns to Follow
+
+- Model: Follow `app/models/accounting/running_balance.rb` pattern — `self.table_name`, `readonly?`, scopes
+- Service: Follow `ActiveInteraction::Base` pattern from `app/services/accounting/post_entry_service.rb`
+- Job: Follow `app/jobs/application_job.rb` — `include CooperativeJob`, `queue_as :default`
+- Reporting: Follow `app/services/accounting/trial_balance_service.rb` pattern
+
+10.3 Migration
+
+```ruby
+class CreateReportingMaterializedViews < ActiveRecord::Migration[8.0]
+  def up
+    # Trial balance
+    execute(<<~SQL)
+      CREATE MATERIALIZED VIEW reporting_trial_balances AS
+      SELECT
+        a.id AS account_id,
+        a.account_code, a.name AS account_name, a.account_type,
+        a.normal_credit_balance, a.cooperative_id,
+        COALESCE(SUM(CASE WHEN al.amount_type = 0 THEN al.amount_cents WHEN al.amount_type = 1 THEN -al.amount_cents END), 0) AS balance_cents,
+        COUNT(DISTINCT e.id) AS entry_count,
+        MAX(e.posted_at) AS last_activity_at
+      FROM accounting_accounts a
+      LEFT JOIN accounting_amount_lines al ON al.account_id = a.id
+      LEFT JOIN accounting_entries e ON e.id = al.entry_id AND e.status = 'posted'
+      GROUP BY a.id, a.account_code, a.name, a.account_type, a.normal_credit_balance, a.cooperative_id
+      ORDER BY a.account_code
+    SQL
+
+    # Balance sheet
+    execute(<<~SQL)
+      CREATE MATERIALIZED VIEW reporting_balance_sheets AS
+      SELECT
+        COALESCE(SUM(CASE WHEN a.account_type = 'asset' THEN bal.balance_cents ELSE 0 END), 0) AS total_assets_cents,
+        COALESCE(SUM(CASE WHEN a.account_type = 'liability' THEN bal.balance_cents ELSE 0 END), 0) AS total_liabilities_cents,
+        COALESCE(SUM(CASE WHEN a.account_type = 'equity' THEN bal.balance_cents ELSE 0 END), 0) AS total_equity_cents,
+        CURRENT_DATE AS as_of_date
+      FROM accounting_accounts a
+      JOIN accounting_running_balances bal ON bal.account_id = a.id
+      WHERE bal.as_of_date = (SELECT MAX(as_of_date) FROM accounting_running_balances)
+    SQL
+
+    # Loan aging
+    execute(<<~SQL)
+      CREATE MATERIALIZED VIEW reporting_loan_agings AS
+      SELECT
+        l.id AS loan_id, l.loan_number, l.cooperative_id,
+        m.id AS member_id,
+        CONCAT(m.last_name, ', ', m.first_name) AS member_name,
+        l.outstanding_principal_cents,
+        MAX(lp.payment_date) AS last_payment_date,
+        CURRENT_DATE AS as_of_date
+      FROM loans l
+      JOIN members m ON m.id = l.member_id
+      LEFT JOIN loan_payments lp ON lp.loan_id = l.id
+      WHERE l.status IN ('active', 'disbursed')
+      GROUP BY l.id, l.loan_number, l.cooperative_id, m.id, m.last_name, m.first_name, l.outstanding_principal_cents
+    SQL
+
+    # Unique indexes for concurrent refresh
+    execute("CREATE UNIQUE INDEX idx_reporting_trial_balances ON reporting_trial_balances (account_id)")
+    execute("CREATE UNIQUE INDEX idx_reporting_loan_agings ON reporting_loan_agings (loan_id)")
+  end
+
+  def down
+    execute("DROP MATERIALIZED VIEW IF EXISTS reporting_trial_balances")
+    execute("DROP MATERIALIZED VIEW IF EXISTS reporting_balance_sheets")
+    execute("DROP MATERIALIZED VIEW IF EXISTS reporting_loan_agings")
+  end
+end
+```
+
+10.4 Read-Only Model
+
+```ruby
+module Reporting
+  class TrialBalance < ApplicationRecord
+    self.table_name = "reporting_trial_balances"
+    self.primary_key = "account_id"
+
+    belongs_to :account, class_name: "Accounting::Account"
+    belongs_to :cooperative
+
+    monetize :balance_cents
+
+    def readonly?
+      true
+    end
+
+    scope :by_cooperative, ->(coop) { where(cooperative_id: coop.id) }
+    scope :by_type, ->(type) { where(account_type: type) }
+    scope :with_balance, -> { where.not(balance_cents: 0) }
+  end
+end
+```
+
+10.5 Reporting Service Update
+
+```ruby
+# app/services/accounting/trial_balance_service.rb — updated
+class Accounting::TrialBalanceService
+  def call(cooperative:, as_of_date: Date.current)
+    if use_materialized_view?
+      Reporting::TrialBalance.by_cooperative(cooperative)
+    else
+      legacy_trial_balance(cooperative, as_of_date)
+    end
+  end
+
+  private
+
+  def use_materialized_view?
+    Reporting::TrialBalance.any?
+  end
+end
+```
+
+10.6 Refresh Job
+
+```ruby
+module Reporting
+  class RefreshMaterializedViewsJob < ApplicationJob
+    queue_as :default
+
+    def perform
+      ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY reporting_trial_balances")
+      ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY reporting_balance_sheets")
+      ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY reporting_loan_agings")
+    end
+
+    # Schedule: every 15 minutes during business hours
+    # config.recurring do
+    #   schedule('refresh_reporting_mv', every: '15 minutes') do
+    #     Reporting::RefreshMaterializedViewsJob.perform_later
+    #   end
+    # end
+  end
+end
+```
+
+10.7 Test Patterns
+
+```ruby
+RSpec.describe Reporting::TrialBalance do
+  it "returns balances as integers" do
+    create(:accounting_entry, :posted)
+    described_class.refresh
+    entry = described_class.first
+    expect(entry.balance_cents).to be_an(Integer)
+  end
+
+  it "is read-only" do
+    expect(described_class.new).to be_readonly
+  end
+
+  it "provides cooperative-scoped data" do
+    coop = create(:cooperative)
+    create(:accounting_entry, :posted, cooperative: coop)
+    described_class.refresh
+    expect(described_class.by_cooperative(coop).count).to eq(Accounting::Account.count)
+  end
+end
+```
+
+11. OpenCode Agent End Goal
+
+```
+[PASS] db/migrate/*_create_reporting_materialized_views.rb exists and runs
+[PASS] 3 materialized views created: trial_balances, balance_sheets, loan_agings
+[PASS] 3 read-only Reporting models exist
+[PASS] Unique indexes exist on each MV (required for CONCURRENTLY)
+[PASS] RefreshMaterializedViewsJob exists and refreshes all 3 MVs
+[PASS] TrialBalanceService uses materialized view when available
+[PASS] Falling back to live query works when MV is unavailable
+[PASS] bin/rspec spec/models/reporting/ -- no failures
+[PASS] bin/rspec spec/services/accounting/trial_balance_service_spec.rb -- no failures
+[PASS] bin/rspec spec/jobs/reporting/ -- no failures
+[PASS] Trial balance query from MV < 50ms on realistic data
+[PASS] bin/rubocop -- no offenses
+[PASS] All existing tests pass
+```

@@ -1,0 +1,415 @@
+PRD: Extract Shared Test Support (spec/support/)
+
+1. Overview
+
+The `spec/support/` directory is completely empty. There are no shared contexts, custom matchers, auth helpers, time-travel helpers, or factory support modules. As a result, the test suite has significant duplication: each spec file manually logs in users, sets up auth headers, creates cooperative context, and freezes time. The Playwright E2E suite has no page objects — selectors like `page.locator('a:has-text("View")')` appear in ~15 places across `journal_entries/happy_path.spec.js`.
+
+For a system meant to survive 5 decades, shared test infrastructure is essential. Every engineer who writes a test should not need to re-solve the same setup problems.
+
+2. Goals
+
+Extract commonly repeated test patterns into reusable support modules
+
+Reduce per-test boilerplate for auth, cooperative context, time freezing, and factory setup
+
+Improve test readability and maintainability
+
+Establish a convention for shared test code
+
+3. Non-Goals
+
+Rewrite all existing tests to use support modules (incremental adoption)
+
+Add new testing frameworks or gems
+
+Change the DatabaseCleaner configuration
+
+Modify the CI pipeline
+
+4. Current State Audit
+
+Duplication patterns across the test suite:
+
+- **Auth setup in request specs**: ~25 files repeat `post sessions_path(...)` or `set_auth_headers` inline
+- **Cooperative context**: ~30 files repeat `let(:cooperative) { ... }` or `let(:branch) { ... }`
+- **Time freezing**: No spec uses `Timecop` or `ActiveSupport::Testing::TimeHelpers` — date-sensitive tests rely on `Time.current` which can produce failures across day boundaries
+- **Factory traits**: No traits defined anywhere — specs manually override attributes for different scenarios
+- **Playwright selectors**: `firstRow.locator('a:has-text("View")').click()` repeated ~15 times across journal entry tests
+- **Playwright auth**: Some specs log in on every `beforeEach` instead of using `storageState`
+- **Playwright `waitForTimeout(500)`**: Used in chart_of_accounts tests — fragile time-based waits
+
+5. Requirements
+
+5.1 Must-Have (High Priority)
+
+- `spec/support/auth_helpers.rb` — module with `sign_in(user)`, `sign_out`, `auth_headers` methods
+- `spec/support/cooperative_helpers.rb` — `let(:cooperative)`, `let(:branch)`, `let(:member)` default setup
+- `spec/support/time_helpers.rb` — `travel_to(date)`, `freeze_time` wrappers using `ActiveSupport::Testing::TimeHelpers`
+- `spec/support/factory_traits.rb` — traits for common accounting scenarios: `:with_entries`, `:with_pending_entry`, `:with_running_balance`, `:contra_account`
+- Playwright `tests/helpers/auth.ts` — `loginAsAdmin()`, `loginAsTeller()`, `loginAsManager()` with `storageState` reuse
+- Playwright `tests/helpers/page_objects/` — base page object classes for JournalEntryList, JournalEntryForm, BalanceSheet
+
+5.2 Nice-to-Have
+
+- `spec/support/shared_contexts/` — reusable `shared_context` blocks for accounting entry creation, loan setup, etc.
+- `spec/support/matchers/` — custom matchers like `have_balance(amount)`, `be_posted`, `be_reversed`
+- Playwright `tests/helpers/factories/` — TypeScript helpers to generate test data via the Rails factory API
+
+6. Proposed Design
+
+6.1 RSpec Auth Helper
+
+```ruby
+# spec/support/auth_helpers.rb
+module AuthHelpers
+  def sign_in(user = nil)
+    user ||= create(:user)
+    post session_path, params: { email: user.email, password: "password123" }
+    user
+  end
+
+  def auth_headers(user = nil)
+    user ||= sign_in
+    { "Authorization" => "Bearer #{user.sessions.last&.token || generate_token(user)}" }
+  end
+
+  private
+
+  def generate_token(user)
+    # Temporary token for request specs
+    Session.create!(user: user, cooperative: user.cooperative).token
+  end
+end
+
+RSpec.configure do |config|
+  config.include AuthHelpers, type: :request
+  config.include AuthHelpers, type: :controller
+end
+```
+
+6.2 RSpec Cooperative Helper
+
+```ruby
+# spec/support/cooperative_helpers.rb
+module CooperativeHelpers
+  extend ActiveSupport::Concern
+
+  included do
+    let(:cooperative) { create(:cooperative) }
+    let(:branch) { create(:management_branch, cooperative: cooperative) }
+    let(:user) { create(:user, cooperative: cooperative) }
+    let(:member) { create(:member, cooperative: cooperative) }
+  end
+end
+
+RSpec.configure do |config|
+  config.include CooperativeHelpers, type: :model
+  config.include CooperativeHelpers, type: :request
+  config.include CooperativeHelpers, type: :service
+end
+```
+
+6.3 RSpec Time Helper
+
+```ruby
+# spec/support/time_helpers.rb
+module TimeHelpers
+  def freeze_time_at(time = Time.current)
+    around { |example| travel_to(time) { example.run } }
+  end
+
+  def at_month_end
+    travel_to(Date.current.end_of_month)
+  end
+
+  def at_quarter_end
+    travel_to(Date.current.end_of_quarter)
+  end
+
+  def at_year_end
+    travel_to(Date.current.end_of_year)
+  end
+end
+
+RSpec.configure do |config|
+  config.include ActiveSupport::Testing::TimeHelpers
+  config.include TimeHelpers
+end
+```
+
+6.4 Factory Traits
+
+```ruby
+# spec/support/factory_traits.rb
+# These traits should be defined directly in factory files, not in support
+
+# Example trait for accounting/entries.rb:
+# trait :with_amount_lines do
+#   after(:create) do |entry|
+#     create(:amount_line, :debit, entry: entry, amount_cents: 10000)
+#     create(:amount_line, :credit, entry: entry, amount_cents: 10000)
+#   end
+# end
+
+# Example trait for accounting/accounts.rb:
+# trait :contra do
+#   contra { true }
+# end
+```
+
+6.5 Playwright Page Object
+
+```typescript
+// tests/helpers/page_objects/journal_entries.ts
+import { Page, Locator } from '@playwright/test';
+
+export class JournalEntryListPage {
+  readonly page: Page;
+  readonly firstRowViewButton: Locator;
+  readonly searchInput: Locator;
+  readonly emptyState: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.firstRowViewButton = page.locator('[data-testid="journal-entry-row"]').first().locator('a:has-text("View")');
+    this.searchInput = page.locator('[data-testid="journal-entries-search"]');
+    this.emptyState = page.locator('[data-testid="empty-state"]');
+  }
+
+  async goto() {
+    await this.page.goto('/accounting/journal_entries');
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  async clickFirstView() {
+    await this.firstRowViewButton.click();
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  async search(query: string) {
+    await this.searchInput.fill(query);
+    await this.searchInput.press('Enter');
+    await this.page.waitForLoadState('networkidle');
+  }
+}
+```
+
+6.6 Playwright Auth Helper
+
+```typescript
+// tests/helpers/auth.ts
+import { Page, request } from '@playwright/test';
+import path from 'path';
+
+const STORAGE_STATE_PATH = path.join(__dirname, '../../playwright/.auth/user.json');
+
+export async function loginAsAdmin(page: Page) {
+  await page.goto('/sessions/new');
+  await page.fill('[name="email"]', 'admin@example.com');
+  await page.fill('[name="password"]', 'password123');
+  await page.click('button:has-text("Sign in")');
+  await page.waitForLoadState('networkidle');
+  await page.context().storageState({ path: STORAGE_STATE_PATH });
+}
+
+export async function loginAsTeller(page: Page) {
+  await page.goto('/sessions/new');
+  await page.fill('[name="email"]', 'teller@example.com');
+  await page.fill('[name="password"]', 'password123');
+  await page.click('button:has-text("Sign in")');
+  await page.waitForLoadState('networkidle');
+}
+```
+
+7. Migration Plan
+
+- Create the support modules incrementally — one per PR
+- RSpec support files are auto-loaded by `config.autoload_paths` or `Dir[Rails.root.join('spec/support/**/*.rb')]`
+- Add the glob require to `spec/rails_helper.rb`
+- Update existing tests to use support modules as they are touched by other work
+- Playwright helpers are created alongside the test files they support
+- No data migration needed
+
+8. Risks & Mitigations
+
+Risk: Glob autoloading of `spec/support/**/*.rb` causes load-order issues
+Mitigation: If modules depend on each other, name them with explicit prefixes (e.g., `00_auth_helpers.rb`, `01_cooperative_helpers.rb`). Or use `require_dependency` within each file.
+
+Risk: Existing tests break when support modules change
+Mitigation: Support modules are additive — existing tests can continue working without changes. They only break if an existing test name conflicts with a new method.
+
+Risk: Playwright page objects are too abstract and slow down test writing
+Mitigation: Create page objects only for the most repeated patterns (auth, journal entries, balance sheet, member search). Keep them lightweight.
+
+9. Definition of Done
+
+- `spec/support/` contains at least 3 RSpec support modules: `auth_helpers.rb`, `cooperative_helpers.rb`, `time_helpers.rb`
+- `spec/rails_helper.rb` includes `Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }`
+- Factory traits exist for: `:with_entries`, `:with_pending_entry`, `:with_running_balance`, `:contra_account`
+- Playwright helpers exist: `tests/helpers/auth.ts` with `loginAsAdmin()` and `loginAsTeller()`
+- Playwright page objects exist: `tests/helpers/page_objects/journal_entries.ts`
+- At least 5 existing tests have been updated to use the new support modules (proving adoption)
+- All existing tests pass with no new failures
+
+10. Codebase Implementation Details
+
+10.1 File Manifest
+
+- `spec/support/auth_helpers.rb` — new
+- `spec/support/cooperative_helpers.rb` — new
+- `spec/support/time_helpers.rb` — new
+- `spec/factories/accounting/entries.rb` — add traits
+- `spec/factories/accounting/accounts.rb` — add traits
+- `spec/factories/accounting/running_balances.rb` — add traits
+- `spec/rails_helper.rb` — add support glob
+- `tests/helpers/auth.ts` — new
+- `tests/helpers/page_objects/journal_entries.ts` — new
+
+10.2 Existing Patterns to Follow
+
+- Rails helper: Follow `spec/rails_helper.rb` line 10 — `Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }` — already has the require, just create the files
+- Test pattern: Follow `spec/services/accounting/post_entry_service_spec.rb` — `let!`, `described_class.run!`, `expect { }.to change`
+- Factory: Follow `spec/factories/accounting/entries.rb` — `FactoryBot.define`, `association`, `trait`, `after(:build)`
+- Playwright: Follow `tests/journal_entries/happy_path.spec.js` — `test.describe`, `test`, `page.locator`, `page.goto`
+
+10.3 Auth Helper Implementation
+
+```ruby
+# spec/support/auth_helpers.rb
+module AuthHelpers
+  def sign_in(user = nil)
+    user ||= create(:user)
+    post session_path, params: { email: user.email, password: "password123" }
+    follow_redirect! if respond_to?(:follow_redirect!)
+    user
+  end
+
+  def auth_headers(user = nil)
+    user ||= sign_in
+    session = user.sessions.last
+    { "Authorization" => "Bearer #{session&.token || 'test-token'}" }
+  end
+end
+
+RSpec.configure do |config|
+  config.include AuthHelpers, type: :request
+  config.include AuthHelpers, type: :controller
+end
+```
+
+10.4 Cooperative Helper Implementation
+
+```ruby
+# spec/support/cooperative_helpers.rb
+module CooperativeHelpers
+  extend ActiveSupport::Concern
+
+  included do
+    let(:cooperative) { create(:cooperative) }
+    let(:branch) { create(:management_branch, cooperative: cooperative) }
+    let(:user) { create(:user, cooperative: cooperative) }
+    let(:member) { create(:member, cooperative: cooperative) }
+  end
+end
+
+RSpec.configure do |config|
+  config.include CooperativeHelpers, type: :model
+  config.include CooperativeHelpers, type: :request
+end
+```
+
+10.5 Factory Traits
+
+```ruby
+# spec/factories/accounting/entries.rb - add traits
+FactoryBot.define do
+  factory :accounting_entry, class: "Accounting::Entry" do
+    # existing attributes...
+    trait :posted do
+      status { "posted" }
+      posted_at { Time.current }
+    end
+
+    trait :pending do
+      status { "pending" }
+    end
+
+    trait :reversed do
+      status { "reversed" }
+      reversed_at { Time.current }
+    end
+
+    trait :with_debit_and_credit do
+      after(:create) do |entry|
+        create(:accounting_amount_line, :debit, entry: entry)
+        create(:accounting_amount_line, :credit, entry: entry)
+      end
+    end
+  end
+end
+```
+
+10.6 Playwright Auth Helper
+
+```typescript
+// tests/helpers/auth.ts
+import { Page } from '@playwright/test';
+import path from 'path';
+
+const STORAGE_PATH = path.join(__dirname, '../../.auth/user.json');
+
+export async function loginAsAdmin(page: Page) {
+  await page.goto('/sessions/new');
+  await page.fill('[name="email"]', 'admin@example.com');
+  await page.fill('[name="password"]', 'password123');
+  await page.click('button:has-text("Sign in")');
+  await page.waitForLoadState('networkidle');
+  await page.context().storageState({ path: STORAGE_PATH });
+}
+```
+
+10.7 Playwright Page Object
+
+```typescript
+// tests/helpers/page_objects/journal_entries.ts
+import { Page, Locator } from '@playwright/test';
+
+export class JournalEntryListPage {
+  readonly page: Page;
+  readonly searchInput: Locator;
+  readonly emptyState: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.searchInput = page.locator('[data-testid="journal-entries-search"]');
+    this.emptyState = page.locator('[data-testid="empty-state"]');
+  }
+
+  async goto() {
+    await this.page.goto('/accounting/journal_entries');
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  async search(query: string) {
+    await this.searchInput.fill(query);
+    await this.searchInput.press('Enter');
+    await this.page.waitForLoadState('networkidle');
+  }
+}
+```
+
+11. OpenCode Agent End Goal
+
+```
+[PASS] spec/support/auth_helpers.rb exists
+[PASS] spec/support/cooperative_helpers.rb exists
+[PASS] spec/support/time_helpers.rb exists
+[PASS] spec/rails_helper.rb includes spec/support/**/*.rb glob
+[PASS] Factory traits exist for: posted, pending, reversed, with_debit_and_credit
+[PASS] tests/helpers/auth.ts exists with loginAsAdmin()
+[PASS] tests/helpers/page_objects/journal_entries.ts exists
+[PASS] At least 5 existing tests updated to use support helpers
+[PASS] bin/rspec -- no failures (no regressions)
+[PASS] bin/rubocop -- no offenses
+[PASS] All existing Playwright tests pass
+```

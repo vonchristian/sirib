@@ -1,0 +1,293 @@
+PRD: GAAP-Compliant Entry Reversal with Offsetting Journal Entries
+
+1. Overview
+
+The `Entry#reverse!` method in `app/models/accounting/entry.rb:93-103` does not create offsetting journal entries. Instead, it flips a `status` column to `:reversed`. The original `amount_lines` remain in the ledger — they are not inverted, canceled, or removed. Balance calculations continue to include the reversed entry unless the caller explicitly filters by status. This is a GAAP/IFRS violation. Auditors require that reversing a journal entry creates a visible, auditable offsetting entry in the general ledger. Simply flagging the original entry as "reversed" without recording the reversal action is not acceptable for a regulated financial institution.
+
+2. Goals
+
+Make entry reversal create an actual offsetting journal entry with inverted debits and credits
+
+Preserve a complete audit trail: original entry, reversal entry, and the link between them
+
+Ensure post-reversal balance queries remain correct without special status filtering
+
+3. Non-Goals
+
+Support for partial reversals (prorated) — full reversal only in scope
+
+Reversal of entries that are themselves reversals (chain reversals)
+
+Scheduled or future-dated reversals
+
+Bulk reversal of multiple entries
+
+4. Current State Audit
+
+`app/models/accounting/entry.rb:85-103`:
+
+```ruby
+def reversible?
+  status == :posted && !reversed?
+end
+
+def reversed?
+  status == :reversed || reversed_at.present?
+end
+
+def reverse!
+  raise Accounting::Error, "Entry is not reversible" unless reversible?
+  transaction do
+    update!(status: :reversed, reversed_at: Time.current)
+  end
+end
+```
+
+- `reverse!` only sets `status: :reversed` and `reversed_at`. No journal entry is created.
+- `amount_lines` records remain unchanged — debits and credits from the original entry stay in the ledger.
+- `ledger_query_service.rb` and `account_balance.rb` strategies must be aware of reversal status to exclude reversed entries. Some query paths may include them inadvertently.
+- No `reversal_of_id` foreign key links the reversal entry to the original.
+- The `entries` table has `reference_number` unique index but no `reversal_id` or `reversed_entry_id` column.
+
+5. Requirements
+
+5.1 Must-Have
+
+- `reverse!` creates a new `Entry` record with inverted `AmountLine` records (debits become credits, credits become debits)
+- The new reversal entry has `entry_type: :reversal` and `reference_number` indicating it is a reversal
+- The reversal entry links back to the original via a `reversal_of_id` foreign key
+- The original entry gets `reversal_entry_id` pointing to the reversal entry (bidirectional link)
+- The original entry's `status` changes to `:reversed` and `reversed_at` is set
+- `reversible?` checks: entry is posted, not already reversed, and no existing reversal entry exists
+- Balance computations must include reversal entries as normal entries (they are real journal entries)
+
+5.2 Nice-to-Have
+
+- Reversal reason is stored as a required text field
+- Reversal requires approval workflow for high-value entries (> PHP 100,000)
+- Reversal notification is sent to the branch manager and compliance officer
+
+6. Proposed Design
+
+6.1 Database Migration
+
+```ruby
+class AddReversalRelationshipToEntries < ActiveRecord::Migration[8.0]
+  def change
+    add_reference :accounting_entries, :reversal_of, foreign_key: { to_table: :accounting_entries }
+    add_reference :accounting_entries, :reversal_entry, foreign_key: { to_table: :accounting_entries }
+    add_column :accounting_entries, :reversal_reason, :text
+  end
+end
+```
+
+6.2 Updated `reverse!` Method
+
+```ruby
+def reverse!(reason: nil)
+  raise Accounting::Error, "Entry is not reversible" unless reversible?
+
+  transaction do
+    self.class.transaction do
+      reversal = self.class.create!(
+        cooperative: cooperative,
+        branch: branch,
+        entry_type: :reversal,
+        status: :posted,
+        description: "Reversal of #{reference_number}: #{description}",
+        reference_number: "REV-#{Time.current.strftime("%Y%m%d-%H%M%S")}-#{SecureRandom.hex(4)}",
+        source_module: source_module,
+        posted_at: Time.current,
+        reversal_of: self,
+        reversal_reason: reason,
+        amount_lines_attributes: amount_lines.map { |line|
+          {
+            account: line.account,
+            amount_type: line.debit? ? :credit : :debit,
+            amount_cents: line.amount_cents
+          }
+        }
+      )
+
+      update!(
+        status: :reversed,
+        reversed_at: Time.current,
+        reversal_entry: reversal
+      )
+
+      reversal.running_balances.build
+
+      reversal
+    end
+  end
+end
+```
+
+6.3 Updated `reversible?` Logic
+
+```ruby
+def reversible?
+  posted? && reversal_of_id.nil? && reversal_entry_id.nil? && reversed_at.nil?
+end
+
+def reversed?
+  status == :reversed || reversed_at.present? || reversal_entry_id.present?
+end
+```
+
+7. Migration Plan
+
+- Run migration to add `reversal_of_id`, `reversal_entry_id`, and `reversal_reason` columns
+- No data migration needed for existing reversed entries — they keep their current `status: :reversed` without a reversal entry
+- Update the `Entry` model with new `reverse!` implementation
+- Add `entry_type: :reversal` to the `entry_type` enum
+- Existing reversed entries remain valid but are "legacy reversals" — no reversal entry is backfilled
+- Rollback: revert migration, revert model changes
+
+8. Risks & Mitigations
+
+Risk: Reversal entry references `amount_lines` that may have changed since original posting
+Mitigation: The reversal copies the original `amount_lines` amounts verbatim, not the current balance. This is correct — a reversal cancels the original entry, not the current state.
+
+Risk: Circular reversal chain (A reversed by B, B reversed by A)
+Mitigation: `reversible?` checks `reversal_of_id.nil?` — a reversal entry cannot itself be reversed. Only original posted entries can be reversed.
+
+Risk: Running balance computation includes both original and reversal entry for the same date
+Mitigation: Because the reversal creates real offsetting lines, the balance naturally cancels out. A 1000 debit + 1000 credit reversal = 0 net effect. Balance computation does not need special reversal filtering.
+
+Risk: `running_balances` migration didn't include `amount_lines` creation before the job runs
+Mitigation: The `after_create_commit` callback on `AmountLine` updates running balances. The reversal's amount lines trigger this callback just like any other entry.
+
+9. Definition of Done
+
+- `reversal_of_id` and `reversal_entry_id` columns exist on `accounting_entries`
+- `reverse!` creates a new reversal `Entry` with inverted `AmountLine` records
+- Reversal entry has `entry_type: :reversal`
+- Reversal entry links back to original via `reversal_of_id`
+- Original entry links to reversal via `reversal_entry_id`
+- `reversible?` returns false for entries that are already reversed
+- `reversed?` includes check for `reversal_entry_id.present?`
+- Balance computation including both original and reversal entries yields correct net zero
+- RSpec tests cover: full reversal creates reversal entry, reversal of already-reversed entry raises error, reversal updates `reversed_at`, reversal entry has correct inverted amounts, balance queries include reversal entries naturally
+- All existing tests pass with no new failures
+
+10. Codebase Implementation Details
+
+10.1 File Manifest
+
+- `app/models/accounting/entry.rb` — modify `reverse!`, `reversible?`, `reversed?`, add `build_reversal_entry`
+- `db/migrate/*_add_reversal_relationship_to_entries.rb` — new migration
+- `app/services/accounting/entry_reversal_service.rb` — optional extracted service (if reverse! grows complex)
+
+10.2 Existing Patterns to Follow
+
+- Entry model: Follow existing `app/models/accounting/entry.rb` patterns — `include CooperativeScoped`, `enum :entry_type`, `has_many :amount_lines, dependent: :restrict_with_error, autosave: true`
+- Reversal enum: Add `reversal_entry: "reversal_entry"` to existing `entry_type` enum
+- Amount line creation: Follow `self.build` class method — `entry.amount_lines.build(account: ..., amount_cents: ..., amount_type: ..., cooperative: ...)`
+- Transaction pattern: Follow existing `reverse!` — `transaction do ... update!(...) end`
+- Reference number: Follow `self.generate_reference_number` — timestamp + hex pattern
+
+10.3 Integration Points
+
+- `entries.status` enum: `{ pending: "pending", posted: "posted", reversed: "reversed" }` — keep `reversed` for the original entry's status
+- `entries.reversal_of_id` — new FK to self (partially present in model as `belongs_to :reversal_of`)
+- `entries.reversed_at` — existing column, used by `reversed?`
+- `Current.user` for tracking who performed the reversal
+
+10.4 Updated reverse! Implementation
+
+```ruby
+def reverse!(reversed_by:, reason: nil)
+  raise Accounting::Error, "Entry is not reversible" unless reversible?
+
+  transaction do
+    reversal = self.class.create!(
+      cooperative: cooperative,
+      branch: branch,
+      entry_type: :reversal_entry,
+      status: :posted,
+      description: "Reversal of #{reference_number}: #{description}",
+      reference_number: "REV-#{Time.current.strftime("%Y%m%d-%H%M%S")}-#{SecureRandom.hex(4).upcase}",
+      source_module: source_module,
+      posted_at: Time.current,
+      reversal_of: self,
+      created_by: reversed_by
+    )
+
+    amount_lines.each do |line|
+      reversal.amount_lines.build(
+        account: line.account,
+        amount_type: line.debit? ? :credit : :debit,
+        amount_cents: line.amount_cents,
+        cooperative: cooperative
+      )
+    end
+
+    reversal.save!
+    update!(status: :reversed, reversed_at: Time.current)
+    reversal
+  end
+end
+```
+
+10.5 Migration Pattern
+
+```ruby
+class AddReversalRelationshipToEntries < ActiveRecord::Migration[8.0]
+  def change
+    add_reference :accounting_entries, :reversal_of,
+                  foreign_key: { to_table: :accounting_entries }
+    add_column :accounting_entries, :reversal_reason, :text
+  end
+end
+```
+
+10.6 Test Patterns
+
+```ruby
+RSpec.describe Accounting::Entry do
+  let(:entry) {
+    create(:accounting_entry, :posted,
+      amount_lines_attributes: [
+        { account: create(:accounting_account, account_type: :asset),
+          amount_cents: 10000, amount_type: :debit },
+        { account: create(:accounting_account, account_type: :liability),
+          amount_cents: 10000, amount_type: :credit }
+      ]
+    )
+  }
+
+  describe "#reverse!" do
+    it "creates a reversal entry with inverted amounts" do
+      reversal = entry.reverse!(reversed_by: create(:user))
+      expect(reversal).to be_persisted
+      expect(reversal.reversal_of).to eq(entry)
+      expect(reversal.total_debits).to eq(0)
+      expect(reversal.total_credits).to eq(0)
+      expect(entry.reload).to be_reversed
+    end
+
+    it "raises error if already reversed" do
+      entry.reverse!(reversed_by: create(:user))
+      expect { entry.reverse!(reversed_by: create(:user)) }
+        .to raise_error(Accounting::Error)
+    end
+  end
+end
+```
+
+11. OpenCode Agent End Goal
+
+```
+[PASS] db/migrate/*_add_reversal_relationship_to_entries.rb exists and runs
+[PASS] app/models/accounting/entry.rb reverse! creates new reversal Entry with inverted amount_lines
+[PASS] reversal entry has entry_type: reversal_entry and reversal_of_id set
+[PASS] reversible? returns false for reversed entries
+[PASS] reversed? checks reversal_entry_id.present?
+[PASS] bin/rspec spec/models/accounting/entry_spec.rb -- no failures
+[PASS] bin/rspec spec/services/accounting/posting_engine_spec.rb -- no failures
+[PASS] Balance queries include reversal entries naturally (no special filtering needed)
+[PASS] bin/rubocop -- no offenses
+[PASS] bin/brakeman -- no new warnings
+[PASS] All existing tests pass
+```

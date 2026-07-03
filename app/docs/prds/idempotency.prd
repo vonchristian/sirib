@@ -1,0 +1,264 @@
+PRD: Idempotency Key System for Financial Operations
+
+1. Overview
+
+The system has no protection against duplicate financial operations. The `validate_idempotency!` method in `app/services/banking/transaction_service.rb:114` is an empty stub — the parameter is accepted but never validated. Every financial write (journal entries, loan disbursements, savings deposits/withdrawals, equity purchases) can be duplicated by a network retry, double-click, or API replay. In a cooperative banking system, a single duplicate transaction creates an irreconcilable ledger error that requires manual intervention and regulatory disclosure.
+
+All `reference_number` values are server-generated (e.g., `ENT-20260625-235959-ABCDEF01` with `SecureRandom.hex(4)`). These are not cryptographically guaranteed unique and have no retry-on-collision logic. No client-supplied idempotency key pattern exists anywhere.
+
+2. Goals
+
+Prevent duplicate financial transactions from being persisted under any failure scenario
+
+Provide a universal, reusable idempotency check that all financial services opt into
+
+Allow safe client retry of any financial API call without side effects
+
+Maintain an audit trail of all idempotency key usage for forensic analysis
+
+Add zero measurable latency to the happy path (single indexed lookup)
+
+3. Non-Goals
+
+Distributed idempotency across separate database instances (single PostgreSQL cluster in scope)
+
+Cross-cooperative idempotency (keys are scoped per cooperative)
+
+Retroactive deduplication of existing data
+
+Removal of server-generated `reference_number` — idempotency keys complement, not replace, reference numbers
+
+4. Current State Audit
+
+- `app/services/banking/transaction_service.rb:114-117` — `validate_idempotency!` is an empty method with a comment: `# In production, check against a idempotency table`
+- `app/services/accounting/posting_engine.rb:20` — `post!` has no idempotency protection. A caller retry after timeout creates duplicate entries.
+- `app/services/lending/loan_restructure_service.rb` — no idempotency. Restructure requests can be submitted multiple times.
+- `app/services/treasury/savings_transaction_service.rb` — no idempotency. Savings deposits/withdrawals can be duplicated.
+- `app/services/equity/buy_shares_service.rb` — no idempotency. Share purchases can be duplicated.
+- `reference_number` is unique-indexed but server-generated. Two entries generated in the same second with different hex values will both pass the unique constraint but represent the same business event.
+
+5. Requirements
+
+5.1 Must-Have
+
+- `idempotency_keys` database table with columns: `id`, `key` (string, unique), `cooperative_id`, `service` (string — which service consumed the key), `resource_type` (string — e.g., `Accounting::Entry`), `resource_id` (bigint — the created record), `expires_at` (timestamptz — auto-cleanup after 24 hours), `created_at`
+- Unique index on `(key, cooperative_id)` to guarantee single-use
+- A `IdempotencyService` concern or mixin that any financial service can include
+- The concern provides: `with_idempotency(key:) { ... }` — returns the existing result if key was already processed, otherwise executes the block and records the key
+- All 6 financial service objects listed above must use the concern
+- HTTP endpoints must accept `Idempotency-Key` header and pass it to the service layer
+- Expired keys are pruned by a daily background job (`IdempotencyKeysCleanupJob`)
+- 24-hour retention window (keys expire after 24 hours)
+
+5.2 Nice-to-Have
+
+- Keys are logged to the audit log service for compliance queries
+- Admin interface to look up idempotency key usage per resource
+- Rate-limit warnings when the same key is submitted within 1 second of the first request (potential replay attack)
+
+6. Proposed Design
+
+Migration:
+
+```ruby
+create_table :idempotency_keys do |t|
+  t.string :key, null: false
+  t.references :cooperative, null: false, foreign_key: true
+  t.string :service, null: false
+  t.string :resource_type
+  t.bigint :resource_id
+  t.datetime :expires_at, null: false
+  t.timestamps
+end
+
+add_index :idempotency_keys, [:key, :cooperative_id], unique: true
+add_index :idempotency_keys, :expires_at, where: "expires_at < NOW()"
+```
+
+Concern:
+
+```ruby
+module IdempotentService
+  extend ActiveSupport::Concern
+
+  def with_idempotency(key:)
+    return yield unless key
+
+    existing = IdempotencyKey.find_by(key: key, cooperative_id: Current.cooperative.id)
+    if existing
+      return existing.resource
+    end
+
+    result = nil
+    transaction_result = -> {
+      result = yield
+      IdempotencyKey.create!(
+        key: key,
+        cooperative: Current.cooperative,
+        service: self.class.name,
+        resource: result,
+        expires_at: 24.hours.from_now
+      )
+      result
+    }
+
+    if defined?(ActiveRecord::Base.transaction)
+      ActiveRecord::Base.transaction { transaction_result.call }
+    else
+      transaction_result.call
+    end
+  end
+end
+```
+
+7. Migration Plan
+
+- Run migration to create `idempotency_keys` table (zero-downtime)
+- Add the `IdempotentService` concern
+- Update each financial service one at a time: `Banking::TransactionService`, `Accounting::PostingEngine`, `Lending::LoanRestructureService`, `Treasury::SavingsTransactionService`, `Equity::BuySharesService`
+- No data migration needed (no existing idempotency data)
+- Rollback: drop the table, remove concern includes
+
+8. Risks & Mitigations
+
+Risk: Overhead of idempotency check on every request
+Mitigation: Indexed lookup by unique key is sub-millisecond. No measurable impact.
+
+Risk: Idempotency key collision across cooperatives
+Mitigation: Unique index includes `cooperative_id`.
+
+Risk: Keys never expire and table grows unbounded
+Mitigation: `expires_at` with 24-hour TTL; daily cleanup job; partial index on `expires_at` for efficient pruning.
+
+Risk: Service crashes between resource creation and key recording
+Mitigation: Both operations happen inside the same DB transaction. If the service crashes after the transaction commits, the key is recorded.
+
+9. Definition of Done
+
+- `idempotency_keys` table created with proper indexes
+- `IdempotentService` concern written with tests
+- All 5 financial services updated to use `with_idempotency`
+- API endpoints accept `Idempotency-Key` header
+- Cleanup job implemented and scheduled
+- RSpec tests cover: first request creates resource, second request returns existing resource, replay with same key after 24h, expired key cleanup, concurrent requests with same key, missing key proceeds normally
+- RSpec tests pass with no new failures
+- No changes to existing `reference_number` generation
+
+10. Codebase Implementation Details
+
+10.1 File Manifest
+
+- `app/models/idempotency_key.rb` — new model
+- `app/models/concerns/idempotent_service.rb` — new concern
+- `app/jobs/idempotency_keys_cleanup_job.rb` — new job
+- `app/services/banking/transaction_service.rb:114-117` — replace stub `validate_idempotency!`
+- `app/services/accounting/posting_engine.rb` — add `with_idempotency` wrapping
+- `app/services/lending/loan_restructure_service.rb` — add idempotency guard
+- `app/services/treasury/savings_transaction_service.rb` — add idempotency guard
+- `app/services/equity/buy_shares_service.rb` — add idempotency guard
+
+10.2 Existing Patterns to Follow
+
+- Model: Follow `app/models/accounting/running_balance.rb` pattern — `include CooperativeScoped`, `monetize` if needed, `validates`, scopes
+- Service: Follow `ActiveInteraction::Base` pattern from `app/services/accounting/post_entry_service.rb` — class inputs, `execute` method, private helpers
+- Concern: Follow `app/models/concerns/cooperative_scoped.rb` pattern — `included do` block with `belongs_to`, `before_validation`, scope
+- Job: Follow `app/jobs/application_job.rb` pattern — `include CooperativeJob`, `queue_as :default`
+- Current scope: Use `Current.cooperative` as in `app/models/concerns/cooperative_scoped.rb:10`
+- Error handling: Raise custom errors like `app/services/accounting/validation_engine.rb:3` (`ValidationError = Class.new(StandardError)`)
+
+10.3 Integration Points
+
+- `Current.user` and `Current.cooperative` (defined in `app/models/current.rb`) are available in service context
+- `ActiveRecord::Base.transaction` block pattern used throughout the codebase (e.g., `app/services/banking/ledger_service.rb:26`)
+- Audit logging via `Management::AuditLogService` (called in `app/services/banking/ledger_service.rb:70-79`)
+
+10.4 Test Patterns
+
+RSpec: Follow `spec/services/accounting/post_entry_service_spec.rb` pattern — `described_class.run!`, `expect { }.to change(Model, :count)`, `let` for factory objects
+
+```ruby
+# spec/models/idempotency_key_spec.rb
+RSpec.describe IdempotencyKey do
+  subject { build(:idempotency_key) }
+  it { is_expected.to validate_presence_of(:key) }
+  it { is_expected.to validate_uniqueness_of(:key).scoped_to(:cooperative_id) }
+end
+
+# spec/services/idempotency_service_spec.rb
+RSpec.describe IdempotentService do
+  let(:service_class) {
+    Class.new do
+      include IdempotentService
+      def call(key:)
+        with_idempotency(key: key) { SecureRandom.uuid }
+      end
+    end
+  }
+
+  it "returns same result for duplicate key" do
+    svc = service_class.new
+    first = svc.call(key: "test-key")
+    second = svc.call(key: "test-key")
+    expect(first).to eq(second)
+  end
+
+  it "allows different keys to proceed independently" do
+    svc = service_class.new
+    first = svc.call(key: "key-a")
+    second = svc.call(key: "key-b")
+    expect(first).not_to eq(second)
+  end
+end
+```
+
+Playwright: Add test in `tests/smoke/idempotency.spec.js` — double-click submission on loan disbursement, verify only one entry created.
+
+10.5 Migration Patterns
+
+Follow the naming convention in `db/migrate/` — timestamp prefix + snake_case description:
+```ruby
+# db/migrate/20260701000001_create_idempotency_keys.rb
+class CreateIdempotencyKeys < ActiveRecord::Migration[8.0]
+  def change
+    create_table :idempotency_keys do |t|
+      t.string :key, null: false
+      t.references :cooperative, null: false, foreign_key: true
+      t.string :service, null: false
+      t.string :resource_type
+      t.bigint :resource_id
+      t.datetime :expires_at, null: false
+      t.timestamps
+    end
+    add_index :idempotency_keys, [:key, :cooperative_id], unique: true
+    add_index :idempotency_keys, :expires_at, where: "expires_at < NOW()"
+  end
+end
+```
+
+11. OpenCode Agent End Goal
+
+The agent must implement all of the following. The implementation is complete only when every item is verified:
+
+```
+[PASS] db/migrate/*_create_idempotency_keys.rb exists and migration runs
+[PASS] app/models/idempotency_key.rb exists with CooperativeScoped, validations, unique index
+[PASS] app/models/concerns/idempotent_service.rb exists with with_idempotency(key:) method
+[PASS] app/jobs/idempotency_keys_cleanup_job.rb exists and prunes expired keys
+[PASS] app/services/banking/transaction_service.rb validate_idempotency! is no longer a stub
+[PASS] app/services/accounting/posting_engine.rb uses with_idempotency
+[PASS] app/services/lending/loan_restructure_service.rb uses with_idempotency
+[PASS] app/services/treasury/savings_transaction_service.rb uses with_idempotency
+[PASS] app/services/equity/buy_shares_service.rb uses with_idempotency
+[PASS] bin/rspec spec/models/idempotency_key_spec.rb -- no failures
+[PASS] bin/rspec spec/services/idempotency_service_spec.rb -- no failures
+[PASS] bin/rspec spec/services/banking/transaction_service_spec.rb -- no failures
+[PASS] bin/rspec spec/services/accounting/posting_engine_spec.rb -- no failures
+[PASS] bin/rspec spec/services/lending/loan_restructure_service_spec.rb -- no failures
+[PASS] bin/rspec spec/services/treasury/savings_transaction_service_spec.rb -- no failures
+[PASS] bin/rspec spec/services/equity/buy_shares_service_spec.rb -- no failures
+[PASS] bin/rubocop -- no offenses in changed files
+[PASS] bin/brakeman -- no new warnings
+[PASS] npm run test:e2e -- tests/smoke/idempotency.spec.js passes
+```
+
+The agent must not create any TODO comments, placeholder code, or dead code.
