@@ -3,13 +3,18 @@ require "rails_helper"
 RSpec.describe Lending::LoanRestructureService do
   describe ".call" do
     subject(:create_case) do
-      described_class.call(type: type, loan: loan, proposed_changes: changes, requested_by: user)
+      described_class.call(type: type, loan: loan, proposed_changes: changes, requested_by: user, idempotency_key: idempotency_key)
     end
 
     let(:loan) { create(:lending_loan, status: "active", restructures_count: 0, max_restructures: 2) }
     let(:user) { create(:user) }
     let(:changes) { { "interest_rate" => "1.0", "term_months" => "18" } }
     let(:type) { "modification" }
+    let(:idempotency_key) { nil }
+
+    before do
+      allow(Current).to receive(:cooperative).and_return(loan.cooperative)
+    end
 
     it "creates a restructure case" do
       expect { create_case }.to change(Lending::LoanRestructureCase, :count).by(1)
@@ -17,6 +22,19 @@ RSpec.describe Lending::LoanRestructureService do
 
     it "creates a loan event" do
       expect { create_case }.to change(Lending::LoanEvent, :count).by(1)
+    end
+
+    context "with idempotency key" do
+      let(:idempotency_key) { SecureRandom.uuid }
+
+      it "creates an IdempotencyKey record" do
+        expect { create_case }.to change(IdempotencyKey, :count).by(1)
+      end
+
+      it "returns cached result on duplicate call" do
+        first = create_case
+        expect(described_class.call(type: type, loan: loan, proposed_changes: changes, requested_by: user, idempotency_key: idempotency_key)).to eq(first)
+      end
     end
 
     it "sets the correct type" do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_25_000005) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_01_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -510,6 +510,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_25_000005) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["cooperative_id"], name: "index_fraud_rules_on_cooperative_id"
+  end
+
+  create_table "idempotency_keys", force: :cascade do |t|
+    t.string "key", null: false
+    t.bigint "cooperative_id", null: false
+    t.string "service", null: false
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_idempotency_keys_on_cooperative_id"
+    t.index ["expires_at"], name: "index_idempotency_keys_on_expires_at"
+    t.index ["key", "cooperative_id"], name: "index_idempotency_keys_on_key_and_cooperative_id", unique: true
   end
 
   create_table "ledgers", force: :cascade do |t|
@@ -1686,6 +1700,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_25_000005) do
   add_foreign_key "fraud_incidents", "cooperatives"
   add_foreign_key "fraud_incidents", "fraud_rules", column: "rule_id"
   add_foreign_key "fraud_rules", "cooperatives"
+  add_foreign_key "idempotency_keys", "cooperatives"
   add_foreign_key "ledgers", "cooperatives"
   add_foreign_key "loan_aging_snapshots", "loan_aging_groups"
   add_foreign_key "loan_agings", "loan_aging_groups"

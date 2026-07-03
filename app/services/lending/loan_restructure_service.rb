@@ -1,5 +1,6 @@
 module Lending
   class LoanRestructureService
+    include IdempotentService
     STRATEGIES = {
       "modification" => "Lending::ModificationRestructure",
       "refinance" => "Lending::RefinanceRestructure",
@@ -19,24 +20,26 @@ module Lending
     end
 
     def call
-      validate_loan!
-      validate_restructure_limit!
+      with_idempotency(key: @options[:idempotency_key]) do
+        validate_loan!
+        validate_restructure_limit!
 
-      restructure_case = create_restructure_case
+        restructure_case = create_restructure_case
 
-      Lending::LoanEvent.create!(
-        cooperative: @loan.cooperative,
-        loan: @loan,
-        actor: @requested_by || User.first,
-        event_type: "restructure_requested",
-        metadata: {
-          restructure_type: @type,
-          restructure_case_id: restructure_case.id,
-          proposed_changes: @proposed_changes
-        }
-      )
+        Lending::LoanEvent.create!(
+          cooperative: @loan.cooperative,
+          loan: @loan,
+          actor: @requested_by || User.first,
+          event_type: "restructure_requested",
+          metadata: {
+            restructure_type: @type,
+            restructure_case_id: restructure_case.id,
+            proposed_changes: @proposed_changes
+          }
+        )
 
-      restructure_case
+        restructure_case
+      end
     end
 
     def simulate

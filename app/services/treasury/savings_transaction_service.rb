@@ -1,37 +1,42 @@
 module Treasury
   class SavingsTransactionService < ActiveInteraction::Base
+    include IdempotentService
+
     object :savings_account, class: Treasury::SavingsAccount
     string :transaction_type
     integer :amount_cents
     string :amount_currency, default: "PHP"
     object :cash_account, class: Accounting::Account
     string :notes, default: nil
+    string :idempotency_key, default: nil
 
     validates :transaction_type, inclusion: { in: %w[deposit withdraw] }
 
     def execute
-      errors.add(:amount_cents, "must be greater than zero") and return unless amount_cents.positive?
+      with_idempotency(key: idempotency_key) do
+        errors.add(:amount_cents, "must be greater than zero") and return unless amount_cents.positive?
 
-      if transaction_type == "withdraw" && amount_cents > savings_account.balance.cents
-        errors.add(:base, "Insufficient balance") and return
-      end
+        if transaction_type == "withdraw" && amount_cents > savings_account.balance.cents
+          errors.add(:base, "Insufficient balance") and return
+        end
 
-      savings_account.transaction do
-        entry = post_journal_entry!
+        savings_account.transaction do
+          entry = post_journal_entry!
 
-        transaction = Treasury::SavingsTransaction.create!(
-          savings_account: savings_account,
-          transaction_type: transaction_type,
-          amount_cents: amount_cents,
-          amount_currency: amount_currency,
-          cash_account: cash_account,
-          entry: entry,
-          notes: notes,
-          status: "completed",
-          posted_at: Time.current
-        )
+          transaction = Treasury::SavingsTransaction.create!(
+            savings_account: savings_account,
+            transaction_type: transaction_type,
+            amount_cents: amount_cents,
+            amount_currency: amount_currency,
+            cash_account: cash_account,
+            entry: entry,
+            notes: notes,
+            status: "completed",
+            posted_at: Time.current
+          )
 
-        transaction
+          transaction
+        end
       end
     end
 
@@ -48,16 +53,16 @@ module Treasury
           description: "Savings deposit - #{savings_account.account_number}",
           reference_number: "SD-#{savings_account.account_number}",
           posted_at: Time.current,
-          debits: [{ account: cash_account, amount: amount_cents }],
-          credits: [{ account: liability, amount: amount_cents }]
+          debits: [ { account: cash_account, amount: amount_cents } ],
+          credits: [ { account: liability, amount: amount_cents } ]
         )
       else
         Accounting::PostEntryService.run!(
           description: "Savings withdrawal - #{savings_account.account_number}",
           reference_number: "SW-#{savings_account.account_number}",
           posted_at: Time.current,
-          debits: [{ account: liability, amount: amount_cents }],
-          credits: [{ account: cash_account, amount: amount_cents }]
+          debits: [ { account: liability, amount: amount_cents } ],
+          credits: [ { account: cash_account, amount: amount_cents } ]
         )
       end
     end

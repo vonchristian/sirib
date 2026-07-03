@@ -1,50 +1,55 @@
 module Equity
   class BuySharesService < ActiveInteraction::Base
+    include IdempotentService
+
     object :share_capital_account, class: Equity::Account
     integer :shares
     object :cash_account, class: Accounting::Account
     object :cash_session, class: Treasury::CashSession, default: nil
     integer :posted_by_id
     string :notes, default: nil
+    string :idempotency_key, default: nil
 
     def execute
-      product = share_capital_account.share_product
+      with_idempotency(key: idempotency_key) do
+        product = share_capital_account.share_product
 
-      errors.add(:shares, "must be greater than zero") and return unless shares.positive?
-      errors.add(:base, "Share capital account is not active") and return unless share_capital_account.active?
-      errors.add(:base, "Product is not active") and return unless product.active?
-      errors.add(:base, "Share product has no equity ledger") and return unless product.equity_ledger
-      errors.add(:base, "Share capital account has no equity account") and return unless share_capital_account.equity_account
+        errors.add(:shares, "must be greater than zero") and return unless shares.positive?
+        errors.add(:base, "Share capital account is not active") and return unless share_capital_account.active?
+        errors.add(:base, "Product is not active") and return unless product.active?
+        errors.add(:base, "Share product has no equity ledger") and return unless product.equity_ledger
+        errors.add(:base, "Share capital account has no equity account") and return unless share_capital_account.equity_account
 
-      validate_purchase_limits!(product)
+        validate_purchase_limits!(product)
 
-      total_amount_cents = shares * product.price_per_share_cents
+        total_amount_cents = shares * product.price_per_share_cents
 
-      share_capital_account.transaction do
-        entry = post_journal_entry!(product, total_amount_cents)
+        share_capital_account.transaction do
+          entry = post_journal_entry!(product, total_amount_cents)
 
-        txn = Equity::Transaction.create!(
-          share_capital_account: share_capital_account,
-          transaction_type: :purchase,
-          shares: shares,
-          price_per_share_cents: product.price_per_share_cents,
-          total_amount_cents: total_amount_cents,
-          cash_account: cash_account,
-          entry: entry,
-          posted_by_id: posted_by_id,
-          notes: notes,
-          status: "completed",
-          posted_at: Time.current
-        )
+          txn = Equity::Transaction.create!(
+            share_capital_account: share_capital_account,
+            transaction_type: :purchase,
+            shares: shares,
+            price_per_share_cents: product.price_per_share_cents,
+            total_amount_cents: total_amount_cents,
+            cash_account: cash_account,
+            entry: entry,
+            posted_by_id: posted_by_id,
+            notes: notes,
+            status: "completed",
+            posted_at: Time.current
+          )
 
-        create_cash_session_voucher!(entry, txn, total_amount_cents) if cash_session
+          create_cash_session_voucher!(entry, txn, total_amount_cents) if cash_session
 
-        share_capital_account.update!(
-          shares_owned: share_capital_account.shares_owned + shares,
-          paid_up_shares: share_capital_account.paid_up_shares + shares
-        )
+          share_capital_account.update!(
+            shares_owned: share_capital_account.shares_owned + shares,
+            paid_up_shares: share_capital_account.paid_up_shares + shares
+          )
 
-        txn
+          txn
+        end
       end
     end
 

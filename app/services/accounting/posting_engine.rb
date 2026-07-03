@@ -1,5 +1,7 @@
 module Accounting
   class PostingEngine
+    include IdempotentService
+
     attr_reader :template, :input, :actor, :entry
 
     def initialize(template:, input: {}, actor: nil)
@@ -13,13 +15,15 @@ module Accounting
       TemplateResolver.new(@template, @input).resolve_lines
     end
 
-    def post!
-      Accounting::Entry.transaction do
-        build_entry
-        @entry.save!
-        Accounting::UpdateRunningBalancesJob.perform_later(@entry)
-        @template.update!(entry: @entry)
-        @entry
+    def post!(idempotency_key: nil)
+      with_idempotency(key: idempotency_key) do
+        Accounting::Entry.transaction do
+          build_entry
+          @entry.save!
+          Accounting::UpdateRunningBalancesJob.perform_later(@entry)
+          @template.update!(entry: @entry)
+          @entry
+        end
       end
     end
 
