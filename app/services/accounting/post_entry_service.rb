@@ -29,7 +29,9 @@ module Accounting
 
       Accounting::Entry.transaction do
         entry.save!
-        update_running_balances!(entry)
+        AppendOnlyOverride.with_override(reason: "RunningBalance update via PostEntryService") do
+          update_running_balances!(entry)
+        end
       end
 
       entry

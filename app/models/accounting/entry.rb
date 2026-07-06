@@ -83,7 +83,7 @@ module Accounting
     end
 
     def reversible?
-      status == :posted && !reversed?
+      posted? && !reversed?
     end
 
     def reversed?

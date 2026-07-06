@@ -3,9 +3,11 @@ module Accounting
     object :entry, class: Accounting::Entry
 
     def execute
-      Accounting::RunningBalance.transaction do
-        update_account_balances!
-        update_ledger_balances!
+      AppendOnlyOverride.with_override(reason: "RunningBalance batch update for entry #{entry.id}") do
+        Accounting::RunningBalance.transaction do
+          update_account_balances!
+          update_ledger_balances!
+        end
       end
     end
 

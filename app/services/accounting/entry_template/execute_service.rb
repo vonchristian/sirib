@@ -16,7 +16,9 @@ module Accounting
         Accounting::Entry.transaction do
           entry = build_entry
           entry.save!
-          update_running_balances!(entry)
+          AppendOnlyOverride.with_override(reason: "RunningBalance update via EntryTemplate::ExecuteService") do
+            update_running_balances!(entry)
+          end
           template.update!(entry: entry)
           entry
         end
