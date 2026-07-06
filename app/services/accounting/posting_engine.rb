@@ -20,8 +20,8 @@ module Accounting
         Accounting::Entry.transaction do
           build_entry
           @entry.save!
-          Accounting::UpdateRunningBalancesJob.perform_later(@entry)
           @template.update!(entry: @entry)
+          Accounting::UpdateRunningBalances.run!(entry: @entry)
           @entry
         end
       end

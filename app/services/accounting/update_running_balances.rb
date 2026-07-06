@@ -14,31 +14,45 @@ module Accounting
     private
 
     def update_account_balances!
-      entry.accounts.distinct.each do |account|
+      locked_accounts.each do |account|
         posted_date = entry.posted_at.to_date
+        balance_cents = account.balance(to_date: posted_date).cents
 
-        balance = Accounting::RunningBalance.find_or_initialize_by(
-          account_id: account.id,
-          as_of_date: posted_date
+        rb = Accounting::RunningBalance
+          .lock("FOR UPDATE")
+          .find_or_initialize_by(account_id: account.id, as_of_date: posted_date)
+
+        rb.update!(
+          balance_cents: balance_cents,
+          ledger: account.ledger
         )
-        balance.ledger = account.ledger
-        balance.balance_cents = account.balance(to_date: posted_date).cents
-        balance.save!
       end
     end
 
     def update_ledger_balances!
-      entry.accounts.includes(:ledger).distinct.map(&:ledger).uniq.each do |ledger|
+      locked_ledgers.each do |ledger|
         posted_date = entry.posted_at.to_date
+        balance_cents = ledger.balance(to_date: posted_date)
 
-        balance = Accounting::RunningBalance.find_or_initialize_by(
-          ledger_id: ledger.id,
-          account_id: nil,
-          as_of_date: posted_date
-        )
-        balance.balance_cents = ledger.balance(to_date: posted_date)
-        balance.save!
+        rb = Accounting::RunningBalance
+          .lock("FOR UPDATE")
+          .find_or_initialize_by(ledger_id: ledger.id, account_id: nil, as_of_date: posted_date)
+
+        rb.update!(balance_cents: balance_cents)
       end
+    end
+
+    def locked_accounts
+      Accounting::Account
+        .lock("FOR UPDATE")
+        .where(id: entry.accounts.select(:id))
+    end
+
+    def locked_ledgers
+      ledger_ids = entry.accounts.includes(:ledger).distinct.map(&:ledger_id).uniq
+      Accounting::Ledger
+        .lock("FOR UPDATE")
+        .where(id: ledger_ids)
     end
   end
 end

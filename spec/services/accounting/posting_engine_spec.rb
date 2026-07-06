@@ -1,19 +1,19 @@
 require "rails_helper"
 
 RSpec.describe Accounting::PostingEngine do
-  let(:debit_account) { create(:accounting_account) }
-  let(:credit_account) { create(:accounting_account) }
+  let(:cooperative) { create(:cooperative) }
+
+  around do |example|
+    Current.set(cooperative: cooperative) { example.run }
+  end
+
+  let(:debit_account) { create(:accounting_account, cooperative: cooperative) }
+  let(:credit_account) { create(:accounting_account, cooperative: cooperative) }
 
   let(:template) do
-    build(:accounting_entry_template).tap do |t|
-      t.lines = [
-        build(:accounting_entry_template_line,
-          entry_template: t, account: debit_account, direction: "debit",
-          amount_mode: "variable", sequence_index: 1),
-        build(:accounting_entry_template_line,
-          entry_template: t, account: credit_account, direction: "credit",
-          amount_mode: "variable", sequence_index: 2)
-      ]
+    Accounting::EntryTemplate.create!(name: "Test Template", cooperative: cooperative).tap do |t|
+      t.lines.create!(account: debit_account, direction: "debit", amount_mode: "variable", sequence_index: 1)
+      t.lines.create!(account: credit_account, direction: "credit", amount_mode: "variable", sequence_index: 2)
     end
   end
 
@@ -57,26 +57,16 @@ RSpec.describe Accounting::PostingEngine do
       engine = described_class.new(template: template, input: { amount: 5_000 })
       entry = engine.post!
 
-      expect(entry.total_amount_cents).to eq(500_000)
+      expect(entry.amount_lines.sum(:amount_cents)).to eq(1_000_000)
     end
 
     context "with mixed fixed and variable lines" do
       let(:mixed_template) do
-        build(:accounting_entry_template, name: "Mixed Entry").tap do |t|
-          t.lines = [
-            build(:accounting_entry_template_line,
-              entry_template: t, account: debit_account, direction: "debit",
-              amount_mode: "fixed", fixed_amount: 500, sequence_index: 1),
-            build(:accounting_entry_template_line,
-              entry_template: t, account: debit_account, direction: "debit",
-              amount_mode: "variable", sequence_index: 2),
-            build(:accounting_entry_template_line,
-              entry_template: t, account: credit_account, direction: "credit",
-              amount_mode: "fixed", fixed_amount: 500, sequence_index: 3),
-            build(:accounting_entry_template_line,
-              entry_template: t, account: credit_account, direction: "credit",
-              amount_mode: "variable", sequence_index: 4)
-          ]
+        Accounting::EntryTemplate.create!(name: "Mixed Entry", cooperative: cooperative).tap do |t|
+          t.lines.create!(account: debit_account, direction: "debit", amount_mode: "fixed", fixed_amount: 500, sequence_index: 1)
+          t.lines.create!(account: debit_account, direction: "debit", amount_mode: "variable", sequence_index: 2)
+          t.lines.create!(account: credit_account, direction: "credit", amount_mode: "fixed", fixed_amount: 500, sequence_index: 3)
+          t.lines.create!(account: credit_account, direction: "credit", amount_mode: "variable", sequence_index: 4)
         end
       end
 

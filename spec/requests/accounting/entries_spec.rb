@@ -1,9 +1,13 @@
 require "rails_helper"
 
 RSpec.describe "Accounting::Entries" do
-  let(:user) { create(:user, password: "secret123") }
+  let(:cooperative) { create(:cooperative) }
+  let(:user) { create(:user, password: "secret123", cooperative: cooperative) }
+  let(:ledger) { create(:accounting_ledger, cooperative: cooperative) }
+  let(:account) { create(:accounting_account, cooperative: cooperative, ledger: ledger) }
 
   before do
+    Current.cooperative = cooperative
     post session_path, params: { email_address: user.email_address, password: "secret123" }
   end
 
@@ -15,7 +19,6 @@ RSpec.describe "Accounting::Entries" do
   end
 
   describe "POST /accounting/entries" do
-    let(:account) { create(:accounting_account) }
     let(:entry_params) do
       {
         description: "Test entry",
@@ -37,10 +40,9 @@ RSpec.describe "Accounting::Entries" do
       expect(response).to redirect_to(accounting_journal_entry_path(Accounting::Entry.last))
     end
 
-    it "enqueues running balance update job" do
-      expect {
-        post accounting_entries_path, params: { entry: entry_params }
-      }.to have_enqueued_job(Accounting::UpdateRunningBalancesJob)
+    it "updates running balances synchronously" do
+      expect(Accounting::UpdateRunningBalances).to receive(:run!).with(entry: instance_of(Accounting::Entry))
+      post accounting_entries_path, params: { entry: entry_params }
     end
 
     it "re-renders new on failure" do
@@ -50,7 +52,7 @@ RSpec.describe "Accounting::Entries" do
 
     context "with invalid amount_lines" do
       it "handles blank account_id" do
-        params = entry_params.merge(amount_lines_attributes: [{ account_id: "", direction: "debit", amount_cents: "0" }])
+        params = entry_params.merge(amount_lines_attributes: [ { account_id: "", direction: "debit", amount_cents: "0" } ])
         post accounting_entries_path, params: { entry: params }
         expect(response).to have_http_status(:unprocessable_entity)
       end

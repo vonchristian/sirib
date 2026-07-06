@@ -17,7 +17,7 @@ module Accounting
       )
 
       if @entry.save
-        Accounting::UpdateRunningBalancesJob.perform_later(@entry)
+        Accounting::UpdateRunningBalances.run!(entry: @entry)
         redirect_to accounting_journal_entry_path(@entry), notice: "Entry created successfully."
       else
         render :new, status: :unprocessable_entity
