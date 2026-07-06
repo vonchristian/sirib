@@ -23,7 +23,7 @@ module External
     delegate :name, to: :bank, prefix: true
 
     def current_balance_money
-      Money.new(current_balance_cents || 0, currency)
+      Money.new(balance_cents || 0, currency)
     end
 
     def last_transaction
@@ -33,8 +33,7 @@ module External
     def update_balance!
       last_tx = last_transaction
       update!(
-        current_balance: last_tx&.running_balance || 0,
-        current_balance_cents: last_tx&.running_balance_cents || 0,
+        balance_cents: last_tx&.running_balance_cents || 0,
         last_synced_at: Time.current
       )
     end
@@ -86,7 +85,7 @@ module External
 
       raw = account_number_encrypted.to_s
       last4 = raw.last(4)
-      "*" * [raw.length - 4, 0].max + last4
+      "*" * [ raw.length - 4, 0 ].max + last4
     end
   end
 end

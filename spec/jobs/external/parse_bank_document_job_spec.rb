@@ -29,7 +29,7 @@ RSpec.describe External::ParseBankDocumentJob do
 
       it "updates the account balance" do
         described_class.perform_now(document)
-        expect(account.reload.current_balance_cents).to eq(132_000_00)
+        expect(account.reload.balance_cents).to eq(132_000_00)
       end
 
       it "is idempotent on re-run" do
@@ -42,7 +42,7 @@ RSpec.describe External::ParseBankDocumentJob do
 
     context "with invalid CSV" do
       before do
-        document.file.attach(io: StringIO.new(%{"unclosed quote}), filename: "bad.csv", content_type: "text/csv")
+        document.file.attach(io: StringIO.new(%("unclosed quote)), filename: "bad.csv", content_type: "text/csv")
       end
 
       it "marks document as failed" do

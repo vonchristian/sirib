@@ -5,11 +5,9 @@ FactoryBot.define do
     description { "Test transaction" }
     reference_number { "REF-#{SecureRandom.hex(4).upcase}" }
     amount_cents { 1000_00 }
-    amount { 1000.0 }
     amount_currency { "PHP" }
     direction { "credit" }
     running_balance_cents { 1000_00 }
-    running_balance { 1000.0 }
     running_balance_currency { "PHP" }
     hash_signature { SecureRandom.hex(32) }
   end

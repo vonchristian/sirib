@@ -47,11 +47,9 @@ module External
           transaction_date: row[:transaction_date],
           description: row[:description].to_s.strip.truncate(500),
           reference_number: row[:reference_number]&.to_s&.strip&.truncate(100),
-          amount: row[:amount].abs,
           amount_cents: row[:amount_cents].abs,
           amount_currency: account.currency,
           direction: row[:direction],
-          running_balance: row[:running_balance],
           running_balance_cents: row[:running_balance_cents],
           running_balance_currency: account.currency,
           hash_signature: hash_signature
@@ -114,10 +112,10 @@ module External
             end
             rows << row
           else
-            pending_desc = [pending_desc, line].compact.join(" ")
+            pending_desc = [ pending_desc, line ].compact.join(" ")
           end
         else
-          pending_desc = [pending_desc, line].compact.join(" ")
+          pending_desc = [ pending_desc, line ].compact.join(" ")
         end
       end
 

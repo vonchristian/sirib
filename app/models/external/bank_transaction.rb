@@ -11,7 +11,7 @@ module External
     enum :direction, { debit: "debit", credit: "credit" }
 
     validates :transaction_date, presence: true
-    validates :amount, presence: true
+    validates :amount_cents, presence: true
     validates :direction, presence: true
     validates :hash_signature, presence: true, uniqueness: true
 

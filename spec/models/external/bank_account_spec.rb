@@ -44,7 +44,7 @@ RSpec.describe External::BankAccount do
 
   describe "#current_balance_money" do
     it "returns a Money object" do
-      account = build(:external_bank_account, current_balance_cents: 500_00, currency: "PHP")
+      account = build(:external_bank_account, balance_cents: 500_00, currency: "PHP")
 
       expect(account.current_balance_money).to be_a(Money)
       expect(account.current_balance_money.cents).to eq(500_00)
@@ -52,7 +52,7 @@ RSpec.describe External::BankAccount do
     end
 
     it "returns zero when balance is nil" do
-      account = build(:external_bank_account, current_balance_cents: nil)
+      account = build(:external_bank_account, balance_cents: nil)
 
       expect(account.current_balance_money.cents).to eq(0)
     end
@@ -82,15 +82,15 @@ RSpec.describe External::BankAccount do
 
       account.update_balance!
 
-      expect(account.reload.current_balance_cents).to eq(2500_00)
+      expect(account.reload.balance_cents).to eq(2500_00)
     end
 
     it "sets balance to zero when no transactions exist" do
-      account = create(:external_bank_account, current_balance_cents: 1000_00)
+      account = create(:external_bank_account, balance_cents: 1000_00)
 
       account.update_balance!
 
-      expect(account.reload.current_balance_cents).to eq(0)
+      expect(account.reload.balance_cents).to eq(0)
     end
   end
 end

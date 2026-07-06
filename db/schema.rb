@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -381,8 +381,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_000001) do
     t.text "account_number_encrypted"
     t.string "account_type", null: false
     t.string "currency", default: "PHP", null: false
-    t.decimal "current_balance", default: "0.0"
-    t.decimal "current_balance_cents", default: "0.0"
+    t.integer "balance_cents", default: 0, null: false
     t.string "current_balance_currency", default: "PHP", null: false
     t.datetime "last_synced_at"
     t.string "status", default: "active", null: false
@@ -439,12 +438,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_000001) do
     t.date "transaction_date", null: false
     t.text "description", null: false
     t.string "reference_number"
-    t.decimal "amount", null: false
-    t.decimal "amount_cents", null: false
+    t.integer "amount_cents", null: false
     t.string "amount_currency", default: "PHP", null: false
     t.string "direction", null: false
-    t.decimal "running_balance"
-    t.decimal "running_balance_cents"
+    t.integer "running_balance_cents", null: false
     t.string "running_balance_currency", default: "PHP"
     t.string "hash_signature", null: false
     t.jsonb "metadata", default: "{}"
@@ -695,13 +692,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_000001) do
     t.bigint "cooperative_id", null: false
     t.bigint "loan_id", null: false
     t.string "reference_number", null: false
-    t.decimal "amount_cents", null: false
+    t.integer "amount_cents", null: false
     t.string "amount_currency", default: "PHP"
-    t.decimal "principal_cents", default: "0.0", null: false
+    t.integer "principal_cents", default: 0, null: false
     t.string "principal_currency", default: "PHP"
-    t.decimal "interest_cents", default: "0.0", null: false
+    t.integer "interest_cents", default: 0, null: false
     t.string "interest_currency", default: "PHP"
-    t.decimal "penalty_cents", default: "0.0", null: false
+    t.integer "penalty_cents", default: 0, null: false
     t.string "penalty_currency", default: "PHP"
     t.date "payment_date", null: false
     t.bigint "entry_id"
@@ -790,12 +787,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_000001) do
     t.bigint "loan_application_id", null: false
     t.bigint "member_id", null: false
     t.bigint "loan_product_id", null: false
-    t.decimal "principal_cents", null: false
+    t.integer "principal_cents", null: false
     t.string "principal_currency", default: "PHP"
     t.decimal "interest_rate", null: false
     t.string "interest_calculation", null: false
     t.integer "term_months", null: false
-    t.decimal "outstanding_principal_cents", null: false
+    t.integer "outstanding_principal_cents", null: false
     t.string "outstanding_principal_currency", default: "PHP"
     t.string "status", default: "active", null: false
     t.date "disbursed_at"
@@ -1497,7 +1494,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_000001) do
     t.bigint "cooperative_id", null: false
     t.bigint "savings_account_id", null: false
     t.integer "transaction_type", null: false
-    t.decimal "amount_cents", null: false
+    t.integer "amount_cents", null: false
     t.string "amount_currency", default: "PHP", null: false
     t.bigint "cash_account_id", null: false
     t.bigint "entry_id"

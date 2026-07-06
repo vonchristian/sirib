@@ -5,7 +5,7 @@ FactoryBot.define do
     account_number_encrypted { SecureRandom.hex(8) }
     account_type { "checking" }
     currency { "PHP" }
-    current_balance_cents { 0 }
+    balance_cents { 0 }
     status { "active" }
   end
 end
