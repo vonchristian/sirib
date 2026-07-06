@@ -1,0 +1,122 @@
+<%= render "marketing_nav" %>
+
+<section class="relative overflow-hidden landing-border border-b pt-32 pb-24">
+  <div class="landing-grid-bg pointer-events-none absolute inset-0"></div>
+  <div class="relative mx-auto max-w-4xl px-6">
+    <p class="landing-label mb-4">For Tellers</p>
+    <h1 class="landing-hero-title text-4xl font-light tracking-[-0.03em] landing-text sm:text-5xl">
+      Process a transaction once.<br>
+      <span class="landing-accent">Let the system handle the rest.</span>
+    </h1>
+    <p class="mt-4 max-w-2xl text-base leading-relaxed landing-muted">
+      Every transaction your tellers process today — deposit, withdrawal, payment — gets entered 
+      multiple times across different systems. Sirib records it once and updates everything: the 
+      member's passbook, the cash position, the day's totals, and the general ledger.
+    </p>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">The Flow</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">What a teller's transaction looks like</h2>
+    <div class="mt-10 space-y-4">
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">1</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Member walks in</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Teller looks up the member by name, account number, or ID. All member information — savings, loans, share capital — is on one screen.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">2</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Transaction is selected and entered</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Deposit, withdrawal, payment — the teller chooses the type and enters the amount. Sirib validates against account limits, cash position, and member standing before proceeding.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">3</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Passbook prints automatically</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">The updated balance prints on the passbook. No handwriting, no transcription errors. Each line is clear and matches exactly what's in the system.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">4</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Cash position and totals update in real time</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">The teller's cash position adjusts. The day's total for that transaction type increments. The general ledger receives the journal entry. All of this happens as part of the same action — no separate data entry, no end-of-day catch-up.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-7xl px-6 py-16">
+    <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
+      <img src="<%= image_path('screenshots/cash_sessions.png') %>" alt="Teller cash session screen in Sirib" class="w-full">
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">What Gets Automated</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">The tasks Sirib handles so your tellers don't have to</h2>
+    <div class="mt-10 grid gap-px sm:grid-cols-2">
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Passbook printing</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">No more handwriting passbook entries. Each transaction prints clearly — type, amount, running balance — the moment it's recorded.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Cash position tracking</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Every deposit and withdrawal updates cash counts in real time. Teller knows their position without counting. Manager sees totals across all tellers and the vault.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">End-of-day reconciliation</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">One click instead of 30 minutes of counting and cross-referencing. The system compares expected vs actual cash and flags discrepancies immediately.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Vault transfers</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Moving cash between tellers or to the vault is recorded in the system. No paper slips. The audit trail shows every movement and who approved it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">Manual Tasks Offloaded</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">What your tellers won't have to do anymore</h2>
+    <ul class="mt-10 space-y-3 text-sm leading-relaxed landing-muted">
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Writing passbook entries by hand — each line is printed automatically</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Counting cash multiple times a day to verify position — the system tracks it</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Reconciling at end of day manually — one click compares expected vs actual</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Logging transactions in separate books or spreadsheets — one entry updates everything</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Preparing reports for the manager — the dashboard shows real-time numbers</li>
+    </ul>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-3xl px-6 py-24 text-center">
+    <p class="landing-label mb-4">See it in action</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">
+      Your tellers already know how to do their jobs.<br>
+      <span class="landing-accent">Sirib removes the parts they shouldn't have to do twice.</span>
+    </h2>
+    <div class="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <a href="/#demo" class="landing-btn-accent px-8 py-3 text-sm font-semibold tracking-wide uppercase transition-colors">Watch the Walkthrough</a>
+      <a href="/#" class="landing-border-muted border px-8 py-3 text-sm font-medium tracking-wide landing-muted uppercase transition-colors hover:landing-btn-outline">Talk to a Fellow Coop Manager</a>
+    </div>
+  </div>
+</section>
+
+<footer class="landing-bg">
+  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-12 sm:flex-row">
+    <a href="/" class="text-sm font-medium tracking-tight landing-muted transition-colors hover:landing-text">← Back to Sirib</a>
+    <p class="text-xs landing-dim">Built for Philippine cooperatives.</p>
+  </div>
+</footer>

@@ -27,7 +27,6 @@ module Fraud
       when "large_amount" then check_large_amount(rule, transaction)
       when "unusual_frequency" then check_frequency(rule, account)
       when "rapid_transfers" then check_rapid_transfers(rule, account)
-      when "impossible_travel" then check_impossible_travel(rule, user)
       when "dormant_account" then check_dormant_account(rule, account)
       when "night_transactions" then check_night_transactions(rule, transaction)
       when "duplicate_transaction" then check_duplicate(rule, transaction)
@@ -75,25 +74,6 @@ module Fraud
       return [] unless count >= threshold
 
       create_incident(rule, "#{count} rapid transfers in #{window.inspect}", severity: rule.severity)
-    end
-
-    def check_impossible_travel(rule, user)
-      return [] unless user
-      threshold_km = rule.config&.dig("threshold_km") || 100
-
-      recent_sessions = user.sessions.active.where.not(ip_address: nil).order(created_at: :desc).limit(2)
-      return [] unless recent_sessions.size >= 2
-
-      locations = recent_sessions.map { |s| geolocate(s.ip_address) }.compact
-      return [] unless locations.size >= 2
-
-      distance = haversine_distance(locations[0], locations[1])
-      return [] unless distance > threshold_km
-
-      time_diff = (recent_sessions[0].created_at - recent_sessions[1].created_at).abs
-      return [] unless time_diff < 1.hour
-
-      create_incident(rule, "Impossible travel: #{distance.round}km in #{time_diff.round}s", severity: rule.severity)
     end
 
     def check_dormant_account(rule, account)
@@ -171,16 +151,6 @@ module Fraud
         description: description,
         severity: severity
       } ]
-    end
-
-    def geolocate(ip)
-      return nil if ip.blank? || ip == "127.0.0.1" || ip == "::1"
-
-      nil
-    end
-
-    def haversine_distance(loc1, loc2)
-      0
     end
   end
 end

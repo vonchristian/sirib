@@ -1,0 +1,124 @@
+<%= render "marketing_nav" %>
+
+<section class="relative overflow-hidden landing-border border-b pt-32 pb-24">
+  <div class="landing-grid-bg pointer-events-none absolute inset-0"></div>
+  <div class="relative mx-auto max-w-4xl px-6">
+    <p class="landing-label mb-4">For Compliance</p>
+    <h1 class="landing-hero-title text-4xl font-light tracking-[-0.03em] landing-text sm:text-5xl">
+      Every peso is traceable.<br>
+      <span class="landing-accent">From member entry to financial statement.</span>
+    </h1>
+    <p class="mt-4 max-w-2xl text-base leading-relaxed landing-muted">
+      Regulators don't accept explanations. They expect evidence — that every transaction was 
+      properly authorised, that every peso is accounted for, that reports are built from verified 
+      data. Sirib creates a complete audit trail for every entry, makes regulatory reports 
+      available from your own data, and keeps the original record intact even when corrections 
+      are needed.
+    </p>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">The Flow</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">How compliance becomes a byproduct of good operations</h2>
+    <div class="mt-10 space-y-4">
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">1</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Transaction is recorded with its full context</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Who processed it, who authorised it, what time, what member, what account — every transaction carries its complete metadata. Nothing is ever deleted, only appended.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">2</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Audit trail is created automatically</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Every change — from creating a member record to posting a correction — is logged with who did it and when. The audit trail is complete and chronological by default.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">3</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Correction entries preserve the original</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">When an error needs correction, Sirib uses reversing or corrective entries — the original transaction stays in the record. This follows proper accounting practice and satisfies audit requirements.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">4</span>
+        <div>
+          <p class="text-sm font-medium landing-text">BSP reports from verified data</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Regulatory templates are pre-configured with the correct account mappings. Reports are populated from the same data your finance team uses. When an examiner asks for numbers, you produce them from the system, not from a manual compilation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-7xl px-6 py-16">
+    <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
+      <img src="<%= image_path('screenshots/journal_entries.png') %>" alt="Journal entries audit trail in Sirib" class="w-full">
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">What Gets Automated</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">The compliance work Sirib handles automatically</h2>
+    <div class="mt-10 grid gap-px sm:grid-cols-2">
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Complete audit trail</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Every transaction, every change, every access is logged. Trace any entry from a member's passbook to the general ledger to the financial statement.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">BSP report templates</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Pre-configured with your chart of accounts mapping. Reports are populated from the ledger — no manual extraction, no format adjustments.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Real-time anomaly alerts</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Unusual transaction patterns, amounts, or frequencies trigger alerts. Compliance is notified while the activity is current, not weeks later during a review.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Correction integrity</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Corrections never overwrite original entries. Reversing entries maintain the complete record. Auditors can see both what happened and what was corrected.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">Manual Tasks Offloaded</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">What compliance won't have to do anymore</h2>
+    <ul class="mt-10 space-y-3 text-sm leading-relaxed landing-muted">
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Reconstructing audit trails from paper records — automatically logged for every transaction</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Manually extracting data for BSP reports — pre-configured templates populate from the ledger</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Tracing individual entries across different systems — everything is in one system</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Preparing for audits by gathering evidence — the audit trail is complete and always available</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Reviewing corrections that overwrite original data — corrections are additive, not destructive</li>
+    </ul>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-3xl px-6 py-24 text-center">
+    <p class="landing-label mb-4">See it in action</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">
+      Your cooperative already follows the rules.<br>
+      <span class="landing-accent">Sirib makes sure the evidence is there without extra effort.</span>
+    </h2>
+    <div class="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <a href="/#demo" class="landing-btn-accent px-8 py-3 text-sm font-semibold tracking-wide uppercase transition-colors">Watch the Walkthrough</a>
+      <a href="/#" class="landing-border-muted border px-8 py-3 text-sm font-medium tracking-wide landing-muted uppercase transition-colors hover:landing-btn-outline">Talk to a Fellow Coop Manager</a>
+    </div>
+  </div>
+</section>
+
+<footer class="landing-bg">
+  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-12 sm:flex-row">
+    <a href="/" class="text-sm font-medium tracking-tight landing-muted transition-colors hover:landing-text">← Back to Sirib</a>
+    <p class="text-xs landing-dim">Built for Philippine cooperatives.</p>
+  </div>
+</footer>

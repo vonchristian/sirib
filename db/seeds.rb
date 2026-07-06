@@ -21,7 +21,12 @@ unless Rails.env.test?
 end
 
 unless Rails.env.test?
-  puts "\nPhase 5: Year-long audit trail"
+  puts "\nPhase 5: Sales demo comprehensive data"
+  require_relative "seeds/sales_demo"
+end
+
+unless Rails.env.test?
+  puts "\nPhase 6: Year-long audit trail"
   require_relative "seeds/audit_trail"
   run_year_long_audit_trail
 end

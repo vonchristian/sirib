@@ -76,12 +76,12 @@ module Equity
       )
     end
 
-    def next_account_code(ledger)
-      max = ledger.accounts.pluck(:account_code).map(&:to_i).max
+    def next_account_code(_ledger)
+      max = Accounting::Account.where(cooperative_id: cooperative_id).pluck(:account_code).map(&:to_i).max
       if max
         format("%05d", max + 1)
       else
-        "#{ledger.account_code}001"
+        "00100"
       end
     end
   end

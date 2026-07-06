@@ -69,7 +69,7 @@ module Treasury
     def assign_accounts_from_product
       return unless savings_product
 
-      if savings_product.liability_ledger
+      if savings_product.liability_ledger && liability_account.blank?
         self.liability_account = savings_product.liability_ledger.accounts.create(
           name: "#{savings_product.name} Savings - #{depositor_name}",
           account_type: :liability,
@@ -99,14 +99,13 @@ module Treasury
     end
 
     def next_account_code(ledger)
-      codes = ledger.accounts.where(cooperative_id: cooperative_id).pluck(:account_code)
-      max = codes.map(&:to_i).max
+      all_codes = Accounting::Account.where(cooperative_id: cooperative_id).pluck(:account_code)
+      max = all_codes.map(&:to_i).max
       result = if max
         format("%05d", max + 1)
       else
         "#{ledger.account_code}001"
       end
-      Rails.logger.debug "[SavingsAccount] next_account_code ledger=#{ledger.account_code} existing=#{codes.inspect} result=#{result}"
       result
     end
   end

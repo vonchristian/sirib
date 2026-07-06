@@ -34,14 +34,23 @@ module Banking
           )
         end
 
-        validate_balanced!(entry)
+        Accounting::ValidationEngine.validate!(entry)
         entry.update!(status: "posted")
-        record_audit(entry, lines)
       end
 
-      broadcast_entry(entry)
+      Management::AuditLogService.run!(
+        action: "ledger_entry_posted",
+        auditable: entry,
+        actor: Current.user,
+        metadata: {
+          description: entry.description,
+          line_count: lines.size,
+          total: lines.sum { |l| l[:amount_cents] }
+        }
+      )
+      BroadcastService.entry_posted(entry)
       Result.new(success?: true, entry: entry)
-    rescue ActiveRecord::RecordInvalid => e
+    rescue ActiveRecord::RecordInvalid, Accounting::ValidationEngine::ValidationError => e
       Result.new(success?: false, errors: [ e.message ])
     end
 
@@ -51,46 +60,6 @@ module Banking
       { account: account.name, balance: balance, as_of: as_of }
     rescue StandardError => e
       Result.new(success?: false, errors: [ e.message ])
-    end
-
-    private
-
-    def validate_balanced!(entry)
-      total_debits = entry.amount_lines.where(side: "debit").sum(:amount_cents)
-      total_credits = entry.amount_lines.where(side: "credit").sum(:amount_cents)
-
-      unless total_debits == total_credits
-        raise ActiveRecord::RecordInvalid.new(entry),
-              "Unbalanced entry: debits (#{total_debits}) != credits (#{total_credits})"
-      end
-    end
-
-    def record_audit(entry, lines)
-      return unless defined?(Management::AuditLogService)
-
-      Management::AuditLogService.log(
-        action: "ledger_entry_posted",
-        auditable: entry,
-        user: Current.user,
-        details: {
-          description: entry.description,
-          line_count: lines.size,
-          total: lines.sum { |l| l[:amount_cents] }
-        }
-      )
-    rescue StandardError => e
-      Rails.logger.warn("Audit log failed: #{e.message}")
-    end
-
-    def broadcast_entry(entry)
-      Turbo::StreamsChannel.broadcast_replace_to(
-        "shell_ledger",
-        target: "ledger_entries",
-        partial: "shell/ledger/entry",
-        locals: { entry: entry }
-      )
-    rescue StandardError
-      nil
     end
   end
 end

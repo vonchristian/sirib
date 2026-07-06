@@ -21,85 +21,71 @@ module Banking
     end
 
     def debit(amount:, from_account:, to_account:, cash_session:, description: nil, idempotency_key: nil)
-      if idempotency_key
-        cached = find_idempotent_result(idempotency_key, amount, from_account, to_account, "debit", description, cash_session)
-        return cached if cached
-      end
-
-      return Result.new(success?: false, errors: [ "Cash session must be open" ]) unless cash_session&.open?
-      return Result.new(success?: false, errors: [ "Insufficient balance" ]) unless sufficient_balance?(from_account, amount)
-
-      transaction = nil
-      entry = nil
-      ActiveRecord::Base.transaction do
-        entry = Accounting::Entry.build(
-          posted_at: Date.current.beginning_of_day,
-          description: description || "Debit transfer",
-          reference_number: "D-#{SecureRandom.uuid}",
-          debits: [ { account: from_account, amount: amount.cents } ],
-          credits: [ { account: to_account, amount: amount.cents } ]
-        )
-        entry.save!
-
-        transaction = build_transaction_from_entry(entry, amount, from_account, to_account, "debit", description, cash_session)
-
-        record_audit(transaction)
-        record_idempotency!(idempotency_key, entry) if idempotency_key
-      end
-
-      broadcast_transaction(transaction)
-      Result.new(success?: true, transaction: transaction)
-    rescue ActiveRecord::RecordInvalid => e
-      Result.new(success?: false, errors: [ e.message ])
+      post_line(
+        type: :debit, amount: amount, cash_session: cash_session,
+        description: description, idempotency_key: idempotency_key,
+        from_account: from_account, to_account: to_account
+      )
     end
 
     def credit(amount:, to_account:, cash_session:, from_account: nil, description: nil, idempotency_key: nil)
-      if idempotency_key
-        cached = find_idempotent_result(idempotency_key, amount, from_account, to_account, "credit", description, cash_session)
-        return cached if cached
-      end
-
-      return Result.new(success?: false, errors: [ "Cash session must be open" ]) unless cash_session&.open?
-
-      source = from_account
-      transaction = nil
-      entry = nil
-      ActiveRecord::Base.transaction do
-        entry = Accounting::Entry.build(
-          posted_at: Date.current.beginning_of_day,
-          description: description || "Credit transaction",
-          reference_number: "C-#{SecureRandom.uuid}",
-          debits: [ { account: source, amount: amount.cents } ],
-          credits: [ { account: to_account, amount: amount.cents } ]
-        )
-        entry.save!
-
-        transaction = build_transaction_from_entry(entry, amount, nil, to_account, "credit", description, cash_session)
-
-        record_audit(transaction)
-        record_idempotency!(idempotency_key, entry) if idempotency_key
-      end
-
-      broadcast_transaction(transaction)
-      Result.new(success?: true, transaction: transaction)
-    rescue ActiveRecord::RecordInvalid => e
-      Result.new(success?: false, errors: [ e.message ])
+      post_line(
+        type: :credit, amount: amount, cash_session: cash_session,
+        description: description, idempotency_key: idempotency_key,
+        from_account: from_account, to_account: to_account
+      )
     end
 
     private
 
+    def post_line(type:, amount:, cash_session:, description:, idempotency_key:, **extras)
+      return Result.new(success?: false, errors: [ "Cash session must be open" ]) unless cash_session&.open?
+
+      if type == :debit
+        return Result.new(success?: false, errors: [ "Insufficient balance" ]) unless sufficient_balance?(extras[:from_account], amount)
+      end
+
+      description ||= "#{type.capitalize} transaction"
+      entry = with_idempotency(key: idempotency_key) do
+        ActiveRecord::Base.transaction do
+          lock_accounts(extras[:from_account], extras[:to_account])
+
+          ref_prefix = type == :debit ? "D" : "C"
+
+          entry = Accounting::Entry.build(
+            posted_at: Date.current.beginning_of_day,
+            description: description,
+            reference_number: "#{ref_prefix}-#{SecureRandom.uuid}",
+            debits: [ { account: extras[:from_account] || extras[:to_account], amount: amount.cents } ],
+            credits: [ { account: extras[:to_account], amount: amount.cents } ]
+          )
+          entry.save!
+          entry
+        end
+      end
+
+      result = build_transaction_from_entry(entry, amount, extras[:from_account], extras[:to_account], type.to_s, description, cash_session)
+      Management::AuditLogService.run!(
+        action: "#{type}_posted",
+        auditable: entry,
+        actor: Current.user,
+        metadata: { type: type.to_s, amount: amount.to_s, description: description }
+      )
+      BroadcastService.transaction_posted(result)
+      Result.new(success?: true, transaction: result)
+    rescue ActiveRecord::RecordInvalid => e
+      Result.new(success?: false, errors: [ e.message ])
+    end
+
     def sufficient_balance?(account, amount)
+      return false unless account
+
       account.balance >= amount
     end
 
-    def find_idempotent_result(key, amount, from_account, to_account, type, description, cash_session)
-      existing = IdempotencyKey.active.find_by(key: key, cooperative_id: Current.cooperative&.id)
-      return nil unless existing&.resource
-
-      Result.new(
-        success?: true,
-        transaction: build_transaction_from_entry(existing.resource, amount, from_account, to_account, type, description, cash_session)
-      )
+    def lock_accounts(*accounts)
+      ids = accounts.flatten.compact.map(&:id)
+      Accounting::Account.lock("FOR UPDATE").where(id: ids).load if ids.any?
     end
 
     def build_transaction_from_entry(entry, amount, from_account, to_account, type, description, cash_session)
@@ -114,43 +100,6 @@ module Banking
         cash_session_id: cash_session&.id,
         created_at: entry.created_at
       )
-    end
-
-    def record_idempotency!(key, resource)
-      idem_key = IdempotencyKey.find_or_initialize_by(key: key, cooperative: Current.cooperative)
-      idem_key.update!(
-        service: self.class.name,
-        resource: resource,
-        expires_at: 24.hours.from_now
-      )
-    end
-
-    def record_audit(transaction)
-      return unless defined?(Management::AuditLogService)
-
-      Management::AuditLogService.log(
-        action: "transaction_created",
-        auditable: transaction,
-        user: Current.user,
-        details: {
-          type: transaction.type,
-          amount: transaction.amount.to_s,
-          description: transaction.description
-        }
-      )
-    rescue StandardError => e
-      Rails.logger.warn("Audit log failed: #{e.message}")
-    end
-
-    def broadcast_transaction(transaction)
-      Turbo::StreamsChannel.broadcast_replace_to(
-        "shell_transactions",
-        target: "recent_transactions",
-        partial: "shell/transactions/recent",
-        locals: { transactions: [ transaction ] }
-      )
-    rescue StandardError
-      nil
     end
   end
 end

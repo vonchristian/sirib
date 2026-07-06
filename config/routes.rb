@@ -2,7 +2,13 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   get "health" => "health#show", as: :health_check
 
-  root "dashboard#index"
+  root "home#landing"
+
+  # Marketing pages
+  get "tellers", to: "home#tellers"
+  get "loan-officers", to: "home#loan_officers"
+  get "finance", to: "home#finance"
+  get "compliance", to: "home#compliance"
 
   # Member Portal — prefixed with /portal
   scope :portal, module: :portal, as: :portal do

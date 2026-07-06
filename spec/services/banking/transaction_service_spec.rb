@@ -5,6 +5,7 @@ RSpec.describe Banking::TransactionService do
 
   before do
     allow(Current).to receive(:cooperative).and_return(cooperative)
+    allow(BroadcastService).to receive(:transaction_posted)
   end
 
   describe ".debit" do

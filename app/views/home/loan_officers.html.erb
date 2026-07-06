@@ -1,0 +1,123 @@
+<%= render "marketing_nav" %>
+
+<section class="relative overflow-hidden landing-border border-b pt-32 pb-24">
+  <div class="landing-grid-bg pointer-events-none absolute inset-0"></div>
+  <div class="relative mx-auto max-w-4xl px-6">
+    <p class="landing-label mb-4">For Loan Officers</p>
+    <h1 class="landing-hero-title text-4xl font-light tracking-[-0.03em] landing-text sm:text-5xl">
+      One profile. Every detail.<br>
+      <span class="landing-accent">No more jumping between systems.</span>
+    </h1>
+    <p class="mt-4 max-w-2xl text-base leading-relaxed landing-muted">
+      Your loan officers know their members. But the tools force them to check the loan system, 
+      then the savings system, then the paper file — just to answer a simple question. Sirib 
+      shows everything about a member in one place, and handles the calculations so your loan 
+      officers can focus on making good lending decisions.
+    </p>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">The Flow</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">From application to collection in one system</h2>
+    <div class="mt-10 space-y-4">
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">1</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Member profile shows the full picture</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Savings balances, existing loans, payment history, share capital — all on one screen. The loan officer sees the member's complete relationship with the coop before making any decision.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">2</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Application is created and evaluated</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Loan product is selected, amount entered, terms set. Sirib checks eligibility against policy — member standing, existing exposure, collateral requirements — and flags any issues before submission.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">3</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Disbursement generates the amortisation schedule</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">When a loan is disbursed, the payment schedule is created automatically. Principal, interest, due dates — every instalment is calculated and recorded. No Excel, no manual setup.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">4</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Collection posts and updates the schedule</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">When a member pays, the loan officer posts it in one step. Principal, interest, and remaining balance update automatically. The amortisation schedule reflects the payment immediately.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-7xl px-6 py-16">
+    <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
+      <img src="<%= image_path('screenshots/member_detail.png') %>" alt="Member profile showing savings, loans, and payment history" class="w-full">
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">What Gets Automated</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">The repetitive work Sirib handles</h2>
+    <div class="mt-10 grid gap-px sm:grid-cols-2">
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Amortisation schedule generation</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">On disbursement, the full payment schedule is calculated and stored. Principal amortisation, interest, due dates — every instalment is ready for collection.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Collection posting</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">One entry posts principal, interest, and updates the loan balance. No separate calculations, no double entry. The amortisation schedule reflects the payment immediately.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Loan restructuring</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">When a member needs modified terms, the system calculates the new schedule based on remaining balance and revised terms. No manual rebuild, no spreadsheet errors.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Portfolio-at-risk reports</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Current PAR by ageing bucket, available on demand. No data gathering across systems, no Excel consolidation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">Manual Tasks Offloaded</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">What your loan officers won't have to do anymore</h2>
+    <ul class="mt-10 space-y-3 text-sm leading-relaxed landing-muted">
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Checking multiple systems to answer a member's question — one profile shows everything</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Building amortisation schedules in Excel — generated automatically on disbursement</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Manually computing principal and interest for each collection — posted in one step</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Rebuilding schedules manually for restructured loans — recalculated from remaining balance</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Compiling PAR data across spreadsheets — available as a real-time report</li>
+    </ul>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-3xl px-6 py-24 text-center">
+    <p class="landing-label mb-4">See it in action</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">
+      Your loan officers already know their members.<br>
+      <span class="landing-accent">Sirib makes sure they have the full picture at their fingertips.</span>
+    </h2>
+    <div class="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <a href="/#demo" class="landing-btn-accent px-8 py-3 text-sm font-semibold tracking-wide uppercase transition-colors">Watch the Walkthrough</a>
+      <a href="/#" class="landing-border-muted border px-8 py-3 text-sm font-medium tracking-wide landing-muted uppercase transition-colors hover:landing-btn-outline">Talk to a Fellow Coop Manager</a>
+    </div>
+  </div>
+</section>
+
+<footer class="landing-bg">
+  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-12 sm:flex-row">
+    <a href="/" class="text-sm font-medium tracking-tight landing-muted transition-colors hover:landing-text">← Back to Sirib</a>
+    <p class="text-xs landing-dim">Built for Philippine cooperatives.</p>
+  </div>
+</footer>

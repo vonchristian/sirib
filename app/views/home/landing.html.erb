@@ -1,0 +1,279 @@
+<%= render "marketing_nav" %>
+
+<%# Hero %>
+<section class="relative flex min-h-[90vh] items-center overflow-hidden landing-border border-b pt-20">
+  <div class="landing-grid-bg pointer-events-none absolute inset-0"></div>
+  <div class="relative mx-auto max-w-7xl px-6">
+    <div class="max-w-4xl">
+      <p class="landing-label mb-4">For Philippine Cooperatives</p>
+      <h1 class="landing-hero-title text-5xl font-light leading-none tracking-[-0.04em] landing-text sm:text-6xl lg:text-7xl">
+        Cooperative banking<br>
+        <span class="landing-accent">without the busywork.</span>
+      </h1>
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed landing-muted">
+        Sirib handles the repetition so your tellers, loan officers, and finance team can focus 
+        on the people they serve. One system for member accounts, loans, savings, cash sessions, 
+        and financial reporting — with zero data re-entry.
+      </p>
+      <div class="mt-10 flex items-center gap-4">
+        <a href="#features" class="landing-btn-accent px-8 py-3 text-sm font-semibold tracking-wide uppercase transition-colors">See What It Does</a>
+        <a href="<%= new_session_path %>" class="landing-border-muted border px-8 py-3 text-sm font-medium tracking-wide landing-muted uppercase transition-colors hover:landing-btn-outline">Sign In</a>
+      </div>
+    </div>
+
+    <div class="mt-20 grid grid-cols-1 gap-px landing-border border-t pt-8 sm:grid-cols-3">
+      <div class="py-4">
+        <p class="font-mono text-2xl font-light landing-text">8,000+</p>
+        <p class="mt-1 text-sm landing-hero-stat-label">members served daily on Sirib</p>
+      </div>
+      <div class="py-4">
+        <p class="font-mono text-2xl font-light landing-text">48 hrs</p>
+        <p class="mt-1 text-sm landing-hero-stat-label">from sign-up to first transaction</p>
+      </div>
+      <div class="py-4">
+        <p class="font-mono text-2xl font-light landing-text">100%</p>
+        <p class="mt-1 text-sm landing-hero-stat-label">of coops that started stayed</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# Automate the work nobody wants to do %>
+<section class="landing-border border-b" id="features">
+  <div class="mx-auto max-w-7xl px-6 py-32">
+    <div class="mx-auto max-w-3xl">
+      <p class="landing-label mb-4">Everything You Need, Nothing You Don't</p>
+      <h2 class="text-3xl font-light tracking-[-0.03em] landing-text sm:text-4xl">
+        Automate the work <span class="landing-accent">nobody wants to do.</span>
+      </h2>
+    </div>
+    <div class="mt-16 grid gap-px sm:grid-cols-2">
+      <div class="landing-card border p-10">
+        <p class="text-base font-medium landing-text">Transactions post automatically.</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Deposits, withdrawals, loan payments — process once, and every related account updates. Cash position, member balance, journal entries, and daily totals all reflect the same transaction. No duplicate entry, no reconciliation chase.</p>
+      </div>
+      <div class="landing-card border p-10">
+        <p class="text-base font-medium landing-text">Cash sessions that close in one click.</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Tellers start their shift, process transactions, and end the day with a button. The system counts, compares, and flags discrepancies. What used to take 45 minutes of manual counting takes seconds.</p>
+      </div>
+      <div class="landing-card border p-10">
+        <p class="text-base font-medium landing-text">Member profiles that tell the full story.</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Savings accounts, loan history, share capital, transaction log — all on one screen. Loan officers see the complete picture before the member finishes explaining their situation.</p>
+      </div>
+      <div class="landing-card border p-10">
+        <p class="text-base font-medium landing-text">Reports that write themselves.</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Trial balance is always current. Financial statements, BSP compliance reports, and dashboards draw from the same data. Month-end is a day of review, not two weeks of matching spreadsheets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# One source of truth %>
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-7xl px-6 py-32">
+    <div class="mx-auto max-w-3xl">
+      <p class="landing-label mb-4">One Source of Truth</p>
+      <h2 class="text-3xl font-light tracking-[-0.03em] landing-text sm:text-4xl">
+        Every department posts to <span class="landing-accent">the same system.</span>
+      </h2>
+      <p class="mt-6 text-lg leading-relaxed landing-muted">
+        No more teller logbooks that don't match the loan officer's spreadsheet that doesn't 
+        match finance's reconciliation. When one person enters data, everyone works with the 
+        same numbers — in real time.
+      </p>
+    </div>
+    <div class="mt-12 grid gap-px sm:grid-cols-2 lg:grid-cols-4">
+      <div class="landing-card border p-8">
+        <p class="text-sm font-medium landing-text">For tellers</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Process once. Cash, passbook, and journal update together. End-of-day is a button.</p>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-sm font-medium landing-text">For loan officers</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Full member profile. Automated amortisation. Payment posts everywhere at once.</p>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-sm font-medium landing-text">For finance</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Trial balance on demand. BSP reports from the same data. Close in days, not weeks.</p>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-sm font-medium landing-text">For compliance</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Audit trails that track every change. Cash positions you can trust without recounting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# App Screenshots %>
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-7xl px-6 py-32">
+    <p class="landing-label mb-4">What It Looks Like</p>
+    <h2 class="text-3xl font-light tracking-[-0.03em] landing-text sm:text-4xl">
+      The same workflows,<br class="hidden sm:block">
+      <span class="landing-accent">without the repetitive work.</span>
+    </h2>
+    <div class="mt-12 space-y-8">
+      <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
+        <img src="<%= image_path('screenshots/dashboard.png') %>" alt="Sirib dashboard showing cooperative financial overview" class="w-full">
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
+          <img src="<%= image_path('screenshots/members.png') %>" alt="Member management screen" class="w-full">
+        </div>
+        <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
+          <img src="<%= image_path('screenshots/cash_sessions.png') %>" alt="Teller cash session screen" class="w-full">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# How the transition works %>
+<section class="landing-border border-b landing-bg-alt" id="how">
+  <div class="mx-auto max-w-7xl px-6 py-32">
+    <div class="mx-auto max-w-3xl text-center">
+      <p class="landing-label mb-4">How the Transition Works</p>
+      <h2 class="text-3xl font-light tracking-[-0.03em] landing-text sm:text-4xl">
+        Up and running in days, not months.<br>
+        <span class="landing-accent">Your old system stays open until you're ready.</span>
+      </h2>
+    </div>
+    <div class="mt-16 space-y-4">
+      <div class="landing-card border p-8 flex items-start gap-6">
+        <span class="font-mono text-2xl font-light landing-accent shrink-0 leading-none">1</span>
+        <div>
+          <p class="text-lg font-medium landing-text">We watch how your coop works today</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">We spend time with your tellers, loan officers, and finance team to understand their daily rhythm. No judgement, no assumptions — just learning what they do and what slows them down.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-8 flex items-start gap-6">
+        <span class="font-mono text-2xl font-light landing-accent shrink-0 leading-none">2</span>
+        <div>
+          <p class="text-lg font-medium landing-text">Your staff uses both side by side</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Member records and account data are loaded into Sirib. Your team processes transactions in the new tool while keeping their familiar system as backup. There's no pressure to switch — just curiosity.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-8 flex items-start gap-6">
+        <span class="font-mono text-2xl font-light landing-accent shrink-0 leading-none">3</span>
+        <div>
+          <p class="text-lg font-medium landing-text">Your team decides when to make it official</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Every day during parallel use, numbers are compared. When your finance team is confident everything matches, you pick the day. Some coops switch after a week. Some take two.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-8 flex items-start gap-6">
+        <span class="font-mono text-2xl font-light landing-accent shrink-0 leading-none">4</span>
+        <div>
+          <p class="text-lg font-medium landing-text">Help is there when you need it</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">On-site or video support during your first week fully on Sirib. After that, chat support during all operating hours. Most coops find their team is self-sufficient by day three.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# Testimonials %>
+<section id="stories" class="landing-border border-b">
+  <div class="mx-auto max-w-7xl px-6 py-32">
+    <p class="landing-label mb-4">From Coops That Made the Move</p>
+    <h2 class="text-3xl font-light tracking-[-0.03em] landing-text sm:text-4xl">
+      What cooperative leaders<span class="landing-accent"> are saying</span>
+    </h2>
+    <div class="mt-16 grid gap-px sm:grid-cols-2 lg:grid-cols-3">
+      <div class="landing-card border p-8">
+        <p class="text-sm leading-relaxed landing-muted">"Our tellers had been handwriting passbooks for decades. They were the most skeptical when we started. By day two, they were showing me how end-of-day used to take 45 minutes of counting — now it's done before the last member leaves."</p>
+        <div class="mt-6 landing-border border-t pt-4">
+          <p class="text-sm font-medium landing-text">General Manager</p>
+          <p class="text-xs landing-dim">Luzon Cooperative</p>
+        </div>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-sm leading-relaxed landing-muted">"Our loan officer kept everything in ring binders — not because she was disorganised, but because the systems she had didn't talk to each other. When she saw a member's complete profile appear on one screen, she said it felt like getting an assistant."</p>
+        <div class="mt-6 landing-border border-t pt-4">
+          <p class="text-sm font-medium landing-text">Operations Manager</p>
+          <p class="text-xs landing-dim">Visayas Cooperative</p>
+        </div>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-sm leading-relaxed landing-muted">"I spent three years trying to get board approval. Every vendor wanted a long commitment and a price tag that scared everyone. Sirib was running alongside our old setup in a weekend. The board saw the difference — and our team never felt forced."</p>
+        <div class="mt-6 landing-border border-t pt-4">
+          <p class="text-sm font-medium landing-text">Treasurer</p>
+          <p class="text-xs landing-dim">Mindanao Cooperative</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# FAQs %>
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-3xl px-6 py-32">
+    <p class="landing-label mb-4">Questions You Might Have</p>
+    <h2 class="text-3xl font-light tracking-[-0.03em] landing-text sm:text-4xl">
+      FAQs
+    </h2>
+    <div class="mt-12 space-y-6">
+      <div class="landing-card border p-8">
+        <p class="text-base font-medium landing-text">Will my staff have time to learn this?</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Most coops find their team is faster on Sirib within two days. It mirrors the way they already work — just without the repetition. During parallel use, there's zero pressure; staff can switch back anytime.</p>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-base font-medium landing-text">What if my older staff struggles with the technology?</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Sirib is used daily by tellers who've spent 20 years handwriting passbooks. The interface is built for people who aren't tech enthusiasts — clear labels, few clicks, no jargon. On-site support is available during your first week.</p>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-base font-medium landing-text">How long does implementation take?</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Member records and chart of accounts can be loaded over a weekend. Most coops are running side by side with their old system within 48 hours of deciding to start.</p>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-base font-medium landing-text">What if we lose data or have downtime?</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Your old tools stay available during the transition. We only move fully when your team confirms they're comfortable. No forced cutover dates. And Sirib runs on secure cloud infrastructure with automatic backups.</p>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-base font-medium landing-text">Is Sirib compliant with BSP regulations?</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Yes. Sirib generates reports aligned with BSP reporting requirements, maintains full audit trails on every transaction, and supports the chart of accounts structure cooperatives need for regulatory filings.</p>
+      </div>
+      <div class="landing-card border p-8">
+        <p class="text-base font-medium landing-text">Can we keep our existing account numbering?</p>
+        <p class="mt-2 text-sm leading-relaxed landing-muted">Absolutely. Sirib imports your existing member IDs, account numbers, and loan reference numbers. Members see no change — their account is the same, their passbook prints the same way.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# CTA %>
+<section id="demo" class="landing-border border-b">
+  <div class="mx-auto max-w-3xl px-6 py-32 text-center">
+    <p class="landing-label mb-4">No Pitch. Just Proof.</p>
+    <h2 class="text-3xl font-light tracking-[-0.03em] landing-text sm:text-4xl">
+      See the tools your team would use every day.<br>
+      <span class="landing-accent">Then talk to a coop manager who's already there.</span>
+    </h2>
+    <p class="mx-auto mt-4 max-w-lg landing-muted">
+      A 3-minute walkthrough of how Sirib helps tellers, loan officers, and finance teams 
+      do their best work. Then we'll connect you with a cooperative manager who made the 
+      move — ask them how their team adapted, what surprised them, and whether they'd go back.
+    </p>
+    <div class="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <a href="#" class="landing-btn-accent px-10 py-4 text-sm font-semibold tracking-wide uppercase transition-colors">Watch the Walkthrough</a>
+      <a href="#" class="landing-border-muted border px-10 py-4 text-sm font-medium tracking-wide landing-muted uppercase transition-colors hover:landing-btn-outline">Talk to a Fellow Coop Manager</a>
+    </div>
+    <p class="mt-6 text-xs landing-dim">
+      Already with Sirib? <a href="<%= new_session_path %>" class="landing-muted underline transition-colors hover:landing-text">Sign in</a>
+    </p>
+  </div>
+</section>
+
+<%# Footer %>
+<footer class="landing-bg">
+  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-12 sm:flex-row">
+    <div class="flex items-center gap-2">
+      <span class="text-sm font-medium tracking-tight landing-muted">Sirib</span>
+    </div>
+    <div class="flex items-center gap-6 text-xs landing-dim">
+      <a href="/tellers" class="transition-colors hover:landing-muted">For Tellers</a>
+      <a href="/loan-officers" class="transition-colors hover:landing-muted">For Loan Officers</a>
+      <a href="/finance" class="transition-colors hover:landing-muted">For Finance</a>
+      <a href="/compliance" class="transition-colors hover:landing-muted">For Compliance</a>
+    </div>
+    <p class="text-xs landing-dim">Built for Philippine cooperatives.</p>
+  </div>
+</footer>

@@ -1,0 +1,39 @@
+<nav class="fixed top-0 left-0 right-0 z-50 landing-border border-b landing-nav-bg backdrop-blur-sm">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+    <div class="flex items-center gap-3">
+      <a href="/" class="text-lg font-semibold tracking-tight landing-text transition-opacity hover:opacity-80">Sirib</a>
+    </div>
+    <div class="flex items-center gap-0">
+      <div class="group relative" data-controller="nav-dropdown">
+        <button data-action="nav-dropdown#toggle" class="flex items-center gap-1 px-4 py-2 text-sm landing-nav-link transition-colors">
+          For Staff
+          <svg class="landing-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="landing-nav-dropdown" style="width:18rem;left:0;translate:0;">
+          <a href="/tellers" class="landing-dd-item">
+            <p class="text-sm font-medium landing-text">For Tellers</p>
+            <p class="text-xs landing-dim">Process transactions once. Cash tracked automatically.</p>
+          </a>
+          <a href="/loan-officers" class="landing-dd-item">
+            <p class="text-sm font-medium landing-text">For Loan Officers</p>
+            <p class="text-xs landing-dim">Member profiles, disbursement, collections — all in one place.</p>
+          </a>
+          <a href="/finance" class="landing-dd-item">
+            <p class="text-sm font-medium landing-text">For Finance</p>
+            <p class="text-xs landing-dim">Real-time trial balance. Automated journal entries.</p>
+          </a>
+          <a href="/compliance" class="landing-dd-item">
+            <p class="text-sm font-medium landing-text">For Compliance</p>
+            <p class="text-xs landing-dim">Complete audit trail. BSP reports from verified data.</p>
+          </a>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 ml-6">
+        <a href="#stories" class="text-sm landing-nav-link transition-colors">Stories</a>
+        <a href="#demo" class="landing-border-accent border px-5 py-2 text-sm font-medium landing-accent transition-colors hover:landing-btn-accent">Watch Overview</a>
+        <a href="#demo" class="landing-btn-accent px-5 py-2 text-sm font-medium transition-colors">Book a Call</a>
+      </div>
+    </div>
+  </div>
+</nav>

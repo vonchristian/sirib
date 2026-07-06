@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html style="--color-landing-bg:#faf9f7;--color-landing-alt:#f5f3ef;--color-landing-text:#1c1917;--color-landing-muted:#78716c;--color-landing-dim:#a8a29e;--color-landing-accent:#b45309;--color-landing-accent-hover:#a04006;--color-landing-border:#e7e5e4">
+<head>
+  <title><%= content_for(:title) || "Sirib — Cooperative Banking Platform" %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= yield :head %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400..600&display=swap" rel="stylesheet">
+  <link rel="icon" href="/icon.png" type="image/png">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="landing-bg landing-text font-sans antialiased">
+  <%= yield %>
+</body>
+</html>

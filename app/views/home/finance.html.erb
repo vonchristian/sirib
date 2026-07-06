@@ -1,0 +1,123 @@
+<%= render "marketing_nav" %>
+
+<section class="relative overflow-hidden landing-border border-b pt-32 pb-24">
+  <div class="landing-grid-bg pointer-events-none absolute inset-0"></div>
+  <div class="relative mx-auto max-w-4xl px-6">
+    <p class="landing-label mb-4">For Finance</p>
+    <h1 class="landing-hero-title text-4xl font-light tracking-[-0.03em] landing-text sm:text-5xl">
+      Every transaction posts to the GL.<br>
+      <span class="landing-accent">Trial balance is current. Always.</span>
+    </h1>
+    <p class="mt-4 max-w-2xl text-base leading-relaxed landing-muted">
+      Your finance team reconciles because transactions happen in different systems — teller 
+      operations, loans, savings — and someone has to make them match. Sirib treats the 
+      cooperative as one system. Every transaction creates its journal entry automatically. 
+      Month-end becomes a review instead of a reconciliation marathon.
+    </p>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">The Flow</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">How the books stay current without manual effort</h2>
+    <div class="mt-10 space-y-4">
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">1</span>
+        <div>
+          <p class="text-sm font-medium landing-text">A transaction happens anywhere in the coop</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">A teller processes a deposit. A loan is disbursed. A savings account earns interest. Every action that affects the cooperative's financial position is recorded once.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">2</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Journal entries are created automatically</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">The system knows which accounts to debit and credit for each transaction type. The journal entry is created as part of the same action — no separate posting, no manual coding.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">3</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Interest is computed and posted daily</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Savings interest and loan interest accrue daily based on current balances and product terms. The entries post automatically — no month-end catch-up, no manual calculation.</p>
+        </div>
+      </div>
+      <div class="landing-card border p-6 flex items-start gap-5">
+        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">4</span>
+        <div>
+          <p class="text-sm font-medium landing-text">Trial balance is always current</p>
+          <p class="mt-1 text-sm leading-relaxed landing-muted">Because every entry creates its journal entry automatically, there's nothing to reconcile. The trial balance at any moment reflects every transaction. Period-end is validation, not reconstruction.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-7xl px-6 py-16">
+    <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
+      <img src="<%= image_path('screenshots/chart_of_accounts.png') %>" alt="Chart of accounts in Sirib" class="w-full">
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">What Gets Automated</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">The manual accounting work Sirib eliminates</h2>
+    <div class="mt-10 grid gap-px sm:grid-cols-2">
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Journal entry generation</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Every teller transaction, loan disbursement, and collection creates the correct journal entry automatically. Debits and credits are mapped to the chart of accounts.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Daily interest computation</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Savings and loan interest calculated daily based on end-of-day balances. Entries post automatically through standing journals.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">Real-time trial balance</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Built from every posted entry. No reconciliation between subsystems because there's only one system. Current at all times.</p>
+      </div>
+      <div class="landing-card border p-6">
+        <p class="text-sm font-medium landing-text">BSP report generation</p>
+        <p class="mt-1 text-sm leading-relaxed landing-muted">Financial statements and regulatory report templates pre-configured and populated from your ledger. No manual extraction, no data gathering.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-border border-b landing-bg-alt">
+  <div class="mx-auto max-w-4xl px-6 py-24">
+    <p class="landing-label mb-2">Manual Tasks Offloaded</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">What your finance team won't have to do anymore</h2>
+    <ul class="mt-10 space-y-3 text-sm leading-relaxed landing-muted">
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Entering journal entries from teller operations — created automatically from each transaction</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Manually computing interest at month-end — accrued and posted daily</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Reconciling between teller, loans, and savings systems — everything posts to the same GL</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Preparing trial balance from multiple data sources — current and complete at all times</li>
+      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Extracting data for BSP reports — populated from the same verified data</li>
+    </ul>
+  </div>
+</section>
+
+<section class="landing-border border-b">
+  <div class="mx-auto max-w-3xl px-6 py-24 text-center">
+    <p class="landing-label mb-4">See it in action</p>
+    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">
+      Your finance team already knows how to get the books right.<br>
+      <span class="landing-accent">Sirib keeps them right so your team can focus on analysis, not reconciliation.</span>
+    </h2>
+    <div class="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <a href="/#demo" class="landing-btn-accent px-8 py-3 text-sm font-semibold tracking-wide uppercase transition-colors">Watch the Walkthrough</a>
+      <a href="/#" class="landing-border-muted border px-8 py-3 text-sm font-medium tracking-wide landing-muted uppercase transition-colors hover:landing-btn-outline">Talk to a Fellow Coop Manager</a>
+    </div>
+  </div>
+</section>
+
+<footer class="landing-bg">
+  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-12 sm:flex-row">
+    <a href="/" class="text-sm font-medium tracking-tight landing-muted transition-colors hover:landing-text">← Back to Sirib</a>
+    <p class="text-xs landing-dim">Built for Philippine cooperatives.</p>
+  </div>
+</footer>

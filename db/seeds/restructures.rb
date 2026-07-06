@@ -6,10 +6,12 @@ loan_product = Lending::LoanProduct.where(cooperative: coop).first
 loan_app = Lending::LoanApplication.where(cooperative: coop, member: member).first
 
 if member && loan_product && loan_app
+  ref_num = "LN-REST-DEMO-#{coop.name.parameterize}-001"
+
   loan = Lending::Loan.find_or_create_by!(
-    reference_number: "LN-REST-DEMO-001",
-    cooperative: coop
+    reference_number: ref_num
   ) do |l|
+    l.cooperative = coop
     l.loan_application = loan_app
     l.member = member
     l.loan_product = loan_product
