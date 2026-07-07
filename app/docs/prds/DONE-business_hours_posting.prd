@@ -1,0 +1,200 @@
+PRD: Business Hours & Batch Posting System
+
+1. Overview
+
+Cooperative operations have defined business hours — teller windows close at a set time, transactions are not processed after hours, and certain back-office operations must wait until the next business day. The system previously ran 24/7 with no concept of business hours. This PRD adds configurable business hours, holiday management, cutoff-based deferred posting, and a recurring batch job to post pending entries.
+
+2. Goals
+
+Allow cooperative administrators to configure business hours (open, close, cutoff) per cooperative
+
+Prevent cash session creation and teller operations outside business hours
+
+Provide configurable holiday management (one-off and recurring) that blocks business operations on those dates
+
+Defer entry posting when created after cutoff time; batch-post them the next business day
+
+Run a recurring Solid Queue job every 5 minutes to post deferred entries
+
+3. Non-Goals
+
+Support per-branch business hours (hours are cooperative-wide)
+
+Support real-time clock-driven opening/closing (sessions are still manually opened by tellers)
+
+Support multi-timezone scheduling (all remains UTC)
+
+Modify existing entry reversal or idempotency semantics
+
+4. Implementation
+
+4.1 Data Model
+
+Migration: `db/migrate/20260707130000_create_management_holidays.rb`
+
+Table: `management_holidays`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint | PK |
+| cooperative_id | bigint | FK, NOT NULL |
+| date | date | NOT NULL |
+| name | string | NOT NULL |
+| recurring | boolean | Default false |
+| timestamps | | created_at, updated_at |
+| Index | | UNIQUE (cooperative_id, date) |
+
+Config keys (stored in `Management::Configuration`):
+- `business_hours_open` — integer hour (UTC), default 8
+- `business_hours_close` — integer hour (UTC), default 17
+- `business_hours_cutoff` — integer hour (UTC), default matches close
+
+4.2 Models
+
+`Management::Holiday` (`app/models/management/holiday.rb`)
+- Scopes: `on_date(date)`, `recurring`, `between(start_date, end_date)`
+- Class method: `self.holiday?(date, cooperative:)` — checks one-off + recurring holidays
+- Recurring holidays match by EXTRACT(MONTH FROM date) and EXTRACT(DAY FROM date)
+
+4.3 Services
+
+`Management::BusinessDayService` (`app/services/management/business_day_service.rb`)
+- `business_day?(date)` — true unless Saturday/Sunday or holiday
+- `within_business_hours?(at_time:)` — current time between open and close hours
+- `after_cutoff?(at_time:)` — current time at or after cutoff hour
+- `next_business_day(from:)` — forward-skips non-business days
+- Reads config keys at call time (not cached)
+
+`Accounting::BusinessHoursPostingService` (`app/services/accounting/business_hours_posting_service.rb`)
+- Wraps `PostEntryService`
+- Decides immediate vs deferred posting based on:
+  1. Explicit `post_immediately:` flag (default false)
+  2. Business hours check via `BusinessDayService`
+- If within business hours OR `post_immediately: true` → calls `PostEntryService.run!`
+- If after hours → creates entry with `status: :pending` (no running balance update)
+
+`Accounting::PostEntryService` (`app/services/accounting/post_entry_service.rb`)
+- Added `post_immediately` boolean input (default true)
+- When false: saves entry with status `pending`, skips running balance computation
+- When true: existing behavior unchanged (status `posted`, running balances computed)
+
+`Accounting::PostPendingEntryService` (`app/services/accounting/post_pending_entry_service.rb`)
+- Transitions a single pending entry to posted
+- Updates running balances using `AppendOnlyOverride`
+
+4.4 Job
+
+`Accounting::PostPendingEntriesJob` (`app/jobs/accounting/post_pending_entries_job.rb`)
+- Scheduled every 5 minutes via `config/recurring.yml`
+- Iterates `Entry.pending.where("posted_at <= ?", Time.current)`
+- Posts each via `PostPendingEntryService`
+
+4.5 Business Logic Integration
+
+`Treasury::CashSession.for_today` — returns nil unless `within_business_hours?` (hard-block at model level)
+`Banking::CashSessionService` — `open` returns error unless within business hours
+`Treasury::SavingsTransactionService` — uses `BusinessHoursPostingService.post` instead of `PostEntryService.run!`
+`Equity::BuySharesService` — uses `BusinessHoursPostingService.post`
+
+4.6 Controller & Views
+
+`Management::HolidaysController` — full CRUD
+Routes: `resources :holidays` under `management` namespace
+Views: index, show, new, edit, _form partial
+All views follow existing management module conventions (layout "dashboard", `content_for :page_title`)
+
+4.7 Seed Data
+
+`db/seeds/demo_data.rb`:
+- 3 config keys with defaults
+- 8 recurring PH holidays (New Year, Araw ng Kagitingan, Labor Day, Independence Day, Ninoy Aquino Day, Bonifacio Day, Christmas Day, Rizal Day)
+
+`bin/e2e-setup`:
+- 3 holidays (Christmas Day, New Year's Day, E2E Test Holiday)
+
+4.8 Scheduled Task
+
+`config/recurring.yml`:
+```yaml
+post_pending_entries:
+  class: Accounting::PostPendingEntriesJob
+  schedule: every 5 minutes
+  description: "Post deferred accounting entries"
+```
+
+5. Testing
+
+RSpec: 6 spec files, all passing
+- `spec/models/management/holiday_spec.rb`
+- `spec/services/management/business_day_service_spec.rb`
+- `spec/services/accounting/post_entry_service_spec.rb`
+- `spec/services/accounting/business_hours_posting_service_spec.rb`
+- `spec/services/accounting/post_pending_entry_service_spec.rb`
+- `spec/concurrency/concurrency_locking_spec.rb` (updated stubs)
+
+Playwright E2E: 4 test files, 12 tests, all passing
+- `tests/management/holidays/happy_path.spec.js`
+- `tests/management/holidays/validation.spec.js`
+- `tests/management/holidays/edge_cases.spec.js`
+- Covers CRUD, validation, empty state, recurring toggle
+
+6. Design Decisions
+
+Time zone: All calculations in UTC. Business hours config stores integer hours, compared against `Time.current.hour` (UTC).
+
+Append-only compatibility: The existing DB trigger on `accounting_entries` already allows `pending → posted` transition. No additional migration needed.
+
+No `source_after_hours` enum: The entry's `status` field (pending/posted/reversed) suffices to distinguish after-hours entries. Adding a source enum value would duplicate state.
+
+Cutoff defaults to close hour: If no explicit cutoff is configured, `Management::BusinessDayService` falls back to `business_hours_close`. Most coops use the same value.
+
+Business hours config is read at call time: Each check queries `Management::Configuration`. Not cached because values may change and the read is cheap.
+
+7. Open Questions / Future Work
+
+Per-coop timezone: Currently UTC only. If a coop operates in PH Time (UTC+8), the business hours config values need manual offset adjustment.
+
+Per-branch business hours: Some coops may want branch-level hours. This would require scoping config and BusinessDayService to branches.
+
+Holiday bulk import: Adding a CSV upload for holidays would improve UX for annual holiday declaration.
+
+Cutoff grace period: Some coops want a 5-15 minute grace window after cutoff for in-progress transactions.
+
+Late-night maintenance window: A configurable maintenance window that blocks ALL operations (not just outside business hours).
+
+8. Files Changed/Created
+
+Created:
+- db/migrate/20260707130000_create_management_holidays.rb
+- app/models/management/holiday.rb
+- app/services/management/business_day_service.rb
+- app/services/accounting/business_hours_posting_service.rb
+- app/services/accounting/post_pending_entry_service.rb
+- app/jobs/accounting/post_pending_entries_job.rb
+- app/controllers/management/holidays_controller.rb
+- app/views/management/holidays/_form.html.erb
+- app/views/management/holidays/index.html.erb
+- app/views/management/holidays/show.html.erb
+- app/views/management/holidays/new.html.erb
+- app/views/management/holidays/edit.html.erb
+- spec/factories/management/holidays.rb
+- spec/models/management/holiday_spec.rb
+- spec/services/management/business_day_service_spec.rb
+- spec/services/accounting/business_hours_posting_service_spec.rb
+- spec/services/accounting/post_pending_entry_service_spec.rb
+- tests/management/holidays/happy_path.spec.js
+- tests/management/holidays/validation.spec.js
+- tests/management/holidays/edge_cases.spec.js
+- app/docs/prds/DONE-business_hours_posting.prd
+
+Modified:
+- app/services/accounting/post_entry_service.rb
+- app/models/treasury/cash_session.rb
+- app/services/banking/cash_session_service.rb
+- app/services/treasury/savings_transaction_service.rb
+- app/services/equity/buy_shares_service.rb
+- config/routes.rb
+- config/recurring.yml
+- db/seeds/demo_data.rb
+- bin/e2e-setup
+- spec/concurrency/concurrency_locking_spec.rb
+- spec/services/accounting/post_entry_service_spec.rb

@@ -8,6 +8,10 @@ RSpec.describe "Concurrency Locking" do
   end
 
   describe "Treasury::CashSession.for_today" do
+    before do
+      allow_any_instance_of(Management::BusinessDayService).to receive(:within_business_hours?).and_return(true)
+    end
+
     it "locks with FOR UPDATE on find_or_create_by!" do
       user = create(:user, cooperative: cooperative)
       account = create(:accounting_account, cooperative: cooperative)

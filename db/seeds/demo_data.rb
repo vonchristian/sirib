@@ -21,23 +21,23 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
   accounts = Accounting::Account.where(cooperative: coop).index_by(&:account_code)
   sample_entries = [
     { desc: "Initial member equity contribution", ref: "ENT-2025-0001", posted: Time.new(2025, 1, 15),
-      debits: [{ account: accounts["11131"], amount: 10_000_000 }],
-      credits: [{ account: accounts["30130"], amount: 10_000_000 }] },
+      debits: [ { account: accounts["11131"], amount: 10_000_000 } ],
+      credits: [ { account: accounts["30130"], amount: 10_000_000 } ] },
     { desc: "Loan disbursement to member - Juan Dela Cruz", ref: "ENT-2025-0002", posted: Time.new(2025, 3, 1),
-      debits: [{ account: accounts["11210"], amount: 2_000_000 }],
-      credits: [{ account: accounts["11131"], amount: 2_000_000 }] },
+      debits: [ { account: accounts["11210"], amount: 2_000_000 } ],
+      credits: [ { account: accounts["11131"], amount: 2_000_000 } ] },
     { desc: "Loan disbursement to member - Maria Santos", ref: "ENT-2025-0003", posted: Time.new(2025, 4, 1),
-      debits: [{ account: accounts["11210"], amount: 1_000_000 }],
-      credits: [{ account: accounts["11133"], amount: 1_000_000 }] },
+      debits: [ { account: accounts["11210"], amount: 1_000_000 } ],
+      credits: [ { account: accounts["11133"], amount: 1_000_000 } ] },
     { desc: "Loan collection - Juan Dela Cruz partial payment", ref: "ENT-2025-0004", posted: Time.new(2025, 5, 15),
-      debits: [{ account: accounts["11133"], amount: 1_200_000 }],
-      credits: [{ account: accounts["11210"], amount: 1_200_000 }] },
+      debits: [ { account: accounts["11133"], amount: 1_200_000 } ],
+      credits: [ { account: accounts["11210"], amount: 1_200_000 } ] },
     { desc: "Purchase of office furniture and fixtures", ref: "ENT-2025-0005", posted: Time.new(2025, 6, 1),
-      debits: [{ account: accounts["14180"], amount: 500_000 }],
-      credits: [{ account: accounts["11131"], amount: 500_000 }] },
+      debits: [ { account: accounts["14180"], amount: 500_000 } ],
+      credits: [ { account: accounts["11131"], amount: 500_000 } ] },
     { desc: "Member savings deposit", ref: "ENT-2025-0006", posted: Time.new(2025, 6, 15),
-      debits: [{ account: accounts["11132"], amount: 300_000 }],
-      credits: [{ account: accounts["21110"], amount: 300_000 }] }
+      debits: [ { account: accounts["11132"], amount: 300_000 } ],
+      credits: [ { account: accounts["21110"], amount: 300_000 } ] }
   ]
   sample_entries.each do |attrs|
     next if Accounting::Entry.exists?(reference_number: attrs[:ref])
@@ -71,7 +71,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
       { first_name: "Gloria", middle_name: "M.",        last_name: "Romero",    suffix: nil,    gender: "female", civil_status: "divorced", mobile_number: "09212223344", birth_date: Date.new(1981, 7, 16)  },
       { first_name: "Fernando", middle_name: "A.",      last_name: "Ramos",     suffix: nil,    gender: "male",   civil_status: "single",  mobile_number: "09335556677", birth_date: Date.new(1993, 9, 21)  },
       { first_name: "Rosario", middle_name: "B.",       last_name: "Castillo",  suffix: nil,    gender: "female", civil_status: "married",  mobile_number: "09178889900", birth_date: Date.new(1987, 3, 11)  },
-      { first_name: "Miguel", middle_name: "N.",        last_name: "Angeles",   suffix: nil,    gender: "male",   civil_status: "single",  mobile_number: "09093334455", birth_date: Date.new(1996, 12, 19) },
+      { first_name: "Miguel", middle_name: "N.",        last_name: "Angeles",   suffix: nil,    gender: "male",   civil_status: "single",  mobile_number: "09093334455", birth_date: Date.new(1996, 12, 19) }
     ]
     member_data.each_with_index do |attrs, i|
       unless Membership::Member.exists?(cooperative: coop, first_name: attrs[:first_name], last_name: attrs[:last_name])
@@ -119,7 +119,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
         title: attrs[:title],
         body: attrs[:body],
         status: "published",
-        published_at: [1.day.ago, 1.week.ago, 2.weeks.ago][announcements.index(attrs)],
+        published_at: [ 1.day.ago, 1.week.ago, 2.weeks.ago ][announcements.index(attrs)],
         author: admin_user_for_portal || User.where(cooperative: coop).first!
       )
     end
@@ -190,7 +190,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
   end
 
   # ── 5. Loan applications & loans ───────────────────────────────────
-  loan_products = Lending::LoanProduct.where(cooperative: coop).where(name: ["Regular Salary Loan", "Emergency Loan", "Educational Loan"]).to_a
+  loan_products = Lending::LoanProduct.where(cooperative: coop).where(name: [ "Regular Salary Loan", "Emergency Loan", "Educational Loan" ]).to_a
 
   if loan_products.any? && Lending::LoanApplication.where(cooperative: coop).count < 3
     members.each_with_index do |member, i|
@@ -237,8 +237,8 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
           reference_number: "DSB-#{prefix}-#{format('%04d', i + 1)}",
           posted_at: 38.days.ago,
           cooperative: coop,
-          debits: [{ account: loan_receivable, amount: app.amount_cents }],
-          credits: [{ account: cash_account, amount: app.amount_cents }]
+          debits: [ { account: loan_receivable, amount: app.amount_cents } ],
+          credits: [ { account: cash_account, amount: app.amount_cents } ]
         )
       end
     end
@@ -269,8 +269,8 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
           reference_number: "SVP-#{prefix}-#{format('%04d', i + 1)}",
           posted_at: 25.days.ago,
           cooperative: coop,
-          debits: [{ account: cash_account, amount: (i + 1) * 5_000_00 }],
-          credits: [{ account: account.liability_account, amount: (i + 1) * 5_000_00 }]
+          debits: [ { account: cash_account, amount: (i + 1) * 5_000_00 } ],
+          credits: [ { account: account.liability_account, amount: (i + 1) * 5_000_00 } ]
         )
       end
 
@@ -327,24 +327,24 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
   additional_entries = [
     { ref: "ENT-#{prefix}-001", desc: "Interest income from loans - monthly accrual",
       posted: 15.days.ago,
-      debits: [{ account: Accounting::Account.joins(:ledger).where(account_code: "11210", ledgers: { cooperative_id: coop.id }).first, amount: 75_000_00 }],
-      credits: [{ account: interest_income, amount: 75_000_00 }] },
+      debits: [ { account: Accounting::Account.joins(:ledger).where(account_code: "11210", ledgers: { cooperative_id: coop.id }).first, amount: 75_000_00 } ],
+      credits: [ { account: interest_income, amount: 75_000_00 } ] },
     { ref: "ENT-#{prefix}-002", desc: "Monthly salaries and wages",
       posted: 10.days.ago,
-      debits: [{ account: salaries_expense, amount: 250_000_00 }],
-      credits: [{ account: bank_acct, amount: 250_000_00 }] },
+      debits: [ { account: salaries_expense, amount: 250_000_00 } ],
+      credits: [ { account: bank_acct, amount: 250_000_00 } ] },
     { ref: "ENT-#{prefix}-003", desc: "Monthly rent payment",
       posted: 5.days.ago,
-      debits: [{ account: rent_expense, amount: 50_000_00 }],
-      credits: [{ account: bank_acct, amount: 50_000_00 }] },
+      debits: [ { account: rent_expense, amount: 50_000_00 } ],
+      credits: [ { account: bank_acct, amount: 50_000_00 } ] },
     { ref: "ENT-#{prefix}-004", desc: "Service fees collected from loan processing",
       posted: 3.days.ago,
-      debits: [{ account: cash_on_hand, amount: 12_000_00 }],
-      credits: [{ account: service_fees, amount: 12_000_00 }] },
+      debits: [ { account: cash_on_hand, amount: 12_000_00 } ],
+      credits: [ { account: service_fees, amount: 12_000_00 } ] },
     { ref: "ENT-#{prefix}-005", desc: "Bank service charges",
       posted: 1.day.ago,
-      debits: [{ account: bank_charges, amount: 2_500_00 }],
-      credits: [{ account: bank_acct, amount: 2_500_00 }] }
+      debits: [ { account: bank_charges, amount: 2_500_00 } ],
+      credits: [ { account: bank_acct, amount: 2_500_00 } ] }
   ]
 
   additional_entries.each do |entry_attrs|
@@ -375,7 +375,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     template = branch_perf_templates[i % branch_perf_templates.size]
     variation = 1.0 + ((idx + 1) * 0.05)
 
-    [Date.current, 7.days.ago.to_date].each do |snap_date|
+    [ Date.current, 7.days.ago.to_date ].each do |snap_date|
       Management::BranchPerformanceSnapshot.find_or_create_by!(branch: branch, snapshot_date: snap_date, cooperative: coop) do |s|
         s.metrics = {
           loan_portfolio_cents: (template[:loan_portfolio_cents] * variation).to_i,
@@ -614,7 +614,44 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     end
   end
 
-  # ── 10. Restructure cases ──────────────────────────────────────────
+  # ── 10. Business hours configuration ──────────────────────────────
+  business_hours_config = {
+    "business_hours_open"   => { value: 8,  unit: "hour" },
+    "business_hours_close"  => { value: 17, unit: "hour" },
+    "business_hours_cutoff" => { value: 17, unit: "hour" }
+  }
+
+  business_hours_config.each do |key, val|
+    Management::Configuration.find_or_create_by!(key: key, cooperative: coop) do |c|
+      c.value = val
+      c.status = :active
+      c.changed_by_id = admin_user&.id || 0
+      c.approved_by_id = admin_user&.id || 0
+      c.approved_at = Time.current
+    end
+  end
+
+  # ── 11. PH Holidays ──────────────────────────────────────────────
+  ph_holidays = [
+    { date: Date.new(Date.current.year, 1, 1),  name: "New Year's Day",           recurring: true },
+    { date: Date.new(Date.current.year, 4, 9),  name: "Araw ng Kagitingan",        recurring: true },
+    { date: Date.new(Date.current.year, 5, 1),  name: "Labor Day",                recurring: true },
+    { date: Date.new(Date.current.year, 6, 12), name: "Independence Day",          recurring: true },
+    { date: Date.new(Date.current.year, 8, 21), name: "Ninoy Aquino Day",          recurring: true },
+    { date: Date.new(Date.current.year, 11, 30), name: "Bonifacio Day",            recurring: true },
+    { date: Date.new(Date.current.year, 12, 25), name: "Christmas Day",            recurring: true },
+    { date: Date.new(Date.current.year, 12, 30), name: "Rizal Day",                recurring: true }
+  ]
+
+  ph_holidays.each do |attrs|
+    Management::Holiday.find_or_create_by!(cooperative: coop, date: attrs[:date]) do |h|
+      h.name = attrs[:name]
+      h.recurring = attrs[:recurring]
+    end
+  end
+  puts "  → #{ph_holidays.size} PH holidays seeded"
+
+  # ── 12. Restructure cases ─────────────────────────────────────────
   load_per_coop_seed(coop, "restructures")
 
   # ── 11. AI Agent demo data ─────────────────────────────────────────

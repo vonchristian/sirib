@@ -423,6 +423,35 @@ end
   end
   puts "  AI Digest: created for today"
 
+  # ── BUSINESS HOURS & HOLIDAYS E2E TEST DATA ────────────────────────
+  business_hours_config = {
+    "business_hours_open"   => { value: 8,  unit: "hour" },
+    "business_hours_close"  => { value: 17, unit: "hour" },
+    "business_hours_cutoff" => { value: 17, unit: "hour" }
+  }
+  business_hours_config.each do |key, val|
+    Management::Configuration.find_or_create_by!(key: key) do |c|
+      c.value = val
+      c.status = :active
+      c.changed_by = admin_user
+    end
+  end
+
+  unless Management::Holiday.exists?
+    e2e_holidays = [
+      { date: Date.new(Date.current.year, 12, 25), name: "Christmas Day", recurring: true },
+      { date: Date.new(Date.current.year, 1, 1),   name: "New Year's Day", recurring: true },
+      { date: Date.new(Date.current.year, 12, 30), name: "E2E Test Holiday", recurring: false },
+    ]
+    e2e_holidays.each do |attrs|
+      Management::Holiday.find_or_create_by!(date: attrs[:date]) do |h|
+        h.name = attrs[:name]
+        h.recurring = attrs[:recurring]
+      end
+    end
+    puts "  Holidays: #{e2e_holidays.size} created"
+  end
+
   # Ensure admin_user has ai_dashboard permission
   ai_perm = Management::Permission.find_by(action: "view", subject: "ai_dashboard")
   if admin_role && ai_perm && !Management::RolePermission.exists?(role: admin_role, permission: ai_perm)

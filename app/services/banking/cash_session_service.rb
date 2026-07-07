@@ -17,6 +17,10 @@ module Banking
       return Result.new(success?: true, cash_session: existing) if existing&.open?
       return Result.new(success?: false, errors: [ "Existing session must be closed first" ]) if existing&.open?
 
+      unless Management::BusinessDayService.new(cooperative: user.cooperative).within_business_hours?
+        return Result.new(success?: false, errors: [ "Cash sessions can only be opened during business hours" ])
+      end
+
       cash_account ||= user.cash_accounts.includes(:account).first&.account
       return Result.new(success?: false, errors: [ "No cash account assigned" ]) unless cash_account
 

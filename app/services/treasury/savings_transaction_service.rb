@@ -50,7 +50,8 @@ module Treasury
       end
 
       if transaction_type == "deposit"
-        Accounting::PostEntryService.run!(
+        Accounting::BusinessHoursPostingService.post(
+          cooperative: savings_account.cooperative,
           description: "Savings deposit - #{savings_account.account_number}",
           reference_number: "SD-#{savings_account.account_number}",
           posted_at: Time.current,
@@ -58,7 +59,8 @@ module Treasury
           credits: [ { account: liability, amount: amount_cents } ]
         )
       else
-        Accounting::PostEntryService.run!(
+        Accounting::BusinessHoursPostingService.post(
+          cooperative: savings_account.cooperative,
           description: "Savings withdrawal - #{savings_account.account_number}",
           reference_number: "SW-#{savings_account.account_number}",
           posted_at: Time.current,

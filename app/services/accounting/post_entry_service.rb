@@ -4,6 +4,7 @@ module Accounting
     string :reference_number, default: nil
     time :posted_at, default: nil
     object :cooperative, class: Cooperative, default: nil
+    boolean :post_immediately, default: true
     array :debits, default: [] do
       hash do
         object :account, class: Accounting::Account
@@ -27,10 +28,14 @@ module Accounting
         cooperative: cooperative
       )
 
+      entry.status = :pending unless post_immediately
+
       Accounting::Entry.transaction do
         entry.save!
-        AppendOnlyOverride.with_override(reason: "RunningBalance update via PostEntryService") do
-          update_running_balances!(entry)
+        if post_immediately
+          AppendOnlyOverride.with_override(reason: "RunningBalance update via PostEntryService") do
+            update_running_balances!(entry)
+          end
         end
       end
 

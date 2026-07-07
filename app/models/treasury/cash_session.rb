@@ -25,6 +25,10 @@ module Treasury
       cash_account ||= user.cash_accounts.includes(:account).first&.account
       return nil unless cash_account
 
+      unless Management::BusinessDayService.new(cooperative: user.cooperative).within_business_hours?
+        return nil
+      end
+
       lock("FOR UPDATE").find_or_create_by!(user: user, cash_account: cash_account, date: Date.current) do |s|
         s.opened_at = Time.current
         s.status = "open"

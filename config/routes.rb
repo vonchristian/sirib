@@ -295,6 +295,8 @@ Rails.application.routes.draw do
 
     resources :password_policies, only: [ :index, :show, :new, :create, :edit, :update ]
 
+    resources :holidays
+
     get "settings", to: "settings#index"
 
     resources :restructures, only: [ :index, :show ], controller: "restructures" do

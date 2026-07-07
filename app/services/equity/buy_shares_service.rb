@@ -69,7 +69,8 @@ module Equity
     end
 
     def post_journal_entry!(product, total_amount_cents)
-      Accounting::PostEntryService.run!(
+      Accounting::BusinessHoursPostingService.post(
+        cooperative: share_capital_account.cooperative,
         description: "Share capital purchase - #{share_capital_account.account_number}",
         reference_number: "SC-#{share_capital_account.account_number}-#{SecureRandom.uuid}",
         posted_at: Time.current,
