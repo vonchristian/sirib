@@ -38,31 +38,16 @@ module Banking
 
     private
 
+    # Lock ordering: Account/Ledger (5) — see app/docs/prds/concurrency_locking.prd
     def post_line(type:, amount:, cash_session:, description:, idempotency_key:, **extras)
       return Result.new(success?: false, errors: [ "Cash session must be open" ]) unless cash_session&.open?
 
-      if type == :debit
-        return Result.new(success?: false, errors: [ "Insufficient balance" ]) unless sufficient_balance?(extras[:from_account], amount)
-      end
-
       description ||= "#{type.capitalize} transaction"
       entry = with_idempotency(key: idempotency_key) do
-        ActiveRecord::Base.transaction do
-          lock_accounts(extras[:from_account], extras[:to_account])
-
-          ref_prefix = type == :debit ? "D" : "C"
-
-          entry = Accounting::Entry.build(
-            posted_at: Date.current.beginning_of_day,
-            description: description,
-            reference_number: "#{ref_prefix}-#{SecureRandom.uuid}",
-            debits: [ { account: extras[:from_account] || extras[:to_account], amount: amount.cents } ],
-            credits: [ { account: extras[:to_account], amount: amount.cents } ]
-          )
-          entry.save!
-          entry
-        end
+        lock_and_post!(type:, amount:, description:, extras:)
       end
+
+      return Result.new(success?: false, errors: [ "Insufficient balance" ]) if entry.nil?
 
       result = build_transaction_from_entry(entry, amount, extras[:from_account], extras[:to_account], type.to_s, description, cash_session)
       Management::AuditLogService.run!(
@@ -77,10 +62,31 @@ module Banking
       Result.new(success?: false, errors: [ e.message ])
     end
 
-    def sufficient_balance?(account, amount)
-      return false unless account
+    def lock_and_post!(type:, amount:, description:, extras:)
+      entry = nil
+      ActiveRecord::Base.transaction do
+        lock_accounts(extras[:from_account], extras[:to_account])
 
-      account.balance >= amount
+        if type == :debit
+          from = extras[:from_account]
+          from.reload
+          unless from.balance >= amount
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        ref_prefix = type == :debit ? "D" : "C"
+
+        entry = Accounting::Entry.build(
+          posted_at: Date.current.beginning_of_day,
+          description: description,
+          reference_number: "#{ref_prefix}-#{SecureRandom.uuid}",
+          debits: [ { account: extras[:from_account] || extras[:to_account], amount: amount.cents } ],
+          credits: [ { account: extras[:to_account], amount: amount.cents } ]
+        )
+        entry.save!
+      end
+      entry
     end
 
     def lock_accounts(*accounts)

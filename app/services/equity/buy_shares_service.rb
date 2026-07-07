@@ -10,6 +10,7 @@ module Equity
     string :notes, default: nil
     string :idempotency_key, default: nil
 
+    # Lock ordering: Equity Account/Equity Product (4) — see app/docs/prds/concurrency_locking.prd
     def execute
       with_idempotency(key: idempotency_key) do
         product = share_capital_account.share_product
@@ -24,7 +25,7 @@ module Equity
 
         total_amount_cents = shares * product.price_per_share_cents
 
-        share_capital_account.transaction do
+        share_capital_account.with_lock do
           entry = post_journal_entry!(product, total_amount_cents)
 
           txn = Equity::Transaction.create!(

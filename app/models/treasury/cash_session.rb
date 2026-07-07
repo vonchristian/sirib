@@ -12,7 +12,7 @@ module Treasury
 
     validates :date, presence: true
     validates :status, inclusion: { in: %w[open closed] }
-    validates :date, uniqueness: { scope: [:user_id, :cash_account_id],
+    validates :date, uniqueness: { scope: [ :user_id, :cash_account_id ],
               message: "already has a session for this cash account" }
 
     scope :open, -> { where(status: "open") }
@@ -20,34 +20,37 @@ module Treasury
     scope :for_date, ->(date) { where(date: date) }
     scope :by_latest, -> { order(date: :desc, created_at: :desc) }
 
+    # Lock ordering: Cash Session (7) — see app/docs/prds/concurrency_locking.prd
     def self.for_today(user, cash_account: nil)
       cash_account ||= user.cash_accounts.includes(:account).first&.account
       return nil unless cash_account
 
-      find_or_create_by!(user: user, cash_account: cash_account, date: Date.current) do |s|
+      lock("FOR UPDATE").find_or_create_by!(user: user, cash_account: cash_account, date: Date.current) do |s|
         s.opened_at = Time.current
         s.status = "open"
         s.beginning_balance_cents = cash_account.balance.cents
       end
     end
 
+    # Lock ordering: Cash Session (7) — see app/docs/prds/concurrency_locking.prd
     def close!(ending_balance: nil, notes: nil)
-      update!(
+      with_lock { update!(
         status: "closed",
         closed_at: Time.current,
         ending_balance_cents: ending_balance&.cents || cash_account.balance.cents,
         notes: notes
-      )
+      ) }
     end
 
+    # Lock ordering: Cash Session (7) — see app/docs/prds/concurrency_locking.prd
     def close_with_count!(total_counted, notes: nil, counts: [])
-      update!(
+      with_lock { update!(
         status: "closed",
         closed_at: Time.current,
         ending_balance_cents: total_counted,
         notes: notes,
         counts: counts
-      )
+      ) }
     end
 
     def open?

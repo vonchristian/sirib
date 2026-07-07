@@ -4,7 +4,7 @@ module Accounting
     self.table_name = "entries"
     include CooperativeScoped
 
-    pg_search_scope :search, against: [:description, :reference_number],
+    pg_search_scope :search, against: [ :description, :reference_number ],
       using: { tsearch: { prefix: true, dictionary: "english" }, trigram: { threshold: 0.3 } }
 
     belongs_to :branch, class_name: "Management::Branch", foreign_key: :branch_id, optional: true
@@ -90,10 +90,11 @@ module Accounting
       status == :reversed || reversed_at.present?
     end
 
+    # Lock ordering: Entry/Amount Line (6) — see app/docs/prds/concurrency_locking.prd
     def reverse!(reversed_by:, reason: nil)
       return false unless reversible?
 
-      transaction do
+      with_lock do
         update!(
           status: :reversed,
           reversed_at: Time.current

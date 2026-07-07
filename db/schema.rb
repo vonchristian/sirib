@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_07_124351) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -185,6 +185,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.string "amount_currency", limit: 3, default: "PHP", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["account_id", "entry_id"], name: "index_amount_lines_on_account_id_and_entry_id"
     t.index ["account_id"], name: "index_amount_lines_on_account_id"
     t.index ["cooperative_id"], name: "index_amount_lines_on_cooperative_id"
@@ -262,6 +263,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.boolean "inter_branch", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id"], name: "index_entries_on_cooperative_id"
     t.index ["created_by_id"], name: "index_entries_on_created_by_id"
     t.index ["posted_at", "branch_id"], name: "index_entries_on_posted_at_and_branch_id"
@@ -317,6 +319,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "equity_account_id"
+    t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id", "account_number"], name: "index_equity_accounts_on_cooperative_id_and_account_number", unique: true
     t.index ["cooperative_id"], name: "index_equity_accounts_on_cooperative_id"
     t.index ["equity_account_id"], name: "index_equity_accounts_on_equity_account_id"
@@ -366,6 +369,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["cash_account_id"], name: "index_equity_transactions_on_cash_account_id"
     t.index ["cooperative_id"], name: "index_equity_transactions_on_cooperative_id"
     t.index ["entry_id"], name: "index_equity_transactions_on_entry_id"
@@ -704,6 +708,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.bigint "entry_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id"], name: "index_loan_payments_on_cooperative_id"
     t.index ["entry_id"], name: "index_loan_payments_on_entry_id"
     t.index ["loan_id"], name: "index_loan_payments_on_loan_id"
@@ -801,6 +806,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.datetime "updated_at", null: false
     t.integer "restructures_count", default: 0, null: false
     t.integer "max_restructures", default: 2, null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id"], name: "index_loans_on_cooperative_id"
     t.index ["loan_application_id"], name: "index_loans_on_loan_application_id"
     t.index ["loan_product_id"], name: "index_loans_on_loan_product_id"
@@ -1358,6 +1364,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.string "balance_currency", limit: 3, default: "PHP", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["account_id", "as_of_date"], name: "idx_running_balances_on_account_date", unique: true, where: "(account_id IS NOT NULL)"
     t.index ["account_id"], name: "index_running_balances_on_account_id"
     t.index ["cooperative_id"], name: "index_running_balances_on_cooperative_id"
@@ -1437,6 +1444,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.jsonb "counts", default: "[]"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["cash_account_id"], name: "index_treasury_cash_sessions_on_cash_account_id"
     t.index ["cooperative_id"], name: "index_treasury_cash_sessions_on_cooperative_id"
     t.index ["user_id", "cash_account_id", "date"], name: "idx_on_user_id_cash_account_id_date_98598fc1bb", unique: true
@@ -1457,6 +1465,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.bigint "interest_expense_account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id", "account_number"], name: "idx_treasury_savings_accounts_on_coop_account_number", unique: true
     t.index ["cooperative_id"], name: "index_treasury_savings_accounts_on_cooperative_id"
     t.index ["depositor_type", "depositor_id"], name: "idx_on_depositor_type_depositor_id_b642e154d8"
@@ -1504,6 +1513,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_000001) do
     t.datetime "posted_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["cash_account_id"], name: "index_treasury_savings_transactions_on_cash_account_id"
     t.index ["cooperative_id"], name: "index_treasury_savings_transactions_on_cooperative_id"
     t.index ["entry_id"], name: "index_treasury_savings_transactions_on_entry_id"

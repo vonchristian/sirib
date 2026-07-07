@@ -48,12 +48,14 @@ module Lending
       strategy_class.constantize.new(@loan, @proposed_changes, @options).simulate
     end
 
+    # Lock ordering: Loan/Loan Product (2) — see app/docs/prds/concurrency_locking.prd
     def execute(restructure_case:)
       raise "Case not approved" unless restructure_case.approved?
       raise "Case type mismatch" unless restructure_case.restructure_type == @type
 
       ActiveRecord::Base.transaction do
-        result = strategy_class.constantize.new(@loan, @proposed_changes, @options).execute!
+        @loan.with_lock do
+          result = strategy_class.constantize.new(@loan, @proposed_changes, @options).execute!
 
         restructure_case.execute!
 
@@ -68,9 +70,10 @@ module Lending
           }
         )
 
-        @loan.increment_restructures!
+          @loan.increment_restructures!
 
-        result
+          result
+        end
       end
     end
 

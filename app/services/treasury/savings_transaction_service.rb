@@ -12,15 +12,16 @@ module Treasury
 
     validates :transaction_type, inclusion: { in: %w[deposit withdraw] }
 
+    # Lock ordering: Savings Account/Savings Product (3) — see app/docs/prds/concurrency_locking.prd
     def execute
       with_idempotency(key: idempotency_key) do
         errors.add(:amount_cents, "must be greater than zero") and return unless amount_cents.positive?
 
-        if transaction_type == "withdraw" && amount_cents > savings_account.balance.cents
-          errors.add(:base, "Insufficient balance") and return
-        end
+        savings_account.with_lock do
+          if transaction_type == "withdraw" && amount_cents > savings_account.balance.cents
+            errors.add(:base, "Insufficient balance") and return
+          end
 
-        savings_account.transaction do
           entry = post_journal_entry!
 
           transaction = Treasury::SavingsTransaction.create!(

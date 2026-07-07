@@ -15,9 +15,11 @@ module Accounting
       TemplateResolver.new(@template, @input).resolve_lines
     end
 
+    # Lock ordering: Account/Ledger (5), Entry/Amount Line (6) — see app/docs/prds/concurrency_locking.prd
     def post!(idempotency_key: nil)
       with_idempotency(key: idempotency_key) do
         Accounting::Entry.transaction do
+          lock_affected_accounts!
           build_entry
           @entry.save!
           @template.update!(entry: @entry)
@@ -43,6 +45,19 @@ module Accounting
         debits: resolver.resolve_debits.map { |l| { account: l[:account], amount: l[:amount_cents] } },
         credits: resolver.resolve_credits.map { |l| { account: l[:account], amount: l[:amount_cents] } }
       )
+    end
+
+    def lock_affected_accounts!
+      account_ids = TemplateResolver.new(@template, @input)
+        .resolve_debits
+        .map { |l| l[:account]&.id }
+        .compact +
+        TemplateResolver.new(@template, @input)
+        .resolve_credits
+        .map { |l| l[:account]&.id }
+        .compact
+
+      Accounting::Account.lock("FOR UPDATE").where(id: account_ids.uniq).load if account_ids.any?
     end
 
     def build_description
