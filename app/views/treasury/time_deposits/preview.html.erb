@@ -1,1 +1,51 @@
-<%= form_tag treasury_time_deposits_path, method: :post, data: { turbo: false }, class:"space-y-0" do %> <div class="rounded-md border border-border bg-surface"> <div class="px-6 py-5 border-b border-border"> <h2 class="text-base font-semibold text-text-primary">Preview Time Deposit</h2> <p class="mt-0.5 text-sm text-text-secondary">Review the details before confirming.</p> </div> <div class="px-6 py-5 space-y-4"> <dl class="divide-y divide-border"> <div class="flex justify-between py-3"> <dt class="text-sm text-text-secondary">Product</dt> <dd class="text-sm font-medium text-text-primary"><%= @product.name %></dd> </div> <div class="flex justify-between py-3"> <dt class="text-sm text-text-secondary">Amount</dt> <dd class="text-sm font-medium text-text-primary"><%= @amount.format %></dd> </div> <div class="flex justify-between py-3"> <dt class="text-sm text-text-secondary">Interest Rate</dt> <dd class="text-sm font-medium text-text-primary"><%= number_to_percentage(@product.interest_rate * 100, precision: 2) %></dd> </div> <div class="flex justify-between py-3"> <dt class="text-sm text-text-secondary">Term</dt> <dd class="text-sm font-medium text-text-primary"><%= pluralize(@product.term_in_days,"day") %></dd> </div> <div class="flex justify-between py-3"> <dt class="text-sm text-text-secondary">Maturity Date</dt> <dd class="text-sm font-medium text-text-primary"><%= l @matured_on, format: :long %></dd> </div> <div class="flex justify-between py-3 border-t-2 border-border"> <dt class="text-sm font-semibold text-text-primary">Interest Earnings</dt> <dd class="text-sm font-semibold text-green-600"><%= @interest_earned.format %></dd> </div> </dl> <%= hidden_field_tag"time_deposit[time_deposit_product_id]", @product.id %> <%= hidden_field_tag"time_deposit[amount_cents]", @amount.cents %> <%= hidden_field_tag"time_deposit[amount_currency]", @amount.currency.to_s %> </div> <div class="px-6 py-4 flex items-center justify-end gap-3 border-t border-border"> <%= link_to"Back", new_treasury_time_deposit_path, class:"rounded-md border border-border px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-alt transition-colors" %> <%= submit_tag"Confirm & Open", data: { disable_with:"Opening..." }, class:"rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors" %> </div> </div> <% end %> 
+<%= form_tag treasury_time_deposits_path, method: :post, data: { turbo: false }, class:"space-y-0" do %> 
+  <div class="rounded-md border border-border bg-surface"> 
+    <div class="px-6 py-5 border-b border-border"> 
+      <h2 class="text-base font-semibold text-text-primary">Preview Time Deposit</h2>
+ 
+      <p class="mt-0.5 text-sm text-text-secondary">Review the details before confirming.</p>
+ </div>
+ 
+    <div class="px-6 py-5 space-y-4"> 
+      <dl class="divide-y divide-border"> 
+        <div class="flex justify-between py-3"> 
+          <dt class="text-sm text-text-secondary">Product</dt>
+ 
+          <dd class="text-sm font-medium text-text-primary"><%= @product.name %></dd>
+ </div>
+ 
+        <div class="flex justify-between py-3"> 
+          <dt class="text-sm text-text-secondary">Amount</dt>
+ 
+          <dd class="text-sm font-medium text-text-primary"><%= @amount.format %></dd>
+ </div>
+ 
+        <div class="flex justify-between py-3"> 
+          <dt class="text-sm text-text-secondary">Interest Rate</dt>
+ 
+          <dd class="text-sm font-medium text-text-primary"><%= number_to_percentage(@product.interest_rate * 100, precision: 2) %></dd>
+ </div>
+ 
+        <div class="flex justify-between py-3"> 
+          <dt class="text-sm text-text-secondary">Term</dt>
+ 
+          <dd class="text-sm font-medium text-text-primary"><%= pluralize(@product.term_in_days,"day") %></dd>
+ </div>
+ 
+        <div class="flex justify-between py-3"> 
+          <dt class="text-sm text-text-secondary">Maturity Date</dt>
+ 
+          <dd class="text-sm font-medium text-text-primary"><%= l @matured_on, format: :long %></dd>
+ </div>
+ 
+        <div class="flex justify-between py-3 border-t-2 border-border"> 
+          <dt class="text-sm font-semibold text-text-primary">Interest Earnings</dt>
+ 
+          <dd class="text-sm font-semibold text-green-600"><%= @interest_earned.format %></dd>
+ </div>
+ </dl>
+ <%= hidden_field_tag"time_deposit[time_deposit_product_id]", @product.id %> <%= hidden_field_tag"time_deposit[amount_cents]", @amount.cents %> <%= hidden_field_tag"time_deposit[amount_currency]", @amount.currency.to_s %> </div>
+ 
+    <div class="px-6 py-4 flex items-center justify-end gap-3 border-t border-border"> <%= link_to"Back", new_treasury_time_deposit_path, class:"rounded-md border border-border px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-alt transition-colors" %> <%= submit_tag"Confirm & Open", data: { disable_with:"Opening..." }, class:"rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors" %> </div>
+ </div>
+ <% end %> 

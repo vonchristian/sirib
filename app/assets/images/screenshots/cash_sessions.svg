@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" fill="none">
+  <rect width="1200" height="750" fill="#f7f5f0"/>
+  <!-- Sidebar -->
+  <rect width="256" height="750" fill="#ffffff"/>
+  <rect x="256" width="1" height="750" fill="#e8e0d5"/>
+  <rect x="16" y="16" width="224" height="48" rx="8" fill="#f0f7ef"/>
+  <circle cx="40" cy="40" r="14" fill="#5b8c5a"/>
+  <rect x="64" y="32" width="48" height="6" rx="3" fill="#2c241b"/>
+  <rect x="64" y="42" width="80" height="4" rx="2" fill="#aea398"/>
+  <!-- Header -->
+  <rect x="280" y="16" width="200" height="36" rx="8" fill="#5b8c5a"/>
+  <text x="316" y="40" font-family="system-ui" font-size="13" font-weight="500" fill="#ffffff">+ Open Session</text>
+  <rect x="500" y="16" width="140" height="36" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="528" y="40" font-family="system-ui" font-size="13" fill="#6e6358">📋 History</text>
+  <!-- Stats -->
+  <rect x="280" y="68" width="284" height="80" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="300" y="92" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">OPEN SESSIONS</text>
+  <text x="300" y="126" font-family="system-ui" font-size="28" font-weight="600" fill="#059669">3</text>
+  <rect x="576" y="68" width="284" height="80" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="596" y="92" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">TOTAL CASH ON HAND</text>
+  <text x="596" y="126" font-family="system-ui" font-size="28" font-weight="600" fill="#2c241b">₱1,035,000</text>
+  <rect x="872" y="68" width="284" height="80" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="892" y="92" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">TODAY'S TRANSACTIONS</text>
+  <text x="892" y="126" font-family="system-ui" font-size="28" font-weight="600" fill="#2c241b">47</text>
+  <!-- Two column layout for sessions -->
+  <rect x="280" y="168" width="432" height="340" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <rect x="280" y="168" width="432" height="44" rx="8" fill="#ffffff"/>
+  <text x="300" y="194" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">Active Sessions</text>
+  <!-- Session card 1 -->
+  <rect x="300" y="220" width="392" height="72" rx="8" fill="#f7f5f0" stroke="#e8e0d5" stroke-width="1"/>
+  <circle cx="324" cy="244" r="6" fill="#059669"/>
+  <rect x="328" y="238" width="2" height="12" rx="1" fill="#059669" opacity="0.3"/>
+  <text x="344" y="248" font-family="system-ui" font-size="13" font-weight="500" fill="#2c241b">HQ Branch — Teller 1</text>
+  <text x="344" y="264" font-family="system-ui" font-size="11" fill="#6e6358">Opened 8:00 AM | ₱150,000</text>
+  <text x="620" y="248" font-family="system-ui" font-size="11" font-weight="500" fill="#059669">OPEN</text>
+  <rect x="300" y="300" width="392" height="72" rx="8" fill="#f7f5f0" stroke="#e8e0d5" stroke-width="1"/>
+  <circle cx="324" cy="324" r="6" fill="#059669"/>
+  <text x="344" y="328" font-family="system-ui" font-size="13" font-weight="500" fill="#2c241b">HQ Branch — Teller 2</text>
+  <text x="344" y="344" font-family="system-ui" font-size="11" fill="#6e6358">Opened 8:30 AM | ₱200,000</text>
+  <text x="620" y="328" font-family="system-ui" font-size="11" font-weight="500" fill="#059669">OPEN</text>
+  <rect x="300" y="380" width="392" height="72" rx="8" fill="#f7f5f0" stroke="#e8e0d5" stroke-width="1"/>
+  <circle cx="324" cy="404" r="6" fill="#059669"/>
+  <text x="344" y="408" font-family="system-ui" font-size="13" font-weight="500" fill="#2c241b">MKT Branch — Teller 3</text>
+  <text x="344" y="424" font-family="system-ui" font-size="11" fill="#6e6358">Opened 9:00 AM | ₱100,000</text>
+  <text x="620" y="408" font-family="system-ui" font-size="11" font-weight="500" fill="#059669">OPEN</text>
+
+  <!-- Recent sessions -->
+  <rect x="728" y="168" width="432" height="340" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <rect x="728" y="168" width="432" height="44" rx="8" fill="#ffffff"/>
+  <text x="748" y="194" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">Recent Sessions</text>
+  <rect x="728" y="212" width="432" height="36" fill="#f7f5f0"/>
+  <text x="748" y="234" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">BRANCH</text>
+  <text x="860" y="234" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">TELLER</text>
+  <text x="960" y="234" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">START</text>
+  <text x="1040" y="234" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">STATUS</text>
+  <rect x="728" y="248" width="432" height="36" fill="#ffffff"/>
+  <text x="748" y="270" font-family="system-ui" font-size="12" fill="#6e6358">HQ Branch</text>
+  <text x="860" y="270" font-family="system-ui" font-size="12" fill="#2c241b">Juan T.</text>
+  <text x="960" y="270" font-family="system-ui" font-size="11" fill="#aea398">8:00 AM</text>
+  <rect x="1036" y="260" width="50" height="18" rx="9" fill="#fef2f2"/>
+  <text x="1042" y="273" font-family="system-ui" font-size="9" font-weight="500" fill="#dc2626">Closed</text>
+  <rect x="728" y="284" width="432" height="1" fill="#e8e0d5"/>
+  <rect x="728" y="285" width="432" height="36" fill="#ffffff"/>
+  <text x="748" y="307" font-family="system-ui" font-size="12" fill="#6e6358">MKT Branch</text>
+  <text x="860" y="307" font-family="system-ui" font-size="12" fill="#2c241b">Ana M.</text>
+  <text x="960" y="307" font-family="system-ui" font-size="11" fill="#aea398">7:30 AM</text>
+  <rect x="1036" y="297" width="50" height="18" rx="9" fill="#fef2f2"/>
+  <text x="1042" y="310" font-family="system-ui" font-size="9" font-weight="500" fill="#dc2626">Closed</text>
+  <rect x="728" y="321" width="432" height="1" fill="#e8e0d5"/>
+  <rect x="728" y="322" width="432" height="36" fill="#ffffff"/>
+  <text x="748" y="344" font-family="system-ui" font-size="12" fill="#6e6358">QC Branch</text>
+  <text x="860" y="344" font-family="system-ui" font-size="12" fill="#2c241b">Carlo R.</text>
+  <text x="960" y="344" font-family="system-ui" font-size="11" fill="#aea398">8:15 AM</text>
+  <rect x="1036" y="334" width="50" height="18" rx="9" fill="#fef2f2"/>
+  <text x="1042" y="347" font-family="system-ui" font-size="9" font-weight="500" fill="#dc2626">Closed</text>
+  <rect x="728" y="358" width="432" height="1" fill="#e8e0d5"/>
+  <rect x="728" y="359" width="432" height="36" fill="#ffffff"/>
+  <text x="748" y="381" font-family="system-ui" font-size="12" fill="#6e6358">HQ Branch</text>
+  <text x="860" y="381" font-family="system-ui" font-size="12" fill="#2c241b">Maria R.</text>
+  <text x="960" y="381" font-family="system-ui" font-size="11" fill="#aea398">Yesterday</text>
+  <rect x="1036" y="371" width="50" height="18" rx="9" fill="#fef2f2"/>
+  <text x="1042" y="384" font-family="system-ui" font-size="9" font-weight="500" fill="#dc2626">Closed</text>
+
+  <!-- Bottom activity -->
+  <rect x="280" y="528" width="880" height="170" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <rect x="280" y="528" width="880" height="44" rx="8" fill="#ffffff"/>
+  <text x="300" y="554" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">Cash Flow Today</text>
+  <!-- Mini bar chart -->
+  <rect x="300" y="590" width="40" height="60" rx="4" fill="#5b8c5a" opacity="0.6"/>
+  <rect x="360" y="570" width="40" height="80" rx="4" fill="#5b8c5a" opacity="0.6"/>
+  <rect x="420" y="550" width="40" height="100" rx="4" fill="#5b8c5a" opacity="0.6"/>
+  <rect x="480" y="580" width="40" height="70" rx="4" fill="#5b8c5a" opacity="0.6"/>
+  <rect x="540" y="560" width="40" height="90" rx="4" fill="#5b8c5a" opacity="0.6"/>
+  <rect x="600" y="590" width="40" height="60" rx="4" fill="#5b8c5a" opacity="0.6"/>
+  <rect x="660" y="540" width="40" height="110" rx="4" fill="#5b8c5a"/>
+  <text x="300" y="668" font-family="system-ui" font-size="10" fill="#aea398">Mon</text>
+  <text x="360" y="668" font-family="system-ui" font-size="10" fill="#aea398">Tue</text>
+  <text x="420" y="668" font-family="system-ui" font-size="10" fill="#aea398">Wed</text>
+  <text x="480" y="668" font-family="system-ui" font-size="10" fill="#aea398">Thu</text>
+  <text x="540" y="668" font-family="system-ui" font-size="10" fill="#aea398">Fri</text>
+  <text x="600" y="668" font-family="system-ui" font-size="10" fill="#aea398">Sat</text>
+  <text x="660" y="668" font-family="system-ui" font-size="10" fill="#aea398">Today</text>
+  <!-- Summary -->
+  <text x="820" y="600" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">₱285,000</text>
+  <text x="820" y="618" font-family="system-ui" font-size="11" fill="#aea398">Total Cash In Today</text>
+  <text x="820" y="644" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">₱195,000</text>
+  <text x="820" y="662" font-family="system-ui" font-size="11" fill="#aea398">Total Cash Out Today</text>
+  <rect x="820" y="678" width="100" height="2" rx="1" fill="#059669" opacity="0.3"/>
+  <rect x="820" y="678" width="70" height="2" rx="1" fill="#059669"/>
+</svg>

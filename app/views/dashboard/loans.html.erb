@@ -1,1 +1,37 @@
-<% content_for :page_title,"Loans" %> <% content_for :page_subtitle,"Manage loan applications and disbursements" %> <div class="animate-fade-in"> <div class="rounded-lg border border-border bg-surface overflow-hidden"> <div class="overflow-x-auto"> <table class="min-w-full text-sm"> <thead> <tr class="border-b border-border"> <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary">Member</th> <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-tertiary">Amount</th> <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary">Status</th> <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary">Date</th> <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary">Actions</th> </tr> </thead> <tbody class="divide-y divide-border"> <% 5.times do |i| %> <tr class="hover:bg-surface-alt /30 transition-colors"> <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary">Member Name #<%= i + 1 %></td> <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary text-right tabular-nums">₱—</td> <td class="px-6 py-4 whitespace-nowrap"> <span class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 text-xs font-medium text-warning ring-1 ring-inset ring-warning/20 dark:bg-amber-900/30 dark:text-amber-400">Pending</span> </td> <td class="px-6 py-4 whitespace-nowrap text-sm text-text-tertiary">—</td> <td class="px-6 py-4 whitespace-nowrap text-sm"> <a href="#" class="font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors">Review</a> </td> </tr> <% end %> </tbody> </table> </div> </div> </div> 
+<% content_for :page_title,"Loans" %> <% content_for :page_subtitle,"Manage loan applications and disbursements" %> 
+<div class="animate-fade-in"> 
+  <div class="rounded-lg border border-border bg-surface overflow-hidden"> 
+    <div class="overflow-x-auto"> 
+      <table class="min-w-full text-sm"> 
+        <thead> 
+          <tr class="border-b border-border"> 
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary">Member</th>
+ 
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-tertiary">Amount</th>
+ 
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary">Status</th>
+ 
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary">Date</th>
+ 
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary">Actions</th>
+ </tr>
+ </thead>
+ 
+        <tbody class="divide-y divide-border"> <% 5.times do |i| %> 
+            <tr class="hover:bg-surface-alt /30 transition-colors"> 
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary">Member Name #<%= i + 1 %></td>
+ 
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary text-right tabular-nums">₱—</td>
+ 
+              <td class="px-6 py-4 whitespace-nowrap"> <span class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 text-xs font-medium text-warning ring-1 ring-inset ring-warning/20 dark:bg-warning-900/30 dark:text-warning-400">Pending</span> </td>
+ 
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-text-tertiary">—</td>
+ 
+              <td class="px-6 py-4 whitespace-nowrap text-sm"> <a href="#" class="font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors">Review</a> </td>
+ </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+ 

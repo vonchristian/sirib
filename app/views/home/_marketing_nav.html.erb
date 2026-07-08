@@ -1,9 +1,10 @@
-<nav class="fixed top-0 left-0 right-0 z-50 landing-border border-b landing-nav-bg backdrop-blur-sm">
+<nav class="fixed top-0 left-0 right-0 z-50 landing-border border-b landing-nav-bg backdrop-blur-sm" data-controller="mobile-nav" data-action="keydown@window->mobile-nav#closeKeydown">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
     <div class="flex items-center gap-3">
       <a href="/" class="text-lg font-semibold tracking-tight landing-text transition-opacity hover:opacity-80">Sirib</a>
     </div>
-    <div class="flex items-center gap-0">
+    <%# Desktop nav %>
+    <div class="hidden md:flex md:items-center md:gap-0">
       <div class="group relative" data-controller="nav-dropdown">
         <button data-action="nav-dropdown#toggle" class="flex items-center gap-1 px-4 py-2 text-sm landing-nav-link transition-colors">
           For Staff
@@ -28,11 +29,42 @@
           </a>
         </div>
       </div>
-
       <div class="flex items-center gap-4 ml-6">
         <a href="#stories" class="text-sm landing-nav-link transition-colors">Stories</a>
-        <a href="#demo" class="landing-border-accent border px-5 py-2 text-sm font-medium landing-accent transition-colors hover:landing-btn-accent">Watch Overview</a>
-        <a href="#demo" class="landing-btn-accent px-5 py-2 text-sm font-medium transition-colors">Book a Call</a>
+        <a href="/tellers" class="landing-border-accent border px-5 py-2 text-sm font-medium landing-accent transition-colors hover:landing-btn-accent">Walkthrough</a>
+        <a href="/session/new" class="landing-btn-accent px-5 py-2 text-sm font-medium transition-colors">Sign In</a>
+      </div>
+    </div>
+    <%# Hamburger button (mobile only) %>
+    <button data-action="mobile-nav#toggle" class="md:hidden flex items-center justify-center p-2 landing-text transition-colors hover:opacity-70" aria-label="Toggle navigation menu">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+      </svg>
+    </button>
+  </div>
+  <%# Mobile drawer backdrop %>
+  <div data-mobile-nav-target="backdrop" class="hidden fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden" data-action="click->mobile-nav#backdropClick"></div>
+  <%# Mobile drawer %>
+  <div data-mobile-nav-target="menu" class="fixed top-0 right-0 z-50 h-full w-72 landing-bg border-l landing-border shadow-lg translate-x-full transition-transform duration-300 ease-out md:hidden" data-action="click@window->mobile-nav#closeKeydown">
+    <div class="flex items-center justify-between px-6 pt-4 pb-2">
+      <span class="text-sm font-medium landing-text">Menu</span>
+      <button data-action="mobile-nav#close" class="p-1 landing-dim transition-colors hover:landing-muted" aria-label="Close menu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="px-4 py-4 space-y-1">
+      <p class="section-title px-3 pt-4 pb-1">For Staff</p>
+      <a href="/tellers" class="nav-link text-sm">Tellers</a>
+      <a href="/loan-officers" class="nav-link text-sm">Loan Officers</a>
+      <a href="/finance" class="nav-link text-sm">Finance</a>
+      <a href="/compliance" class="nav-link text-sm">Compliance</a>
+      <div class="landing-border border-t my-4"></div>
+      <a href="#stories" class="nav-link text-sm">Stories</a>
+      <div class="pt-4 space-y-2">
+        <a href="/tellers" class="landing-btn-accent block w-full px-5 py-3 text-sm font-semibold text-center tracking-wide uppercase transition-colors">Walkthrough</a>
+        <a href="/session/new" class="landing-border-muted block w-full border px-5 py-3 text-sm font-medium text-center landing-accent transition-colors hover:landing-btn-accent">Sign In</a>
       </div>
     </div>
   </div>

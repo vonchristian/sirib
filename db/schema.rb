@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_07_124351) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1009,6 +1009,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_124351) do
     t.index ["cooperative_id"], name: "index_management_departments_on_cooperative_id"
   end
 
+  create_table "management_holidays", force: :cascade do |t|
+    t.bigint "cooperative_id", null: false
+    t.date "date", null: false
+    t.string "name", null: false
+    t.boolean "recurring", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id", "date"], name: "index_management_holidays_on_cooperative_id_and_date", unique: true
+    t.index ["cooperative_id"], name: "index_management_holidays_on_cooperative_id"
+  end
+
   create_table "management_permissions", force: :cascade do |t|
     t.bigint "cooperative_id", null: false
     t.string "action", null: false
@@ -1773,6 +1784,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_124351) do
   add_foreign_key "management_configurations", "users", column: "changed_by_id"
   add_foreign_key "management_departments", "cooperatives"
   add_foreign_key "management_departments", "management_branches", column: "branch_id"
+  add_foreign_key "management_holidays", "cooperatives"
   add_foreign_key "management_permissions", "cooperatives"
   add_foreign_key "management_policies", "cooperatives"
   add_foreign_key "management_policies", "users", column: "approved_by_id"

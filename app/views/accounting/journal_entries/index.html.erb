@@ -1,1 +1,77 @@
-<% content_for :page_title,"Journal Entries" %> <% content_for :page_subtitle,"Advanced filtering, search & reporting" %> <div class="flex gap-6 h-full" data-controller="journal-entries"> <%= render"accounting/journal_entries/filter_panel", branches: @branches, accounts: @accounts, users: @users, saved_filters: @saved_filters %> <div class="flex-1 min-w-0 flex flex-col"> <div class="flex items-center justify-between mb-4"> <div class="flex items-center gap-3"> <%= form_tag accounting_journal_entries_path, method: :get, class:"flex items-center gap-2", data: { turbo_frame:"entries_table" } do %> <%= text_field_tag :q, params[:q], placeholder:"Search entries...", class:"w-64 rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none","data-journal-entries-target":"searchBox" %> <%= submit_tag"Search", class:"rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors cursor-pointer" %> <% end %> </div> <div class="flex items-center gap-3"> <div class="relative" data-controller="dropdown"> <button type="button" data-action="dropdown#toggle" class="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors"> <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 12l-3-3m0 0l3 3m-3-3v9"/> </svg> Export <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/> </svg> </button> <div class="hidden absolute right-0 mt-1 w-40 rounded-md border border-border bg-surface shadow-lg z-10" data-dropdown-target="menu"> <%= link_to accounting_journal_entries_path(format: :csv, **request.query_parameters), class:"flex items-center gap-2 px-3 py-2 text-xs text-text-secondary hover:bg-surface-alt transition-colors", data: { testid:"export-csv" } do %> <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 12l-3-3m0 0l3 3m-3-3v9"/> </svg> Export CSV <% end %> <button type="button" class="w-full flex items-center gap-2 px-3 py-2 text-xs text-text-secondary hover:bg-surface-alt transition-colors" onclick="window.print()"> <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"> <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.052-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.052.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/> </svg> Print Report </button> </div> </div> <%= link_to new_accounting_journal_entry_path, class:"rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors" do %> <svg class="w-4 h-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/> </svg> New Entry <% end %> </div> </div> <%= turbo_frame_tag"entries_table", class:"flex-1 min-h-0" do %> <div class="rounded-lg border border-border bg-surface overflow-hidden flex-1"> <table class="w-full text-sm"> <thead> <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> <th class="px-4 py-3 font-medium">Entry #</th> <th class="px-4 py-3 font-medium">Description</th> <th class="px-4 py-3 font-medium">Branch</th> <th class="px-4 py-3 font-medium">Type</th> <th class="px-4 py-3 font-medium text-right">Debit</th> <th class="px-4 py-3 font-medium text-right">Credit</th> <th class="px-4 py-3 font-medium">Status</th> <th class="px-4 py-3 font-medium">Posted At</th> <th class="px-4 py-3 font-medium text-right">Actions</th> </tr> </thead> <tbody class="divide-y divide-border" data-journal-entries-target="entriesList"> <% @entries.each do |entry| %> <% entry_template = Accounting::EntryTemplate.find_by(entry_id: entry.id) %> <tr class="hover:bg-surface-alt transition-colors cursor-pointer" data-href="<%= accounting_journal_entry_path(entry) %>" data-action="click->journal-entries#showEntry" data-entry-id="<%= entry.id %>" data-testid="journal-row"> <td class="px-4 py-3 font-mono text-xs"><%= entry.reference_number %></td> <td class="px-4 py-3 text-text-primary max-w-xs truncate"><%= entry.description %></td> <td class="px-4 py-3 text-text-secondary text-xs"><%= entry.branch&.name ||"—" %></td> <td class="px-4 py-3"> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= entry_type_class(entry.entry_type) %>"> <%= entry.entry_type.titleize %> </span> </td> <td class="px-4 py-3 text-right font-mono text-xs text-danger"><%= number_to_currency(entry.amount_lines.debit.total.to_f / 100, unit:"₱") %></td> <td class="px-4 py-3 text-right font-mono text-xs text-success"><%= number_to_currency(entry.amount_lines.credit.total.to_f / 100, unit:"₱") %></td> <td class="px-4 py-3"> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= status_class(entry.status) %>"> <%= entry.status.titleize %> </span> </td> <td class="px-4 py-3 text-text-secondary text-xs"><%= l(entry.posted_at, format: :short) %></td> <td class="px-4 py-3 text-right"> <%= link_to"View", accounting_journal_entry_path(entry), class:"text-xs text-primary hover:text-primary-700 transition-colors" %> </td> </tr> <% end %> <% if @entries.empty? %> <tr><td colspan="9" class="px-4 py-8 text-center text-text-tertiary"> <div class="flex flex-col items-center"> <svg class="w-12 h-12 text-text-tertiary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"> <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/> </svg> <p>No journal entries found</p> <p class="text-xs mt-1">Try adjusting your filters or create a new entry</p> </div> </td></tr> <% end %> </tbody> </table> </div> <div class="mt-4 flex items-center justify-between"> <div class="text-xs text-text-tertiary"> <%= pagy_info(@pagy) if defined?(@pagy) %> </div> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div> <% end %> </div> <%= turbo_frame_tag"entry_detail", class:"w-96 flex-shrink-0" %> </div> 
+<% content_for :page_title,"Journal Entries" %> <% content_for :page_subtitle,"Advanced filtering, search & reporting" %> 
+<div class="flex gap-6 h-full" data-controller="journal-entries"> <%= render"accounting/journal_entries/filter_panel", branches: @branches, accounts: @accounts, users: @users, saved_filters: @saved_filters %> 
+  <div class="flex-1 min-w-0 flex flex-col"> 
+    <div class="flex items-center justify-between mb-4"> 
+      <div class="flex items-center gap-3"> <%= form_tag accounting_journal_entries_path, method: :get, class:"flex items-center gap-2", data: { turbo_frame:"entries_table" } do %> <%= text_field_tag :q, params[:q], placeholder:"Search entries...", class:"w-64 rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none","data-journal-entries-target":"searchBox" %> <%= submit_tag"Search", class:"rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors cursor-pointer" %> <% end %> </div>
+ 
+      <div class="flex items-center gap-3"> 
+        <div class="relative" data-controller="dropdown"> <button type="button" data-action="dropdown#toggle" class="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors"> <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 12l-3-3m0 0l3 3m-3-3v9"/> </svg> Export <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/> </svg> </button> 
+          <div class="hidden absolute right-0 mt-1 w-40 rounded-md border border-border bg-surface shadow-lg z-10" data-dropdown-target="menu"> <%= link_to accounting_journal_entries_path(format: :csv, **request.query_parameters), class:"flex items-center gap-2 px-3 py-2 text-xs text-text-secondary hover:bg-surface-alt transition-colors", data: { testid:"export-csv" } do %> <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 12l-3-3m0 0l3 3m-3-3v9"/> </svg> Export CSV <% end %> <button type="button" class="w-full flex items-center gap-2 px-3 py-2 text-xs text-text-secondary hover:bg-surface-alt transition-colors" onclick="window.print()"> <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"> <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.052-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.052.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/> </svg> Print Report </button> </div>
+ </div>
+ <%= link_to new_accounting_journal_entry_path, class:"rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors" do %> <svg class="w-4 h-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/> </svg> New Entry <% end %> </div>
+ </div>
+ <%= turbo_frame_tag"entries_table", class:"flex-1 min-h-0" do %> 
+      <div class="rounded-lg border border-border bg-surface overflow-hidden flex-1"> 
+        <table class="w-full text-sm"> 
+          <thead> 
+            <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> 
+              <th class="px-4 py-3 font-medium">Entry #</th>
+ 
+              <th class="px-4 py-3 font-medium">Description</th>
+ 
+              <th class="px-4 py-3 font-medium">Branch</th>
+ 
+              <th class="px-4 py-3 font-medium">Type</th>
+ 
+              <th class="px-4 py-3 font-medium text-right">Debit</th>
+ 
+              <th class="px-4 py-3 font-medium text-right">Credit</th>
+ 
+              <th class="px-4 py-3 font-medium">Status</th>
+ 
+              <th class="px-4 py-3 font-medium">Posted At</th>
+ 
+              <th class="px-4 py-3 font-medium text-right">Actions</th>
+ </tr>
+ </thead>
+ 
+          <tbody class="divide-y divide-border" data-journal-entries-target="entriesList"> <% @entries.each do |entry| %> <% entry_template = Accounting::EntryTemplate.find_by(entry_id: entry.id) %> 
+              <tr class="hover:bg-surface-alt transition-colors cursor-pointer" data-href="<%= accounting_journal_entry_path(entry) %>" data-action="click->journal-entries#showEntry" data-entry-id="<%= entry.id %>" data-testid="journal-row"> 
+                <td class="px-4 py-3 font-mono text-xs"><%= entry.reference_number %></td>
+ 
+                <td class="px-4 py-3 text-text-primary max-w-xs truncate"><%= entry.description %></td>
+ 
+                <td class="px-4 py-3 text-text-secondary text-xs"><%= entry.branch&.name ||"—" %></td>
+ 
+                <td class="px-4 py-3"> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= entry_type_class(entry.entry_type) %>"> <%= entry.entry_type.titleize %> </span> </td>
+ 
+                <td class="px-4 py-3 text-right font-mono text-xs text-danger"><%= number_to_currency(entry.amount_lines.debit.total.to_f / 100, unit:"₱") %></td>
+ 
+                <td class="px-4 py-3 text-right font-mono text-xs text-success"><%= number_to_currency(entry.amount_lines.credit.total.to_f / 100, unit:"₱") %></td>
+ 
+                <td class="px-4 py-3"> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= status_class(entry.status) %>"> <%= entry.status.titleize %> </span> </td>
+ 
+                <td class="px-4 py-3 text-text-secondary text-xs"><%= l(entry.posted_at, format: :short) %></td>
+ 
+                <td class="px-4 py-3 text-right"> <%= link_to"View", accounting_journal_entry_path(entry), class:"text-xs text-primary hover:text-primary-700 transition-colors" %> </td>
+ </tr>
+ <% end %> <% if @entries.empty? %> 
+              <tr>
+                <td colspan="9" class="px-4 py-8 text-center text-text-tertiary"> 
+                  <div class="flex flex-col items-center"> <svg class="w-12 h-12 text-text-tertiary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"> <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/> </svg> 
+                    <p>No journal entries found</p>
+ 
+                    <p class="text-xs mt-1">Try adjusting your filters or create a new entry</p>
+ </div>
+ </td>
+              </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ 
+      <div class="mt-4 flex items-center justify-between"> 
+        <div class="text-xs text-text-tertiary"> <%= pagy_info(@pagy) if defined?(@pagy) %> </div>
+ <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div>
+ <% end %> </div>
+ <%= turbo_frame_tag"entry_detail", class:"w-96 flex-shrink-0" %> </div>
+ 

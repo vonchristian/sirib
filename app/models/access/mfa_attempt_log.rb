@@ -5,7 +5,7 @@ module Access
     belongs_to :user
 
     validates :action, presence: true
-    validates :success, inclusion: { in: [true, false] }
+    validates :success, inclusion: { in: [ true, false ] }
 
     scope :successful, -> { where(success: true) }
     scope :failed, -> { where(success: false) }

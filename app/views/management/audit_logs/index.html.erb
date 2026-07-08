@@ -1,1 +1,41 @@
-<% content_for :page_title,"Audit Logs" %> <% content_for :page_subtitle,"System audit trail" %> <div class="flex items-center gap-2 mb-6"> <%= form_tag management_audit_logs_path, method: :get, class:"flex items-center gap-2 flex-wrap" do %> <%= select_tag :action_type, options_for_select(Management::AuditLog.distinct.pluck(:action), params[:action_type]), include_blank:"All Actions", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= date_field_tag :from, params[:from], class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"From" %> <%= date_field_tag :to, params[:to], class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"To" %> <%= submit_tag"Filter", class:"rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %> <% end %> </div> <div class="rounded-lg border border-border bg-surface overflow-hidden"> <table class="w-full text-sm"> <thead> <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> <th class="px-5 py-3 font-medium">Timestamp</th> <th class="px-5 py-3 font-medium">Action</th> <th class="px-5 py-3 font-medium">Actor</th> <th class="px-5 py-3 font-medium">Subject</th> <th class="px-5 py-3 font-medium text-right">Details</th> </tr> </thead> <tbody class="divide-y divide-border"> <% @audit_logs.each do |log| %> <tr class="hover:bg-surface-alt transition-colors"> <td class="px-5 py-3 text-text-secondary whitespace-nowrap"><%= log.created_at.strftime("%b %d %H:%M") %></td> <td class="px-5 py-3"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-surface-alt text-text-secondary"><%= log.action %></span> </td> <td class="px-5 py-3 text-text-secondary"><%= log.actor&.email_address ||"System" %></td> <td class="px-5 py-3 text-text-secondary max-w-[200px] truncate"><%= log.auditable_type %> #<%= log.auditable_id %></td> <td class="px-5 py-3 text-right"> <%= link_to"View", management_audit_log_path(log), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </td> </tr> <% end %> <% if @audit_logs.empty? %> <tr><td colspan="5" class="px-5 py-8 text-center text-text-tertiary">No audit logs found.</td></tr> <% end %> </tbody> </table> </div> <div class="mt-4"> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div> 
+<% content_for :page_title,"Audit Logs" %> <% content_for :page_subtitle,"System audit trail" %> 
+<div class="flex items-center gap-2 mb-6"> <%= form_tag management_audit_logs_path, method: :get, class:"flex items-center gap-2 flex-wrap" do %> <%= select_tag :action_type, options_for_select(Management::AuditLog.distinct.pluck(:action), params[:action_type]), include_blank:"All Actions", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= date_field_tag :from, params[:from], class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"From" %> <%= date_field_tag :to, params[:to], class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"To" %> <%= submit_tag"Filter", class:"rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %> <% end %> </div>
+ 
+<div class="rounded-lg border border-border bg-surface overflow-hidden"> 
+  <table class="w-full text-sm"> 
+    <thead> 
+      <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> 
+        <th class="px-5 py-3 font-medium">Timestamp</th>
+ 
+        <th class="px-5 py-3 font-medium">Action</th>
+ 
+        <th class="px-5 py-3 font-medium">Actor</th>
+ 
+        <th class="px-5 py-3 font-medium">Subject</th>
+ 
+        <th class="px-5 py-3 font-medium text-right">Details</th>
+ </tr>
+ </thead>
+ 
+    <tbody class="divide-y divide-border"> <% @audit_logs.each do |log| %> 
+        <tr class="hover:bg-surface-alt transition-colors"> 
+          <td class="px-5 py-3 text-text-secondary whitespace-nowrap"><%= log.created_at.strftime("%b %d %H:%M") %></td>
+ 
+          <td class="px-5 py-3"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-surface-alt text-text-secondary"><%= log.action %></span> </td>
+ 
+          <td class="px-5 py-3 text-text-secondary"><%= log.actor&.email_address ||"System" %></td>
+ 
+          <td class="px-5 py-3 text-text-secondary max-w-[200px] truncate"><%= log.auditable_type %> #<%= log.auditable_id %></td>
+ 
+          <td class="px-5 py-3 text-right"> <%= link_to"View", management_audit_log_path(log), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </td>
+ </tr>
+ <% end %> <% if @audit_logs.empty? %> 
+        <tr>
+          <td colspan="5" class="px-5 py-8 text-center text-text-tertiary">No audit logs found.</td>
+        </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ 
+<div class="mt-4"> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div>
+ 

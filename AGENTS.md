@@ -319,3 +319,14 @@ A feature is complete only when:
 - The feature can be confidently deployed to production without additional engineering work.
 
 Do not stop until every item above has been satisfied.
+
+---
+
+## Design Context
+
+- **Creative North Star:** "The Toolbox Standard" — reliable tools, calm confidence, anti-corporate
+- **Primary accent:** Olive green (#5b8c5a, OKLCH 55% 0.075 135) — growth, shared prosperity, cooperative roots
+- **Palette:** Warm neutrals (surface: white, surface-alt: #f7f5f0, text: #2c241b)
+- **Fonts:** Inter (sans), JetBrains Mono (data/labels) — 14px body, compact for info density
+- **Elevation:** Flat by default, minimal shadows for state changes only
+- **See** `PRODUCT.md` (strategy) and `DESIGN.md` (visual system) for full details.

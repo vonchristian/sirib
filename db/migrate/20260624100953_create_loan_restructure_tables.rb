@@ -12,8 +12,8 @@ class CreateLoanRestructureTables < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :loan_schedules, [:loan_id, :version], unique: true
-    add_index :loan_schedules, [:loan_id, :status]
+    add_index :loan_schedules, [ :loan_id, :version ], unique: true
+    add_index :loan_schedules, [ :loan_id, :status ]
 
     create_table :loan_links do |t|
       t.references :from_loan, null: false, foreign_key: { to_table: :loans }
@@ -25,9 +25,9 @@ class CreateLoanRestructureTables < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :loan_links, [:from_loan_id, :link_type]
-    add_index :loan_links, [:to_loan_id, :link_type]
-    add_index :loan_links, [:from_loan_id, :to_loan_id], unique: true
+    add_index :loan_links, [ :from_loan_id, :link_type ]
+    add_index :loan_links, [ :to_loan_id, :link_type ]
+    add_index :loan_links, [ :from_loan_id, :to_loan_id ], unique: true
 
     create_table :loan_events do |t|
       t.references :loan, null: false, foreign_key: true
@@ -38,8 +38,8 @@ class CreateLoanRestructureTables < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :loan_events, [:loan_id, :event_type]
-    add_index :loan_events, [:loan_id, :created_at]
+    add_index :loan_events, [ :loan_id, :event_type ]
+    add_index :loan_events, [ :loan_id, :created_at ]
 
     create_table :loan_restructure_cases do |t|
       t.references :loan, null: false, foreign_key: true
@@ -59,7 +59,7 @@ class CreateLoanRestructureTables < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :loan_restructure_cases, [:loan_id, :status]
-    add_index :loan_restructure_cases, [:loan_id, :restructure_type]
+    add_index :loan_restructure_cases, [ :loan_id, :status ]
+    add_index :loan_restructure_cases, [ :loan_id, :restructure_type ]
   end
 end

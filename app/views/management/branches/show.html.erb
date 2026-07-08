@@ -1,1 +1,65 @@
-<% content_for :page_title, @branch.name %> <% content_for :page_subtitle,"Branch ##{@branch.code}" %> <div class="flex items-center justify-end gap-2 mb-6"> <%= link_to"Edit", edit_management_branch_path(@branch), class:"rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors" %> <%= link_to"Back", management_branches_path, class:"rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors" %> </div> <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"> <div class="lg:col-span-2 space-y-6"> <div class="rounded-lg border border-border bg-surface"> <div class="border-b border-border px-5 py-4"> <h3 class="text-sm font-semibold text-text-primary">Details</h3> </div> <div class="p-5 space-y-3"> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Name</span> <span class="text-sm text-text-primary font-medium"><%= @branch.name %></span> </div> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Code</span> <span class="text-sm text-text-primary"><%= @branch.code %></span> </div> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Status</span> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= @branch.active? ? 'bg-positive-50 text-positive' : 'bg-surface-alt text-text-tertiary' %>"><%= @branch.status.titleize %></span> </div> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Address</span> <span class="text-sm text-text-primary"><%= @branch.address ||"—" %></span> </div> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Phone</span> <span class="text-sm text-text-primary"><%= @branch.phone ||"—" %></span> </div> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Email</span> <span class="text-sm text-text-primary"><%= @branch.email ||"—" %></span> </div> </div> </div> <div class="rounded-lg border border-border bg-surface"> <div class="border-b border-border px-5 py-4"> <h3 class="text-sm font-semibold text-text-primary">Departments</h3> </div> <div class="divide-y divide-border"> <% @departments.each do |dept| %> <div class="flex items-center justify-between px-5 py-3"> <div> <p class="text-sm text-text-primary"><%= dept.name %></p> <p class="text-xs text-text-tertiary"><%= dept.code %></p> </div> <span class="text-xs text-text-tertiary"><%= dept.teams.count %> teams</span> </div> <% end %> <% if @departments.empty? %> <p class="px-5 py-4 text-sm text-text-tertiary">No departments.</p> <% end %> </div> </div> </div> <div class="space-y-6"> <div class="rounded-lg border border-border bg-surface"> <div class="border-b border-border px-5 py-4"> <h3 class="text-sm font-semibold text-text-primary">Performance</h3> </div> <div class="p-5 space-y-3"> <% if @snapshot %> <% m = @snapshot.metrics %> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Total Assets</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["loan_portfolio_cents"] || 0).to_f / 100, unit:"₱") %></span> </div> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Loan Portfolio</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["loan_portfolio_cents"] || 0).to_f / 100, unit:"₱") %></span> </div> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Savings Deposits</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["savings_balance_cents"] || 0).to_f / 100, unit:"₱") %></span> </div> <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Members</span> <span class="text-sm font-medium text-text-primary"><%= m["total_members"] || 0 %></span> </div> <% else %> <p class="text-sm text-text-tertiary">No performance data yet.</p> <% end %> </div> </div> </div> </div> 
+<% content_for :page_title, @branch.name %> <% content_for :page_subtitle,"Branch ##{@branch.code}" %> 
+<div class="flex items-center justify-end gap-2 mb-6"> <%= link_to"Edit", edit_management_branch_path(@branch), class:"rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors" %> <%= link_to"Back", management_branches_path, class:"rounded-md border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-alt transition-colors" %> </div>
+ 
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6"> 
+  <div class="lg:col-span-2 space-y-6"> 
+    <div class="rounded-lg border border-border bg-surface"> 
+      <div class="border-b border-border px-5 py-4"> 
+        <h3 class="text-sm font-semibold text-text-primary">Details</h3>
+ </div>
+ 
+      <div class="p-5 space-y-3"> 
+        <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Name</span> <span class="text-sm text-text-primary font-medium"><%= @branch.name %></span> </div>
+ 
+        <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Code</span> <span class="text-sm text-text-primary"><%= @branch.code %></span> </div>
+ 
+        <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Status</span> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= @branch.active? ? 'bg-positive-50 text-positive' : 'bg-surface-alt text-text-tertiary' %>"><%= @branch.status.titleize %></span> </div>
+ 
+        <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Address</span> <span class="text-sm text-text-primary"><%= @branch.address ||"—" %></span> </div>
+ 
+        <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Phone</span> <span class="text-sm text-text-primary"><%= @branch.phone ||"—" %></span> </div>
+ 
+        <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Email</span> <span class="text-sm text-text-primary"><%= @branch.email ||"—" %></span> </div>
+ </div>
+ </div>
+ 
+    <div class="rounded-lg border border-border bg-surface"> 
+      <div class="border-b border-border px-5 py-4"> 
+        <h3 class="text-sm font-semibold text-text-primary">Departments</h3>
+ </div>
+ 
+      <div class="divide-y divide-border"> <% @departments.each do |dept| %> 
+          <div class="flex items-center justify-between px-5 py-3"> 
+            <div> 
+              <p class="text-sm text-text-primary"><%= dept.name %></p>
+ 
+              <p class="text-xs text-text-tertiary"><%= dept.code %></p>
+ </div>
+ <span class="text-xs text-text-tertiary"><%= dept.teams.count %> teams</span> </div>
+ <% end %> <% if @departments.empty? %> 
+          <p class="px-5 py-4 text-sm text-text-tertiary">No departments.</p>
+ <% end %> </div>
+ </div>
+ </div>
+ 
+  <div class="space-y-6"> 
+    <div class="rounded-lg border border-border bg-surface"> 
+      <div class="border-b border-border px-5 py-4"> 
+        <h3 class="text-sm font-semibold text-text-primary">Performance</h3>
+ </div>
+ 
+      <div class="p-5 space-y-3"> <% if @snapshot %> <% m = @snapshot.metrics %> 
+          <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Total Assets</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["loan_portfolio_cents"] || 0).to_f / 100, unit:"₱") %></span> </div>
+ 
+          <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Loan Portfolio</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["loan_portfolio_cents"] || 0).to_f / 100, unit:"₱") %></span> </div>
+ 
+          <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Savings Deposits</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["savings_balance_cents"] || 0).to_f / 100, unit:"₱") %></span> </div>
+ 
+          <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Members</span> <span class="text-sm font-medium text-text-primary"><%= m["total_members"] || 0 %></span> </div>
+ <% else %> 
+          <p class="text-sm text-text-tertiary">No performance data yet.</p>
+ <% end %> </div>
+ </div>
+ </div>
+ </div>
+ 

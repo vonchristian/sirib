@@ -130,7 +130,7 @@ RSpec.describe Accounting::LedgerQueryService do
       line = entry.amount_lines.first
       line.update!(account: account, cooperative: cooperative)
 
-      ledger_lines = service.build_ledger_lines([line])
+      ledger_lines = service.build_ledger_lines([ line ])
       expect(ledger_lines).to be_an(Array)
       expect(ledger_lines.first).to be_an(Accounting::LedgerLine)
       expect(ledger_lines.first.journal_entry_id).to eq(entry.id)
@@ -152,7 +152,7 @@ RSpec.describe Accounting::LedgerQueryService do
       line3 = entry3.amount_lines.where(amount_type: :debit).first
       line3.update!(account: account, cooperative: cooperative, amount_cents: 5_000)
 
-      lines = [line1, line2, line3]
+      lines = [ line1, line2, line3 ]
       ledger_lines = service.build_ledger_lines(lines)
 
       expect(ledger_lines[0].running_balance.cents).to eq(10_000)
@@ -173,7 +173,7 @@ RSpec.describe Accounting::LedgerQueryService do
       line2 = entry2.amount_lines.where(amount_type: :debit).first
       line2.update!(account: liability_account, cooperative: cooperative, amount_cents: 3_000)
 
-      lines = [line1, line2]
+      lines = [ line1, line2 ]
       ledger_lines = liability_service.build_ledger_lines(lines)
 
       expect(ledger_lines[0].running_balance.cents).to eq(10_000)
@@ -186,7 +186,7 @@ RSpec.describe Accounting::LedgerQueryService do
       line = entry.amount_lines.first
       line.update!(account: account, cooperative: cooperative)
 
-      ledger_lines = service.build_ledger_lines([line])
+      ledger_lines = service.build_ledger_lines([ line ])
       expect(ledger_lines.first.posted_by).to eq(user.email_address.split("@").first)
     end
 

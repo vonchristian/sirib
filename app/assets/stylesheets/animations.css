@@ -1,0 +1,241 @@
+/* ── GPU-Accelerated Animation System ─────────────────────────────────────
+ * Only transform & opacity — no layout-triggering properties.
+ * Durations: 150-300ms for micro-interactions, 400-600ms for reveals.
+ * Easing: var(--ease-out) = cubic-bezier(0.16, 1, 0.3, 1)
+ * ──────────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  /* ── Scale on press (buttons, clickable cards) ──────────────────── */
+  @keyframes press {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.97); }
+    100% { transform: scale(1); }
+  }
+
+  .animate-press:active {
+    animation: press 0.15s ease-out;
+  }
+
+  /* ── Skeleton shimmer (loading states) ──────────────────────────── */
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface-alt) 25%,
+      var(--color-surface-raised) 50%,
+      var(--color-surface-alt) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* ── Notification dot pulse ─────────────────────────────────────── */
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  /* ── Badge count bounce ─────────────────────────────────────────── */
+  @keyframes bounce-in {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.3s var(--ease-out);
+  }
+
+  /* ── Number counter reveal ──────────────────────────────────────── */
+  @keyframes count-up {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-count-up {
+    animation: count-up 0.4s var(--ease-out) both;
+  }
+
+  .animate-count-up-1 { animation: count-up 0.4s var(--ease-out) 0.05s both; }
+  .animate-count-up-2 { animation: count-up 0.4s var(--ease-out) 0.1s both; }
+  .animate-count-up-3 { animation: count-up 0.4s var(--ease-out) 0.15s both; }
+  .animate-count-up-4 { animation: count-up 0.4s var(--ease-out) 0.2s both; }
+
+  /* ── Staggered reveal (for scroll-triggered lists & cards) ──────── */
+  @keyframes reveal-up {
+    0% { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-reveal {
+    animation: reveal-up 0.5s var(--ease-out) both;
+  }
+
+  .animate-reveal-1 { animation: reveal-up 0.5s var(--ease-out) 0.05s both; }
+  .animate-reveal-2 { animation: reveal-up 0.5s var(--ease-out) 0.1s both; }
+  .animate-reveal-3 { animation: reveal-up 0.5s var(--ease-out) 0.15s both; }
+  .animate-reveal-4 { animation: reveal-up 0.5s var(--ease-out) 0.2s both; }
+  .animate-reveal-5 { animation: reveal-up 0.5s var(--ease-out) 0.25s both; }
+  .animate-reveal-6 { animation: reveal-up 0.5s var(--ease-out) 0.3s both; }
+  .animate-reveal-7 { animation: reveal-up 0.5s var(--ease-out) 0.35s both; }
+  .animate-reveal-8 { animation: reveal-up 0.5s var(--ease-out) 0.4s both; }
+
+  /* ── Page enter (Turbo Drive page transitions) ──────────────────── */
+  @keyframes page-enter {
+    0% { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-page-enter {
+    animation: page-enter 0.25s var(--ease-out);
+  }
+
+  /* ── Fade in (page sections, cards) ─────────────────────────────── */
+  @keyframes fade-in {
+    0% { opacity: 0; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.35s var(--ease-out) both;
+  }
+
+  .animate-fade-in-1 { animation: fade-in 0.35s var(--ease-out) 0.05s both; }
+  .animate-fade-in-2 { animation: fade-in 0.35s var(--ease-out) 0.1s both; }
+  .animate-fade-in-3 { animation: fade-in 0.35s var(--ease-out) 0.15s both; }
+  .animate-fade-in-4 { animation: fade-in 0.35s var(--ease-out) 0.2s both; }
+
+  /* ── Fade in up (forms, dialogs) ────────────────────────────────── */
+  @keyframes fade-in-up {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.3s var(--ease-out) both;
+  }
+
+  .animate-fade-in-up-1 { animation: fade-in-up 0.3s var(--ease-out) 0.05s both; }
+
+  /* ── Scale fade (modal/dropdown enter) ──────────────────────────── */
+  @keyframes scale-fade-in {
+    0% { opacity: 0; transform: scale(0.96); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .animate-scale-fade-in {
+    animation: scale-fade-in 0.15s var(--ease-out);
+  }
+
+  /* ── Button ripple (radial burst on click) ──────────────────────── */
+  @keyframes ripple {
+    0% { transform: scale(0); opacity: 0.5; }
+    100% { transform: scale(4); opacity: 0; }
+  }
+
+  /* ── Slide-in for sidebar items ─────────────────────────────────── */
+  @keyframes slide-in-left {
+    0% { opacity: 0; transform: translateX(-8px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 0.3s var(--ease-out) both;
+  }
+
+  .animate-slide-in-left-1 { animation: slide-in-left 0.3s var(--ease-out) 0.02s both; }
+  .animate-slide-in-left-2 { animation: slide-in-left 0.3s var(--ease-out) 0.04s both; }
+  .animate-slide-in-left-3 { animation: slide-in-left 0.3s var(--ease-out) 0.06s both; }
+  .animate-slide-in-left-4 { animation: slide-in-left 0.3s var(--ease-out) 0.08s both; }
+  .animate-slide-in-left-5 { animation: slide-in-left 0.3s var(--ease-out) 0.1s both; }
+  .animate-slide-in-left-6 { animation: slide-in-left 0.3s var(--ease-out) 0.12s both; }
+  .animate-slide-in-left-7 { animation: slide-in-left 0.3s var(--ease-out) 0.14s both; }
+  .animate-slide-in-left-8 { animation: slide-in-left 0.3s var(--ease-out) 0.16s both; }
+
+  /* ── Table row hover lift ──────────────────────────────────────────── */
+  .table tr {
+    transition: transform 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .table tbody tr:hover {
+    transform: translateX(2px);
+  }
+
+  /* ── Card hover lift ───────────────────────────────────────────────── */
+  .card, .stat-card, [class*="rounded-lg border"] {
+    transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .card:hover, .stat-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* ── Nav link slide indicator ──────────────────────────────────────── */
+  .nav-link {
+    position: relative;
+    transition: background-color 0.15s var(--ease-out), color 0.15s var(--ease-out), transform 0.15s var(--ease-out);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .nav-link:hover {
+    transform: translateX(2px);
+  }
+
+  .nav-link.active {
+    transform: translateX(0);
+  }
+
+  /* ── Sidebar rail icon scale ────────────────────────────────────────── */
+  [data-action*="click->sidebar#selectRail"] {
+    transition: transform 0.15s var(--ease-out), background-color 0.15s var(--ease-out);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  [data-action*="click->sidebar#selectRail"]:hover {
+    transform: scale(1.08);
+  }
+
+  /* ── Button hover glow ─────────────────────────────────────────────── */
+  .btn-primary, .btn-danger, .btn-positive {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::after, .btn-danger::after, .btn-positive::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.4s var(--ease-out);
+    pointer-events: none;
+  }
+
+  .btn-primary:hover::after, .btn-danger:hover::after, .btn-positive:hover::after {
+    transform: translateX(100%);
+  }
+}
+
+/* ── Reduce motion respect ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

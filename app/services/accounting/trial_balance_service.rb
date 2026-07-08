@@ -10,9 +10,9 @@ module Accounting
 
       accounts = if cooperative
                    Account.by_cooperative(cooperative).where(id: rows.map { |r| r["account_id"] }).includes(:ledger).index_by(&:id)
-                 else
+      else
                    Account.where(id: rows.map { |r| r["account_id"] }).includes(:ledger).index_by(&:id)
-                 end
+      end
 
       account_lines = rows.map do |row|
         account = accounts[row["account_id"].to_i]

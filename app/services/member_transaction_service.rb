@@ -22,7 +22,7 @@ class MemberTransactionService < ActiveInteraction::Base
   private
 
   def create_journal_entry!(total_cents)
-    debits = [{ account: cash_account, amount: total_cents }]
+    debits = [ { account: cash_account, amount: total_cents } ]
     credits = items.map { |i| { account: i[:credit_account], amount: i[:amount_cents] } }
 
     Accounting::PostEntryService.run!(
@@ -95,7 +95,7 @@ class MemberTransactionService < ActiveInteraction::Base
     )
 
     new_outstanding = loan.outstanding_principal_cents - payment.principal_cents
-    loan.update!(outstanding_principal_cents: [new_outstanding, 0].max)
+    loan.update!(outstanding_principal_cents: [ new_outstanding, 0 ].max)
     loan.update!(status: "paid") if loan.outstanding_principal_cents <= 0
   end
 

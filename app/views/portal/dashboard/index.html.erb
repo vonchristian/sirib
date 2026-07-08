@@ -1,1 +1,121 @@
-<% content_for :title,"Dashboard" %> <div class="space-y-6"> <div class="flex items-center justify-between"> <div> <h1 class="text-lg font-semibold text-text-primary">Welcome, <%= @member.first_name %>!</h1> <p class="text-sm text-text-tertiary">Member ID: <%= @member.member_identifier %></p> </div> </div> <% if @announcements.any? %> <div class="rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-4"> <h2 class="text-xs font-semibold text-primary-700 dark:text-primary-300 uppercase tracking-wider mb-3">Announcements</h2> <div class="space-y-3"> <% @announcements.each do |announcement| %> <div> <h3 class="text-sm font-medium text-primary dark:text-primary-200"><%= announcement.title %></h3> <p class="text-xs text-primary dark:text-primary-400 mt-0.5"><%= truncate(announcement.body, length: 120) %></p> <p class="text-[10px] text-primary-400 dark:text-primary-500 mt-0.5"><%= l(announcement.published_at, format: :long) %></p> </div> <% end %> </div> <%= link_to"View all announcements", portal_announcements_path, class:"text-xs font-medium text-primary dark:text-primary-400 hover:underline mt-2 inline-block" %> </div> <% end %> <div class="grid grid-cols-1 sm:grid-cols-3 gap-4"> <div class="rounded-xl bg-surface border border-border p-4"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Savings</p> <p class="text-2xl font-bold text-text-primary mt-1"><%= number_to_currency(@total_savings / 100.0, unit:"₱") %></p> <p class="text-xs text-text-tertiary mt-1"><%= pluralize(@savings_accounts.count,"account") %></p> </div> <div class="rounded-xl bg-surface border border-border p-4"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Share Capital</p> <p class="text-2xl font-bold text-text-primary mt-1"><%= number_to_currency(@total_share_capital / 100.0, unit:"₱") %></p> <p class="text-xs text-text-tertiary mt-1"><%= pluralize(@share_capital_accounts.count,"account") %></p> </div> <div class="rounded-xl bg-surface border border-border p-4"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Loan Balance</p> <p class="text-2xl font-bold <%= @total_loans > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-text-primary ' %> mt-1"><%= number_to_currency(@total_loans / 100.0, unit:"₱") %></p> <p class="text-xs text-text-tertiary mt-1"><%= pluralize(@loans.count,"loan") %></p> </div> </div> <% if @savings_accounts.any? %> <div class="rounded-xl bg-surface border border-border overflow-hidden"> <div class="px-4 py-3 border-b border-border"> <h2 class="text-sm font-semibold text-text-primary">Savings Accounts</h2> </div> <div class="divide-y divide-border"> <% @savings_accounts.each do |account| %> <div class="px-4 py-3 flex items-center justify-between"> <div> <p class="text-sm font-medium text-text-primary"><%= account.savings_product&.name ||"Savings" %></p> <p class="text-xs text-text-tertiary"><%= account.account_number %></p> </div> <p class="text-sm font-semibold text-text-primary"><%= number_to_currency(account.balance.to_f, unit:"₱") %></p> </div> <% end %> </div> </div> <% end %> <% if @share_capital_accounts.any? %> <div class="rounded-xl bg-surface border border-border overflow-hidden"> <div class="px-4 py-3 border-b border-border"> <h2 class="text-sm font-semibold text-text-primary">Share Capital</h2> </div> <div class="divide-y divide-border"> <% @share_capital_accounts.each do |account| %> <div class="px-4 py-3 flex items-center justify-between"> <div> <p class="text-sm font-medium text-text-primary"><%= account.share_product&.name ||"Shares" %></p> <p class="text-xs text-text-tertiary"><%= account.shares_owned %> shares owned</p> </div> <p class="text-sm font-semibold text-text-primary"><%= number_to_currency(account.current_share_value.to_f, unit:"₱") %></p> </div> <% end %> </div> </div> <% end %> <% if @loans.any? %> <div class="rounded-xl bg-surface border border-border overflow-hidden"> <div class="px-4 py-3 border-b border-border"> <h2 class="text-sm font-semibold text-text-primary">Active Loans</h2> </div> <div class="divide-y divide-border"> <% @loans.each do |loan| %> <div class="px-4 py-3"> <div class="flex items-center justify-between mb-1"> <p class="text-sm font-medium text-text-primary"><%= loan.loan_product&.name ||"Loan" %></p> <span class="text-[10px] font-medium px-1.5 py-0.5 rounded <%= loan.status == 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-surface-alt text-text-secondary ' %>"><%= loan.status.titleize %></span> </div> <div class="flex items-center justify-between"> <p class="text-xs text-text-tertiary">Outstanding: <%= number_to_currency(loan.outstanding_principal_cents.to_f / 100, unit:"₱") %></p> <p class="text-xs text-text-tertiary">Principal: <%= number_to_currency(loan.principal_cents.to_f / 100, unit:"₱") %></p> </div> <% if loan.payment_schedule.any? %> <div class="mt-2 pt-2 border-t border-border/50"> <p class="text-[10px] font-medium text-text-tertiary uppercase tracking-wider mb-1">Repayment Schedule</p> <% loan.payment_schedule.first(3).each do |schedule| %> <div class="flex items-center justify-between text-xs py-0.5"> <span class="text-text-secondary"><%= l(schedule.due_date, format: :short) %></span> <span class="text-text-primary"><%= number_to_currency(schedule.total_cents.to_f / 100, unit:"₱") %></span> </div> <% end %> <% if loan.payment_schedule.count > 3 %> <p class="text-[10px] text-text-tertiary mt-1">+ <%= loan.payment_schedule.count - 3 %> more payments</p> <% end %> </div> <% end %> </div> <% end %> </div> </div> <% end %> <% if @savings_accounts.empty? && @share_capital_accounts.empty? && @loans.empty? %> <div class="text-center py-12"> <svg class="mx-auto h-12 w-12 text-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"> <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 0 4.5 6h.75M3.75 4.5h12m0 0v.75a.75.75 0 0 0 .75.75h.75M3.75 4.5h-1.5m12 0h1.5m-12 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75H4.5a.75.75 0 0 1-.75-.75v-.75Zm0 0V6A.75.75 0 0 0 3.75 6h1.5m12 0V6a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v.75m-12 5.25v5.25a.75.75 0 0 0 .75.75h9a.75.75 0 0 0 .75-.75v-5.25m-12 0h12"/> </svg> <h3 class="mt-4 text-sm font-medium text-text-primary">No accounts yet</h3> <p class="mt-1 text-xs text-text-tertiary">Your accounts will appear here once they are set up by your cooperative.</p> </div> <% end %> </div> 
+<% content_for :title,"Dashboard" %> 
+<div class="space-y-6"> 
+  <div class="flex items-center justify-between"> 
+    <div> 
+      <h1 class="text-lg font-semibold text-text-primary">Welcome, <%= @member.first_name %>!</h1>
+ 
+      <p class="text-sm text-text-tertiary">Member ID: <%= @member.member_identifier %></p>
+ </div>
+ </div>
+ <% if @announcements.any? %> 
+    <div class="rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-4"> 
+      <h2 class="text-xs font-semibold text-primary-700 dark:text-primary-300 uppercase tracking-wider mb-3">Announcements</h2>
+ 
+      <div class="space-y-3"> <% @announcements.each do |announcement| %> 
+          <div> 
+            <h3 class="text-sm font-medium text-primary dark:text-primary-200"><%= announcement.title %></h3>
+ 
+            <p class="text-xs text-primary dark:text-primary-400 mt-0.5"><%= truncate(announcement.body, length: 120) %></p>
+ 
+            <p class="text-[10px] text-primary-400 dark:text-primary-500 mt-0.5"><%= l(announcement.published_at, format: :long) %></p>
+ </div>
+ <% end %> </div>
+ <%= link_to"View all announcements", portal_announcements_path, class:"text-xs font-medium text-primary dark:text-primary-400 hover:underline mt-2 inline-block" %> </div>
+ <% end %> 
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4"> 
+    <div class="rounded-xl bg-surface border border-border p-4"> 
+      <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Savings</p>
+ 
+      <p class="text-2xl font-bold text-text-primary mt-1"><%= number_to_currency(@total_savings / 100.0, unit:"₱") %></p>
+ 
+      <p class="text-xs text-text-tertiary mt-1"><%= pluralize(@savings_accounts.count,"account") %></p>
+ </div>
+ 
+    <div class="rounded-xl bg-surface border border-border p-4"> 
+      <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Share Capital</p>
+ 
+      <p class="text-2xl font-bold text-text-primary mt-1"><%= number_to_currency(@total_share_capital / 100.0, unit:"₱") %></p>
+ 
+      <p class="text-xs text-text-tertiary mt-1"><%= pluralize(@share_capital_accounts.count,"account") %></p>
+ </div>
+ 
+    <div class="rounded-xl bg-surface border border-border p-4"> 
+      <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Loan Balance</p>
+ 
+      <p class="text-2xl font-bold <%= @total_loans > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-text-primary ' %> mt-1"><%= number_to_currency(@total_loans / 100.0, unit:"₱") %></p>
+ 
+      <p class="text-xs text-text-tertiary mt-1"><%= pluralize(@loans.count,"loan") %></p>
+ </div>
+ </div>
+ <% if @savings_accounts.any? %> 
+    <div class="rounded-xl bg-surface border border-border overflow-hidden"> 
+      <div class="px-4 py-3 border-b border-border"> 
+        <h2 class="text-sm font-semibold text-text-primary">Savings Accounts</h2>
+ </div>
+ 
+      <div class="divide-y divide-border"> <% @savings_accounts.each do |account| %> 
+          <div class="px-4 py-3 flex items-center justify-between"> 
+            <div> 
+              <p class="text-sm font-medium text-text-primary"><%= account.savings_product&.name ||"Savings" %></p>
+ 
+              <p class="text-xs text-text-tertiary"><%= account.account_number %></p>
+ </div>
+ 
+            <p class="text-sm font-semibold text-text-primary"><%= number_to_currency(account.balance.to_f, unit:"₱") %></p>
+ </div>
+ <% end %> </div>
+ </div>
+ <% end %> <% if @share_capital_accounts.any? %> 
+    <div class="rounded-xl bg-surface border border-border overflow-hidden"> 
+      <div class="px-4 py-3 border-b border-border"> 
+        <h2 class="text-sm font-semibold text-text-primary">Share Capital</h2>
+ </div>
+ 
+      <div class="divide-y divide-border"> <% @share_capital_accounts.each do |account| %> 
+          <div class="px-4 py-3 flex items-center justify-between"> 
+            <div> 
+              <p class="text-sm font-medium text-text-primary"><%= account.share_product&.name ||"Shares" %></p>
+ 
+              <p class="text-xs text-text-tertiary"><%= account.shares_owned %> shares owned</p>
+ </div>
+ 
+            <p class="text-sm font-semibold text-text-primary"><%= number_to_currency(account.current_share_value.to_f, unit:"₱") %></p>
+ </div>
+ <% end %> </div>
+ </div>
+ <% end %> <% if @loans.any? %> 
+    <div class="rounded-xl bg-surface border border-border overflow-hidden"> 
+      <div class="px-4 py-3 border-b border-border"> 
+        <h2 class="text-sm font-semibold text-text-primary">Active Loans</h2>
+ </div>
+ 
+      <div class="divide-y divide-border"> <% @loans.each do |loan| %> 
+          <div class="px-4 py-3"> 
+            <div class="flex items-center justify-between mb-1"> 
+              <p class="text-sm font-medium text-text-primary"><%= loan.loan_product&.name ||"Loan" %></p>
+ <span class="text-[10px] font-medium px-1.5 py-0.5 rounded <%= loan.status == 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-surface-alt text-text-secondary ' %>"><%= loan.status.titleize %></span> </div>
+ 
+            <div class="flex items-center justify-between"> 
+              <p class="text-xs text-text-tertiary">Outstanding: <%= number_to_currency(loan.outstanding_principal_cents.to_f / 100, unit:"₱") %></p>
+ 
+              <p class="text-xs text-text-tertiary">Principal: <%= number_to_currency(loan.principal_cents.to_f / 100, unit:"₱") %></p>
+ </div>
+ <% if loan.payment_schedule.any? %> 
+              <div class="mt-2 pt-2 border-t border-border/50"> 
+                <p class="text-[10px] font-medium text-text-tertiary uppercase tracking-wider mb-1">Repayment Schedule</p>
+ <% loan.payment_schedule.first(3).each do |schedule| %> 
+                  <div class="flex items-center justify-between text-xs py-0.5"> <span class="text-text-secondary"><%= l(schedule.due_date, format: :short) %></span> <span class="text-text-primary"><%= number_to_currency(schedule.total_cents.to_f / 100, unit:"₱") %></span> </div>
+ <% end %> <% if loan.payment_schedule.count > 3 %> 
+                  <p class="text-[10px] text-text-tertiary mt-1">+ <%= loan.payment_schedule.count - 3 %> more payments</p>
+ <% end %> </div>
+ <% end %> </div>
+ <% end %> </div>
+ </div>
+ <% end %> <% if @savings_accounts.empty? && @share_capital_accounts.empty? && @loans.empty? %> 
+    <div class="text-center py-12"> <svg class="mx-auto h-12 w-12 text-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"> <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 0 4.5 6h.75M3.75 4.5h12m0 0v.75a.75.75 0 0 0 .75.75h.75M3.75 4.5h-1.5m12 0h1.5m-12 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75H4.5a.75.75 0 0 1-.75-.75v-.75Zm0 0V6A.75.75 0 0 0 3.75 6h1.5m12 0V6a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v.75m-12 5.25v5.25a.75.75 0 0 0 .75.75h9a.75.75 0 0 0 .75-.75v-5.25m-12 0h12"/> </svg> 
+      <h3 class="mt-4 text-sm font-medium text-text-primary">No accounts yet</h3>
+ 
+      <p class="mt-1 text-xs text-text-tertiary">Your accounts will appear here once they are set up by your cooperative.</p>
+ </div>
+ <% end %> </div>
+ 

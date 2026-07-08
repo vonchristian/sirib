@@ -1,1 +1,27 @@
-<% content_for :page_title,"Alerts" %> <% content_for :page_subtitle,"System alerts and notifications" %> <div class="flex items-center gap-2 mb-6"> <%= form_tag management_alerts_path, method: :get, class:"flex items-center gap-2" do %> <%= select_tag :severity, options_for_select([["Info","info"], ["Warning","warning"], ["Critical","critical"]], params[:severity]), include_blank:"All Severities", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= select_tag :status, options_for_select([["Active","active"], ["Resolved","resolved"]], params[:status]), include_blank:"All Statuses", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= submit_tag"Filter", class:"rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %> <% end %> </div> <div class="space-y-3"> <% @alerts.each do |alert| %> <div class="rounded-lg border border-border bg-surface p-4 <%= 'border-l-4 border-l-danger' if alert.critical? %><%= 'border-l-4 border-l-warning' if alert.warning? %><%= 'border-l-4 border-l-primary' if alert.info? %>"> <div class="flex items-start justify-between"> <div class="flex items-start gap-3"> <span class="flex h-2.5 w-2.5 rounded-full mt-1.5 <%= alert.critical? ? 'bg-danger' : alert.warning? ? 'bg-warning' : 'bg-primary' %>"></span> <div> <h4 class="text-sm font-medium text-text-primary"><%= alert.title %></h4> <p class="text-xs text-text-tertiary mt-0.5"><%= alert.alert_type.humanize %></p> <p class="text-xs text-text-tertiary mt-1"><%= time_ago_in_words(alert.created_at) %> ago</p> </div> </div> <div class="flex items-center gap-2"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= alert.active? ? 'bg-warning-50 text-warning' : 'bg-positive-50 text-positive' %>"> <%= alert.status.titleize %> </span> <%= link_to"View", management_alert_path(alert), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> <% if alert.active? %> <%= button_to"Resolve", resolve_management_alert_path(alert), method: :post, class:"text-xs text-positive hover:text-positive-700 transition-colors" %> <% end %> </div> </div> </div> <% end %> <% if @alerts.empty? %> <div class="rounded-lg border border-border bg-surface p-8 text-center"> <p class="text-sm text-text-tertiary">No alerts found.</p> </div> <% end %> </div> <div class="mt-4"> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div> 
+<% content_for :page_title,"Alerts" %> <% content_for :page_subtitle,"System alerts and notifications" %> 
+<div class="flex items-center gap-2 mb-6"> <%= form_tag management_alerts_path, method: :get, class:"flex items-center gap-2" do %> <%= select_tag :severity, options_for_select([["Info","info"], ["Warning","warning"], ["Critical","critical"]], params[:severity]), include_blank:"All Severities", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= select_tag :status, options_for_select([["Active","active"], ["Resolved","resolved"]], params[:status]), include_blank:"All Statuses", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= submit_tag"Filter", class:"rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %> <% end %> </div>
+ 
+<div class="space-y-3"> <% @alerts.each do |alert| %> 
+    <div class="rounded-lg border border-border bg-surface p-4 <%= 'border-l-4 border-l-danger' if alert.critical? %><%= 'border-l-4 border-l-warning' if alert.warning? %><%= 'border-l-4 border-l-primary' if alert.info? %>"> 
+      <div class="flex items-start justify-between"> 
+        <div class="flex items-start gap-3"> <span class="flex h-2.5 w-2.5 rounded-full mt-1.5 <%= alert.critical? ? 'bg-danger' : alert.warning? ? 'bg-warning' : 'bg-primary' %>"></span> 
+          <div> 
+            <h4 class="text-sm font-medium text-text-primary"><%= alert.title %></h4>
+ 
+            <p class="text-xs text-text-tertiary mt-0.5"><%= alert.alert_type.humanize %></p>
+ 
+            <p class="text-xs text-text-tertiary mt-1"><%= time_ago_in_words(alert.created_at) %> ago</p>
+ </div>
+ </div>
+ 
+        <div class="flex items-center gap-2"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= alert.active? ? 'bg-warning-50 text-warning' : 'bg-positive-50 text-positive' %>"> <%= alert.status.titleize %> </span> <%= link_to"View", management_alert_path(alert), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> <% if alert.active? %> <%= button_to"Resolve", resolve_management_alert_path(alert), method: :post, class:"text-xs text-positive hover:text-positive-700 transition-colors" %> <% end %> </div>
+ </div>
+ </div>
+ <% end %> <% if @alerts.empty? %> 
+    <div class="rounded-lg border border-border bg-surface p-8 text-center"> 
+      <p class="text-sm text-text-tertiary">No alerts found.</p>
+ </div>
+ <% end %> </div>
+ 
+<div class="mt-4"> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div>
+ 

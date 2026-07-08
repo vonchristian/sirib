@@ -6,7 +6,7 @@ USER_ROSTER = {
   loan_officer: { role: :loan_officer, full_name: "Loan Officer" },
   teller:      { role: :treasurer,   full_name: "Teller" },
   accountant:  { role: :accountant,  full_name: "Accountant" },
-  auditor:     { role: :accountant,  full_name: "Auditor" },
+  auditor:     { role: :accountant,  full_name: "Auditor" }
 }
 
 total = 0

@@ -25,11 +25,12 @@ module Treasury
     end
 
     def show
-      @account = Treasury::SavingsAccount.find(params[:id])
+      @account = Treasury::SavingsAccount.includes(:savings_product).find(params[:id])
       @transactions = @account.transactions.by_latest
       @month_transactions = @account.transactions.where(posted_at: Time.current.beginning_of_month..)
       @month_deposits = @month_transactions.deposit.sum(:amount_cents)
       @month_withdrawals = @month_transactions.withdraw.sum(:amount_cents)
+      @running_balances = @account.liability_account&.running_balances&.index_by(&:as_of_date) || {}
     end
 
     def deposit

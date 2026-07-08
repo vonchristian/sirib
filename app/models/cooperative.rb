@@ -23,5 +23,4 @@ class Cooperative < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     %w[users branches]
   end
-
 end

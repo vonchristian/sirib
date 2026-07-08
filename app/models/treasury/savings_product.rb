@@ -43,7 +43,7 @@ module Treasury
     def next_code_for_type(account_type)
       max = Accounting::Ledger.where(account_type: account_type).maximum(:account_code)
       if max
-        format('%05d', max.to_i + 1)
+        format("%05d", max.to_i + 1)
       else
         case account_type.to_s
         when "liability" then "21100"
@@ -56,7 +56,7 @@ module Treasury
     def next_account_code(_ledger)
       max = Accounting::Account.where(cooperative_id: cooperative_id).pluck(:account_code).map(&:to_i).max
       if max
-        format('%05d', max + 1)
+        format("%05d", max + 1)
       else
         "00100"
       end

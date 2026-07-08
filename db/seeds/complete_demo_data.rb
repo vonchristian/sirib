@@ -52,7 +52,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
         title: attrs[:title],
         body: attrs[:body],
         status: "published",
-        published_at: [1.day.ago, 1.week.ago, 2.weeks.ago][i],
+        published_at: [ 1.day.ago, 1.week.ago, 2.weeks.ago ][i],
         author_id: admin_user_for_portal&.id || User.where(cooperative: coop).first&.id
       )
     end
@@ -148,7 +148,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     members = Membership::Member.where(cooperative: coop).order(Arel.sql("RANDOM()")).limit(20).to_a
     members.each_with_index do |member, i|
       product = loan_products.sample
-      status = ["draft", "submitted", "approved", "rejected"].sample
+      status = [ "draft", "submitted", "approved", "rejected" ].sample
       app = Lending::LoanApplication.create!(
         cooperative_id: coop.id,
         member: member,

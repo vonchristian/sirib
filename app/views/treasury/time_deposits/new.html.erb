@@ -1,1 +1,19 @@
-<%= form_tag preview_treasury_time_deposits_path, method: :post, data: { turbo: false }, class:"space-y-0" do %> <div class="rounded-md border border-border bg-surface"> <div class="px-6 py-5 border-b border-border"> <h2 class="text-base font-semibold text-text-primary">New Time Deposit</h2> <p class="mt-0.5 text-sm text-text-secondary">Choose a product and enter the amount you want to deposit.</p> </div> <div class="px-6 py-5 space-y-5"> <div> <%= label_tag :product_id,"Product", for:"product_id", class:"block text-xs font-medium text-text-secondary mb-1" %> <%= select_tag :product_id, options_from_collection_for_select(@products, :id, :name), prompt:"Select a time deposit product", id:"product_id", class:"block w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %> </div> <div> <%= label_tag :amount_cents,"Amount", for:"amount_cents", class:"block text-xs font-medium text-text-secondary mb-1" %> <div class="relative"> <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-text-secondary">₱</span> <%= number_field_tag :amount_cents, params[:amount_cents], step:"0.01", min:"0", id:"amount_cents", class:"block w-full rounded-md border border-border bg-surface pl-8 pr-3 py-1.5 text-sm text-text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %> </div> </div> <%= hidden_field_tag :amount_currency,"PHP" %> </div> <div class="px-6 py-4 flex items-center justify-end gap-3 border-t border-border"> <%= link_to"Cancel", treasury_time_deposits_path, class:"rounded-md border border-border px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-alt transition-colors" %> <%= submit_tag"Preview", data: { disable_with:"Calculating..." }, class:"rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors" %> </div> </div> <% end %> 
+<%= form_tag preview_treasury_time_deposits_path, method: :post, data: { turbo: false }, class:"space-y-0" do %> 
+  <div class="rounded-md border border-border bg-surface"> 
+    <div class="px-6 py-5 border-b border-border"> 
+      <h2 class="text-base font-semibold text-text-primary">New Time Deposit</h2>
+ 
+      <p class="mt-0.5 text-sm text-text-secondary">Choose a product and enter the amount you want to deposit.</p>
+ </div>
+ 
+    <div class="px-6 py-5 space-y-5"> 
+      <div> <%= label_tag :product_id,"Product", for:"product_id", class:"block text-xs font-medium text-text-secondary mb-1" %> <%= select_tag :product_id, options_from_collection_for_select(@products, :id, :name), prompt:"Select a time deposit product", id:"product_id", class:"block w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %> </div>
+ 
+      <div> <%= label_tag :amount_cents,"Amount", for:"amount_cents", class:"block text-xs font-medium text-text-secondary mb-1" %> 
+        <div class="relative"> <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-text-secondary">₱</span> <%= number_field_tag :amount_cents, params[:amount_cents], step:"0.01", min:"0", id:"amount_cents", class:"block w-full rounded-md border border-border bg-surface pl-8 pr-3 py-1.5 text-sm text-text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %> </div>
+ </div>
+ <%= hidden_field_tag :amount_currency,"PHP" %> </div>
+ 
+    <div class="px-6 py-4 flex items-center justify-end gap-3 border-t border-border"> <%= link_to"Cancel", treasury_time_deposits_path, class:"rounded-md border border-border px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-alt transition-colors" %> <%= submit_tag"Preview", data: { disable_with:"Calculating..." }, class:"rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors" %> </div>
+ </div>
+ <% end %> 

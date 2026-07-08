@@ -1,1 +1,77 @@
-<% content_for :page_title,"Restructure Case ##{@case.id}" %> <% content_for :page_subtitle,"#{@case.restructure_type.titleize} — #{@loan.reference_number}" %> <div class="animate-fade-in max-w-4xl mx-auto"> <div class="flex items-center justify-between mb-6"> <div> <h2 class="text-lg font-semibold text-text-primary">Restructure Case</h2> <p class="text-sm text-text-tertiary mt-1"><%= @case.restructure_type.titleize %> for Loan <%= @loan.reference_number %></p> </div> <%= link_to"Back to Cases", loans_restructure_cases_path, class:"btn-ghost text-sm" %> </div> <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"> <div class="lg:col-span-2 space-y-6"> <div class="rounded-xl border border-border bg-surface p-6"> <h3 class="text-sm font-semibold text-text-primary mb-4">Details</h3> <dl class="grid grid-cols-2 gap-4 text-sm"> <div> <dt class="text-text-tertiary">Status</dt> <dd class="font-medium mt-1"><%= @case.status.titleize %></dd> </div> <div> <dt class="text-text-tertiary">Type</dt> <dd class="font-medium mt-1"><%= @case.restructure_type.titleize %></dd> </div> <div> <dt class="text-text-tertiary">Requested By</dt> <dd class="font-medium mt-1"><%= @case.requested_by&.email_address ||"System" %></dd> </div> <div> <dt class="text-text-tertiary">Date</dt> <dd class="font-medium mt-1"><%= @case.created_at.strftime("%b %d, %Y") %></dd> </div> </dl> <% if @case.notes.present? %> <div class="mt-4 pt-4 border-t border-border"> <dt class="text-sm text-text-tertiary">Notes</dt> <dd class="mt-1 text-sm text-text-primary"><%= @case.notes %></dd> </div> <% end %> </div> <div class="rounded-xl border border-border bg-surface p-6"> <h3 class="text-sm font-semibold text-text-primary mb-4">Proposed Changes</h3> <% if @case.proposed_changes.present? %> <dl class="grid grid-cols-2 gap-4 text-sm"> <% @case.proposed_changes.each do |key, value| %> <div> <dt class="text-text-tertiary"><%= key.titleize %></dt> <dd class="font-medium mt-1"><%= value %></dd> </div> <% end %> </dl> <% else %> <p class="text-sm text-text-tertiary italic">No proposed changes recorded.</p> <% end %> </div> <div class="rounded-xl border border-border bg-surface p-6"> <h3 class="text-sm font-semibold text-text-primary mb-4">Timeline</h3> <% if @events.any? %> <ul class="space-y-3"> <% @events.each do |event| %> <li class="flex items-center gap-3 text-sm"> <span class="w-2 h-2 rounded-full bg-accent flex-shrink-0"></span> <span class="text-text-secondary"><%= event.event_type.titleize %></span> <span class="text-text-tertiary ml-auto"><%= event.created_at.strftime("%b %d, %Y %H:%M") %></span> </li> <% end %> </ul> <% else %> <p class="text-sm text-text-tertiary italic">No events recorded.</p> <% end %> </div> </div> <div class="space-y-4"> <%= link_to"View Full Details", loans_restructure_path(@case), class:"btn-primary w-full text-center" %> </div> </div> </div> 
+<% content_for :page_title,"Restructure Case ##{@case.id}" %> <% content_for :page_subtitle,"#{@case.restructure_type.titleize} — #{@loan.reference_number}" %> 
+<div class="animate-fade-in max-w-4xl mx-auto"> 
+  <div class="flex items-center justify-between mb-6"> 
+    <div> 
+      <h2 class="text-lg font-semibold text-text-primary">Restructure Case</h2>
+ 
+      <p class="text-sm text-text-tertiary mt-1"><%= @case.restructure_type.titleize %> for Loan <%= @loan.reference_number %></p>
+ </div>
+ <%= link_to"Back to Cases", loans_restructure_cases_path, class:"btn-ghost text-sm" %> </div>
+ 
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"> 
+    <div class="lg:col-span-2 space-y-6"> 
+      <div class="rounded-xl border border-border bg-surface p-6"> 
+        <h3 class="text-sm font-semibold text-text-primary mb-4">Details</h3>
+ 
+        <dl class="grid grid-cols-2 gap-4 text-sm"> 
+          <div> 
+            <dt class="text-text-tertiary">Status</dt>
+ 
+            <dd class="font-medium mt-1"><%= @case.status.titleize %></dd>
+ </div>
+ 
+          <div> 
+            <dt class="text-text-tertiary">Type</dt>
+ 
+            <dd class="font-medium mt-1"><%= @case.restructure_type.titleize %></dd>
+ </div>
+ 
+          <div> 
+            <dt class="text-text-tertiary">Requested By</dt>
+ 
+            <dd class="font-medium mt-1"><%= @case.requested_by&.email_address ||"System" %></dd>
+ </div>
+ 
+          <div> 
+            <dt class="text-text-tertiary">Date</dt>
+ 
+            <dd class="font-medium mt-1"><%= @case.created_at.strftime("%b %d, %Y") %></dd>
+ </div>
+ </dl>
+ <% if @case.notes.present? %> 
+          <div class="mt-4 pt-4 border-t border-border"> 
+            <dt class="text-sm text-text-tertiary">Notes</dt>
+ 
+            <dd class="mt-1 text-sm text-text-primary"><%= @case.notes %></dd>
+ </div>
+ <% end %> </div>
+ 
+      <div class="rounded-xl border border-border bg-surface p-6"> 
+        <h3 class="text-sm font-semibold text-text-primary mb-4">Proposed Changes</h3>
+ <% if @case.proposed_changes.present? %> 
+          <dl class="grid grid-cols-2 gap-4 text-sm"> <% @case.proposed_changes.each do |key, value| %> 
+              <div> 
+                <dt class="text-text-tertiary"><%= key.titleize %></dt>
+ 
+                <dd class="font-medium mt-1"><%= value %></dd>
+ </div>
+ <% end %> </dl>
+ <% else %> 
+          <p class="text-sm text-text-tertiary italic">No proposed changes recorded.</p>
+ <% end %> </div>
+ 
+      <div class="rounded-xl border border-border bg-surface p-6"> 
+        <h3 class="text-sm font-semibold text-text-primary mb-4">Timeline</h3>
+ <% if @events.any? %> 
+          <ul class="space-y-3"> <% @events.each do |event| %> 
+              <li class="flex items-center gap-3 text-sm"> <span class="w-2 h-2 rounded-full bg-accent flex-shrink-0"></span> <span class="text-text-secondary"><%= event.event_type.titleize %></span> <span class="text-text-tertiary ml-auto"><%= event.created_at.strftime("%b %d, %Y %H:%M") %></span> </li>
+ <% end %> </ul>
+ <% else %> 
+          <p class="text-sm text-text-tertiary italic">No events recorded.</p>
+ <% end %> </div>
+ </div>
+ 
+    <div class="space-y-4"> <%= link_to"View Full Details", loans_restructure_path(@case), class:"btn-primary w-full text-center" %> </div>
+ </div>
+ </div>
+ 

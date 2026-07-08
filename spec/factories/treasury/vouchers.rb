@@ -14,7 +14,7 @@ FactoryBot.define do
       type { "Treasury::CashDisbursementVoucher" }
     end
 
-    factory :cash_receipt_voucher, traits: [:receipt]
-    factory :cash_disbursement_voucher, traits: [:disbursement]
+    factory :cash_receipt_voucher, traits: [ :receipt ]
+    factory :cash_disbursement_voucher, traits: [ :disbursement ]
   end
 end

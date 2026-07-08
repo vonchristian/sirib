@@ -1,1 +1,5 @@
-<% branches.each do |branch| %> <div class="px-3 py-2 hover:bg-surface-alt cursor-pointer text-sm text-text-primary" data-search-result data-id="<%= branch.id %>" data-name="<%= branch.name %>"> <%= branch.name %> (<%= branch.code %>) </div> <% end %> <% if branches.empty? %> <div class="px-3 py-2 text-sm text-text-tertiary">No branches found.</div> <% end %> 
+<% branches.each do |branch| %> 
+  <div class="px-3 py-2 hover:bg-surface-alt cursor-pointer text-sm text-text-primary" data-search-result data-id="<%= branch.id %>" data-name="<%= branch.name %>"> <%= branch.name %> (<%= branch.code %>) </div>
+ <% end %> <% if branches.empty? %> 
+  <div class="px-3 py-2 text-sm text-text-tertiary">No branches found.</div>
+ <% end %> 

@@ -1,1 +1,79 @@
-<% content_for :page_title,"Restructure Loan ##{@loan.reference_number}" %> <% content_for :page_subtitle, @loan.member.name %> <div class="animate-fade-in max-w-5xl mx-auto space-y-6"> <div class="flex items-center justify-between"> <div> <h2 class="text-lg font-semibold text-text-primary">Restructure Options</h2> <p class="text-sm text-text-tertiary mt-1">Loan <%= @loan.reference_number %> — Outstanding: <%= number_to_currency(@loan.outstanding_principal_cents.to_f / 100, unit:"PHP") %></p> </div> <%= link_to"Back to Loan", loans_loan_path(@loan), class:"btn-ghost text-sm" %> </div> <% if @pending_cases.any? %> <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4"> <div class="flex items-center gap-2 text-amber-400"> <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/> </svg> <span class="text-sm font-medium">Pending restructure cases exist</span> </div> <div class="mt-2 space-y-1"> <% @pending_cases.each do |c| %> <%= link_to"#{c.restructure_type.titleize} case ##{c.id} — #{c.status}", loans_restructure_path(c), class:"text-sm text-primary hover:underline block" %> <% end %> </div> </div> <% end %> <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <%= link_to new_loans_restructure_path(loan_id: @loan.id, type:"modification"), class:"rounded-xl border border-border bg-surface p-6 hover:border-primary/50 transition-colors group" do %> <div class="flex items-center gap-3 mb-3"> <div class="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center"> <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/> </svg> </div> <h3 class="text-base font-semibold text-text-primary group-hover:text-primary transition-colors">Modification</h3> </div> <p class="text-sm text-text-tertiary">Same loan, adjusted terms. Change interest rate, term, or grace period.</p> <ul class="mt-3 space-y-1 text-xs text-text-tertiary"> <li>✓ No principal movement</li> <li>✓ New schedule version</li> <li>✓ Same loan ID</li> </ul> <% end %> <%= link_to new_loans_restructure_path(loan_id: @loan.id, type:"refinance"), class:"rounded-xl border border-border bg-surface p-6 hover:border-primary/50 transition-colors group" do %> <div class="flex items-center gap-3 mb-3"> <div class="w-10 h-10 rounded-lg bg-positive-50 dark:bg-emerald-900/20 flex items-center justify-center"> <svg class="w-5 h-5 text-positive" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/> </svg> </div> <h3 class="text-base font-semibold text-text-primary group-hover:text-primary transition-colors">Refinance</h3> </div> <p class="text-sm text-text-tertiary">New loan replaces old loan. Full payoff via new loan proceeds.</p> <ul class="mt-3 space-y-1 text-xs text-text-tertiary"> <li>✓ New loan created</li> <li>✓ Old loan closed</li> <li>✓ LoanLink created</li> </ul> <% end %> <%= link_to new_loans_restructure_path(loan_id: @loan.id, type:"hybrid"), class:"rounded-xl border border-border bg-surface p-6 hover:border-primary/50 transition-colors group" do %> <div class="flex items-center gap-3 mb-3"> <div class="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center"> <svg class="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/> </svg> </div> <h3 class="text-base font-semibold text-text-primary group-hover:text-primary transition-colors">Hybrid</h3> </div> <p class="text-sm text-text-tertiary">Partial payoff with arrears capitalization. Flexible restructuring.</p> <ul class="mt-3 space-y-1 text-xs text-text-tertiary"> <li>✓ Arrears capitalization</li> <li>✓ Partial payoff option</li> <li>✓ LoanLink with amount</li> </ul> <% end %> </div> <% if @past_cases.any? %> <div class="rounded-xl border border-border bg-surface p-6"> <h3 class="text-sm font-semibold text-text-primary mb-3">Past Restructures</h3> <div class="space-y-2"> <% @past_cases.each do |c| %> <div class="flex items-center justify-between rounded-lg border border-border bg-surface-alt px-4 py-3"> <div> <span class="text-sm font-medium text-text-primary"><%= c.restructure_type.titleize %></span> <span class="text-xs text-text-tertiary ml-2">Case ##{c.id}</span> </div> <div class="flex items-center gap-3"> <span class="text-xs text-text-tertiary"><%= c.executed_at&.strftime("%b %d, %Y") %></span> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-positive-50 text-positive">Executed</span> </div> </div> <% end %> </div> </div> <% end %> </div> 
+<% content_for :page_title,"Restructure Loan ##{@loan.reference_number}" %> <% content_for :page_subtitle, @loan.member.name %> 
+<div class="animate-fade-in max-w-5xl mx-auto space-y-6"> 
+  <div class="flex items-center justify-between"> 
+    <div> 
+      <h2 class="text-lg font-semibold text-text-primary">Restructure Options</h2>
+ 
+      <p class="text-sm text-text-tertiary mt-1">Loan <%= @loan.reference_number %> — Outstanding: <%= number_to_currency(@loan.outstanding_principal_cents.to_f / 100, unit:"PHP") %></p>
+ </div>
+ <%= link_to"Back to Loan", loans_loan_path(@loan), class:"btn-ghost text-sm" %> </div>
+ <% if @pending_cases.any? %> 
+    <div class="rounded-xl border border-warning-500/30 bg-warning-500/10 p-4"> 
+      <div class="flex items-center gap-2 text-warning"> <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/> </svg> <span class="text-sm font-medium">Pending restructure cases exist</span> </div>
+ 
+      <div class="mt-2 space-y-1"> <% @pending_cases.each do |c| %> <%= link_to"#{c.restructure_type.titleize} case ##{c.id} — #{c.status}", loans_restructure_path(c), class:"text-sm text-primary hover:underline block" %> <% end %> </div>
+ </div>
+ <% end %> 
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <%= link_to new_loans_restructure_path(loan_id: @loan.id, type:"modification"), class:"rounded-xl border border-border bg-surface p-6 hover:border-primary/50 transition-colors group" do %> 
+      <div class="flex items-center gap-3 mb-3"> 
+        <div class="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center"> <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/> </svg> </div>
+ 
+        <h3 class="text-base font-semibold text-text-primary group-hover:text-primary transition-colors">Modification</h3>
+ </div>
+ 
+      <p class="text-sm text-text-tertiary">Same loan, adjusted terms. Change interest rate, term, or grace period.</p>
+ 
+      <ul class="mt-3 space-y-1 text-xs text-text-tertiary"> 
+        <li>✓ No principal movement</li>
+ 
+        <li>✓ New schedule version</li>
+ 
+        <li>✓ Same loan ID</li>
+ </ul>
+ <% end %> <%= link_to new_loans_restructure_path(loan_id: @loan.id, type:"refinance"), class:"rounded-xl border border-border bg-surface p-6 hover:border-primary/50 transition-colors group" do %> 
+      <div class="flex items-center gap-3 mb-3"> 
+        <div class="w-10 h-10 rounded-lg bg-positive-50 dark:bg-emerald-900/20 flex items-center justify-center"> <svg class="w-5 h-5 text-positive" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/> </svg> </div>
+ 
+        <h3 class="text-base font-semibold text-text-primary group-hover:text-primary transition-colors">Refinance</h3>
+ </div>
+ 
+      <p class="text-sm text-text-tertiary">New loan replaces old loan. Full payoff via new loan proceeds.</p>
+ 
+      <ul class="mt-3 space-y-1 text-xs text-text-tertiary"> 
+        <li>✓ New loan created</li>
+ 
+        <li>✓ Old loan closed</li>
+ 
+        <li>✓ LoanLink created</li>
+ </ul>
+ <% end %> <%= link_to new_loans_restructure_path(loan_id: @loan.id, type:"hybrid"), class:"rounded-xl border border-border bg-surface p-6 hover:border-primary/50 transition-colors group" do %> 
+      <div class="flex items-center gap-3 mb-3"> 
+        <div class="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center"> <svg class="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/> </svg> </div>
+ 
+        <h3 class="text-base font-semibold text-text-primary group-hover:text-primary transition-colors">Hybrid</h3>
+ </div>
+ 
+      <p class="text-sm text-text-tertiary">Partial payoff with arrears capitalization. Flexible restructuring.</p>
+ 
+      <ul class="mt-3 space-y-1 text-xs text-text-tertiary"> 
+        <li>✓ Arrears capitalization</li>
+ 
+        <li>✓ Partial payoff option</li>
+ 
+        <li>✓ LoanLink with amount</li>
+ </ul>
+ <% end %> </div>
+ <% if @past_cases.any? %> 
+    <div class="rounded-xl border border-border bg-surface p-6"> 
+      <h3 class="text-sm font-semibold text-text-primary mb-3">Past Restructures</h3>
+ 
+      <div class="space-y-2"> <% @past_cases.each do |c| %> 
+          <div class="flex items-center justify-between rounded-lg border border-border bg-surface-alt px-4 py-3"> 
+            <div> <span class="text-sm font-medium text-text-primary"><%= c.restructure_type.titleize %></span> <span class="text-xs text-text-tertiary ml-2">Case ##{c.id}</span> </div>
+ 
+            <div class="flex items-center gap-3"> <span class="text-xs text-text-tertiary"><%= c.executed_at&.strftime("%b %d, %Y") %></span> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-positive-50 text-positive">Executed</span> </div>
+ </div>
+ <% end %> </div>
+ </div>
+ <% end %> </div>
+ 

@@ -20,7 +20,7 @@ class SecurityHeaders
       headers[name] = value unless headers.key?(name)
     end
 
-    [status, headers, body]
+    [ status, headers, body ]
   end
 end
 

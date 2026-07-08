@@ -5,7 +5,7 @@ expense_ledger = Accounting::Ledger.find_by(account_code: "60230", cooperative: 
 savings_products = [
   { name: "Regular Savings", description: "Standard savings account with competitive interest" },
   { name: "Youth Savings", description: "Savings account for members under 18" },
-  { name: "Business Savings", description: "High-yield savings for business accounts" },
+  { name: "Business Savings", description: "High-yield savings for business accounts" }
 ]
 
 savings_products.each do |attrs|

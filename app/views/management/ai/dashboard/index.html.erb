@@ -1,1 +1,85 @@
-<% content_for :page_title,"AI Branch Manager" %> <% content_for :page_subtitle, @branch.name %> <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8"> <div class="rounded-lg border border-border bg-surface p-5 lg:col-span-2"> <div class="flex items-center justify-between mb-4"> <h3 class="text-sm font-semibold text-text-primary">Today's Summary</h3> <% if @today_digest %> <span class="text-xs text-text-tertiary"><%= time_ago_in_words(@today_digest.generated_at) %> ago</span> <% end %> </div> <% if @today_digest %> <div class="prose prose-sm dark:prose-invert max-w-none"> <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @today_digest.summary %></pre> </div> <div class="mt-4 pt-4 border-t border-border"> <h4 class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Risk Summary</h4> <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @today_digest.risk_summary %></pre> </div> <% else %> <p class="text-sm text-text-tertiary">No digest generated yet. The daily digest is generated at 6:00 AM.</p> <div class="mt-4"> <%= link_to"View Past Digests", management_ai_digests_path, class:"text-sm text-accent hover:text-accent-hover" %> </div> <% end %> </div> <div class="rounded-lg border border-border bg-surface p-5"> <div class="flex items-center justify-between mb-4"> <h3 class="text-sm font-semibold text-text-primary">Critical Alerts</h3> <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-danger rounded-full"><%= @critical_observations.count %></span> </div> <div class="space-y-3"> <% @critical_observations.each do |obs| %> <div class="flex items-start gap-3"> <span class="flex h-2 w-2 mt-1.5 rounded-full bg-danger shrink-0"></span> <div class="min-w-0"> <p class="text-sm font-medium text-text-primary"><%= obs.title %></p> <p class="text-xs text-text-tertiary mt-0.5"><%= truncate(obs.summary, length: 80) %></p> </div> </div> <% end %> <% if @critical_observations.empty? %> <p class="text-sm text-text-tertiary">No critical alerts.</p> <% end %> </div> </div> </div> <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"> <div class="rounded-lg border border-border bg-surface"> <div class="border-b border-border px-5 py-4"> <div class="flex items-center justify-between"> <h3 class="text-sm font-semibold text-text-primary">Recommendations</h3> <%= link_to"View All", management_ai_recommendations_path, class:"text-xs text-accent hover:text-accent-hover" %> </div> </div> <div class="divide-y divide-border"> <% @active_recommendations.each do |rec| %> <div class="px-5 py-3"> <div class="flex items-center gap-2 mb-1"> <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full <%= rec.priority == 'critical' ? 'bg-danger/10 text-danger' : rec.priority == 'high' ? 'bg-warning/10 text-warning' : 'bg-info/10 text-info' %>"> <%= rec.priority.titleize %> </span> <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-surface-secondary text-text-tertiary"> <%= rec.status.titleize %> </span> </div> <p class="text-sm font-medium text-text-primary"><%= rec.title %></p> <p class="text-xs text-text-tertiary mt-0.5"><%= truncate(rec.summary, length: 100) %></p> <div class="mt-2 flex items-center gap-2"> <%= button_to"Acknowledge", acknowledge_management_ai_recommendation_path(rec), method: :post, class:"text-xs px-3 py-1 rounded-md bg-accent text-white hover:bg-accent-hover" %> <%= button_to"Dismiss", dismiss_management_ai_recommendation_path(rec), method: :post, class:"text-xs px-3 py-1 rounded-md border border-border text-text-tertiary hover:text-text-primary" %> </div> </div> <% end %> <% if @active_recommendations.empty? %> <p class="px-5 py-4 text-sm text-text-tertiary">No active recommendations.</p> <% end %> </div> </div> <div class="rounded-lg border border-border bg-surface"> <div class="border-b border-border px-5 py-4"> <div class="flex items-center justify-between"> <h3 class="text-sm font-semibold text-text-primary">Observations</h3> <%= link_to"View All", management_ai_observations_path, class:"text-xs text-accent hover:text-accent-hover" %> </div> </div> <div class="divide-y divide-border"> <% @observations.each do |obs| %> <div class="px-5 py-3"> <div class="flex items-center gap-2 mb-1"> <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full <%= obs.severity == 'critical' ? 'bg-danger/10 text-danger' : obs.severity == 'high' ? 'bg-warning/10 text-warning' : obs.severity == 'medium' ? 'bg-info/10 text-info' : 'bg-surface-secondary text-text-tertiary' %>"> <%= obs.severity.titleize %> </span> <span class="text-xs text-text-tertiary"><%= obs.category.titleize %></span> </div> <p class="text-sm text-text-primary"><%= obs.title %></p> <p class="text-xs text-text-tertiary mt-0.5"> Detected <%= time_ago_in_words(obs.detected_at) %> ago </p> </div> <% end %> <% if @observations.empty? %> <p class="px-5 py-4 text-sm text-text-tertiary">No observations recorded.</p> <% end %> </div> </div> </div> 
+<% content_for :page_title,"AI Branch Manager" %> <% content_for :page_subtitle, @branch.name %> 
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8"> 
+  <div class="rounded-lg border border-border bg-surface p-5 lg:col-span-2"> 
+    <div class="flex items-center justify-between mb-4"> 
+      <h3 class="text-sm font-semibold text-text-primary">Today's Summary</h3>
+ <% if @today_digest %> <span class="text-xs text-text-tertiary"><%= time_ago_in_words(@today_digest.generated_at) %> ago</span> <% end %> </div>
+ <% if @today_digest %> 
+      <div class="prose prose-sm dark:prose-invert max-w-none"> 
+        <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @today_digest.summary %></pre>
+ </div>
+ 
+      <div class="mt-4 pt-4 border-t border-border"> 
+        <h4 class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Risk Summary</h4>
+ 
+        <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @today_digest.risk_summary %></pre>
+ </div>
+ <% else %> 
+      <p class="text-sm text-text-tertiary">No digest generated yet. The daily digest is generated at 6:00 AM.</p>
+ 
+      <div class="mt-4"> <%= link_to"View Past Digests", management_ai_digests_path, class:"text-sm text-accent hover:text-accent-hover" %> </div>
+ <% end %> </div>
+ 
+  <div class="rounded-lg border border-border bg-surface p-5"> 
+    <div class="flex items-center justify-between mb-4"> 
+      <h3 class="text-sm font-semibold text-text-primary">Critical Alerts</h3>
+ <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-danger rounded-full"><%= @critical_observations.count %></span> </div>
+ 
+    <div class="space-y-3"> <% @critical_observations.each do |obs| %> 
+        <div class="flex items-start gap-3"> <span class="flex h-2 w-2 mt-1.5 rounded-full bg-danger shrink-0"></span> 
+          <div class="min-w-0"> 
+            <p class="text-sm font-medium text-text-primary"><%= obs.title %></p>
+ 
+            <p class="text-xs text-text-tertiary mt-0.5"><%= truncate(obs.summary, length: 80) %></p>
+ </div>
+ </div>
+ <% end %> <% if @critical_observations.empty? %> 
+        <p class="text-sm text-text-tertiary">No critical alerts.</p>
+ <% end %> </div>
+ </div>
+ </div>
+ 
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"> 
+  <div class="rounded-lg border border-border bg-surface"> 
+    <div class="border-b border-border px-5 py-4"> 
+      <div class="flex items-center justify-between"> 
+        <h3 class="text-sm font-semibold text-text-primary">Recommendations</h3>
+ <%= link_to"View All", management_ai_recommendations_path, class:"text-xs text-accent hover:text-accent-hover" %> </div>
+ </div>
+ 
+    <div class="divide-y divide-border"> <% @active_recommendations.each do |rec| %> 
+        <div class="px-5 py-3"> 
+          <div class="flex items-center gap-2 mb-1"> <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full <%= rec.priority == 'critical' ? 'bg-danger/10 text-danger' : rec.priority == 'high' ? 'bg-warning/10 text-warning' : 'bg-info/10 text-info' %>"> <%= rec.priority.titleize %> </span> <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-surface-secondary text-text-tertiary"> <%= rec.status.titleize %> </span> </div>
+ 
+          <p class="text-sm font-medium text-text-primary"><%= rec.title %></p>
+ 
+          <p class="text-xs text-text-tertiary mt-0.5"><%= truncate(rec.summary, length: 100) %></p>
+ 
+          <div class="mt-2 flex items-center gap-2"> <%= button_to"Acknowledge", acknowledge_management_ai_recommendation_path(rec), method: :post, class:"text-xs px-3 py-1 rounded-md bg-accent text-white hover:bg-accent-hover" %> <%= button_to"Dismiss", dismiss_management_ai_recommendation_path(rec), method: :post, class:"text-xs px-3 py-1 rounded-md border border-border text-text-tertiary hover:text-text-primary" %> </div>
+ </div>
+ <% end %> <% if @active_recommendations.empty? %> 
+        <p class="px-5 py-4 text-sm text-text-tertiary">No active recommendations.</p>
+ <% end %> </div>
+ </div>
+ 
+  <div class="rounded-lg border border-border bg-surface"> 
+    <div class="border-b border-border px-5 py-4"> 
+      <div class="flex items-center justify-between"> 
+        <h3 class="text-sm font-semibold text-text-primary">Observations</h3>
+ <%= link_to"View All", management_ai_observations_path, class:"text-xs text-accent hover:text-accent-hover" %> </div>
+ </div>
+ 
+    <div class="divide-y divide-border"> <% @observations.each do |obs| %> 
+        <div class="px-5 py-3"> 
+          <div class="flex items-center gap-2 mb-1"> <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full <%= obs.severity == 'critical' ? 'bg-danger/10 text-danger' : obs.severity == 'high' ? 'bg-warning/10 text-warning' : obs.severity == 'medium' ? 'bg-info/10 text-info' : 'bg-surface-secondary text-text-tertiary' %>"> <%= obs.severity.titleize %> </span> <span class="text-xs text-text-tertiary"><%= obs.category.titleize %></span> </div>
+ 
+          <p class="text-sm text-text-primary"><%= obs.title %></p>
+ 
+          <p class="text-xs text-text-tertiary mt-0.5"> Detected <%= time_ago_in_words(obs.detected_at) %> ago </p>
+ </div>
+ <% end %> <% if @observations.empty? %> 
+        <p class="px-5 py-4 text-sm text-text-tertiary">No observations recorded.</p>
+ <% end %> </div>
+ </div>
+ </div>
+ 

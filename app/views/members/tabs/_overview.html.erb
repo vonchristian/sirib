@@ -1,1 +1,128 @@
-<div class="space-y-6"> <div class="grid grid-cols-1 gap-6 lg:grid-cols-2"> <div class="card"> <div class="card-header"> <h3 class="card-header-title">Member Information</h3> </div> <div class="card-body"> <dl class="space-y-2.5 text-sm"> <div class="flex justify-between"> <dt class="text-text-tertiary">Member Number</dt> <dd class="text-text-primary font-medium font-mono"><%= summary[:member].member_identifier %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Full Name</dt> <dd class="text-text-primary font-medium"><%= summary[:member].name %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Birth Date</dt> <dd class="text-text-primary font-medium"><%= summary[:member].birth_date.strftime("%b %d, %Y") %> (<%= ((Date.current - summary[:member].birth_date) / 365).to_i %> yrs)</dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Gender</dt> <dd class="text-text-primary font-medium capitalize"><%= summary[:member].gender %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Civil Status</dt> <dd class="text-text-primary font-medium capitalize"><%= summary[:member].civil_status %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Mobile</dt> <dd class="text-text-primary font-medium"><%= summary[:member].mobile_number %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Email</dt> <dd class="text-text-primary font-medium"><%= summary[:member].email_address ||"—" %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Member Since</dt> <dd class="text-text-primary font-medium"><%= summary[:member].created_at.strftime("%b %d, %Y") %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Status</dt> <dd class="text-text-primary font-medium"> <span class="badge badge-success">Active</span> </dd> </div> </dl> </div> </div> <div class="card"> <div class="card-header"> <h3 class="card-header-title">Financial Snapshot</h3> </div> <div class="card-body"> <div class="space-y-3"> <div class="flex items-center justify-between rounded-md bg-surface-alt px-3 py-2"> <span class="text-sm text-text-secondary">Savings Balance</span> <span class="text-sm font-semibold text-text-primary tabular-nums"><%= number_to_currency(summary[:savings_balance] / 100.0, unit:"₱") %></span> </div> <div class="flex items-center justify-between rounded-md bg-surface-alt px-3 py-2"> <span class="text-sm text-text-secondary">Time Deposit Balance</span> <span class="text-sm font-semibold text-text-primary tabular-nums"><%= number_to_currency(summary[:time_deposit_total] / 100.0, unit:"₱") %></span> </div> <div class="flex items-center justify-between rounded-md bg-surface-alt px-3 py-2"> <span class="text-sm text-text-secondary">Loan Balance</span> <span class="text-sm font-semibold text-text-primary tabular-nums"><%= number_to_currency(summary[:loan_outstanding] / 100.0, unit:"₱") %></span> </div> <div class="flex items-center justify-between rounded-md bg-surface-alt px-3 py-2"> <span class="text-sm text-text-secondary">Share Capital</span> <span class="text-sm font-semibold text-text-primary tabular-nums"><%= number_to_currency(summary[:share_capital_paid_up] / 100.0, unit:"₱") %></span> </div> </div> </div> </div> </div> <div class="card"> <div class="card-header"> <h3 class="card-header-title">Recent Activity</h3> </div> <div class="card-body"> <% if recent_activity.any? %> <div class="table-container"> <table class="table"> <thead> <tr> <th>Date</th> <th>Module</th> <th>Reference</th> <th>Description</th> <th class="text-right">Amount</th> </tr> </thead> <tbody> <% recent_activity.each do |activity| %> <tr> <td class="text-text-secondary"><%= activity[:date].strftime("%b %d, %Y") %></td> <td><span class="badge badge-primary"><%= activity[:module] %></span></td> <td class="font-mono text-text-primary"><%= activity[:reference] %></td> <td class="text-text-secondary"><%= activity[:description] %></td> <td class="font-medium tabular-nums text-right text-text-primary"><%= activity[:amount].format %></td> </tr> <% end %> </tbody> </table> </div> <% else %> <p class="text-sm text-text-tertiary italic text-center py-4">No recent activity.</p> <% end %> </div> </div> </div> 
+<div class="space-y-6"> 
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2"> 
+    <div class="card"> 
+      <div class="card-header"> 
+        <h3 class="card-header-title">Member Information</h3>
+ </div>
+ 
+      <div class="card-body"> 
+        <dl class="space-y-2.5 text-sm"> 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Member Number</dt>
+ 
+            <dd class="text-text-primary font-medium font-mono"><%= summary[:member].member_identifier %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Full Name</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= summary[:member].name %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Birth Date</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= summary[:member].birth_date.strftime("%b %d, %Y") %> (<%= ((Date.current - summary[:member].birth_date) / 365).to_i %> yrs)</dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Gender</dt>
+ 
+            <dd class="text-text-primary font-medium capitalize"><%= summary[:member].gender %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Civil Status</dt>
+ 
+            <dd class="text-text-primary font-medium capitalize"><%= summary[:member].civil_status %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Mobile</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= summary[:member].mobile_number %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Email</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= summary[:member].email_address ||"—" %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Member Since</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= summary[:member].created_at.strftime("%b %d, %Y") %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Status</dt>
+ 
+            <dd class="text-text-primary font-medium"> <span class="badge badge-success">Active</span> </dd>
+ </div>
+ </dl>
+ </div>
+ </div>
+ 
+    <div class="card"> 
+      <div class="card-header"> 
+        <h3 class="card-header-title">Financial Snapshot</h3>
+ </div>
+ 
+      <div class="card-body"> 
+        <div class="space-y-1"> 
+          <div class="flex items-center justify-between rounded-md px-3 py-2.5 transition-colors hover:bg-surface-alt"> <span class="text-sm text-text-secondary">Savings Balance</span> <span class="text-sm font-semibold text-text-primary tabular-nums"><%= number_to_currency(summary[:savings_balance] / 100.0, unit:"₱") %></span> </div>
+          <hr class="border-border mx-3">
+          <div class="flex items-center justify-between rounded-md px-3 py-2.5 transition-colors hover:bg-surface-alt"> <span class="text-sm text-text-secondary">Time Deposit Balance</span> <span class="text-sm font-semibold text-text-primary tabular-nums"><%= number_to_currency(summary[:time_deposit_total] / 100.0, unit:"₱") %></span> </div>
+          <hr class="border-border mx-3">
+          <div class="flex items-center justify-between rounded-md px-3 py-2.5 transition-colors hover:bg-surface-alt"> <span class="text-sm text-text-secondary">Loan Balance</span> <span class="text-sm font-semibold text-text-primary tabular-nums"><%= number_to_currency(summary[:loan_outstanding] / 100.0, unit:"₱") %></span> </div>
+          <hr class="border-border mx-3">
+          <div class="flex items-center justify-between rounded-md px-3 py-2.5 transition-colors hover:bg-surface-alt"> <span class="text-sm text-text-secondary">Share Capital</span> <span class="text-sm font-semibold text-text-primary tabular-nums"><%= number_to_currency(summary[:share_capital_paid_up] / 100.0, unit:"₱") %></span> </div>
+  </div>
+ </div>
+ </div>
+ </div>
+ 
+  <div class="card"> 
+    <div class="card-header"> 
+      <h3 class="card-header-title">Recent Activity</h3>
+ </div>
+ 
+    <div class="card-body"> <% if recent_activity.any? %> 
+        <div class="table-container"> 
+          <table class="table"> 
+            <thead> 
+              <tr> 
+                <th>Date</th>
+ 
+                <th>Module</th>
+ 
+                <th>Reference</th>
+ 
+                <th>Description</th>
+ 
+                <th class="text-right">Amount</th>
+ </tr>
+ </thead>
+ 
+            <tbody> <% recent_activity.each do |activity| %> 
+                <tr> 
+                  <td class="text-text-secondary"><%= activity[:date].strftime("%b %d, %Y") %></td>
+ 
+                  <td><span class="badge badge-primary"><%= activity[:module] %></span></td>
+ 
+                  <td class="font-mono text-text-primary"><%= activity[:reference] %></td>
+ 
+                  <td class="text-text-secondary"><%= activity[:description] %></td>
+ 
+                  <td class="font-medium tabular-nums text-right text-text-primary"><%= activity[:amount].format %></td>
+ </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ <% else %> 
+        <p class="text-sm text-text-tertiary italic text-center py-4">No recent activity.</p>
+ <% end %> </div>
+ </div>
+ </div>
+ 

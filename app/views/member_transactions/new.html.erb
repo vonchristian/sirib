@@ -1,1 +1,129 @@
-<% content_for :page_title,"New Member Transaction" %> <% content_for :page_subtitle, @member.name %> <div class="animate-fade-in-up max-w-3xl"> <div class="rounded-lg border border-border bg-surface overflow-hidden"> <div class="flex items-center justify-between border-b border-border px-5 py-4"> <h2 class="text-sm font-semibold text-text-primary">Transaction</h2> <div class="text-xs text-text-tertiary"><%= @member.name %> — <%= @member.mobile_number %></div> </div> <% if @total_amount %> <div class="border-t border-border"> <div class="p-5 space-y-5"> <div class="rounded-lg border border-border bg-surface-alt p-5 space-y-3"> <h3 class="text-sm font-semibold text-text-primary">Transaction Summary</h3> <div class="space-y-1.5"> <% @items.each do |item| %> <div class="flex justify-between text-sm"> <span class="text-text-tertiary"><%= item[:credit_account_name] %></span> <span class="font-medium tabular-nums text-text-primary"><%= Money.new(item[:amount_cents],"PHP").format %></span> </div> <% end %> <div class="pt-2 border-t border-border flex justify-between text-sm"> <span class="font-semibold text-text-primary">Total Amount</span> <span class="font-bold text-lg text-primary tabular-nums"><%= @total_amount.format %></span> </div> </div> </div> <div class="rounded-lg border border-border bg-surface-alt p-4"> <h4 class="text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider">Journal Entry Preview</h4> <table class="w-full text-xs"> <thead> <tr class="border-b border-border"> <th class="py-1.5 text-left font-medium text-text-tertiary">Account</th> <th class="py-1.5 text-right font-medium text-text-tertiary">Debit</th> <th class="py-1.5 text-right font-medium text-text-tertiary">Credit</th> </tr> </thead> <tbody> <% @debits.each do |line| %> <tr class="border-b border-border/50"> <td class="py-1.5 text-text-primary"><%= line[:account] %></td> <td class="py-1.5 text-right text-positive font-medium tabular-nums"><%= line[:amount] %></td> <td class="py-1.5 text-right text-text-tertiary">—</td> </tr> <% end %> <% @credits.each do |line| %> <tr class="border-b border-border/50"> <td class="py-1.5 text-text-primary"><%= line[:account] %></td> <td class="py-1.5 text-right text-text-tertiary">—</td> <td class="py-1.5 text-right text-warning font-medium tabular-nums"><%= line[:amount] %></td> </tr> <% end %> </tbody> </table> </div> <%= form_tag member_transaction_path(@member), method: :post, data: { turbo: false } do %> <% @items.each_with_index do |item, idx| %> <% prefix = case item[:type]; when :savings_deposit then"savings"; when :loan_payment then"loans"; when :share_purchase then"shares"; end %> <%= hidden_field_tag"#{prefix}[#{idx}][account_id]", item[:account].id %> <%= hidden_field_tag"#{prefix}[#{idx}][amount_cents]", item[:amount_input] %> <% end %> <%= hidden_field_tag :cash_account_id, @cash_account.id %> <%= hidden_field_tag :notes, @notes %> <div class="flex items-center justify-between gap-2"> <%= link_to"Edit", new_member_transaction_path(@member), class:"inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %> <div class="flex items-center gap-2"> <%= link_to"Cancel", @member, class:"inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %> <%= submit_tag"Confirm Transaction", class:"inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", data: { disable_with:"Processing..." } %> </div> </div> <% end %> </div> </div> <% else %> <%= form_tag preview_member_transaction_path(@member), method: :post, data: { turbo: false } do %> <div class="border-t border-border"> <div class="p-5 space-y-5"> <% if @savings_accounts.any? %> <div class="rounded-lg border border-border bg-surface-alt p-4"> <h3 class="text-xs font-semibold text-text-primary mb-3 uppercase tracking-wider">Savings Deposits</h3> <div class="space-y-3"> <% @savings_accounts.each_with_index do |acct, idx| %> <div class="flex items-center gap-3"> <div class="flex-1 min-w-0"> <p class="text-sm font-medium text-text-primary"><%= acct.savings_product.name %></p> <p class="text-xs text-text-tertiary"><%= acct.account_number %> · Balance: <%= acct.balance.format %></p> </div> <div class="w-40"> <%= number_field_tag"savings[#{idx}][amount_cents]", nil, class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"Amount", min: 0.01, step: 0.01 %> <%= hidden_field_tag"savings[#{idx}][account_id]", acct.id %> </div> </div> <% end %> </div> </div> <% end %> <% if @loans.any? %> <div class="rounded-lg border border-border bg-surface-alt p-4"> <h3 class="text-xs font-semibold text-text-primary mb-3 uppercase tracking-wider">Loan Payments</h3> <div class="space-y-3"> <% @loans.each_with_index do |loan, idx| %> <div class="flex items-center gap-3"> <div class="flex-1 min-w-0"> <p class="text-sm font-medium text-text-primary"><%= loan.loan_product.name %></p> <p class="text-xs text-text-tertiary"><%= loan.reference_number %> · Outstanding: <%= Money.new(loan.outstanding_principal_cents,"PHP").format %></p> </div> <div class="w-40"> <%= number_field_tag"loans[#{idx}][amount_cents]", nil, class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"Amount", min: 0.01, step: 0.01 %> <%= hidden_field_tag"loans[#{idx}][loan_id]", loan.id %> </div> </div> <% end %> </div> </div> <% end %> <% if @share_accounts.any? %> <div class="rounded-lg border border-border bg-surface-alt p-4"> <h3 class="text-xs font-semibold text-text-primary mb-3 uppercase tracking-wider">Share Purchases</h3> <div class="space-y-3"> <% @share_accounts.each_with_index do |acct, idx| %> <div class="flex items-center gap-3"> <div class="flex-1 min-w-0"> <p class="text-sm font-medium text-text-primary"><%= acct.share_product.name %> · <%= acct.share_product.price_per_share.format %>/share</p> <p class="text-xs text-text-tertiary"><%= acct.account_number %> · Owned: <%= acct.shares_owned %> shares</p> </div> <div class="w-40"> <%= number_field_tag"shares[#{idx}][amount_cents]", nil, class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"Amount", min: 0.01, step: 0.01 %> <%= hidden_field_tag"shares[#{idx}][account_id]", acct.id %> </div> </div> <% end %> </div> </div> <% end %> <div> <%= label_tag :cash_account_id,"Cash on Hand Account", class:"block mb-1.5 text-xs font-medium text-text-primary" %> <% if @single_cash_account %> <%= hidden_field_tag :cash_account_id, @single_cash_account.id %> <div class="py-2 text-sm font-medium text-text-primary"><%= @single_cash_account.name %></div> <p class="mt-1 text-xs text-text-tertiary">This is the only cash account available.</p> <% elsif @cash_accounts.many? %> <%= select_tag :cash_account_id, options_from_collection_for_select(@cash_accounts, :id, :name, params[:cash_account_id]), { prompt:"Select cash account", required: true, class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.75rem_center] pr-10" } %> <p class="mt-1 text-xs text-text-tertiary">Select the cash account to record this transaction against.</p> <% end %> </div> <div> <%= label_tag :notes,"Notes", class:"block mb-1.5 text-xs font-medium text-text-primary" %> <%= text_area_tag :notes, params[:notes], rows: 2, placeholder:"Optional notes...", class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-y min-h-[2.5rem]" %> <p class="mt-1 text-xs text-text-tertiary">Reference or memo for this transaction.</p> </div> </div> </div> <div class="flex items-center justify-end gap-2 border-t border-border bg-surface-alt px-5 py-3"> <%= link_to"Cancel", @member, class:"inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %> <%= submit_tag"Preview Transaction", class:"inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", data: { disable_with:"Processing..." } %> </div> <% end %> <% end %> </div> </div> 
+<% content_for :page_title,"New Member Transaction" %> <% content_for :page_subtitle, @member.name %> 
+<div class="animate-fade-in-up max-w-3xl"> 
+  <div class="rounded-lg border border-border bg-surface overflow-hidden"> 
+    <div class="flex items-center justify-between border-b border-border px-5 py-4"> 
+      <h2 class="text-sm font-semibold text-text-primary">Transaction</h2>
+ 
+      <div class="text-xs text-text-tertiary"><%= @member.name %> — <%= @member.mobile_number %></div>
+ </div>
+ <% if @total_amount %> 
+      <div class="border-t border-border"> 
+        <div class="p-5 space-y-5"> 
+          <div class="rounded-lg border border-border bg-surface-alt p-5 space-y-3"> 
+            <h3 class="text-sm font-semibold text-text-primary">Transaction Summary</h3>
+ 
+            <div class="space-y-1.5"> <% @items.each do |item| %> 
+                <div class="flex justify-between text-sm"> <span class="text-text-tertiary"><%= item[:credit_account_name] %></span> <span class="font-medium tabular-nums text-text-primary"><%= Money.new(item[:amount_cents],"PHP").format %></span> </div>
+ <% end %> 
+              <div class="pt-2 border-t border-border flex justify-between text-sm"> <span class="font-semibold text-text-primary">Total Amount</span> <span class="font-bold text-lg text-primary tabular-nums"><%= @total_amount.format %></span> </div>
+ </div>
+ </div>
+ 
+          <div class="rounded-lg border border-border bg-surface-alt p-4"> 
+            <h4 class="text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider">Journal Entry Preview</h4>
+ 
+            <table class="w-full text-xs"> 
+              <thead> 
+                <tr class="border-b border-border"> 
+                  <th class="py-1.5 text-left font-medium text-text-tertiary">Account</th>
+ 
+                  <th class="py-1.5 text-right font-medium text-text-tertiary">Debit</th>
+ 
+                  <th class="py-1.5 text-right font-medium text-text-tertiary">Credit</th>
+ </tr>
+ </thead>
+ 
+              <tbody> <% @debits.each do |line| %> 
+                  <tr class="border-b border-border/50"> 
+                    <td class="py-1.5 text-text-primary"><%= line[:account] %></td>
+ 
+                    <td class="py-1.5 text-right text-positive font-medium tabular-nums"><%= line[:amount] %></td>
+ 
+                    <td class="py-1.5 text-right text-text-tertiary">—</td>
+ </tr>
+ <% end %> <% @credits.each do |line| %> 
+                  <tr class="border-b border-border/50"> 
+                    <td class="py-1.5 text-text-primary"><%= line[:account] %></td>
+ 
+                    <td class="py-1.5 text-right text-text-tertiary">—</td>
+ 
+                    <td class="py-1.5 text-right text-warning font-medium tabular-nums"><%= line[:amount] %></td>
+ </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ <%= form_tag member_transaction_path(@member), method: :post, data: { turbo: false } do %> <% @items.each_with_index do |item, idx| %> <% prefix = case item[:type]; when :savings_deposit then"savings"; when :loan_payment then"loans"; when :share_purchase then"shares"; end %> <%= hidden_field_tag"#{prefix}[#{idx}][account_id]", item[:account].id %> <%= hidden_field_tag"#{prefix}[#{idx}][amount_cents]", item[:amount_input] %> <% end %> <%= hidden_field_tag :cash_account_id, @cash_account.id %> <%= hidden_field_tag :notes, @notes %> 
+            <div class="flex items-center justify-between gap-2"> <%= link_to"Edit", new_member_transaction_path(@member), class:"inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %> 
+              <div class="flex items-center gap-2"> <%= link_to"Cancel", @member, class:"inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %> <%= submit_tag"Confirm Transaction", class:"inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", data: { disable_with:"Processing..." } %> </div>
+ </div>
+ <% end %> </div>
+ </div>
+ <% else %> <%= form_tag preview_member_transaction_path(@member), method: :post, data: { turbo: false } do %> 
+        <div class="border-t border-border"> 
+          <div class="p-5 space-y-5"> <% if @savings_accounts.any? %> 
+              <div class="rounded-lg border border-border bg-surface-alt p-4"> 
+                <h3 class="text-xs font-semibold text-text-primary mb-3 uppercase tracking-wider">Savings Deposits</h3>
+ 
+                <div class="space-y-3"> <% @savings_accounts.each_with_index do |acct, idx| %> 
+                    <div class="flex items-center gap-3"> 
+                      <div class="flex-1 min-w-0"> 
+                        <p class="text-sm font-medium text-text-primary"><%= acct.savings_product.name %></p>
+ 
+                        <p class="text-xs text-text-tertiary"><%= acct.account_number %> · Balance: <%= acct.balance.format %></p>
+ </div>
+ 
+                      <div class="w-40"> <%= number_field_tag"savings[#{idx}][amount_cents]", nil, class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"Amount", min: 0.01, step: 0.01 %> <%= hidden_field_tag"savings[#{idx}][account_id]", acct.id %> </div>
+ </div>
+ <% end %> </div>
+ </div>
+ <% end %> <% if @loans.any? %> 
+              <div class="rounded-lg border border-border bg-surface-alt p-4"> 
+                <h3 class="text-xs font-semibold text-text-primary mb-3 uppercase tracking-wider">Loan Payments</h3>
+ 
+                <div class="space-y-3"> <% @loans.each_with_index do |loan, idx| %> 
+                    <div class="flex items-center gap-3"> 
+                      <div class="flex-1 min-w-0"> 
+                        <p class="text-sm font-medium text-text-primary"><%= loan.loan_product.name %></p>
+ 
+                        <p class="text-xs text-text-tertiary"><%= loan.reference_number %> · Outstanding: <%= Money.new(loan.outstanding_principal_cents,"PHP").format %></p>
+ </div>
+ 
+                      <div class="w-40"> <%= number_field_tag"loans[#{idx}][amount_cents]", nil, class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"Amount", min: 0.01, step: 0.01 %> <%= hidden_field_tag"loans[#{idx}][loan_id]", loan.id %> </div>
+ </div>
+ <% end %> </div>
+ </div>
+ <% end %> <% if @share_accounts.any? %> 
+              <div class="rounded-lg border border-border bg-surface-alt p-4"> 
+                <h3 class="text-xs font-semibold text-text-primary mb-3 uppercase tracking-wider">Share Purchases</h3>
+ 
+                <div class="space-y-3"> <% @share_accounts.each_with_index do |acct, idx| %> 
+                    <div class="flex items-center gap-3"> 
+                      <div class="flex-1 min-w-0"> 
+                        <p class="text-sm font-medium text-text-primary"><%= acct.share_product.name %> · <%= acct.share_product.price_per_share.format %>/share</p>
+ 
+                        <p class="text-xs text-text-tertiary"><%= acct.account_number %> · Owned: <%= acct.shares_owned %> shares</p>
+ </div>
+ 
+                      <div class="w-40"> <%= number_field_tag"shares[#{idx}][amount_cents]", nil, class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder:"Amount", min: 0.01, step: 0.01 %> <%= hidden_field_tag"shares[#{idx}][account_id]", acct.id %> </div>
+ </div>
+ <% end %> </div>
+ </div>
+ <% end %> 
+            <div> <%= label_tag :cash_account_id,"Cash on Hand Account", class:"block mb-1.5 text-xs font-medium text-text-primary" %> <% if @single_cash_account %> <%= hidden_field_tag :cash_account_id, @single_cash_account.id %> 
+                <div class="py-2 text-sm font-medium text-text-primary"><%= @single_cash_account.name %></div>
+ 
+                <p class="mt-1 text-xs text-text-tertiary">This is the only cash account available.</p>
+ <% elsif @cash_accounts.many? %> <%= select_tag :cash_account_id, options_from_collection_for_select(@cash_accounts, :id, :name, params[:cash_account_id]), { prompt:"Select cash account", required: true, class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.75rem_center] pr-10" } %> 
+                <p class="mt-1 text-xs text-text-tertiary">Select the cash account to record this transaction against.</p>
+ <% end %> </div>
+ 
+            <div> <%= label_tag :notes,"Notes", class:"block mb-1.5 text-xs font-medium text-text-primary" %> <%= text_area_tag :notes, params[:notes], rows: 2, placeholder:"Optional notes...", class:"block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-y min-h-[2.5rem]" %> 
+              <p class="mt-1 text-xs text-text-tertiary">Reference or memo for this transaction.</p>
+ </div>
+ </div>
+ </div>
+ 
+        <div class="flex items-center justify-end gap-2 border-t border-border bg-surface-alt px-5 py-3"> <%= link_to"Cancel", @member, class:"inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-alt transition-colors" %> <%= submit_tag"Preview Transaction", class:"inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-xs font-medium text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", data: { disable_with:"Processing..." } %> </div>
+ <% end %> <% end %> </div>
+ </div>
+ 

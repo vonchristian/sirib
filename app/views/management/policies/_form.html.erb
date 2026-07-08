@@ -1,1 +1,43 @@
-<%= form_with model: policy, class:"space-y-4" do |f| %> <% if policy.errors.any? %> <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger"> <ul class="list-inside list-disc"> <% policy.errors.each do |error| %> <li><%= error.full_message %></li> <% end %> </ul> </div> <% end %> <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <%= f.label :name, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.text_field :name, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> <div> <%= f.label :code, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.text_field :code, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> </div> <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <%= f.label :category, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.text_field :category, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> <div> <%= f.label :status, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.select :status, Management::Policy.statuses.keys.map { |s| [s.titleize, s] }, {}, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> </div> <div> <%= f.label :description, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.text_area :description, rows: 3, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> <div> <p class="block text-xs font-medium text-text-secondary mb-2">Rules</p> <div id="policy-rules"> <%= f.fields_for :rules do |rf| %> <div class="border border-border rounded-md p-3 mb-2 bg-surface"> <div class="grid grid-cols-2 sm:grid-cols-4 gap-2"> <div> <%= rf.label :field, class:"block text-xs text-text-tertiary mb-0.5" %> <%= rf.text_field :field, class:"w-full rounded-md border border-border bg-surface py-1.5 px-2 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> <div> <%= rf.label :operator, class:"block text-xs text-text-tertiary mb-0.5" %> <%= rf.text_field :operator, class:"w-full rounded-md border border-border bg-surface py-1.5 px-2 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> <div> <%= rf.label :value, class:"block text-xs text-text-tertiary mb-0.5" %> <%= rf.text_field :value, class:"w-full rounded-md border border-border bg-surface py-1.5 px-2 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> <div> <%= rf.label :effect, class:"block text-xs text-text-tertiary mb-0.5" %> <%= rf.select :effect, Management::PolicyRule.effects.keys.map { |e| [e.titleize, e] }, {}, class:"w-full rounded-md border border-border bg-surface py-1.5 px-2 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div> </div> <% if rf.object.persisted? %> <div class="mt-2"> <%= rf.check_box :_destroy, class:"rounded border-border text-primary focus:ring-primary" %> <%= rf.label :_destroy,"Remove", class:"text-xs text-text-tertiary" %> </div> <% end %> </div> <% end %> </div> </div> <div class="flex items-center gap-3 pt-2"> <%= f.submit class:"rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %> <%= link_to"Cancel", management_policies_path, class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </div> <% end %> 
+<%= form_with model: policy, class:"space-y-4" do |f| %> <% if policy.errors.any? %> 
+    <div class="rounded-lg border border-danger/20 bg-danger-50 px-4 py-3 text-sm text-danger"> 
+      <ul class="list-inside list-disc"> <% policy.errors.each do |error| %> 
+          <li><%= error.full_message %></li>
+ <% end %> </ul>
+ </div>
+ <% end %> 
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"> 
+    <div> <%= f.label :name, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.text_field :name, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ 
+    <div> <%= f.label :code, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.text_field :code, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ </div>
+ 
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"> 
+    <div> <%= f.label :category, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.text_field :category, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ 
+    <div> <%= f.label :status, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.select :status, Management::Policy.statuses.keys.map { |s| [s.titleize, s] }, {}, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ </div>
+ 
+  <div> <%= f.label :description, class:"block text-xs font-medium text-text-secondary mb-1" %> <%= f.text_area :description, rows: 3, class:"w-full rounded-md border border-border bg-surface py-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ 
+  <div> 
+    <p class="block text-xs font-medium text-text-secondary mb-2">Rules</p>
+ 
+    <div id="policy-rules"> <%= f.fields_for :rules do |rf| %> 
+        <div class="border border-border rounded-md p-3 mb-2 bg-surface"> 
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2"> 
+            <div> <%= rf.label :field, class:"block text-xs text-text-tertiary mb-0.5" %> <%= rf.text_field :field, class:"w-full rounded-md border border-border bg-surface py-1.5 px-2 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ 
+            <div> <%= rf.label :operator, class:"block text-xs text-text-tertiary mb-0.5" %> <%= rf.text_field :operator, class:"w-full rounded-md border border-border bg-surface py-1.5 px-2 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ 
+            <div> <%= rf.label :value, class:"block text-xs text-text-tertiary mb-0.5" %> <%= rf.text_field :value, class:"w-full rounded-md border border-border bg-surface py-1.5 px-2 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ 
+            <div> <%= rf.label :effect, class:"block text-xs text-text-tertiary mb-0.5" %> <%= rf.select :effect, Management::PolicyRule.effects.keys.map { |e| [e.titleize, e] }, {}, class:"w-full rounded-md border border-border bg-surface py-1.5 px-2 text-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> </div>
+ </div>
+ <% if rf.object.persisted? %> 
+            <div class="mt-2"> <%= rf.check_box :_destroy, class:"rounded border-border text-primary focus:ring-primary" %> <%= rf.label :_destroy,"Remove", class:"text-xs text-text-tertiary" %> </div>
+ <% end %> </div>
+ <% end %> </div>
+ </div>
+ 
+  <div class="flex items-center gap-3 pt-2"> <%= f.submit class:"rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %> <%= link_to"Cancel", management_policies_path, class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </div>
+ <% end %> 

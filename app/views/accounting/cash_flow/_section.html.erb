@@ -1,1 +1,20 @@
-<tr class="bg-surface-alt /40"> <td colspan="2" class="px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-text-secondary"> <%= section[:name] %> </td> </tr> <% if section[:rows].any? %> <% section[:rows].each do |row| %> <tr class="hover:bg-surface-alt /30 transition-colors text-text-secondary"> <td class="px-6 py-1.5 text-xs" style="padding-left: 48px"> <span class="tabular-nums"><%= row[:account].account_code %></span> <span class="ml-1"><%= row[:account].name %></span> </td> <td class="px-6 py-1.5 text-right text-xs tabular-nums <%= row[:amount].cents >= 0 ? 'text-positive dark:text-emerald-400' : 'text-negative dark:text-red-400' %>"> <%= row[:amount].cents >= 0 ? row[:amount].format :"(#{row[:amount].abs.format})" %> </td> </tr> <% end %> <% else %> <tr class="text-text-tertiary"> <td colspan="2" class="px-6 py-3 text-xs italic text-center" style="padding-left: 48px"> No activity </td> </tr> <% end %> <tr> <td class="px-6 py-2.5 text-sm font-semibold text-text-primary" style="padding-left: 40px"> Net Cash <%= section[:name].sub("CASH FLOWS FROM","").sub(" ACTIVITIES","") %> </td> <td class="px-6 py-2.5 text-right text-sm font-semibold tabular-nums text-text-primary border-t-2 border-border-strong <%= section[:total].cents >= 0 ? 'text-positive dark:text-emerald-400' : 'text-negative dark:text-red-400' %>"> <%= section[:total].cents >= 0 ? section[:total].format :"(#{section[:total].abs.format})" %> </td> </tr> 
+<tr class="bg-surface-alt /40"> 
+  <td colspan="2" class="px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-text-secondary"> <%= section[:name] %> </td>
+ </tr>
+ <% if section[:rows].any? %> <% section[:rows].each do |row| %> 
+    <tr class="hover:bg-surface-alt /30 transition-colors text-text-secondary"> 
+      <td class="px-6 py-1.5 text-xs" style="padding-left: 48px"> <span class="tabular-nums"><%= row[:account].account_code %></span> <span class="ml-1"><%= row[:account].name %></span> </td>
+ 
+      <td class="px-6 py-1.5 text-right text-xs tabular-nums <%= row[:amount].cents >= 0 ? 'text-positive dark:text-positive-400' : 'text-negative dark:text-danger-400' %>"> <%= row[:amount].cents >= 0 ? row[:amount].format :"(#{row[:amount].abs.format})" %> </td>
+ </tr>
+ <% end %> <% else %> 
+  <tr class="text-text-tertiary"> 
+    <td colspan="2" class="px-6 py-3 text-xs italic text-center" style="padding-left: 48px"> No activity </td>
+ </tr>
+ <% end %> 
+<tr> 
+  <td class="px-6 py-2.5 text-sm font-semibold text-text-primary" style="padding-left: 40px"> Net Cash <%= section[:name].sub("CASH FLOWS FROM","").sub(" ACTIVITIES","") %> </td>
+ 
+  <td class="px-6 py-2.5 text-right text-sm font-semibold tabular-nums text-text-primary border-t-2 border-border-strong <%= section[:total].cents >= 0 ? 'text-positive dark:text-positive-400' : 'text-negative dark:text-danger-400' %>"> <%= section[:total].cents >= 0 ? section[:total].format :"(#{section[:total].abs.format})" %> </td>
+ </tr>
+ 

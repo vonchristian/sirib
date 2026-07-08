@@ -48,7 +48,7 @@ module Treasury
 
       Result.new(success?: true, voucher: voucher, transaction: txn)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
-      Result.new(success?: false, errors: [e.message])
+      Result.new(success?: false, errors: [ e.message ])
     end
 
     def withdraw(cash_session:, savings_account:, amount:, cash_account:, notes: nil)
@@ -87,7 +87,7 @@ module Treasury
 
       Result.new(success?: true, voucher: voucher, transaction: txn)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
-      Result.new(success?: false, errors: [e.message])
+      Result.new(success?: false, errors: [ e.message ])
     end
   end
 end

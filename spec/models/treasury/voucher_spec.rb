@@ -111,7 +111,7 @@ RSpec.describe Treasury::Voucher do
 
       context "when cash session is closed" do
         let(:closed_cash_session) { instance_double(Treasury::CashSession, closed?: true) }
-        
+
         it "raises an error when called via subclass post_entry!" do
           voucher_instance = described_class.new(status: "pending")
           # Set the instance variable to simulate a closed cash session

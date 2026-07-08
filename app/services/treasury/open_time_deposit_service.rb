@@ -51,8 +51,8 @@ module Treasury
         description: "Time deposit ##{deposit.id} opened",
         reference_number: "TD-#{deposit.id}",
         posted_at: deposit.opened_at,
-        debits: [{ account: cash_account, amount: deposit.amount_cents }],
-        credits: [{ account: time_deposit_account, amount: deposit.amount_cents }]
+        debits: [ { account: cash_account, amount: deposit.amount_cents } ],
+        credits: [ { account: time_deposit_account, amount: deposit.amount_cents } ]
       )
     end
 

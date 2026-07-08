@@ -1,1 +1,11 @@
-<% content_for :title, @announcement.title %> <div class="max-w-2xl"> <%= link_to"← Back to announcements", portal_announcements_path, class:"text-xs font-medium text-primary dark:text-primary-400 hover:underline mb-4 inline-block" %> <div class="rounded-xl bg-surface border border-border p-6"> <h1 class="text-lg font-semibold text-text-primary"><%= @announcement.title %></h1> <p class="text-xs text-text-tertiary mt-1"><%= l(@announcement.published_at, format: :long) %></p> <div class="mt-4 text-sm text-text-secondary leading-relaxed whitespace-pre-wrap"><%= @announcement.body %></div> </div> </div> 
+<% content_for :title, @announcement.title %> 
+<div class="max-w-2xl"> <%= link_to"← Back to announcements", portal_announcements_path, class:"text-xs font-medium text-primary dark:text-primary-400 hover:underline mb-4 inline-block" %> 
+  <div class="rounded-xl bg-surface border border-border p-6"> 
+    <h1 class="text-lg font-semibold text-text-primary"><%= @announcement.title %></h1>
+ 
+    <p class="text-xs text-text-tertiary mt-1"><%= l(@announcement.published_at, format: :long) %></p>
+ 
+    <div class="mt-4 text-sm text-text-secondary leading-relaxed whitespace-pre-wrap"><%= @announcement.body %></div>
+ </div>
+ </div>
+ 

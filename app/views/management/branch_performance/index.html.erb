@@ -1,1 +1,81 @@
-<% content_for :page_title,"Branch Performance" %> <% content_for :page_subtitle,"Branch ranking with KPI scorecards" %> <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Active Branches</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= @branches.size %></p> </div> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Assets</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@branches.sum { |b| b[:total_assets].cents }.to_f / 100, unit:"₱") %></p> </div> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Loans</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@branches.sum { |b| b[:loan_portfolio].cents }.to_f / 100, unit:"₱") %></p> </div> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Savings</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@branches.sum { |b| b[:savings_deposits].cents }.to_f / 100, unit:"₱") %></p> </div> </div> <div class="rounded-lg border border-border bg-surface overflow-hidden"> <div class="border-b border-border px-5 py-4"> <h3 class="text-sm font-semibold text-text-primary">Branch Ranking</h3> </div> <div class="overflow-x-auto"> <table class="w-full text-sm"> <thead> <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> <th class="px-5 py-3 font-medium">Rank</th> <th class="px-5 py-3 font-medium">Branch</th> <th class="px-5 py-3 font-medium text-right">Total Assets</th> <th class="px-5 py-3 font-medium text-right">Loan Portfolio</th> <th class="px-5 py-3 font-medium text-right">Savings Deposits</th> <th class="px-5 py-3 font-medium text-right">Members</th> <th class="px-5 py-3 font-medium text-right">Growth Rate</th> </tr> </thead> <tbody class="divide-y divide-border"> <% @branches.each_with_index do |b, i| %> <tr class="hover:bg-surface-alt transition-colors"> <td class="px-5 py-3"> <span class="inline-flex items-center justify-center h-6 w-6 rounded-full <%= i == 0 ? 'bg-warning text-white' : i == 1 ? 'bg-surface-alt text-text-secondary' : i == 2 ? 'bg-surface-alt text-text-secondary' : 'text-text-tertiary' %> text-xs font-semibold"><%= i + 1 %></span> </td> <td class="px-5 py-3"> <p class="font-medium text-text-primary"><%= b[:branch].name %></p> <p class="text-xs text-text-tertiary"><%= b[:branch].code %></p> </td> <td class="px-5 py-3 text-right text-text-primary"><%= number_to_currency(b[:total_assets], unit:"₱") %></td> <td class="px-5 py-3 text-right text-text-primary"><%= number_to_currency(b[:loan_portfolio], unit:"₱") %></td> <td class="px-5 py-3 text-right text-text-primary"><%= number_to_currency(b[:savings_deposits], unit:"₱") %></td> <td class="px-5 py-3 text-right text-text-primary"><%= b[:member_count] %></td> <td class="px-5 py-3 text-right"> <span class="<%= b[:growth_rate] >= 0 ? 'text-positive' : 'text-danger' %>"><%= number_to_percentage(b[:growth_rate], precision: 1) %></span> </td> </tr> <% end %> <% if @branches.empty? %> <tr><td colspan="7" class="px-5 py-8 text-center text-text-tertiary">No branch data available.</td></tr> <% end %> </tbody> </table> </div> </div> 
+<% content_for :page_title,"Branch Performance" %> <% content_for :page_subtitle,"Branch ranking with KPI scorecards" %> 
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"> 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Active Branches</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= @branches.size %></p>
+ </div>
+ 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Assets</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@branches.sum { |b| b[:total_assets].cents }.to_f / 100, unit:"₱") %></p>
+ </div>
+ 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Loans</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@branches.sum { |b| b[:loan_portfolio].cents }.to_f / 100, unit:"₱") %></p>
+ </div>
+ 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Savings</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@branches.sum { |b| b[:savings_deposits].cents }.to_f / 100, unit:"₱") %></p>
+ </div>
+ </div>
+ 
+<div class="rounded-lg border border-border bg-surface overflow-hidden"> 
+  <div class="border-b border-border px-5 py-4"> 
+    <h3 class="text-sm font-semibold text-text-primary">Branch Ranking</h3>
+ </div>
+ 
+  <div class="overflow-x-auto"> 
+    <table class="w-full text-sm"> 
+      <thead> 
+        <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> 
+          <th class="px-5 py-3 font-medium">Rank</th>
+ 
+          <th class="px-5 py-3 font-medium">Branch</th>
+ 
+          <th class="px-5 py-3 font-medium text-right">Total Assets</th>
+ 
+          <th class="px-5 py-3 font-medium text-right">Loan Portfolio</th>
+ 
+          <th class="px-5 py-3 font-medium text-right">Savings Deposits</th>
+ 
+          <th class="px-5 py-3 font-medium text-right">Members</th>
+ 
+          <th class="px-5 py-3 font-medium text-right">Growth Rate</th>
+ </tr>
+ </thead>
+ 
+      <tbody class="divide-y divide-border"> <% @branches.each_with_index do |b, i| %> 
+          <tr class="hover:bg-surface-alt transition-colors"> 
+            <td class="px-5 py-3"> <span class="inline-flex items-center justify-center h-6 w-6 rounded-full <%= i == 0 ? 'bg-warning text-white' : i == 1 ? 'bg-surface-alt text-text-secondary' : i == 2 ? 'bg-surface-alt text-text-secondary' : 'text-text-tertiary' %> text-xs font-semibold"><%= i + 1 %></span> </td>
+ 
+            <td class="px-5 py-3"> 
+              <p class="font-medium text-text-primary"><%= b[:branch].name %></p>
+ 
+              <p class="text-xs text-text-tertiary"><%= b[:branch].code %></p>
+ </td>
+ 
+            <td class="px-5 py-3 text-right text-text-primary"><%= number_to_currency(b[:total_assets], unit:"₱") %></td>
+ 
+            <td class="px-5 py-3 text-right text-text-primary"><%= number_to_currency(b[:loan_portfolio], unit:"₱") %></td>
+ 
+            <td class="px-5 py-3 text-right text-text-primary"><%= number_to_currency(b[:savings_deposits], unit:"₱") %></td>
+ 
+            <td class="px-5 py-3 text-right text-text-primary"><%= b[:member_count] %></td>
+ 
+            <td class="px-5 py-3 text-right"> <span class="<%= b[:growth_rate] >= 0 ? 'text-positive' : 'text-danger' %>"><%= number_to_percentage(b[:growth_rate], precision: 1) %></span> </td>
+ </tr>
+ <% end %> <% if @branches.empty? %> 
+          <tr>
+            <td colspan="7" class="px-5 py-8 text-center text-text-tertiary">No branch data available.</td>
+          </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ </div>
+ 

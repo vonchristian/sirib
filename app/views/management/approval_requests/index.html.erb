@@ -1,1 +1,43 @@
-<% content_for :page_title,"Approval Requests" %> <% content_for :page_subtitle,"#{@workflow.name}" %> <div class="flex items-center justify-between mb-6"> <div> <%= link_to"Back to Workflow", management_approval_workflow_path(@workflow), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </div> </div> <div class="rounded-lg border border-border bg-surface overflow-hidden"> <table class="w-full text-sm"> <thead> <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> <th class="px-5 py-3 font-medium">ID</th> <th class="px-5 py-3 font-medium">Requested By</th> <th class="px-5 py-3 font-medium">Status</th> <th class="px-5 py-3 font-medium">Created</th> <th class="px-5 py-3 font-medium text-right">Actions</th> </tr> </thead> <tbody class="divide-y divide-border"> <% @approval_requests.each do |req| %> <tr class="hover:bg-surface-alt transition-colors"> <td class="px-5 py-3 font-medium text-text-primary">#<%= req.id %></td> <td class="px-5 py-3 text-text-secondary"><%= req.requested_by.email_address %></td> <td class="px-5 py-3"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= req.pending? ? 'bg-warning-50 text-warning' : req.approved? ? 'bg-positive-50 text-positive' : req.rejected? ? 'bg-danger-50 text-danger' : 'bg-surface-alt text-text-tertiary' %>"> <%= req.status.titleize %> </span> </td> <td class="px-5 py-3 text-text-secondary"><%= time_ago_in_words(req.created_at) %> ago</td> <td class="px-5 py-3 text-right"> <%= link_to"View", management_approval_workflow_approval_request_path(@workflow, req), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </td> </tr> <% end %> <% if @approval_requests.empty? %> <tr><td colspan="5" class="px-5 py-8 text-center text-text-tertiary">No requests found.</td></tr> <% end %> </tbody> </table> </div> <div class="mt-4"> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div> 
+<% content_for :page_title,"Approval Requests" %> <% content_for :page_subtitle,"#{@workflow.name}" %> 
+<div class="flex items-center justify-between mb-6"> 
+  <div> <%= link_to"Back to Workflow", management_approval_workflow_path(@workflow), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </div>
+ </div>
+ 
+<div class="rounded-lg border border-border bg-surface overflow-hidden"> 
+  <table class="w-full text-sm"> 
+    <thead> 
+      <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> 
+        <th class="px-5 py-3 font-medium">ID</th>
+ 
+        <th class="px-5 py-3 font-medium">Requested By</th>
+ 
+        <th class="px-5 py-3 font-medium">Status</th>
+ 
+        <th class="px-5 py-3 font-medium">Created</th>
+ 
+        <th class="px-5 py-3 font-medium text-right">Actions</th>
+ </tr>
+ </thead>
+ 
+    <tbody class="divide-y divide-border"> <% @approval_requests.each do |req| %> 
+        <tr class="hover:bg-surface-alt transition-colors"> 
+          <td class="px-5 py-3 font-medium text-text-primary">#<%= req.id %></td>
+ 
+          <td class="px-5 py-3 text-text-secondary"><%= req.requested_by.email_address %></td>
+ 
+          <td class="px-5 py-3"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= req.pending? ? 'bg-warning-50 text-warning' : req.approved? ? 'bg-positive-50 text-positive' : req.rejected? ? 'bg-danger-50 text-danger' : 'bg-surface-alt text-text-tertiary' %>"> <%= req.status.titleize %> </span> </td>
+ 
+          <td class="px-5 py-3 text-text-secondary"><%= time_ago_in_words(req.created_at) %> ago</td>
+ 
+          <td class="px-5 py-3 text-right"> <%= link_to"View", management_approval_workflow_approval_request_path(@workflow, req), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </td>
+ </tr>
+ <% end %> <% if @approval_requests.empty? %> 
+        <tr>
+          <td colspan="5" class="px-5 py-8 text-center text-text-tertiary">No requests found.</td>
+        </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ 
+<div class="mt-4"> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div>
+ 

@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" fill="none">
+  <rect width="1200" height="750" fill="#f7f5f0"/>
+  <!-- Sidebar -->
+  <rect width="256" height="750" fill="#ffffff" rx="0"/>
+  <rect x="256" width="1" height="750" fill="#e8e0d5"/>
+  <rect x="16" y="16" width="224" height="48" rx="8" fill="#f0f7ef"/>
+  <circle cx="40" cy="40" r="14" fill="#5b8c5a"/>
+  <rect x="64" y="32" width="48" height="6" rx="3" fill="#2c241b"/>
+  <rect x="64" y="42" width="80" height="4" rx="2" fill="#aea398"/>
+  <!-- Sidebar nav items -->
+  <rect x="16" y="88" width="224" height="8" rx="4" fill="#aea398"/>
+  <rect x="16" y="108" width="224" height="36" rx="6" fill="#e8f0e0"/>
+  <rect x="44" y="120" width="80" height="6" rx="3" fill="#5b8c5a"/>
+  <rect x="16" y="156" width="224" height="36" rx="6" fill="transparent"/>
+  <rect x="44" y="168" width="60" height="6" rx="3" fill="#57534e"/>
+  <rect x="16" y="204" width="224" height="36" rx="6" fill="transparent"/>
+  <rect x="44" y="216" width="100" height="6" rx="3" fill="#57534e"/>
+  <rect x="16" y="252" width="224" height="36" rx="6" fill="transparent"/>
+  <rect x="44" y="264" width="70" height="6" rx="3" fill="#57534e"/>
+  <!-- Top header -->
+  <rect x="256" y="0" width="944" height="56" fill="#ffffff"/>
+  <rect x="256" y="56" width="944" height="1" fill="#e8e0d5"/>
+  <text x="280" y="34" font-family="system-ui" font-size="14" font-weight="600" fill="#2c241b">Dashboard</text>
+  <text x="280" y="48" font-family="system-ui" font-size="11" fill="#aea398">Overview of your cooperative</text>
+  <!-- Search bar -->
+  <rect x="880" y="14" width="240" height="28" rx="6" fill="#f7f5f0" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="892" y="33" font-family="system-ui" font-size="11" fill="#aea398">Search accounts, members...</text>
+  <!-- Stat cards -->
+  <rect x="280" y="80" width="212" height="88" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="300" y="104" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">ACTIVE LOANS</text>
+  <text x="300" y="130" font-family="system-ui" font-size="22" font-weight="600" fill="#2c241b">₱8.5M</text>
+  <rect x="300" y="142" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="308" y="155" font-family="system-ui" font-size="10" font-weight="500" fill="#059669">+12%</text>
+
+  <rect x="504" y="80" width="212" height="88" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="524" y="104" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">PENDING DISBURSEMENT</text>
+  <text x="524" y="130" font-family="system-ui" font-size="22" font-weight="600" fill="#2c241b">₱2.1M</text>
+  <rect x="524" y="142" width="60" height="18" rx="9" fill="#fef2f2"/>
+  <text x="532" y="155" font-family="system-ui" font-size="10" font-weight="500" fill="#dc2626">-8%</text>
+
+  <rect x="728" y="80" width="212" height="88" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="748" y="104" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">TODAY'S COLLECTIONS</text>
+  <text x="748" y="130" font-family="system-ui" font-size="22" font-weight="600" fill="#2c241b">₱342K</text>
+
+  <rect x="952" y="80" width="212" height="88" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="972" y="104" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">TOTAL MEMBERS</text>
+  <text x="972" y="130" font-family="system-ui" font-size="22" font-weight="600" fill="#2c241b">1,247</text>
+  <rect x="972" y="142" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="980" y="155" font-family="system-ui" font-size="10" font-weight="500" fill="#059669">+3</text>
+
+  <!-- Tasks card -->
+  <rect x="280" y="188" width="562" height="200" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <rect x="280" y="188" width="562" height="44" rx="8" fill="#ffffff"/>
+  <text x="300" y="214" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">Pending Tasks</text>
+  <text x="780" y="214" font-family="system-ui" font-size="11" fill="#5b8c5a">View all →</text>
+  <rect x="256" y="232" width="562" height="1" fill="#e8e0d5"/>
+  <!-- Task items -->
+  <rect x="300" y="246" width="14" height="14" rx="7" fill="none" stroke="#d4cabd" stroke-width="2"/>
+  <text x="326" y="258" font-family="system-ui" font-size="12" fill="#2c241b">Review loan application #LA-2024-001</text>
+  <rect x="516" y="248" width="40" height="18" rx="9" fill="#fffbeb"/>
+  <text x="526" y="261" font-family="system-ui" font-size="9" font-weight="500" fill="#d97706">HIGH</text>
+  <text x="326" y="272" font-family="system-ui" font-size="10" fill="#aea398">Due today</text>
+  <rect x="256" y="278" width="562" height="1" fill="#e8e0d5"/>
+
+  <rect x="300" y="292" width="14" height="14" rx="7" fill="none" stroke="#d4cabd" stroke-width="2"/>
+  <text x="326" y="304" font-family="system-ui" font-size="12" fill="#2c241b">Approve disbursement for Maria Santos</text>
+  <rect x="530" y="294" width="40" height="18" rx="9" fill="#fffbeb"/>
+  <text x="540" y="307" font-family="system-ui" font-size="9" font-weight="500" fill="#d97706">HIGH</text>
+  <text x="326" y="318" font-family="system-ui" font-size="10" fill="#aea398">Due tomorrow</text>
+
+  <!-- Right sidebar cards -->
+  <rect x="860" y="188" width="304" height="200" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <rect x="860" y="188" width="304" height="44" rx="8" fill="#ffffff"/>
+  <text x="880" y="214" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">Today's Schedule</text>
+  <circle cx="900" cy="256" r="4" fill="#5b8c5a"/>
+  <text x="916" y="260" font-family="system-ui" font-size="12" fill="#6e6358">Team standup</text>
+  <text x="1100" y="260" font-family="system-ui" font-size="11" fill="#aea398">9:00 AM</text>
+  <circle cx="900" cy="286" r="4" fill="#059669"/>
+  <text x="916" y="290" font-family="system-ui" font-size="12" fill="#6e6358">Disbursement review</text>
+  <text x="1100" y="290" font-family="system-ui" font-size="11" fill="#aea398">10:30 AM</text>
+  <circle cx="900" cy="316" r="4" fill="#d97706"/>
+  <text x="916" y="320" font-family="system-ui" font-size="12" fill="#6e6358">Member meeting</text>
+  <text x="1100" y="320" font-family="system-ui" font-size="11" fill="#aea398">2:00 PM</text>
+
+  <!-- Bottom table -->
+  <rect x="280" y="408" width="884" height="280" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <rect x="280" y="408" width="884" height="44" rx="8" fill="#ffffff"/>
+  <text x="300" y="434" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">Recent Transactions</text>
+  <!-- Table header -->
+  <rect x="280" y="452" width="884" height="36" fill="#f7f5f0"/>
+  <text x="300" y="474" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">DATE</text>
+  <text x="420" y="474" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">REFERENCE</text>
+  <text x="560" y="474" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">DESCRIPTION</text>
+  <text x="760" y="474" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">TYPE</text>
+  <text x="880" y="474" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">AMOUNT</text>
+  <text x="1020" y="474" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">STATUS</text>
+  <!-- Table rows -->
+  <rect x="280" y="488" width="884" height="44" fill="#ffffff"/>
+  <text x="300" y="514" font-family="system-ui" font-size="12" fill="#6e6358">Jul 08</text>
+  <text x="420" y="514" font-family="system-ui" font-size="12" fill="#2c241b">#TRX-2024-089</text>
+  <text x="560" y="514" font-family="system-ui" font-size="12" fill="#6e6358">Loan disbursement</text>
+  <text x="760" y="514" font-family="system-ui" font-size="12" fill="#6e6358">Disbursement</text>
+  <text x="880" y="514" font-family="system-ui" font-size="12" font-weight="600" fill="#2c241b">₱50,000</text>
+  <rect x="1012" y="504" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="1020" y="517" font-family="system-ui" font-size="9" font-weight="500" fill="#059669">Completed</text>
+  <rect x="280" y="532" width="884" height="1" fill="#e8e0d5"/>
+
+  <rect x="280" y="533" width="884" height="44" fill="#ffffff"/>
+  <text x="300" y="559" font-family="system-ui" font-size="12" fill="#6e6358">Jul 08</text>
+  <text x="420" y="559" font-family="system-ui" font-size="12" fill="#2c241b">#TRX-2024-088</text>
+  <text x="560" y="559" font-family="system-ui" font-size="12" fill="#6e6358">Savings deposit</text>
+  <text x="760" y="559" font-family="system-ui" font-size="12" fill="#6e6358">Deposit</text>
+  <text x="880" y="559" font-family="system-ui" font-size="12" font-weight="600" fill="#059669">+₱5,000</text>
+  <rect x="1012" y="549" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="1020" y="562" font-family="system-ui" font-size="9" font-weight="500" fill="#059669">Completed</text>
+  <rect x="280" y="577" width="884" height="1" fill="#e8e0d5"/>
+
+  <rect x="280" y="578" width="884" height="44" fill="#ffffff"/>
+  <text x="300" y="604" font-family="system-ui" font-size="12" fill="#6e6358">Jul 07</text>
+  <text x="420" y="604" font-family="system-ui" font-size="12" fill="#2c241b">#TRX-2024-087</text>
+  <text x="560" y="604" font-family="system-ui" font-size="12" fill="#6e6358">Share capital purchase</text>
+  <text x="760" y="604" font-family="system-ui" font-size="12" fill="#6e6358">Equity</text>
+  <text x="880" y="604" font-family="system-ui" font-size="12" font-weight="600" fill="#2c241b">₱10,000</text>
+  <rect x="1012" y="594" width="50" height="18" rx="9" fill="#fffbeb"/>
+  <text x="1022" y="607" font-family="system-ui" font-size="9" font-weight="500" fill="#d97706">Pending</text>
+  <rect x="280" y="622" width="884" height="1" fill="#e8e0d5"/>
+
+  <rect x="280" y="623" width="884" height="44" fill="#ffffff"/>
+  <text x="300" y="649" font-family="system-ui" font-size="12" fill="#6e6358">Jul 07</text>
+  <text x="420" y="649" font-family="system-ui" font-size="12" fill="#2c241b">#TRX-2024-086</text>
+  <text x="560" y="649" font-family="system-ui" font-size="12" fill="#6e6358">Loan payment — Juan Cruz</text>
+  <text x="760" y="649" font-family="system-ui" font-size="12" fill="#6e6358">Payment</text>
+  <text x="880" y="649" font-family="system-ui" font-size="12" font-weight="600" fill="#059669">+₱2,540</text>
+  <rect x="1012" y="639" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="1020" y="652" font-family="system-ui" font-size="9" font-weight="500" fill="#059669">Completed</text>
+</svg>

@@ -10,7 +10,7 @@ class CreateIdempotencyKeys < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :idempotency_keys, [:key, :cooperative_id], unique: true
+    add_index :idempotency_keys, [ :key, :cooperative_id ], unique: true
     add_index :idempotency_keys, :expires_at
   end
 end

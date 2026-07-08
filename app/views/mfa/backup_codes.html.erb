@@ -1,1 +1,28 @@
-<% content_for :page_title,"Backup Recovery Codes" %> <div class="max-w-lg mx-auto mt-12 animate-fade-in"> <div class="card"> <div class="card-header"> <h2 class="card-header-title"><%= @backup_codes.is_a?(Array) ? "Backup Recovery Codes" :"Saved Backup Codes" %></h2> </div> <div class="card-body space-y-6"> <div class="rounded-md border border-warning/30 bg-warning-50 p-4"> <div class="flex gap-3"> <svg class="w-5 h-5 flex-shrink-0 text-warning mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/> </svg> <div> <p class="text-sm font-semibold text-warning">Save these codes</p> <p class="text-xs mt-1 text-warning/80">Each code can be used once. Store them in a safe place.</p> </div> </div> </div> <div class="grid grid-cols-2 gap-3"> <% if @backup_codes.is_a?(Array) %> <% @backup_codes.each do |code| %> <div class="rounded-md border border-border bg-surface-alt px-4 py-3 font-mono text-sm text-text-primary tracking-wider text-center select-all"> <%= code %> </div> <% end %> <% else %> <% @backup_codes.each do |bc| %> <div class="rounded-md border border-border bg-surface-alt px-4 py-3 font-mono text-sm text-text-muted tracking-wider text-center"> ••••-••••-•••• </div> <% end %> <% end %> </div> <div class="flex items-center justify-between pt-2"> <%= link_to"Done", root_path, class:"btn-primary text-sm" %> </div> </div> </div> </div>
+<% content_for :page_title,"Backup Recovery Codes" %> 
+<div class="max-w-lg mx-auto mt-12 animate-fade-in"> 
+  <div class="card"> 
+    <div class="card-header"> 
+      <h2 class="card-header-title"><%= @backup_codes.is_a?(Array) ? "Backup Recovery Codes" :"Saved Backup Codes" %></h2>
+ </div>
+ 
+    <div class="card-body space-y-6"> 
+      <div class="rounded-md border border-warning/30 bg-warning-50 p-4"> 
+        <div class="flex gap-3"> <svg class="w-5 h-5 flex-shrink-0 text-warning mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/> </svg> 
+          <div> 
+            <p class="text-sm font-semibold text-warning">Save these codes</p>
+ 
+            <p class="text-xs mt-1 text-warning/80">Each code can be used once. Store them in a safe place.</p>
+ </div>
+ </div>
+ </div>
+ 
+      <div class="grid grid-cols-2 gap-3"> <% if @backup_codes.is_a?(Array) %> <% @backup_codes.each do |code| %> 
+            <div class="rounded-md border border-border bg-surface-alt px-4 py-3 font-mono text-sm text-text-primary tracking-wider text-center select-all"> <%= code %> </div>
+ <% end %> <% else %> <% @backup_codes.each do |bc| %> 
+            <div class="rounded-md border border-border bg-surface-alt px-4 py-3 font-mono text-sm text-text-muted tracking-wider text-center"> ••••-••••-•••• </div>
+ <% end %> <% end %> </div>
+ 
+      <div class="flex items-center justify-between pt-2"> <%= link_to"Done", root_path, class:"btn-primary text-sm" %> </div>
+ </div>
+ </div>
+ </div>

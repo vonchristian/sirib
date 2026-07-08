@@ -1,1 +1,123 @@
-<% content_for :page_title,"Restructure Case ##{@case.id}" %> <% content_for :page_subtitle, @loan.member.name %> <div class="animate-fade-in" style="max-width: 1280px;"> <div class="flex items-center justify-between mb-6"> <div class="flex items-center gap-3"> <h2 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 0;">Restructure Case #<%= @case.id %></h2> <span style="display: inline-flex; align-items-center; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; text-transform: capitalize; <%= case @case.status when 'draft' then 'background: var(--bg-tertiary); color: var(--text-muted);' when 'submitted', 'under_review' then 'background: rgba(212, 175, 55, 0.15); color: #d4af37;' when 'approved' then 'background: var(--accent-dim); color: var(--accent);' when 'rejected' then 'background: rgba(239, 68, 68, 0.15); color: #ef4444;' when 'executed' then 'background: rgba(34, 197, 94, 0.15); color: #22c55e;' when 'failed' then 'background: rgba(239, 68, 68, 0.15); color: #ef4444;' end %>"> <%= @case.status %> </span> </div> <div class="flex items-center gap-2"> <%= link_to"Loan ##{@loan.reference_number}", loans_loan_path(@loan), class:"btn-ghost text-sm" %> <%= link_to"Cases", loans_restructure_cases_path, class:"btn-ghost text-sm" %> </div> </div> <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"> <div class="lg:col-span-2 space-y-6"> <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px;"> <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px;">Case Details</h3> <dl class="grid grid-cols-2 gap-x-6 gap-y-4"> <div> <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Type</dt> <dd style="margin: 4px 0 0; font-size: 13px; font-weight: 500; color: var(--text-primary); text-transform: capitalize;"><%= @case.restructure_type %></dd> </div> <div> <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Status</dt> <dd style="margin: 4px 0 0; font-size: 13px; text-transform: capitalize; color: var(--text-primary);"><%= @case.status %></dd> </div> <div> <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Requested By</dt> <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.requested_by&.email_address ||"System" %></dd> </div> <div> <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Submitted</dt> <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.submitted_at&.strftime("%b %d, %Y %H:%M") ||"Not yet" %></dd> </div> <% if @case.reviewed_at %> <div> <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Reviewed At</dt> <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.reviewed_at.strftime("%b %d, %Y %H:%M") %></dd> </div> <% end %> <% if @case.approved_by %> <div> <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Reviewed By</dt> <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.approved_by.email_address %></dd> </div> <% end %> <% if @case.executed_at %> <div> <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Executed</dt> <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.executed_at.strftime("%b %d, %Y %H:%M") %></dd> </div> <% end %> </dl> <% if @case.notes.present? %> <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);"> <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Notes</dt> <dd style="font-size: 13px; color: var(--text-secondary);"><%= @case.notes %></dd> </div> <% end %> </div> <% if @simulation.present? %> <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px;"> <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px;">Simulation Preview</h3> <%= render partial:"loans/restructures/simulation_panel", locals: { simulation: @simulation } %> </div> <% end %> </div> <div class="space-y-4"> <% if @case.draft? || @case.rejected? %> <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;"> <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 12px;">Actions</h3> <div class="space-y-2"> <%= button_to"Submit for Approval", submit_loans_restructure_path(@case), method: :post, style:"width: 100%; background: var(--accent); color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;", data: { turbo_confirm:"Submit this restructure case for approval?" } %> <%= link_to"Edit Case", new_loans_restructure_path(loan_id: @loan.id, type: @case.restructure_type), style:"width: 100%; display: block; text-align: center; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 4px; text-decoration: none;" %> </div> </div> <% end %> <% if @case.submitted? || @case.under_review? %> <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;"> <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 12px;">Review</h3> <div class="space-y-2"> <%= button_to"Approve", approve_loans_restructure_path(@case), method: :post, style:"width: 100%; background: var(--accent); color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;", data: { turbo_confirm:"Approve this restructure case?" } %> <%= button_to"Reject", reject_loans_restructure_path(@case), method: :post, style:"width: 100%; background: #ef4444; color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;", data: { turbo_confirm:"Reject this restructure case?" } %> </div> </div> <% end %> <% if @case.approved? %> <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 16px;"> <h3 style="font-size: 13px; font-weight: 600; color: #22c55e; margin: 0 0 8px;">Ready to Execute</h3> <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px;">This restructure case has been approved and is ready for execution.</p> <%= button_to"Execute Restructure", execute_loans_restructure_path(@case), method: :post, style:"width: 100%; background: var(--accent); color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;", data: { turbo_confirm:"Execute this restructure? This action cannot be undone." } %> </div> <% end %> <% if @case.executed? %> <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 16px;"> <div style="display: flex; align-items: center; gap: 8px; color: #22c55e;"> <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/> </svg> <span style="font-size: 13px; font-weight: 600;">Executed Successfully</span> </div> <p style="font-size: 12px; color: rgba(34, 197, 94, 0.7); margin: 4px 0 0;">Completed <%= time_ago_in_words(@case.executed_at) %> ago</p> </div> <% end %> <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;"> <h3 style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px;">Loan Info</h3> <dl class="space-y-2"> <div class="flex justify-between"> <dt style="font-size: 12px; color: var(--text-muted);">Reference</dt> <dd style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary);"><%= @loan.reference_number %></dd> </div> <div class="flex justify-between"> <dt style="font-size: 12px; color: var(--text-muted);">Outstanding</dt> <dd style="font-size: 12px; font-weight: 500; color: var(--text-primary);"><%= number_to_currency(@loan.outstanding_principal_cents.to_f / 100, unit:"PHP") %></dd> </div> <div class="flex justify-between"> <dt style="font-size: 12px; color: var(--text-muted);">Status</dt> <dd style="font-size: 12px; text-transform: capitalize; color: var(--text-primary);"><%= @loan.status %></dd> </div> </dl> </div> </div> </div> </div> 
+<% content_for :page_title,"Restructure Case ##{@case.id}" %> <% content_for :page_subtitle, @loan.member.name %> 
+<div class="animate-fade-in" style="max-width: 1280px;"> 
+  <div class="flex items-center justify-between mb-6"> 
+    <div class="flex items-center gap-3"> 
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 0;">Restructure Case #<%= @case.id %></h2>
+ <span style="display: inline-flex; align-items-center; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; text-transform: capitalize; <%= case @case.status when 'draft' then 'background: var(--bg-tertiary); color: var(--text-muted);' when 'submitted', 'under_review' then 'background: rgba(91, 140, 90, 0.15); color: #5b8c5a;' when 'approved' then 'background: var(--accent-dim); color: var(--accent);' when 'rejected' then 'background: rgba(239, 68, 68, 0.15); color: #ef4444;' when 'executed' then 'background: rgba(34, 197, 94, 0.15); color: #22c55e;' when 'failed' then 'background: rgba(239, 68, 68, 0.15); color: #ef4444;' end %>"> <%= @case.status %> </span> </div>
+ 
+    <div class="flex items-center gap-2"> <%= link_to"Loan ##{@loan.reference_number}", loans_loan_path(@loan), class:"btn-ghost text-sm" %> <%= link_to"Cases", loans_restructure_cases_path, class:"btn-ghost text-sm" %> </div>
+ </div>
+ 
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"> 
+    <div class="lg:col-span-2 space-y-6"> 
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px;"> 
+        <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px;">Case Details</h3>
+ 
+        <dl class="grid grid-cols-2 gap-x-6 gap-y-4"> 
+          <div> 
+            <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Type</dt>
+ 
+            <dd style="margin: 4px 0 0; font-size: 13px; font-weight: 500; color: var(--text-primary); text-transform: capitalize;"><%= @case.restructure_type %></dd>
+ </div>
+ 
+          <div> 
+            <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Status</dt>
+ 
+            <dd style="margin: 4px 0 0; font-size: 13px; text-transform: capitalize; color: var(--text-primary);"><%= @case.status %></dd>
+ </div>
+ 
+          <div> 
+            <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Requested By</dt>
+ 
+            <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.requested_by&.email_address ||"System" %></dd>
+ </div>
+ 
+          <div> 
+            <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Submitted</dt>
+ 
+            <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.submitted_at&.strftime("%b %d, %Y %H:%M") ||"Not yet" %></dd>
+ </div>
+ <% if @case.reviewed_at %> 
+            <div> 
+              <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Reviewed At</dt>
+ 
+              <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.reviewed_at.strftime("%b %d, %Y %H:%M") %></dd>
+ </div>
+ <% end %> <% if @case.approved_by %> 
+            <div> 
+              <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Reviewed By</dt>
+ 
+              <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.approved_by.email_address %></dd>
+ </div>
+ <% end %> <% if @case.executed_at %> 
+            <div> 
+              <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Executed</dt>
+ 
+              <dd style="margin: 4px 0 0; font-size: 13px; color: var(--text-primary);"><%= @case.executed_at.strftime("%b %d, %Y %H:%M") %></dd>
+ </div>
+ <% end %> </dl>
+ <% if @case.notes.present? %> 
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);"> 
+            <dt style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Notes</dt>
+ 
+            <dd style="font-size: 13px; color: var(--text-secondary);"><%= @case.notes %></dd>
+ </div>
+ <% end %> </div>
+ <% if @simulation.present? %> 
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px;"> 
+          <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px;">Simulation Preview</h3>
+ <%= render partial:"loans/restructures/simulation_panel", locals: { simulation: @simulation } %> </div>
+ <% end %> </div>
+ 
+    <div class="space-y-4"> <% if @case.draft? || @case.rejected? %> 
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;"> 
+          <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 12px;">Actions</h3>
+ 
+          <div class="space-y-2"> <%= button_to"Submit for Approval", submit_loans_restructure_path(@case), method: :post, style:"width: 100%; background: var(--accent); color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;", data: { turbo_confirm:"Submit this restructure case for approval?" } %> <%= link_to"Edit Case", new_loans_restructure_path(loan_id: @loan.id, type: @case.restructure_type), style:"width: 100%; display: block; text-align: center; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 4px; text-decoration: none;" %> </div>
+ </div>
+ <% end %> <% if @case.submitted? || @case.under_review? %> 
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;"> 
+          <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 12px;">Review</h3>
+ 
+          <div class="space-y-2"> <%= button_to"Approve", approve_loans_restructure_path(@case), method: :post, style:"width: 100%; background: var(--accent); color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;", data: { turbo_confirm:"Approve this restructure case?" } %> <%= button_to"Reject", reject_loans_restructure_path(@case), method: :post, style:"width: 100%; background: #ef4444; color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;", data: { turbo_confirm:"Reject this restructure case?" } %> </div>
+ </div>
+ <% end %> <% if @case.approved? %> 
+        <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 16px;"> 
+          <h3 style="font-size: 13px; font-weight: 600; color: #22c55e; margin: 0 0 8px;">Ready to Execute</h3>
+ 
+          <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px;">This restructure case has been approved and is ready for execution.</p>
+ <%= button_to"Execute Restructure", execute_loans_restructure_path(@case), method: :post, style:"width: 100%; background: var(--accent); color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;", data: { turbo_confirm:"Execute this restructure? This action cannot be undone." } %> </div>
+ <% end %> <% if @case.executed? %> 
+        <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 16px;"> 
+          <div style="display: flex; align-items: center; gap: 8px; color: #22c55e;"> <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/> </svg> <span style="font-size: 13px; font-weight: 600;">Executed Successfully</span> </div>
+ 
+          <p style="font-size: 12px; color: rgba(34, 197, 94, 0.7); margin: 4px 0 0;">Completed <%= time_ago_in_words(@case.executed_at) %> ago</p>
+ </div>
+ <% end %> 
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;"> 
+        <h3 style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px;">Loan Info</h3>
+ 
+        <dl class="space-y-2"> 
+          <div class="flex justify-between"> 
+            <dt style="font-size: 12px; color: var(--text-muted);">Reference</dt>
+ 
+            <dd style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary);"><%= @loan.reference_number %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt style="font-size: 12px; color: var(--text-muted);">Outstanding</dt>
+ 
+            <dd style="font-size: 12px; font-weight: 500; color: var(--text-primary);"><%= number_to_currency(@loan.outstanding_principal_cents.to_f / 100, unit:"PHP") %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt style="font-size: 12px; color: var(--text-muted);">Status</dt>
+ 
+            <dd style="font-size: 12px; text-transform: capitalize; color: var(--text-primary);"><%= @loan.status %></dd>
+ </div>
+ </dl>
+ </div>
+ </div>
+ </div>
+ </div>
+ 

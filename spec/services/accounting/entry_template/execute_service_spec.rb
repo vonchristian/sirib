@@ -110,7 +110,7 @@ RSpec.describe Accounting::EntryTemplate::ExecuteService do
     describe "validation" do
       it "rejects invalid templates" do
         invalid_template = build(:accounting_entry_template)
-        invalid_template.lines = [build(:accounting_entry_template_line, entry_template: invalid_template, direction: "debit")]
+        invalid_template.lines = [ build(:accounting_entry_template_line, entry_template: invalid_template, direction: "debit") ]
         result = described_class.run(template: invalid_template)
 
         expect(result).not_to be_valid

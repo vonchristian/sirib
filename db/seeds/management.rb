@@ -35,7 +35,7 @@ end
 
 headquarters ||= Management::Branch.where(cooperative: @coop).find_by!(code: "HQ")
 
-department_names = ["Administration", "Lending", "Savings", "Accounting", "Compliance"]
+department_names = [ "Administration", "Lending", "Savings", "Accounting", "Compliance" ]
 Management::Branch.where(cooperative: @coop).find_each do |branch|
   department_names.each do |dept_name|
     Management::Department.find_or_create_by!(
@@ -74,44 +74,44 @@ end
 role_permissions = {
   "board_member" => {
     view: subjects.map(&:to_sym),
-    approve: [:policy],
-    export: [:report]
+    approve: [ :policy ],
+    export: [ :report ]
   },
   "general_manager" => {
     view: subjects.map(&:to_sym),
-    create: [:member, :loan, :savings, :time_deposit, :share_capital],
-    update: [:member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :configuration],
-    approve: [:loan, :policy, :configuration, :approval_workflow],
-    reject: [:loan, :policy, :approval_workflow],
-    export: [:report]
+    create: [ :member, :loan, :savings, :time_deposit, :share_capital ],
+    update: [ :member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :configuration ],
+    approve: [ :loan, :policy, :configuration, :approval_workflow ],
+    reject: [ :loan, :policy, :approval_workflow ],
+    export: [ :report ]
   },
   "branch_manager" => {
-    view: [:member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :report, :ai_dashboard],
-    create: [:member, :loan],
-    update: [:member, :loan, :branch],
-    approve: [:loan],
-    export: [:report]
+    view: [ :member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :report, :ai_dashboard ],
+    create: [ :member, :loan ],
+    update: [ :member, :loan, :branch ],
+    approve: [ :loan ],
+    export: [ :report ]
   },
   "loan_officer" => {
-    view: [:member, :loan, :savings],
-    create: [:loan],
-    update: [:loan],
-    delete: [:loan]
+    view: [ :member, :loan, :savings ],
+    create: [ :loan ],
+    update: [ :loan ],
+    delete: [ :loan ]
   },
   "teller" => {
-    view: [:member, :savings, :treasury],
-    create: [:savings],
-    update: [:savings, :treasury]
+    view: [ :member, :savings, :treasury ],
+    create: [ :savings ],
+    update: [ :savings, :treasury ]
   },
   "accountant" => {
-    view: [:member, :accounting, :treasury, :report],
-    create: [:accounting],
-    update: [:accounting, :treasury],
-    export: [:report]
+    view: [ :member, :accounting, :treasury, :report ],
+    create: [ :accounting ],
+    update: [ :accounting, :treasury ],
+    export: [ :report ]
   },
   "auditor" => {
     view: subjects.map(&:to_sym),
-    export: [:report, :audit_log]
+    export: [ :report, :audit_log ]
   },
   "system_admin" => {
     view: subjects.map(&:to_sym),

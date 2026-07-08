@@ -19,7 +19,7 @@ RSpec.describe Treasury::TimeDeposit do
       it "returns time deposits with pending status" do
         pending_deposit = create(:time_deposit, status: "pending")
         active_deposit = create(:time_deposit, status: "active")
-        
+
         expect(described_class.pending).to contain_exactly(pending_deposit)
       end
     end
@@ -28,7 +28,7 @@ RSpec.describe Treasury::TimeDeposit do
       it "returns time deposits with active status" do
         pending_deposit = create(:time_deposit, status: "pending")
         active_deposit = create(:time_deposit, status: "active")
-        
+
         expect(described_class.active).to contain_exactly(active_deposit)
       end
     end
@@ -37,8 +37,8 @@ RSpec.describe Treasury::TimeDeposit do
       it "orders time deposits by created_at descending" do
         deposit1 = create(:time_deposit, created_at: 2.days.ago)
         deposit2 = create(:time_deposit, created_at: 1.day.ago)
-        
-        expect(described_class.by_latest).to eq([deposit2, deposit1])
+
+        expect(described_class.by_latest).to eq([ deposit2, deposit1 ])
       end
     end
   end

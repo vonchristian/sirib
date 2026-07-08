@@ -18,7 +18,7 @@ members = [
   { first_name: "Gloria", middle_name: "M.",        last_name: "Romero",    suffix: nil,    gender: "female", civil_status: "divorced", mobile_number: "09212223344", birth_date: Date.new(1981, 7, 16)  },
   { first_name: "Fernando", middle_name: "A.",      last_name: "Ramos",     suffix: nil,    gender: "male",   civil_status: "single",  mobile_number: "09335556677", birth_date: Date.new(1993, 9, 21)  },
   { first_name: "Rosario", middle_name: "B.",       last_name: "Castillo",  suffix: nil,    gender: "female", civil_status: "married",  mobile_number: "09178889900", birth_date: Date.new(1987, 3, 11)  },
-  { first_name: "Miguel", middle_name: "N.",        last_name: "Angeles",   suffix: nil,    gender: "male",   civil_status: "single",  mobile_number: "09093334455", birth_date: Date.new(1996, 12, 19) },
+  { first_name: "Miguel", middle_name: "N.",        last_name: "Angeles",   suffix: nil,    gender: "male",   civil_status: "single",  mobile_number: "09093334455", birth_date: Date.new(1996, 12, 19) }
 ]
 
 members.each_with_index do |attrs, i|

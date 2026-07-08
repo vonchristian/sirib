@@ -12,8 +12,8 @@ FactoryBot.define do
     city { "Manila" }
     province { "Metro Manila" }
     region { "NCR" }
-    sources_of_income { [{ "source_type" => "Employment", "monthly_income" => "50000" }] }
-    identifications { [{ "id_type" => "BIR", "id_number" => "BIR-123-456" }] }
+    sources_of_income { [ { "source_type" => "Employment", "monthly_income" => "50000" } ] }
+    identifications { [ { "id_type" => "BIR", "id_number" => "BIR-123-456" } ] }
     signature_specimens { [
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",

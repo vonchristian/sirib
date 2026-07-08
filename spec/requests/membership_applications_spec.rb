@@ -70,12 +70,12 @@ RSpec.describe "MembershipApplications" do
 
     it "displays identification front/back images and sources of income" do
       app = create(:membership_application,
-        identifications: [{
+        identifications: [ {
           "id_type" => "Passport", "id_number" => "P123",
           "front_image" => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
           "back_image" => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-        }],
-        sources_of_income: [{ "source_type" => "Business", "monthly_income" => "100000" }])
+        } ],
+        sources_of_income: [ { "source_type" => "Business", "monthly_income" => "100000" } ])
       get membership_application_path(app.uuid)
       expect(response.body).to include("Passport")
       expect(response.body).to include("P123")

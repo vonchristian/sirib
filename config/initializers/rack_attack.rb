@@ -32,6 +32,6 @@ class Rack::Attack
       "Content-Type" => "application/json",
       "Retry-After" => env["rack.attack.match_data"]&.dig(:period).to_s
     }
-    [429, headers, [{ error: "Rate limit exceeded. Try again later." }.to_json]]
+    [ 429, headers, [ { error: "Rate limit exceeded. Try again later." }.to_json ] ]
   end
 end

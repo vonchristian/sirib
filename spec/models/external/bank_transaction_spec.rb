@@ -39,7 +39,7 @@ RSpec.describe External::BankTransaction do
         older = create(:external_bank_transaction, transaction_date: 5.days.ago)
         newer = create(:external_bank_transaction, transaction_date: 1.day.ago)
 
-        expect(described_class.by_date).to eq([older, newer])
+        expect(described_class.by_date).to eq([ older, newer ])
       end
     end
 
@@ -48,7 +48,7 @@ RSpec.describe External::BankTransaction do
         older = create(:external_bank_transaction, transaction_date: 5.days.ago)
         newer = create(:external_bank_transaction, transaction_date: 1.day.ago)
 
-        expect(described_class.by_date_desc).to eq([newer, older])
+        expect(described_class.by_date_desc).to eq([ newer, older ])
       end
     end
   end

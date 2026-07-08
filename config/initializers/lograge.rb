@@ -15,6 +15,6 @@ Rails.application.configure do
     }.compact
   end
 
-  config.lograge.ignore_actions = ["Rails::HealthController#show"]
-  config.lograge.base_controller_class = ["ActionController::Base"]
+  config.lograge.ignore_actions = [ "Rails::HealthController#show" ]
+  config.lograge.base_controller_class = [ "ActionController::Base" ]
 end

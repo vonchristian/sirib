@@ -1,0 +1,6 @@
+{
+  "files": ["app/views/layouts/{application,dashboard,landing,portal,shell}.html.erb"],
+  "insertBefore": "</body>",
+  "commentSyntax": "html",
+  "cspChecked": true
+}

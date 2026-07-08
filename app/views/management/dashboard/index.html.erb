@@ -1,1 +1,109 @@
-<% content_for :page_title,"Management Dashboard" %> <% content_for :page_subtitle,"Key performance indicators and system overview" %> <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Assets</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@total_assets, unit:"₱") %></p> </div> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Loan Portfolio</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@loan_portfolio, unit:"₱") %></p> </div> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Savings Deposits</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@savings_deposits, unit:"₱") %></p> </div> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Share Capital</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@share_capital, unit:"₱") %></p> </div> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Net Income</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@net_income, unit:"₱") %></p> </div> <div class="rounded-lg border border-border bg-surface p-5"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Cash Position</p> <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@cash_position, unit:"₱") %></p> </div> </div> <% if @ai_has_data %> <div class="mb-8"> <div class="flex items-center justify-between mb-4"> <h3 class="text-sm font-semibold text-text-primary">AI Branch Manager Insights</h3> <%= link_to"View AI Dashboard", management_ai_dashboard_path, class:"text-xs text-accent hover:text-accent-hover" %> </div> <div class="grid grid-cols-1 lg:grid-cols-3 gap-4"> <% if @ai_today_digest %> <div class="rounded-lg border border-border bg-surface p-4"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Today's Digest</p> <p class="mt-1 text-sm text-text-primary line-clamp-3"><%= @ai_today_digest.summary&.truncate(150) %></p> <p class="mt-2 text-xs text-text-tertiary"><%= time_ago_in_words(@ai_today_digest.generated_at) %> ago</p> </div> <% end %> <div class="rounded-lg border border-border bg-surface p-4"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Critical Observations</p> <p class="mt-1 text-2xl font-bold text-danger"><%= @ai_critical_observations.count %></p> <% @ai_critical_observations.each do |obs| %> <p class="mt-1 text-xs text-text-primary truncate"><%= obs.title %></p> <% end %> </div> <div class="rounded-lg border border-border bg-surface p-4"> <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Active Recommendations</p> <p class="mt-1 text-2xl font-bold text-warning"><%= @ai_active_recommendations.count %></p> <% @ai_active_recommendations.each do |rec| %> <p class="mt-1 text-xs text-text-primary truncate">[<%= rec.priority.titleize %>] <%= rec.title %></p> <% end %> </div> </div> </div> <% end %> <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"> <div class="rounded-lg border border-border bg-surface"> <div class="border-b border-border px-5 py-4"> <h3 class="text-sm font-semibold text-text-primary">Recent Alerts</h3> </div> <div class="divide-y divide-border"> <% @recent_alerts.each do |alert| %> <div class="flex items-center gap-3 px-5 py-3"> <span class="flex h-2 w-2 rounded-full <%= alert.critical? ? 'bg-danger' : alert.warning? ? 'bg-warning' : 'bg-positive' %>"></span> <div class="flex-1 min-w-0"> <p class="text-sm text-text-primary truncate"><%= alert.title %></p> <p class="text-xs text-text-tertiary"><%= alert.alert_type.humanize %></p> </div> <span class="text-xs text-text-tertiary"><%= time_ago_in_words(alert.created_at) %> ago</span> </div> <% end %> <% if @recent_alerts.empty? %> <p class="px-5 py-4 text-sm text-text-tertiary">No active alerts.</p> <% end %> </div> </div> <div class="rounded-lg border border-border bg-surface"> <div class="border-b border-border px-5 py-4"> <h3 class="text-sm font-semibold text-text-primary">Pending Approvals</h3> </div> <div class="divide-y divide-border"> <% @pending_approvals.each do |request| %> <div class="flex items-center gap-3 px-5 py-3"> <div class="flex-1 min-w-0"> <p class="text-sm text-text-primary truncate"><%= request.workflow.name %></p> <p class="text-xs text-text-tertiary">by <%= request.requested_by.email_address %></p> </div> <span class="text-xs text-text-tertiary"><%= time_ago_in_words(request.created_at) %> ago</span> </div> <% end %> <% if @pending_approvals.empty? %> <p class="px-5 py-4 text-sm text-text-tertiary">No pending approvals.</p> <% end %> </div> </div> </div> 
+<% content_for :page_title,"Management Dashboard" %> <% content_for :page_subtitle,"Key performance indicators and system overview" %> 
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"> 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Total Assets</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@total_assets, unit:"₱") %></p>
+ </div>
+ 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Loan Portfolio</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@loan_portfolio, unit:"₱") %></p>
+ </div>
+ 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Savings Deposits</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@savings_deposits, unit:"₱") %></p>
+ </div>
+ 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Share Capital</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@share_capital, unit:"₱") %></p>
+ </div>
+ 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Net Income</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@net_income, unit:"₱") %></p>
+ </div>
+ 
+  <div class="stat-card"> 
+    <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Cash Position</p>
+ 
+    <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@cash_position, unit:"₱") %></p>
+ </div>
+ </div>
+ <% if @ai_has_data %> 
+  <div class="mb-8"> 
+    <div class="flex items-center justify-between mb-4"> 
+      <h3 class="text-sm font-semibold text-text-primary">AI Branch Manager Insights</h3>
+ <%= link_to"View AI Dashboard", management_ai_dashboard_path, class:"text-xs text-accent hover:text-accent-hover" %> </div>
+ 
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4"> <% if @ai_today_digest %> 
+        <div class="rounded-lg border border-border bg-surface p-4"> 
+          <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Today's Digest</p>
+ 
+          <p class="mt-1 text-sm text-text-primary line-clamp-3"><%= @ai_today_digest.summary&.truncate(150) %></p>
+ 
+          <p class="mt-2 text-xs text-text-tertiary"><%= time_ago_in_words(@ai_today_digest.generated_at) %> ago</p>
+ </div>
+ <% end %> 
+      <div class="rounded-lg border border-border bg-surface p-4"> 
+        <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Critical Observations</p>
+ 
+        <p class="mt-1 text-2xl font-bold text-danger"><%= @ai_critical_observations.count %></p>
+ <% @ai_critical_observations.each do |obs| %> 
+          <p class="mt-1 text-xs text-text-primary truncate"><%= obs.title %></p>
+ <% end %> </div>
+ 
+      <div class="rounded-lg border border-border bg-surface p-4"> 
+        <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Active Recommendations</p>
+ 
+        <p class="mt-1 text-2xl font-bold text-warning"><%= @ai_active_recommendations.count %></p>
+ <% @ai_active_recommendations.each do |rec| %> 
+          <p class="mt-1 text-xs text-text-primary truncate">[<%= rec.priority.titleize %>] <%= rec.title %></p>
+ <% end %> </div>
+ </div>
+ </div>
+ <% end %> 
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6"> 
+  <div class="rounded-lg border border-border bg-surface"> 
+    <div class="border-b border-border px-5 py-4"> 
+      <h3 class="text-sm font-semibold text-text-primary">Recent Alerts</h3>
+ </div>
+ 
+    <div class="divide-y divide-border"> <% @recent_alerts.each do |alert| %> 
+        <div class="flex items-center gap-3 px-5 py-3"> <span class="flex h-2 w-2 rounded-full <%= alert.critical? ? 'bg-danger' : alert.warning? ? 'bg-warning' : 'bg-positive' %>"></span> 
+          <div class="flex-1 min-w-0"> 
+            <p class="text-sm text-text-primary truncate"><%= alert.title %></p>
+ 
+            <p class="text-xs text-text-tertiary"><%= alert.alert_type.humanize %></p>
+ </div>
+ <span class="text-xs text-text-tertiary"><%= time_ago_in_words(alert.created_at) %> ago</span> </div>
+ <% end %> <% if @recent_alerts.empty? %> 
+        <p class="px-5 py-4 text-sm text-text-tertiary">No active alerts.</p>
+ <% end %> </div>
+ </div>
+ 
+  <div class="rounded-lg border border-border bg-surface"> 
+    <div class="border-b border-border px-5 py-4"> 
+      <h3 class="text-sm font-semibold text-text-primary">Pending Approvals</h3>
+ </div>
+ 
+    <div class="divide-y divide-border"> <% @pending_approvals.each do |request| %> 
+        <div class="flex items-center gap-3 px-5 py-3"> 
+          <div class="flex-1 min-w-0"> 
+            <p class="text-sm text-text-primary truncate"><%= request.workflow.name %></p>
+ 
+            <p class="text-xs text-text-tertiary">by <%= request.requested_by.email_address %></p>
+ </div>
+ <span class="text-xs text-text-tertiary"><%= time_ago_in_words(request.created_at) %> ago</span> </div>
+ <% end %> <% if @pending_approvals.empty? %> 
+        <p class="px-5 py-4 text-sm text-text-tertiary">No pending approvals.</p>
+ <% end %> </div>
+ </div>
+ </div>
+ 

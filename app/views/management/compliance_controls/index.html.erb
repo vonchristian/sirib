@@ -1,1 +1,45 @@
-<% content_for :page_title,"Compliance Controls" %> <% content_for :page_subtitle,"Security and compliance monitoring" %> <div class="flex items-center gap-2 mb-6"> <%= form_tag management_compliance_controls_path, method: :get, class:"flex items-center gap-2 flex-wrap" do %> <%= select_tag :category, options_for_select([["Authentication","authentication"], ["Authorization","authorization"], ["Encryption","encryption"], ["Audit","audit"], ["Logging","logging"], ["Security","security"], ["Fraud","fraud"]], params[:category]), include_blank:"All Categories", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= select_tag :status, options_for_select([["Active","active"], ["Inactive","inactive"]], params[:status]), include_blank:"All Statuses", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= submit_tag"Filter", class:"rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %> <% end %> </div> <div class="rounded-lg border border-border bg-surface overflow-hidden"> <table class="w-full text-sm"> <thead> <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> <th class="px-5 py-3 font-medium">Name</th> <th class="px-5 py-3 font-medium">Category</th> <th class="px-5 py-3 font-medium">Frequency</th> <th class="px-5 py-3 font-medium">Status</th> <th class="px-5 py-3 font-medium text-right">Evidence</th> <th class="px-5 py-3 font-medium text-right">Actions</th> </tr> </thead> <tbody class="divide-y divide-border"> <% @controls.each do |control| %> <tr class="hover:bg-surface-alt transition-colors"> <td class="px-5 py-3 font-medium text-text-primary"><%= control.name %></td> <td class="px-5 py-3"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-surface-alt text-text-secondary"><%= control.category.humanize %></span> </td> <td class="px-5 py-3 text-text-secondary"><%= control.frequency.titleize %></td> <td class="px-5 py-3"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= control.active ? "bg-green-50 text-green-700" :"bg-surface-alt text-text-tertiary" %>"> <%= control.active ? "Active" :"Inactive" %> </span> </td> <td class="px-5 py-3 text-right text-text-secondary"><%= control.evidences.size %></td> <td class="px-5 py-3 text-right"> <%= link_to"View", management_compliance_control_path(control), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </td> </tr> <% end %> <% if @controls.empty? %> <tr><td colspan="6" class="px-5 py-8 text-center text-text-tertiary">No compliance controls found.</td></tr> <% end %> </tbody> </table> </div> <div class="mt-4"> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div> 
+<% content_for :page_title,"Compliance Controls" %> <% content_for :page_subtitle,"Security and compliance monitoring" %> 
+<div class="flex items-center gap-2 mb-6"> <%= form_tag management_compliance_controls_path, method: :get, class:"flex items-center gap-2 flex-wrap" do %> <%= select_tag :category, options_for_select([["Authentication","authentication"], ["Authorization","authorization"], ["Encryption","encryption"], ["Audit","audit"], ["Logging","logging"], ["Security","security"], ["Fraud","fraud"]], params[:category]), include_blank:"All Categories", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= select_tag :status, options_for_select([["Active","active"], ["Inactive","inactive"]], params[:status]), include_blank:"All Statuses", class:"rounded-md border border-border bg-surface py-2 px-3 text-xs text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none" %> <%= submit_tag"Filter", class:"rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 transition-colors cursor-pointer" %> <% end %> </div>
+ 
+<div class="rounded-lg border border-border bg-surface overflow-hidden"> 
+  <table class="w-full text-sm"> 
+    <thead> 
+      <tr class="border-b border-border text-left text-xs text-text-tertiary uppercase tracking-wider"> 
+        <th class="px-5 py-3 font-medium">Name</th>
+ 
+        <th class="px-5 py-3 font-medium">Category</th>
+ 
+        <th class="px-5 py-3 font-medium">Frequency</th>
+ 
+        <th class="px-5 py-3 font-medium">Status</th>
+ 
+        <th class="px-5 py-3 font-medium text-right">Evidence</th>
+ 
+        <th class="px-5 py-3 font-medium text-right">Actions</th>
+ </tr>
+ </thead>
+ 
+    <tbody class="divide-y divide-border"> <% @controls.each do |control| %> 
+        <tr class="hover:bg-surface-alt transition-colors"> 
+          <td class="px-5 py-3 font-medium text-text-primary"><%= control.name %></td>
+ 
+          <td class="px-5 py-3"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-surface-alt text-text-secondary"><%= control.category.humanize %></span> </td>
+ 
+          <td class="px-5 py-3 text-text-secondary"><%= control.frequency.titleize %></td>
+ 
+          <td class="px-5 py-3"> <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= control.active ? "bg-green-50 text-green-700" :"bg-surface-alt text-text-tertiary" %>"> <%= control.active ? "Active" :"Inactive" %> </span> </td>
+ 
+          <td class="px-5 py-3 text-right text-text-secondary"><%= control.evidences.size %></td>
+ 
+          <td class="px-5 py-3 text-right"> <%= link_to"View", management_compliance_control_path(control), class:"text-xs text-text-secondary hover:text-primary transition-colors" %> </td>
+ </tr>
+ <% end %> <% if @controls.empty? %> 
+        <tr>
+          <td colspan="6" class="px-5 py-8 text-center text-text-tertiary">No compliance controls found.</td>
+        </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ 
+<div class="mt-4"> <%= render"shared/pagination", pagy: @pagy if defined?(@pagy) %> </div>
+ 

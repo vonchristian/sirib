@@ -84,7 +84,7 @@ module Accounting
       {
         title: "Trial Balance",
         date_range: date_range,
-        headers: ["Account", "Name", "Debit", "Credit"],
+        headers: [ "Account", "Name", "Debit", "Credit" ],
         rows: build_trial_balance_rows(debits, credits),
         totals: { debits: total_debits, credits: total_credits },
         balanced: total_debits == total_credits
@@ -93,7 +93,7 @@ module Accounting
 
     def build_trial_balance_rows(debits, credits)
       rows = []
-      max_rows = [debits.size, credits.size].max
+      max_rows = [ debits.size, credits.size ].max
 
       max_rows.times do |i|
         debit_row = debits[i] || { account: "", name: "", amount: 0 }
@@ -123,9 +123,9 @@ module Accounting
       if account_id.present?
         account = if cooperative
                     Accounting::Account.by_cooperative(cooperative).find(account_id)
-                  else
+        else
                     Accounting::Account.find(account_id)
-                  end
+        end
         account_entries = Accounting::Entry.by_account(account_id)
                                           .posted
                                           .date_range(start_date, end_date)
@@ -226,8 +226,8 @@ module Accounting
       {
         title: "Journal Summary",
         date_range: date_range,
-        headers: ["Date", "Reference", "Description", "Branch", "Type", "Source", "Status", "Amount", "Created By"],
-        rows: rows.map { |r| [r[:date], r[:reference], r[:description], r[:branch], r[:entry_type], r[:source], r[:status], r[:total].format, r[:created_by]] },
+        headers: [ "Date", "Reference", "Description", "Branch", "Type", "Source", "Status", "Amount", "Created By" ],
+        rows: rows.map { |r| [ r[:date], r[:reference], r[:description], r[:branch], r[:entry_type], r[:source], r[:status], r[:total].format, r[:created_by] ] },
         total_entries: entries.size,
         total_amount: entries.sum(&:net_amount)
       }
@@ -239,7 +239,7 @@ module Accounting
       {
         title: "Reversal Report",
         date_range: date_range,
-        headers: ["Date", "Reference", "Original Entry", "Reversed By", "Reason", "Amount"],
+        headers: [ "Date", "Reference", "Original Entry", "Reversed By", "Reason", "Amount" ],
         rows: scope.map do |entry|
           original = entry.reversal_of
           [
@@ -260,7 +260,7 @@ module Accounting
       {
         title: "Adjustment Report",
         date_range: date_range,
-        headers: ["Date", "Reference", "Description", "Branch", "Status", "Amount", "Created By"],
+        headers: [ "Date", "Reference", "Description", "Branch", "Status", "Amount", "Created By" ],
         rows: scope.map do |entry|
           [
             entry.posted_at.to_date,

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-08T00:00:00.000Z",
+  "title": "Design System: Sirib",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Green 500", "canonical": "oklch(55% 0.075 135)", "tonalRamp": ["oklch(22% 0.05 135)", "oklch(33% 0.06 135)", "oklch(42% 0.06 135)", "oklch(48% 0.065 135)", "oklch(55% 0.075 135)", "oklch(63% 0.075 135)", "oklch(71% 0.065 135)", "oklch(82% 0.045 135)", "oklch(92% 0.025 135)", "oklch(97% 0.012 135)"] },
+      "surface": { "role": "neutral", "displayName": "Surface", "canonical": "oklch(100% 0 0)", "tonalRamp": ["oklch(15% 0 0)", "oklch(25% 0 0)", "oklch(35% 0 0)", "oklch(45% 0 0)", "oklch(55% 0 0)", "oklch(65% 0 0)", "oklch(75% 0 0)", "oklch(85% 0 0)", "oklch(92% 0 0)", "oklch(100% 0 0)"] },
+      "surface-alt": { "role": "neutral", "displayName": "Surface Alt", "canonical": "oklch(97% 0.004 85)", "tonalRamp": ["oklch(15% 0.002 85)", "oklch(25% 0.003 85)", "oklch(35% 0.003 85)", "oklch(45% 0.003 85)", "oklch(55% 0.003 85)", "oklch(65% 0.003 85)", "oklch(75% 0.003 85)", "oklch(85% 0.003 85)", "oklch(92% 0.004 85)", "oklch(97% 0.004 85)"] },
+      "text-primary": { "role": "neutral", "displayName": "Text Primary", "canonical": "oklch(22% 0.01 60)", "tonalRamp": [] },
+      "text-secondary": { "role": "neutral", "displayName": "Text Secondary", "canonical": "oklch(48% 0.015 65)", "tonalRamp": [] },
+      "text-tertiary": { "role": "neutral", "displayName": "Text Tertiary", "canonical": "oklch(70% 0.02 70)", "tonalRamp": [] },
+      "positive": { "role": "positive", "displayName": "Positive", "canonical": "oklch(58% 0.18 160)", "tonalRamp": [] },
+      "warning": { "role": "warning", "displayName": "Warning", "canonical": "oklch(65% 0.16 75)", "tonalRamp": [] },
+      "danger": { "role": "danger", "displayName": "Danger", "canonical": "oklch(54% 0.2 30)", "tonalRamp": [] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headlines on landing and marketing pages only. Never inside the product UI." },
+      "body": { "displayName": "Body", "purpose": "Default text for the entire product UI. Compact 14px for information-dense financial screens." },
+      "label": { "displayName": "Label", "purpose": "Data values, codes, technical labels. JetBrains Mono distinguishes data from narrative." }
+    },
+    "shadows": [
+      { "name": "shadow-xs", "value": "0 1px 2px 0 rgb(0 0 0 / 0.03)", "purpose": "Card hover states indicating interactivity." },
+      { "name": "shadow-sm", "value": "0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04)", "purpose": "Default card shadow when tonal layering isn't enough." },
+      { "name": "shadow-md", "value": "0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04)", "purpose": "Dropdown menus, popovers, small floating panels." },
+      { "name": "shadow-lg", "value": "0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.04)", "purpose": "Modals, large floating panels, full-screen overlays." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Default easing for all state transitions and reveals." },
+      { "name": "duration-micro", "value": "150ms", "purpose": "Micro-interactions: hover, focus, press." },
+      { "name": "duration-standard", "value": "300ms", "purpose": "Standard transitions: menu open, card hover lift." },
+      { "name": "duration-reveal", "value": "500ms", "purpose": "Staggered reveal animations for lists and sections." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary CTA for the product UI. Green background, white text, compact padding.",
+      "html": "<button class=\"ds-btn-primary\">Save Changes</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.875rem; line-height: 1.25rem; padding: 0.5rem 1rem; background-color: #5b8c5a; color: #ffffff; border: 1px solid transparent; cursor: pointer; transition: background-color 0.15s ease; } .ds-btn-primary:hover { background-color: #3d6b3c; } .ds-btn-primary:focus-visible { outline: 2px solid #5b8c5a; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary action. White background with warm border.",
+      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.875rem; line-height: 1.25rem; padding: 0.5rem 1rem; background-color: #ffffff; color: #2c241b; border: 1px solid #d4cabd; cursor: pointer; transition: all 0.15s ease; } .ds-btn-secondary:hover { background-color: #f7f5f0; border-color: #5b8c5a; } .ds-btn-secondary:focus-visible { outline: 2px solid #5b8c5a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Third-tier action. Transparent until hovered.",
+      "html": "<button class=\"ds-btn-ghost\">More options</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.875rem; line-height: 1.25rem; padding: 0.5rem 1rem; background-color: transparent; color: #2c241b; border: 1px solid transparent; cursor: pointer; transition: all 0.15s ease; } .ds-btn-ghost:hover { background-color: #f7f5f0; border-color: #e8e0d5; } .ds-btn-ghost:focus-visible { outline: 2px solid #5b8c5a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Standard text input with warm border and green focus glow.",
+      "html": "<div><label class=\"ds-label\">Member Name</label><input class=\"ds-input\" placeholder=\"Enter member name\" /></div>",
+      "css": ".ds-label { display: block; font-size: 0.875rem; font-weight: 500; color: #2c241b; margin-bottom: 0.375rem; } .ds-input { display: block; width: 100%; border-radius: 0.5rem; border: 1px solid #e8e0d5; background-color: #ffffff; padding: 0.5rem 0.75rem; font-size: 0.875rem; color: #2c241b; transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box; } .ds-input::placeholder { color: #aea398; } .ds-input:focus { outline: none; border-color: #5b8c5a; box-shadow: 0 0 0 3px rgba(91, 140, 90, 0.1); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Standard content container. White background, warm border, no shadow at rest.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-header\"><span class=\"ds-card-title\">Account Summary</span></div><div class=\"ds-card-body\"><p style=\"font-size:0.875rem;color:#6e6358;\">Card content goes here.</p></div></div>",
+      "css": ".ds-card { background-color: #ffffff; border: 1px solid #e8e0d5; border-radius: 0.5rem; overflow: hidden; } .ds-card-header { padding: 1rem 1.25rem; border-bottom: 1px solid #e8e0d5; display: flex; align-items: center; justify-content: space-between; } .ds-card-title { font-size: 0.875rem; font-weight: 600; color: #2c241b; } .ds-card-body { padding: 1.25rem; }"
+    },
+    {
+      "name": "Badge Primary",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Status badge with tinted green background.",
+      "html": "<span class=\"ds-badge\">Active</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background-color: #f0f7ef; color: #3d6b3c; }"
+    },
+    {
+      "name": "Badge Success",
+      "kind": "chip",
+      "refersTo": "badge-success",
+      "description": "Positive status badge with tinted green background.",
+      "html": "<span class=\"ds-badge-success\">Completed</span>",
+      "css": ".ds-badge-success { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background-color: #ecfdf5; color: #047857; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Sidebar navigation link with hover and active states.",
+      "html": "<a class=\"ds-nav-link\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/></svg>Dashboard</a>",
+      "css": ".ds-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; color: #57534e; transition: all 0.15s ease; text-decoration: none; } .ds-nav-link:hover { background-color: #efebe3; color: #2c241b; } .ds-nav-link.active { background-color: #e8f0e0; color: #5b8c5a; font-weight: 500; }"
+    },
+    {
+      "name": "Landing CTA Button",
+      "kind": "button",
+      "refersTo": "landing-btn-accent",
+      "description": "Landing page primary CTA. Olive green, uppercase, tracked.",
+      "html": "<a class=\"ds-landing-cta\" href=\"#\">See What It Does</a>",
+      "css": ".ds-landing-cta { display: inline-flex; align-items: center; justify-content: center; background-color: #3d6b3c; color: #ffffff; padding: 0.75rem 2rem; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: background-color 0.15s ease; } .ds-landing-cta:hover { background-color: #2d522c; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Toolbox Standard",
+    "overview": "Sirib's design is a set of reliable, well-crafted tools that feel solid in the hand — like a well-worn ledger or a brass calculator that has never made a mistake. It is calm and professional without being cold. Every surface has a purpose, every interaction is deliberate. The system earns its keep by making daily banking operations faster, clearer, and less error-prone.\n\nThe palette is restrained: warm neutrals ground the interface, with a green primary that communicates growth, shared prosperity, and cooperative roots. Shadows are minimal — surfaces structure themselves through tonal layering, not drop-shadows. Typography is set in Inter at a compact 14px body, optimized for dense financial screens where information density is a feature, not a flaw.\n\nThis design explicitly rejects corporate banking aesthetics (navy, marble, gilded accents) and generic SaaS dashboard tropes (cold data-entry panels, uniform card grids).",
+    "keyCharacteristics": [
+      "Warm neutral palette with a green functional accent",
+      "Compact 14px body for information-dense financial screens",
+      "Minimal shadows; hierarchy through tonal layering",
+      "Solid, responsive components with clear states",
+      "Dark mode that mirrors the warm-light philosophy in low-light settings"
+    ],
+    "rules": [
+      { "name": "The Green Rarity Rule", "body": "The green accent is used on ≤10% of any given screen. It appears on primary actions (buttons, active nav items), key data highlights, and brand moments. If a screen has more green than that, it's over-designed. The rarity of the accent is what gives it weight.", "section": "colors" },
+      { "name": "The Compact-By-Design Rule", "body": "14px body text is not a compromise — it is a deliberate choice for information-dense financial screens. The system never falls below 12px (caption / label). Touch targets remain at minimum 44px for interactive elements regardless of text size.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. Shadows appear only as a response to state (hover, elevation, focus). A resting card should never look like it's floating — it sits on the page like a tool on a desk.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use the green accent sparingly — ≤10% of any screen. Its rarity is its weight.",
+      "Do use tonal layering (surface → surface-alt → surface-raised) as the primary hierarchy tool before reaching for shadows.",
+      "Do keep body text at 14px in the product UI. It is deliberately compact for information density.",
+      "Do use JetBrains Mono for data values, codes, and technical labels to distinguish them from narrative text.",
+      "Do make interactive elements have minimum 44px touch targets regardless of text size.",
+      "Do maintain WCAG 2.1 AA contrast: body text ≥4.5:1 against its background, large text ≥3:1.",
+      "Do provide clear, visible focus indicators (2px Green outline with 2px offset) on all interactive elements.",
+      "Do respect reduced-motion preferences — all animations degrade to instant transitions."
+    ],
+    "donts": [
+      "Don't use corporate banking aesthetics: no navy blue, green gradients, marble textures, or heavy gilded accents.",
+      "Don't build generic SaaS dashboard layouts with uniform card grids, tiny uppercase eyebrow labels on every section, or hero-metric templates.",
+      "Don't apply shadows to resting surfaces — shadows indicate response to state, not default depth.",
+      "Don't use gradient text (background-clip: text with a gradient). Single solid colors only.",
+      "Don't use border-left or border-right greater than 1px as a colored accent stripe on cards, callouts, or list items.",
+      "Don't create nested cards — if you need nested containers, use tonal layering instead.",
+      "Don't drop below 12px type for any UI text, or below 14px for body copy.",
+      "Don't animate CSS layout properties (width, height, position). Animate only transform and opacity.",
+      "Don't use glassmorphism (backdrop blur on semi-transparent backgrounds) as a default treatment.",
+      "Don't let heading text overflow its container at any breakpoint — reduce clamp max or rewrite copy."
+    ]
+  }
+}

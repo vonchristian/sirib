@@ -12,7 +12,7 @@ RSpec.describe Messaging::MessageDispatcher do
           message_type: "member_activation",
           recipient: member,
           payload: { token: "abc123" },
-          channels: ["email"]
+          channels: [ "email" ]
         )
 
         expect(result).to be_persisted
@@ -31,11 +31,11 @@ RSpec.describe Messaging::MessageDispatcher do
           message_type: "block_notice",
           recipient: member,
           payload: { body: "Account blocked" },
-          channels: ["email", "messenger"]
+          channels: [ "email", "messenger" ]
         )
 
         expect(result.deliveries.count).to eq(2)
-        expect(result.deliveries.pluck(:channel_id)).to match_array([email_channel.id, messenger_channel.id])
+        expect(result.deliveries.pluck(:channel_id)).to match_array([ email_channel.id, messenger_channel.id ])
         expect(result.deliveries.pluck(:status)).to all(eq("queued"))
       end
 
@@ -62,7 +62,7 @@ RSpec.describe Messaging::MessageDispatcher do
             message_type: "member_activation",
             recipient: member,
             payload: { token: "abc" },
-            channels: ["email"]
+            channels: [ "email" ]
           )
         }.to have_enqueued_job(Messaging::ProcessDeliveryJob)
       end
@@ -75,7 +75,7 @@ RSpec.describe Messaging::MessageDispatcher do
           message_type: "member_activation",
           recipient: member,
           payload: {},
-          channels: ["email"],
+          channels: [ "email" ],
           scheduled_at: scheduled_time
         )
 
@@ -111,7 +111,7 @@ RSpec.describe Messaging::MessageDispatcher do
           message_type: "member_activation",
           recipient: member,
           payload: {},
-          channels: ["nonexistent_channel"]
+          channels: [ "nonexistent_channel" ]
         )
 
         expect(result).not_to be_valid

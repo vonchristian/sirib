@@ -1,1 +1,67 @@
-<%= turbo_frame_tag"delinquent_loans" do %> <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;"> <div style="padding: 12px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;"> <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0;">Delinquent Loans</h3> <span style="font-size: 11px; color: var(--text-muted);"><%= @pagy.count %> loan(s)</span> </div> <div style="overflow-x: auto;"> <table style="width: 100%; font-size: 13px; border-collapse: collapse;"> <thead> <tr> <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Loan #</th> <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Borrower</th> <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Branch</th> <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Product</th> <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Principal</th> <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Interest</th> <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Penalty</th> <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Exposure</th> <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">DPD</th> <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Group</th> <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Actions</th> </tr> </thead> <tbody> <% if @delinquent_loans.any? %> <% @delinquent_loans.each do |aging| %> <% loan = aging.loan %> <tr style="transition: background 0.1s;"> <td style="padding: 10px 16px; border-bottom: 1px solid var(--border-color);"> <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 3px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);"><%= loan.reference_number %></code> </td> <td style="padding: 10px 16px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-color);"><%= loan.member.name %></td> <td style="padding: 10px 16px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= loan.member.branch&.name ||"—" %></td> <td style="padding: 10px 16px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= loan.loan_product.name %></td> <td style="padding: 10px 16px; text-align: right; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= number_to_currency(aging.outstanding_principal_cents.to_f / 100, unit:"PHP") %></td> <td style="padding: 10px 16px; text-align: right; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= number_to_currency(aging.outstanding_interest_cents.to_f / 100, unit:"PHP") %></td> <td style="padding: 10px 16px; text-align: right; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= number_to_currency(aging.penalty_amount_cents.to_f / 100, unit:"PHP") %></td> <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color);"><%= number_to_currency(aging.total_exposure_cents.to_f / 100, unit:"PHP") %></td> <td style="padding: 10px 16px; text-align: right; border-bottom: 1px solid var(--border-color);"> <span style="color: <%= aging.days_past_due >= 90 ? '#ef4444' : 'var(--text-secondary)' %>; font-weight: <%= aging.days_past_due >= 90 ? '600' : '400' %>;"><%= aging.days_past_due %>d</span> </td> <td style="padding: 10px 16px; border-bottom: 1px solid var(--border-color);"> <span class="<%= group_badge_class(aging.loan_aging_group) %>" style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500;"> <%= aging.group_name %> </span> </td> <td style="padding: 10px 16px; text-align: right; border-bottom: 1px solid var(--border-color);"> <%= link_to"View", loans_loan_path(loan), style:"font-size: 12px; font-weight: 500; color: var(--accent); text-decoration: none;" %> </td> </tr> <% end %> <% else %> <tr> <td colspan="11" style="padding: 48px 16px; text-align: center; font-size: 13px; color: var(--text-muted);">No delinquent loans found.</td> </tr> <% end %> </tbody> </table> </div> </div> <% end %> 
+<%= turbo_frame_tag"delinquent_loans" do %> 
+  <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;"> 
+    <div style="padding: 12px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;"> 
+      <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0;">Delinquent Loans</h3>
+ <span style="font-size: 11px; color: var(--text-muted);"><%= @pagy.count %> loan(s)</span> </div>
+ 
+    <div style="overflow-x: auto;"> 
+      <table style="width: 100%; font-size: 13px; border-collapse: collapse;"> 
+        <thead> 
+          <tr> 
+            <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Loan #</th>
+ 
+            <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Borrower</th>
+ 
+            <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Branch</th>
+ 
+            <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Product</th>
+ 
+            <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Principal</th>
+ 
+            <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Interest</th>
+ 
+            <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Penalty</th>
+ 
+            <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Exposure</th>
+ 
+            <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">DPD</th>
+ 
+            <th style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Group</th>
+ 
+            <th style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">Actions</th>
+ </tr>
+ </thead>
+ 
+        <tbody> <% if @delinquent_loans.any? %> <% @delinquent_loans.each do |aging| %> <% loan = aging.loan %> 
+              <tr style="transition: background 0.1s;"> 
+                <td style="padding: 10px 16px; border-bottom: 1px solid var(--border-color);"> <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 3px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);"><%= loan.reference_number %></code> </td>
+ 
+                <td style="padding: 10px 16px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-color);"><%= loan.member.name %></td>
+ 
+                <td style="padding: 10px 16px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= loan.member.branch&.name ||"—" %></td>
+ 
+                <td style="padding: 10px 16px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= loan.loan_product.name %></td>
+ 
+                <td style="padding: 10px 16px; text-align: right; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= number_to_currency(aging.outstanding_principal_cents.to_f / 100, unit:"PHP") %></td>
+ 
+                <td style="padding: 10px 16px; text-align: right; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= number_to_currency(aging.outstanding_interest_cents.to_f / 100, unit:"PHP") %></td>
+ 
+                <td style="padding: 10px 16px; text-align: right; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);"><%= number_to_currency(aging.penalty_amount_cents.to_f / 100, unit:"PHP") %></td>
+ 
+                <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color);"><%= number_to_currency(aging.total_exposure_cents.to_f / 100, unit:"PHP") %></td>
+ 
+                <td style="padding: 10px 16px; text-align: right; border-bottom: 1px solid var(--border-color);"> <span style="color: <%= aging.days_past_due >= 90 ? '#ef4444' : 'var(--text-secondary)' %>; font-weight: <%= aging.days_past_due >= 90 ? '600' : '400' %>;"><%= aging.days_past_due %>d</span> </td>
+ 
+                <td style="padding: 10px 16px; border-bottom: 1px solid var(--border-color);"> <span class="<%= group_badge_class(aging.loan_aging_group) %>" style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500;"> <%= aging.group_name %> </span> </td>
+ 
+                <td style="padding: 10px 16px; text-align: right; border-bottom: 1px solid var(--border-color);"> <%= link_to"View", loans_loan_path(loan), style:"font-size: 12px; font-weight: 500; color: var(--accent); text-decoration: none;" %> </td>
+ </tr>
+ <% end %> <% else %> 
+            <tr> 
+              <td colspan="11" style="padding: 48px 16px; text-align: center; font-size: 13px; color: var(--text-muted);">No delinquent loans found.</td>
+ </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ </div>
+ <% end %> 

@@ -1,1 +1,19 @@
-<%= turbo_frame_tag"aging_distribution" do %> <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;"> <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px;">Aging Distribution</h3> <div style="display: flex; flex-direction: column; gap: 10px;"> <% @aging_distribution.each do |item| %> <% group = item[:group] %> <% total = @aging_distribution.sum { |d| d[:total_exposure_cents] } %> <% percentage = total > 0 ? (item[:total_exposure_cents].to_f / total.to_f * 100).round(1) : 0 %> <div> <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"> <div style="display: flex; align-items: center; gap: 6px;"> <span style="width: 8px; height: 8px; border-radius: 2px; background: <%= group_color(group) %>; display: inline-block;"></span> <span style="font-size: 12px; color: var(--text-secondary);"><%= group.name %></span> </div> <div style="display: flex; align-items: center; gap: 8px;"> <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);"> <%= number_to_currency(item[:total_exposure_cents].to_f / 100, unit:"PHP") %> </span> <span style="font-size: 11px; color: var(--text-muted);"><%= percentage %>% (<%= item[:loan_count] %>)</span> </div> </div> <div style="width: 100%; height: 6px; border-radius: 3px; background: var(--bg-tertiary); overflow: hidden;"> <div style="height: 100%; border-radius: 3px; width: <%= percentage %>%; background: <%= group_color(group) %>; transition: width 0.5s;"></div> </div> </div> <% end %> </div> </div> <% end %> 
+<%= turbo_frame_tag"aging_distribution" do %> 
+  <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;"> 
+    <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px;">Aging Distribution</h3>
+ 
+    <div style="display: flex; flex-direction: column; gap: 10px;"> <% @aging_distribution.each do |item| %> <% group = item[:group] %> <% total = @aging_distribution.sum { |d| d[:total_exposure_cents] } %> <% percentage = total > 0 ? (item[:total_exposure_cents].to_f / total.to_f * 100).round(1) : 0 %> 
+        <div> 
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"> 
+            <div style="display: flex; align-items: center; gap: 6px;"> <span style="width: 8px; height: 8px; border-radius: 2px; background: <%= group_color(group) %>; display: inline-block;"></span> <span style="font-size: 12px; color: var(--text-secondary);"><%= group.name %></span> </div>
+ 
+            <div style="display: flex; align-items: center; gap: 8px;"> <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);"> <%= number_to_currency(item[:total_exposure_cents].to_f / 100, unit:"PHP") %> </span> <span style="font-size: 11px; color: var(--text-muted);"><%= percentage %>% (<%= item[:loan_count] %>)</span> </div>
+ </div>
+ 
+          <div style="width: 100%; height: 6px; border-radius: 3px; background: var(--bg-tertiary); overflow: hidden;"> 
+            <div style="height: 100%; border-radius: 3px; width: <%= percentage %>%; background: <%= group_color(group) %>; transition: width 0.5s;"></div>
+ </div>
+ </div>
+ <% end %> </div>
+ </div>
+ <% end %> 

@@ -10,7 +10,7 @@ COOPERATIVES = [
   { name: "Sama-sama Cooperative",   address: "147 Laurel Street, Batangas City",          contact_number: "+63-43-555-0007", registration_number: "COOP-REG-007" },
   { name: "Liwanag Cooperative",     address: "258 Roxas Street, San Fernando, Pampanga",  contact_number: "+63-45-555-0008", registration_number: "COOP-REG-008" },
   { name: "Pagkakaisa Cooperative",  address: "369 Delgado Street, Iloilo City",           contact_number: "+63-33-555-0009", registration_number: "COOP-REG-009" },
-  { name: "Asenso Cooperative",      address: "741 Velez Street, Cagayan de Oro City",    contact_number: "+63-88-555-0010", registration_number: "COOP-REG-010" },
+  { name: "Asenso Cooperative",      address: "741 Velez Street, Cagayan de Oro City",    contact_number: "+63-88-555-0010", registration_number: "COOP-REG-010" }
 ]
 
 COOPERATIVES.each_with_index do |attrs, i|

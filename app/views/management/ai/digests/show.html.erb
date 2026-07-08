@@ -1,1 +1,39 @@
-<% content_for :page_title,"Daily Digest" %> <% content_for :page_subtitle,"#{@digest.branch.name} — #{@digest.generated_at.to_date.to_fs(:long)}" %> <div class="max-w-3xl"> <div class="rounded-lg border border-border bg-surface p-6"> <div class="flex items-center justify-between mb-6"> <div> <h3 class="text-lg font-semibold text-text-primary">Branch Summary</h3> <p class="text-xs text-text-tertiary">Generated <%= time_ago_in_words(@digest.generated_at) %> ago</p> </div> <div class="flex items-center gap-3 text-xs text-text-tertiary"> <span><%= @digest.observation_count %> observations</span> <span><%= @digest.recommendation_count %> recommendations</span> </div> </div> <div class="prose prose-sm dark:prose-invert max-w-none"> <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @digest.summary %></pre> </div> <% if @digest.risk_summary.present? %> <div class="mt-6 pt-6 border-t border-border"> <h4 class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Risk Summary</h4> <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @digest.risk_summary %></pre> </div> <% end %> <% if @digest.recommendations_summary.present? %> <div class="mt-6 pt-6 border-t border-border"> <h4 class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Recommendations</h4> <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @digest.recommendations_summary %></pre> </div> <% end %> <% if @digest.metrics.present? %> <div class="mt-6 pt-6 border-t border-border"> <h4 class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Key Metrics</h4> <pre class="text-xs text-text-secondary bg-surface-secondary rounded-md p-3 overflow-x-auto"><%= JSON.pretty_generate(@digest.metrics) %></pre> </div> <% end %> </div> <div class="mt-6 flex items-center gap-3"> <%= link_to"Back to Digests", management_ai_digests_path, class:"text-sm px-4 py-2 rounded-md border border-border text-text-tertiary hover:text-text-primary" %> <%= link_to"AI Dashboard", management_ai_dashboard_path, class:"text-sm px-4 py-2 rounded-md bg-accent text-white hover:bg-accent-hover" %> </div> </div> 
+<% content_for :page_title,"Daily Digest" %> <% content_for :page_subtitle,"#{@digest.branch.name} — #{@digest.generated_at.to_date.to_fs(:long)}" %> 
+<div class="max-w-3xl"> 
+  <div class="rounded-lg border border-border bg-surface p-6"> 
+    <div class="flex items-center justify-between mb-6"> 
+      <div> 
+        <h3 class="text-lg font-semibold text-text-primary">Branch Summary</h3>
+ 
+        <p class="text-xs text-text-tertiary">Generated <%= time_ago_in_words(@digest.generated_at) %> ago</p>
+ </div>
+ 
+      <div class="flex items-center gap-3 text-xs text-text-tertiary"> <span><%= @digest.observation_count %> observations</span> <span><%= @digest.recommendation_count %> recommendations</span> </div>
+ </div>
+ 
+    <div class="prose prose-sm dark:prose-invert max-w-none"> 
+      <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @digest.summary %></pre>
+ </div>
+ <% if @digest.risk_summary.present? %> 
+      <div class="mt-6 pt-6 border-t border-border"> 
+        <h4 class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Risk Summary</h4>
+ 
+        <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @digest.risk_summary %></pre>
+ </div>
+ <% end %> <% if @digest.recommendations_summary.present? %> 
+      <div class="mt-6 pt-6 border-t border-border"> 
+        <h4 class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Recommendations</h4>
+ 
+        <pre class="text-sm text-text-secondary whitespace-pre-wrap font-sans"><%= @digest.recommendations_summary %></pre>
+ </div>
+ <% end %> <% if @digest.metrics.present? %> 
+      <div class="mt-6 pt-6 border-t border-border"> 
+        <h4 class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Key Metrics</h4>
+ 
+        <pre class="text-xs text-text-secondary bg-surface-secondary rounded-md p-3 overflow-x-auto"><%= JSON.pretty_generate(@digest.metrics) %></pre>
+ </div>
+ <% end %> </div>
+ 
+  <div class="mt-6 flex items-center gap-3"> <%= link_to"Back to Digests", management_ai_digests_path, class:"text-sm px-4 py-2 rounded-md border border-border text-text-tertiary hover:text-text-primary" %> <%= link_to"AI Dashboard", management_ai_dashboard_path, class:"text-sm px-4 py-2 rounded-md bg-accent text-white hover:bg-accent-hover" %> </div>
+ </div>
+ 

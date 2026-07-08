@@ -72,7 +72,7 @@ puts "  Creating savings accounts..."
 if savings_product && savings_liability_ledger
   # Use a high starting code to avoid cross-ledger collisions
   global_max = Accounting::Account.maximum(:account_code).to_i
-  next_code = [global_max, 100_000_000].max + 1
+  next_code = [ global_max, 100_000_000 ].max + 1
   code_counter = 0
 
   active_savers = members.sample(members.size * 6 / 10)
@@ -180,7 +180,7 @@ if equity_product
   end
 
   partial_members.each_with_index do |member, idx|
-    shares = [min_shares - 5, 1].max
+    shares = [ min_shares - 5, 1 ].max
     account = Equity::Account.create!(
       member: member,
       share_product: equity_product,
@@ -214,7 +214,7 @@ paid_borrowers = members.sample(members.size / 10)
 paid_borrowers.each do |member|
   product = loan_products.sample
   amount = rand(5_000_00..100_000_00)
-  term = [3, 6, 12].sample
+  term = [ 3, 6, 12 ].sample
   interest = rand(1_000_00..amount / 4)
 
   app = Lending::LoanApplication.create!(
@@ -258,7 +258,7 @@ active_borrowers = members.sample(members.size / 8)
 active_borrowers.each do |member|
   product = loan_products.sample
   amount = rand(10_000_00..200_000_00)
-  term = [3, 6, 12, 18, 24].sample
+  term = [ 3, 6, 12, 18, 24 ].sample
   remaining = amount * rand(3..9) / 10
 
   app = Lending::LoanApplication.create!(
@@ -292,7 +292,7 @@ default_borrowers = members.sample(members.size / 10)
 default_borrowers.each do |member|
   product = loan_products.sample
   amount = rand(5_000_00..80_000_00)
-  term = [3, 6, 12].sample
+  term = [ 3, 6, 12 ].sample
   remaining = amount * rand(7..10) / 10
 
   app = Lending::LoanApplication.create!(

@@ -18,7 +18,7 @@ RSpec.describe Accounting::EntryTemplate::ValidateService do
     context "with only one line" do
       it "adds error" do
         template = build(:accounting_entry_template)
-        template.lines = [build(:accounting_entry_template_line, entry_template: template, direction: "debit")]
+        template.lines = [ build(:accounting_entry_template_line, entry_template: template, direction: "debit") ]
         result = described_class.run(template: template)
 
         expect(result).not_to be_valid

@@ -61,8 +61,8 @@ RSpec.describe Accounting::Entry do
       account = create(:accounting_account)
       entry = described_class.build(
         description: "Test entry",
-        debits: [{ account:, amount: 10000 }],
-        credits: [{ account:, amount: 10000 }]
+        debits: [ { account:, amount: 10000 } ],
+        credits: [ { account:, amount: 10000 } ]
       )
       expect(entry).to be_a_new(described_class)
       expect(entry.description).to eq("Test entry")

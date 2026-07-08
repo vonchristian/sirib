@@ -7,15 +7,7 @@ module Accounting
     end
 
     def entry_type_class(type)
-      case type
-      when "manual_entry" then "bg-blue-500/10 text-blue-400"
-      when "system_entry" then "bg-purple-500/10 text-purple-400"
-      when "interest_entry" then "bg-amber-500/10 text-amber-400"
-      when "fees_entry" then "bg-orange-500/10 text-orange-400"
-      when "reversal_entry" then "bg-red-500/10 text-red-400"
-      when "adjustment_entry" then "bg-indigo-500/10 text-indigo-400"
-      else "bg-gray-500/10 text-gray-400"
-      end
+      "bg-surface-alt text-text-tertiary"
     end
   end
 end

@@ -1,1 +1,24 @@
-<% member_row = local_assigns[:member_row] || member_row %> <tr class="hover:bg-surface-alt transition-colors"> <td class="px-4 py-3"> <div class="flex items-center gap-3"> <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-xs font-semibold text-primary"> <%= member_row.first_name.first.upcase %><%= member_row.last_name.first.upcase %> </div> <div> <p class="font-medium text-text-primary"><%= member_row.name %></p> <p class="text-xs text-text-tertiary"><%= member_row.address&.city&.titleize %></p> </div> </div> </td> <td class="px-4 py-3 text-sm text-text-secondary capitalize"><%= member_row.gender %></td> <td class="px-4 py-3 text-sm text-text-secondary"><%= member_row.mobile_number %></td> <td class="px-4 py-3 text-sm text-text-secondary"><%= member_row.email_address ||"—" %></td> <td class="px-4 py-3 text-sm text-text-secondary"><%= member_row.created_at.strftime("%b %d, %Y") %></td> <td class="px-4 py-3 text-right"> <%= link_to"View", member_row, class:"text-sm font-medium text-primary hover:text-primary-700 transition-colors" %> </td> </tr>
+<% member_row = local_assigns[:member_row] || member_row %> 
+<tr class="hover:bg-surface-alt transition-colors"> 
+  <td class="px-4 py-3"> 
+    <div class="flex items-center gap-3"> 
+      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-xs font-semibold text-primary"> <%= member_row.first_name.first.upcase %><%= member_row.last_name.first.upcase %> </div>
+ 
+      <div> 
+        <p class="font-medium text-text-primary"><%= member_row.name %></p>
+ 
+        <p class="text-xs text-text-tertiary"><%= member_row.address&.city&.titleize %></p>
+ </div>
+ </div>
+ </td>
+ 
+  <td class="px-4 py-3 text-sm text-text-secondary capitalize"><%= member_row.gender %></td>
+ 
+  <td class="px-4 py-3 text-sm text-text-secondary"><%= member_row.mobile_number %></td>
+ 
+  <td class="px-4 py-3 text-sm text-text-secondary"><%= member_row.email_address ||"—" %></td>
+ 
+  <td class="px-4 py-3 text-sm text-text-secondary"><%= member_row.created_at.strftime("%b %d, %Y") %></td>
+ 
+  <td class="px-4 py-3 text-right"> <%= link_to"View", member_row, class:"text-sm font-medium text-primary hover:text-primary-700 transition-colors" %> </td>
+ </tr>

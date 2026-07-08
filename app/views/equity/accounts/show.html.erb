@@ -1,1 +1,183 @@
-<% content_for :page_title,"Share Capital Account" %> <% content_for :page_subtitle, @account.account_number %> <div class="animate-fade-in"> <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"> <div class="lg:col-span-2 space-y-6"> <div class="rounded-xl border border-border bg-surface p-6"> <div class="flex items-center justify-between mb-4"> <h2 class="text-sm font-semibold text-text-primary">Account Details</h2> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= @account.status == 'active' ? 'bg-positive-50 text-positive' : 'bg-text-tertiary/10 text-text-tertiary' %>"> <%= @account.status %> </span> </div> <dl class="grid grid-cols-2 gap-4 text-sm"> <div> <dt class="text-text-tertiary text-xs">Account Number</dt> <dd class="text-text-primary font-medium"><%= @account.account_number %></dd> </div> <div> <dt class="text-text-tertiary text-xs">Member</dt> <dd class="text-text-primary"><%= @account.member_name %></dd> </div> <div> <dt class="text-text-tertiary text-xs">Product</dt> <dd class="text-text-primary"><%= @account.share_product.name %></dd> </div> <div> <dt class="text-text-tertiary text-xs">Share Price</dt> <dd class="text-text-primary font-medium"><%= @account.share_product.price_per_share.format %></dd> </div> <div> <dt class="text-text-tertiary text-xs">Branch</dt> <dd class="text-text-primary"><%= @account.branch.presence ||"—" %></dd> </div> <div> <dt class="text-text-tertiary text-xs">Opened</dt> <dd class="text-text-primary"><%= @account.opened_at.strftime("%b %d, %Y %H:%M") %></dd> </div> </dl> </div> <div class="rounded-xl border border-border bg-surface p-6"> <h2 class="text-sm font-semibold text-text-primary mb-4">Share Progress</h2> <div class="grid grid-cols-3 gap-6 mb-6"> <div> <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Required Shares</p> <p class="text-xl font-semibold text-text-primary mt-0.5 tabular-nums"><%= @account.share_product.minimum_required_shares %></p> </div> <div> <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Owned Shares</p> <p class="text-xl font-semibold text-primary mt-0.5 tabular-nums"><%= @account.shares_owned %></p> </div> <div> <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Remaining</p> <p class="text-xl font-semibold text-warning mt-0.5 tabular-nums"><%= @account.remaining_required_shares %></p> </div> </div> <div class="mb-6"> <div class="flex items-center justify-between mb-1.5"> <span class="text-xs text-text-tertiary">Progress</span> <span class="text-xs font-semibold text-text-primary"><%= @account.progress_percentage %>%</span> </div> <div class="w-full h-2.5 rounded-full bg-surface-alt overflow-hidden"> <div class="h-full rounded-full bg-primary transition-all duration-500" style="width: <%= @account.progress_percentage %>%"></div> </div> </div> <div class="grid grid-cols-3 gap-6 pt-4 border-t border-border"> <div> <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Paid-up Capital</p> <p class="text-lg font-semibold text-text-primary mt-0.5 tabular-nums"><%= @account.paid_up_capital.format %></p> </div> <div> <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Current Share Value</p> <p class="text-lg font-semibold text-text-primary mt-0.5 tabular-nums"><%= @account.current_share_value.format %></p> <p class="text-[10px] text-text-tertiary mt-0.5"><%= @account.shares_owned %> &times; <%= @account.share_product.price_per_share.format %></p> </div> <div> <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Remaining Needed</p> <p class="text-lg font-semibold text-warning mt-0.5 tabular-nums"><%= @account.remaining_amount_needed.format %></p> </div> </div> </div> <div class="rounded-xl border border-border bg-surface p-6"> <h2 class="text-sm font-semibold text-text-primary mb-4">Transaction History</h2> <% if @transactions.any? %> <div class="overflow-hidden"> <table class="min-w-full text-sm"> <thead> <tr class="bg-surface-alt border-b border-border"> <th class="px-3 py-2 text-left text-xs font-semibold text-text-tertiary uppercase">Reference</th> <th class="px-3 py-2 text-left text-xs font-semibold text-text-tertiary uppercase">Type</th> <th class="px-3 py-2 text-right text-xs font-semibold text-text-tertiary uppercase">Shares</th> <th class="px-3 py-2 text-right text-xs font-semibold text-text-tertiary uppercase">Amount</th> <th class="px-3 py-2 text-left text-xs font-semibold text-text-tertiary uppercase">Date</th> </tr> </thead> <tbody class="divide-y divide-border"> <% @transactions.each do |txn| %> <tr> <td class="px-3 py-2 text-xs text-text-primary"><%= txn.reference_number %></td> <td class="px-3 py-2"> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium <%= txn.purchase? ? 'bg-positive-50 text-positive' : 'bg-warning-50 text-warning' %>"> <%= txn.transaction_type.capitalize %> </span> </td> <td class="px-3 py-2 text-right font-medium tabular-nums"><%= txn.shares %></td> <td class="px-3 py-2 text-right font-medium tabular-nums"><%= txn.total_amount.format %></td> <td class="px-3 py-2 text-text-secondary text-xs"><%= txn.posted_at.strftime("%b %d, %Y %H:%M") %></td> </tr> <% end %> </tbody> </table> </div> <% else %> <div class="py-8 text-center"> <p class="text-sm text-text-tertiary">No transactions yet.</p> </div> <% end %> </div> </div> <div class="space-y-4"> <%= link_to buy_equity_account_path(@account), class:"block w-full rounded-lg border border-border bg-surface p-5 text-center hover:bg-surface-alt transition-colors" do %> <svg class="mx-auto h-8 w-8 text-positive mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3"/> </svg> <span class="text-sm font-medium text-text-primary">Buy Shares</span> <p class="text-xs text-text-tertiary mt-0.5">Purchase additional shares</p> <% end %> <div class="rounded-lg border border-border bg-surface p-4"> <h3 class="text-xs font-semibold text-text-primary mb-3">Dashboard</h3> <dl class="space-y-2 text-xs"> <div class="flex justify-between"> <dt class="text-text-tertiary">Dividend Eligible</dt> <dd class="text-text-primary font-medium"><%= @account.share_product.dividend_eligible? ? "Yes" :"No" %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Voting Rights</dt> <dd class="text-text-primary font-medium"><%= @account.share_product.voting_rights? ? "Yes" :"No" %></dd> </div> <div class="flex justify-between"> <dt class="text-text-tertiary">Last Purchase</dt> <dd class="text-text-primary font-medium"><%= @account.transactions.purchases.last&.posted_at&.strftime("%b %d, %Y") ||"—" %></dd> </div> </dl> </div> <div class="rounded-lg border border-border bg-surface p-4 text-xs text-text-tertiary"> <h3 class="font-semibold text-text-primary mb-2">Accounting</h3> <dl class="space-y-1"> <dt class="text-text-tertiary">Equity Account</dt> <dd class="text-text-primary"><%= @account.equity_account&.name ||"—" %></dd> </dl> </div> </div> </div> </div> 
+<% content_for :page_title,"Share Capital Account" %> <% content_for :page_subtitle, @account.account_number %> 
+<div class="animate-fade-in"> 
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"> 
+    <div class="lg:col-span-2 space-y-6"> 
+      <div class="rounded-xl border border-border bg-surface p-6"> 
+        <div class="flex items-center justify-between mb-4"> 
+          <h2 class="text-sm font-semibold text-text-primary">Account Details</h2>
+ <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= @account.status == 'active' ? 'bg-positive-50 text-positive' : 'bg-text-tertiary/10 text-text-tertiary' %>"> <%= @account.status %> </span> </div>
+ 
+        <dl class="grid grid-cols-2 gap-4 text-sm"> 
+          <div> 
+            <dt class="text-text-tertiary text-xs">Account Number</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= @account.account_number %></dd>
+ </div>
+ 
+          <div> 
+            <dt class="text-text-tertiary text-xs">Member</dt>
+ 
+            <dd class="text-text-primary"><%= @account.member_name %></dd>
+ </div>
+ 
+          <div> 
+            <dt class="text-text-tertiary text-xs">Product</dt>
+ 
+            <dd class="text-text-primary"><%= @account.share_product.name %></dd>
+ </div>
+ 
+          <div> 
+            <dt class="text-text-tertiary text-xs">Share Price</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= @account.share_product.price_per_share.format %></dd>
+ </div>
+ 
+          <div> 
+            <dt class="text-text-tertiary text-xs">Branch</dt>
+ 
+            <dd class="text-text-primary"><%= @account.branch.presence ||"—" %></dd>
+ </div>
+ 
+          <div> 
+            <dt class="text-text-tertiary text-xs">Opened</dt>
+ 
+            <dd class="text-text-primary"><%= @account.opened_at.strftime("%b %d, %Y %H:%M") %></dd>
+ </div>
+ </dl>
+ </div>
+ 
+      <div class="rounded-xl border border-border bg-surface p-6"> 
+        <h2 class="text-sm font-semibold text-text-primary mb-4">Share Progress</h2>
+ 
+        <div class="grid grid-cols-3 gap-6 mb-6"> 
+          <div> 
+            <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Required Shares</p>
+ 
+            <p class="text-xl font-semibold text-text-primary mt-0.5 tabular-nums"><%= @account.share_product.minimum_required_shares %></p>
+ </div>
+ 
+          <div> 
+            <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Owned Shares</p>
+ 
+            <p class="text-xl font-semibold text-primary mt-0.5 tabular-nums"><%= @account.shares_owned %></p>
+ </div>
+ 
+          <div> 
+            <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Remaining</p>
+ 
+            <p class="text-xl font-semibold text-warning mt-0.5 tabular-nums"><%= @account.remaining_required_shares %></p>
+ </div>
+ </div>
+ 
+        <div class="mb-6"> 
+          <div class="flex items-center justify-between mb-1.5"> <span class="text-xs text-text-tertiary">Progress</span> <span class="text-xs font-semibold text-text-primary"><%= @account.progress_percentage %>%</span> </div>
+ 
+          <div class="w-full h-2.5 rounded-full bg-surface-alt overflow-hidden"> 
+            <div class="h-full rounded-full bg-primary transition-all duration-500" style="width: <%= @account.progress_percentage %>%"></div>
+ </div>
+ </div>
+ 
+        <div class="grid grid-cols-3 gap-6 pt-4 border-t border-border"> 
+          <div> 
+            <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Paid-up Capital</p>
+ 
+            <p class="text-lg font-semibold text-text-primary mt-0.5 tabular-nums"><%= @account.paid_up_capital.format %></p>
+ </div>
+ 
+          <div> 
+            <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Current Share Value</p>
+ 
+            <p class="text-lg font-semibold text-text-primary mt-0.5 tabular-nums"><%= @account.current_share_value.format %></p>
+ 
+            <p class="text-[10px] text-text-tertiary mt-0.5"><%= @account.shares_owned %> &times; <%= @account.share_product.price_per_share.format %></p>
+ </div>
+ 
+          <div> 
+            <p class="text-[11px] uppercase tracking-wider text-text-tertiary">Remaining Needed</p>
+ 
+            <p class="text-lg font-semibold text-warning mt-0.5 tabular-nums"><%= @account.remaining_amount_needed.format %></p>
+ </div>
+ </div>
+ </div>
+ 
+      <div class="rounded-xl border border-border bg-surface p-6"> 
+        <h2 class="text-sm font-semibold text-text-primary mb-4">Transaction History</h2>
+ <% if @transactions.any? %> 
+          <div class="overflow-hidden"> 
+            <table class="min-w-full text-sm"> 
+              <thead> 
+                <tr class="bg-surface-alt border-b border-border"> 
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-text-tertiary uppercase">Reference</th>
+ 
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-text-tertiary uppercase">Type</th>
+ 
+                  <th class="px-3 py-2 text-right text-xs font-semibold text-text-tertiary uppercase">Shares</th>
+ 
+                  <th class="px-3 py-2 text-right text-xs font-semibold text-text-tertiary uppercase">Amount</th>
+ 
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-text-tertiary uppercase">Date</th>
+ </tr>
+ </thead>
+ 
+              <tbody class="divide-y divide-border"> <% @transactions.each do |txn| %> 
+                  <tr> 
+                    <td class="px-3 py-2 text-xs text-text-primary"><%= txn.reference_number %></td>
+ 
+                    <td class="px-3 py-2"> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium <%= txn.purchase? ? 'bg-positive-50 text-positive' : 'bg-warning-50 text-warning' %>"> <%= txn.transaction_type.capitalize %> </span> </td>
+ 
+                    <td class="px-3 py-2 text-right font-medium tabular-nums"><%= txn.shares %></td>
+ 
+                    <td class="px-3 py-2 text-right font-medium tabular-nums"><%= txn.total_amount.format %></td>
+ 
+                    <td class="px-3 py-2 text-text-secondary text-xs"><%= txn.posted_at.strftime("%b %d, %Y %H:%M") %></td>
+ </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ <% else %> 
+          <div class="py-8 text-center"> 
+            <p class="text-sm text-text-tertiary">No transactions yet.</p>
+ </div>
+ <% end %> </div>
+ </div>
+ 
+    <div class="space-y-4"> <%= link_to buy_equity_account_path(@account), class:"block w-full rounded-lg border border-border bg-surface p-5 text-center hover:bg-surface-alt transition-colors" do %> <svg class="mx-auto h-8 w-8 text-positive mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-3-3m3 3 3-3"/> </svg> <span class="text-sm font-medium text-text-primary">Buy Shares</span> 
+        <p class="text-xs text-text-tertiary mt-0.5">Purchase additional shares</p>
+ <% end %> 
+      <div class="rounded-lg border border-border bg-surface p-4"> 
+        <h3 class="text-xs font-semibold text-text-primary mb-3">Dashboard</h3>
+ 
+        <dl class="space-y-2 text-xs"> 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Dividend Eligible</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= @account.share_product.dividend_eligible? ? "Yes" :"No" %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Voting Rights</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= @account.share_product.voting_rights? ? "Yes" :"No" %></dd>
+ </div>
+ 
+          <div class="flex justify-between"> 
+            <dt class="text-text-tertiary">Last Purchase</dt>
+ 
+            <dd class="text-text-primary font-medium"><%= @account.transactions.purchases.last&.posted_at&.strftime("%b %d, %Y") ||"—" %></dd>
+ </div>
+ </dl>
+ </div>
+ 
+      <div class="rounded-lg border border-border bg-surface p-4 text-xs text-text-tertiary"> 
+        <h3 class="font-semibold text-text-primary mb-2">Accounting</h3>
+ 
+        <dl class="space-y-1"> 
+          <dt class="text-text-tertiary">Equity Account</dt>
+ 
+          <dd class="text-text-primary"><%= @account.equity_account&.name ||"—" %></dd>
+ </dl>
+ </div>
+ </div>
+ </div>
+ </div>
+ 

@@ -61,11 +61,11 @@ if existing_count < 100
       mobile_number: "0917#{format('%07d', 1000 + members.size)}",
       birth_date: birthdate_range.to_a.sample,
       member_identifier: "MBR-#{coop.name.parameterize.upcase}-#{format('%04d', existing_count + members.size + 1)}",
-      identifications_attributes: [{
+      identifications_attributes: [ {
         cooperative: coop,
         id_type: "BIR",
         id_number: format("%03d-%03d-%03d", rand(100..999), rand(100..999), rand(100..999))
-      }]
+      } ]
     )
     members << m
   end
@@ -158,8 +158,8 @@ if savers_needed > 0
         reference_number: "DEP-#{account.account_number}-INIT",
         posted_at: account.opened_at,
         cooperative: coop,
-        debits: [{ account: cash_account, amount: initial_balance }],
-        credits: [{ account: liability, amount: initial_balance }]
+        debits: [ { account: cash_account, amount: initial_balance } ],
+        credits: [ { account: liability, amount: initial_balance } ]
       )
     rescue => e
       puts "    [post fail] #{e.message}"
@@ -230,7 +230,7 @@ if loans_needed > 0
   borrowers.sample(paid_count).each do |member|
     product = loan_products.sample
     amount = rand(10_000_00..150_000_00)
-    term = [3, 6, 12].sample
+    term = [ 3, 6, 12 ].sample
     interest = rand(1_000_00..amount / 5)
     disbursed_at = rand(90..365).days.ago
 
@@ -251,7 +251,7 @@ if loans_needed > 0
 
     Lending::LoanPayment.create!(
       loan: loan, amount_cents: amount + interest, principal_cents: amount,
-      interest_cents: interest, penalty_cents: 0, 
+      interest_cents: interest, penalty_cents: 0,
       payment_date: rand(disbursed_at..Date.current)
     )
   rescue => e
@@ -263,7 +263,7 @@ if loans_needed > 0
   borrowers.sample(active_count).each do |member|
     product = loan_products.sample
     amount = rand(20_000_00..300_000_00)
-    term = [6, 12, 18, 24].sample
+    term = [ 6, 12, 18, 24 ].sample
     remaining = (amount * rand(4..9) / 10.0).round
     disbursed_at = rand(15..120).days.ago
 
@@ -291,7 +291,7 @@ if loans_needed > 0
   borrowers.sample(default_count).each do |member|
     product = loan_products.sample
     amount = rand(5_000_00..100_000_00)
-    term = [3, 6, 12].sample
+    term = [ 3, 6, 12 ].sample
     remaining = (amount * rand(7..10) / 10.0).round
     disbursed_at = rand(180..400).days.ago
 
@@ -361,8 +361,8 @@ total_payments = 0
       reference_number: "SD-#{date.strftime('%Y%m%d')}-#{format('%04d', rand(9999))}",
       posted_at: posted_at,
       cooperative: coop,
-      debits: [{ account: cash_account, amount: amount }],
-      credits: [{ account: sa.liability_account, amount: amount }]
+      debits: [ { account: cash_account, amount: amount } ],
+      credits: [ { account: sa.liability_account, amount: amount } ]
     )
     day_deposits += 1
   rescue => e
@@ -393,8 +393,8 @@ total_payments = 0
       reference_number: "SW-#{date.strftime('%Y%m%d')}-#{format('%04d', rand(9999))}",
       posted_at: posted_at + 1.hour,
       cooperative: coop,
-      debits: [{ account: sa.liability_account, amount: amount }],
-      credits: [{ account: cash_account, amount: amount }]
+      debits: [ { account: sa.liability_account, amount: amount } ],
+      credits: [ { account: cash_account, amount: amount } ]
     )
     day_withdrawals += 1
   rescue => e
@@ -402,12 +402,12 @@ total_payments = 0
   end
 
   # ── Daily loan payments (3-8 active loans) ──────────────────────────
-  payment_count = [rand(3..8), active_loans.size].min
+  payment_count = [ rand(3..8), active_loans.size ].min
   payers = active_loans.sample(payment_count)
   day_payments = 0
 
   payers.each do |loan|
-    principal_payment = [loan.outstanding_principal_cents, rand(1_000_00..15_000_00)].min
+    principal_payment = [ loan.outstanding_principal_cents, rand(1_000_00..15_000_00) ].min
     next if principal_payment <= 0
 
     interest = (principal_payment * (loan.interest_rate / 100.0 / 12)).round
@@ -433,7 +433,7 @@ total_payments = 0
         reference_number: "LP-#{date.strftime('%Y%m%d')}-#{format('%04d', rand(9999))}",
         posted_at: posted_at + 2.hours,
         cooperative: coop,
-        debits: [{ account: cash_account, amount: total_payment }],
+        debits: [ { account: cash_account, amount: total_payment } ],
         credits: [
           { account: loan_receivable_acct, amount: principal_payment },
           { account: interest_income_acct, amount: interest }
@@ -475,8 +475,8 @@ if interest_income_acct && loan_receivable_acct
       reference_number: "INTR-ACCRUAL-#{format('%04d', rand(9999))}",
       posted_at: 1.day.ago.beginning_of_day,
       cooperative: coop,
-      debits: [{ account: loan_receivable_acct, amount: monthly_interest }],
-      credits: [{ account: interest_income_acct, amount: monthly_interest }]
+      debits: [ { account: loan_receivable_acct, amount: monthly_interest } ],
+      credits: [ { account: interest_income_acct, amount: monthly_interest } ]
     )
   rescue => e
     # skip

@@ -41,8 +41,8 @@ module Membership
     before_create :assign_member_identifier
 
     pg_search_scope :search,
-      against: [:first_name, :middle_name, :last_name, :mobile_number, :email_address, :member_identifier],
-      associated_against: { address: [:city, :barangay, :province] },
+      against: [ :first_name, :middle_name, :last_name, :mobile_number, :email_address, :member_identifier ],
+      associated_against: { address: [ :city, :barangay, :province ] },
       using: { tsearch: { prefix: true, any_word: true, normalization: 2 } }
 
     scope :portal_active, -> { where(portal_status: "active") }
@@ -54,7 +54,7 @@ module Membership
     end
 
     def name
-      [first_name, middle_name, last_name].compact.join(" ")
+      [ first_name, middle_name, last_name ].compact.join(" ")
     end
 
     def portal_active?

@@ -18,18 +18,18 @@ class PaymentAllocator
 
     # 1st: penalty (if any)
     if overdue_principal > 0 || overdue_interest > 0
-      penalty = [@remaining, (overdue_interest * 0.02).round].min
+      penalty = [ @remaining, (overdue_interest * 0.02).round ].min
       allocation[:penalty_cents] = penalty
       @remaining -= penalty
     end
 
     # 2nd: overdue interest
-    interest = [@remaining, overdue_interest].min
+    interest = [ @remaining, overdue_interest ].min
     allocation[:interest_cents] = interest
     @remaining -= interest
 
     # 3rd: overdue principal
-    principal = [@remaining, overdue_principal].min
+    principal = [ @remaining, overdue_principal ].min
     allocation[:principal_cents] = principal
     @remaining -= principal
 
@@ -47,7 +47,7 @@ class PaymentAllocator
       .select { |s| s.due_date < @payment_date }
       .sum(&:interest_cents)
     paid_interest = @loan.loan_payments.sum(:interest_cents)
-    [total_interest - paid_interest, 0].max
+    [ total_interest - paid_interest, 0 ].max
   end
 
   def calculate_overdue_principal
@@ -56,6 +56,6 @@ class PaymentAllocator
       .select { |s| s.due_date < @payment_date }
       .sum(&:principal_cents)
     paid_principal = @loan.loan_payments.sum(:principal_cents)
-    [total_principal - paid_principal, 0].max
+    [ total_principal - paid_principal, 0 ].max
   end
 end

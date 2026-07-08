@@ -1,1 +1,13 @@
-<% content_for :page_title,"Loan Aging Report" %> <% content_for :page_subtitle,"Delinquency monitoring and portfolio aging" %> <div class="animate-fade-in"> <%= render"filters" %> <div id="summary_cards"> <%= render"summary_cards" %> </div> <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"> <div id="aging_distribution"> <%= render"aging_distribution" %> </div> <div id="branch_performance"> <%= render"branch_performance" %> </div> </div> <div id="delinquent_loans"> <%= render"delinquent_loans" %> </div> <% if @pagy.pages > 1 %> <div class="mt-4 flex justify-center"> <%== pagy_nav(@pagy) %> </div> <% end %> </div> 
+<% content_for :page_title,"Loan Aging Report" %> <% content_for :page_subtitle,"Delinquency monitoring and portfolio aging" %> 
+<div class="animate-fade-in"> <%= render"filters" %> 
+  <div id="summary_cards"> <%= render"summary_cards" %> </div>
+ 
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"> 
+    <div id="aging_distribution"> <%= render"aging_distribution" %> </div>
+ 
+    <div id="branch_performance"> <%= render"branch_performance" %> </div>
+ </div>
+ 
+  <div id="delinquent_loans"> <%= render"delinquent_loans" %> </div>
+ <%= render "shared/pagination", pagy: @pagy if @pagy.pages > 1 %> </div>
+ 

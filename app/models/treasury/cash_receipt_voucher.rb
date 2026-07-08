@@ -8,8 +8,8 @@ module Treasury
         description: description || "Cash receipt: #{category}",
         reference_number: "JE-#{voucher_number}",
         posted_at: Time.current,
-        debits: [{ account: cash_account, amount: amount_cents }],
-        credits: [{ account: credit_account, amount: amount_cents }]
+        debits: [ { account: cash_account, amount: amount_cents } ],
+        credits: [ { account: credit_account, amount: amount_cents } ]
       )
       update!(entry: entry, status: "posted", posted_at: Time.current)
       entry

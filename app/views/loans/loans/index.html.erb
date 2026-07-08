@@ -1,1 +1,67 @@
-<% content_for :page_title,"Loans" %> <% content_for :page_subtitle,"Manage active loans" %> <div class="animate-fade-in"> <div class="grid grid-cols-4 gap-4 mb-6"> <div class="rounded-xl border border-border bg-surface p-4"> <span class="text-xs text-text-tertiary uppercase tracking-wider">Active</span> <p class="text-2xl font-bold text-primary mt-1"><%= @active_count %></p> </div> <div class="rounded-xl border border-border bg-surface p-4"> <span class="text-xs text-text-tertiary uppercase tracking-wider">Restructured</span> <p class="text-2xl font-bold text-purple-500 mt-1"><%= @restructured_count %></p> </div> <div class="rounded-xl border border-border bg-surface p-4"> <span class="text-xs text-text-tertiary uppercase tracking-wider">Defaulted</span> <p class="text-2xl font-bold text-danger mt-1"><%= @defaulted_count %></p> </div> <div class="rounded-xl border border-border bg-surface p-4"> <span class="text-xs text-text-tertiary uppercase tracking-wider">Total</span> <p class="text-2xl font-bold text-text-primary mt-1"><%= @total_count %></p> </div> </div> <div class="mb-4 flex items-center justify-between"> <span class="text-sm text-text-secondary"><%= @loans.size %> loan(s)</span> </div> <div class="rounded-lg border border-border bg-surface overflow-hidden"> <table class="min-w-full text-sm"> <thead> <tr class="border-b border-border bg-surface-alt"> <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Reference</th> <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Member</th> <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Product</th> <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Principal</th> <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Outstanding</th> <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Status</th> <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Actions</th> </tr> </thead> <tbody class="divide-y divide-border"> <% if @loans.any? %> <% @loans.each do |loan| %> <tr class="hover:bg-surface-alt /30 transition-colors"> <td class="px-4 py-3"><code class="rounded bg-surface-alt px-1.5 py-0.5 text-xs font-mono"><%= loan.reference_number %></code></td> <td class="px-4 py-3 font-medium text-text-primary"><%= loan.member.name %></td> <td class="px-4 py-3 text-text-secondary"><%= loan.loan_product.name %></td> <td class="px-4 py-3 text-right text-text-secondary"><%= number_to_currency(loan.principal_cents.to_f / 100, unit:"PHP") %></td> <td class="px-4 py-3 text-right font-medium <%= loan.outstanding_principal_cents > 0 ? 'text-text-primary' : 'text-positive' %>"> <%= number_to_currency(loan.outstanding_principal_cents.to_f / 100, unit:"PHP") %> </td> <td class="px-4 py-3"> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= case loan.status when 'active' then 'bg-primary-50 text-primary' when 'paid' then 'bg-positive-50 text-positive' when 'defaulted' then 'bg-danger-50 text-danger' when 'refinanced' then 'bg-positive-50 text-positive' when 'modified' then 'bg-primary-50 text-primary' when 'hybrid_restructured' then 'bg-purple-50 text-purple-500' when 'restructure_requested' then 'bg-amber-50 text-amber-500' when 'under_review' then 'bg-amber-50 text-amber-500' else 'bg-surface-alt text-text-tertiary' end %>"> <%= loan.status.titleize %> </span> </td> <td class="px-4 py-3 text-right"> <%= link_to"View", loans_loan_path(loan), class:"text-sm font-medium text-primary hover:text-primary-700" %> </td> </tr> <% end %> <% else %> <tr> <td colspan="7" class="px-4 py-12 text-center text-sm text-text-tertiary">No loans yet.</td> </tr> <% end %> </tbody> </table> </div> </div> 
+<% content_for :page_title,"Loans" %> <% content_for :page_subtitle,"Manage active loans" %> 
+<div class="animate-fade-in"> 
+  <div class="grid grid-cols-4 gap-4 mb-6"> 
+    <div class="rounded-xl border border-border bg-surface p-4"> <span class="text-xs text-text-tertiary uppercase tracking-wider">Active</span> 
+      <p class="text-2xl font-bold text-primary mt-1"><%= @active_count %></p>
+ </div>
+ 
+    <div class="rounded-xl border border-border bg-surface p-4"> <span class="text-xs text-text-tertiary uppercase tracking-wider">Restructured</span> 
+      <p class="text-2xl font-bold text-purple-500 mt-1"><%= @restructured_count %></p>
+ </div>
+ 
+    <div class="rounded-xl border border-border bg-surface p-4"> <span class="text-xs text-text-tertiary uppercase tracking-wider">Defaulted</span> 
+      <p class="text-2xl font-bold text-danger mt-1"><%= @defaulted_count %></p>
+ </div>
+ 
+    <div class="rounded-xl border border-border bg-surface p-4"> <span class="text-xs text-text-tertiary uppercase tracking-wider">Total</span> 
+      <p class="text-2xl font-bold text-text-primary mt-1"><%= @total_count %></p>
+ </div>
+ </div>
+ 
+  <div class="mb-4 flex items-center justify-between"> <span class="text-sm text-text-secondary"><%= @loans.size %> loan(s)</span> </div>
+ 
+  <div class="rounded-lg border border-border bg-surface overflow-hidden"> 
+    <table class="min-w-full text-sm"> 
+      <thead> 
+        <tr class="border-b border-border bg-surface-alt"> 
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Reference</th>
+ 
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Member</th>
+ 
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Product</th>
+ 
+          <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Principal</th>
+ 
+          <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Outstanding</th>
+ 
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Status</th>
+ 
+          <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Actions</th>
+ </tr>
+ </thead>
+ 
+      <tbody class="divide-y divide-border"> <% if @loans.any? %> <% @loans.each do |loan| %> 
+            <tr class="hover:bg-surface-alt /30 transition-colors"> 
+              <td class="px-4 py-3"><code class="rounded bg-surface-alt px-1.5 py-0.5 text-xs font-mono"><%= loan.reference_number %></code></td>
+ 
+              <td class="px-4 py-3 font-medium text-text-primary"><%= loan.member.name %></td>
+ 
+              <td class="px-4 py-3 text-text-secondary"><%= loan.loan_product.name %></td>
+ 
+              <td class="px-4 py-3 text-right text-text-secondary"><%= number_to_currency(loan.principal_cents.to_f / 100, unit:"PHP") %></td>
+ 
+              <td class="px-4 py-3 text-right font-medium <%= loan.outstanding_principal_cents > 0 ? 'text-text-primary' : 'text-positive' %>"> <%= number_to_currency(loan.outstanding_principal_cents.to_f / 100, unit:"PHP") %> </td>
+ 
+              <td class="px-4 py-3"> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= case loan.status when 'active' then 'bg-primary-50 text-primary' when 'paid' then 'bg-positive-50 text-positive' when 'defaulted' then 'bg-danger-50 text-danger' when 'refinanced' then 'bg-positive-50 text-positive' when 'modified' then 'bg-primary-50 text-primary' when 'hybrid_restructured' then 'bg-purple-50 text-purple-500' when 'restructure_requested' then 'bg-amber-50 text-amber-500' when 'under_review' then 'bg-amber-50 text-amber-500' else 'bg-surface-alt text-text-tertiary' end %>"> <%= loan.status.titleize %> </span> </td>
+ 
+              <td class="px-4 py-3 text-right"> <%= link_to"View", loans_loan_path(loan), class:"text-sm font-medium text-primary hover:text-primary-700" %> </td>
+ </tr>
+ <% end %> <% else %> 
+          <tr> 
+            <td colspan="7" class="px-4 py-12 text-center text-sm text-text-tertiary">No loans yet.</td>
+ </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ </div>
+ 

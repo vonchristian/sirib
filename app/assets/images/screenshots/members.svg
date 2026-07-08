@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" fill="none">
+  <rect width="1200" height="750" fill="#f7f5f0"/>
+  <!-- Sidebar -->
+  <rect width="256" height="750" fill="#ffffff"/>
+  <rect x="256" width="1" height="750" fill="#e8e0d5"/>
+  <rect x="16" y="16" width="224" height="48" rx="8" fill="#f0f7ef"/>
+  <circle cx="40" cy="40" r="14" fill="#5b8c5a"/>
+  <rect x="64" y="32" width="48" height="6" rx="3" fill="#2c241b"/>
+  <rect x="64" y="42" width="80" height="4" rx="2" fill="#aea398"/>
+  <!-- Search -->
+  <rect x="280" y="16" width="400" height="36" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="300" y="40" font-family="system-ui" font-size="13" fill="#aea398">Search members by name, ID, or contact...</text>
+  <rect x="700" y="16" width="120" height="36" rx="8" fill="#5b8c5a"/>
+  <text x="724" y="40" font-family="system-ui" font-size="13" font-weight="500" fill="#ffffff">+ Add Member</text>
+  <!-- Stats row -->
+  <rect x="280" y="68" width="220" height="72" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="300" y="92" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">TOTAL MEMBERS</text>
+  <text x="300" y="118" font-family="system-ui" font-size="24" font-weight="600" fill="#2c241b">1,247</text>
+  <rect x="504" y="68" width="220" height="72" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="524" y="92" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">ACTIVE BORROWERS</text>
+  <text x="524" y="118" font-family="system-ui" font-size="24" font-weight="600" fill="#2c241b">386</text>
+  <rect x="728" y="68" width="220" height="72" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="748" y="92" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">NEW THIS MONTH</text>
+  <text x="748" y="118" font-family="system-ui" font-size="24" font-weight="600" fill="#2c241b">12</text>
+  <rect x="952" y="68" width="220" height="72" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <text x="972" y="92" font-family="system-ui" font-size="11" font-weight="600" fill="#aea398">PENDING APPROVAL</text>
+  <text x="972" y="118" font-family="system-ui" font-size="24" font-weight="600" fill="#d97706">5</text>
+  <!-- Table -->
+  <rect x="280" y="160" width="884" height="530" rx="8" fill="#ffffff" stroke="#e8e0d5" stroke-width="1"/>
+  <rect x="280" y="160" width="884" height="44" rx="8" fill="#ffffff"/>
+  <text x="300" y="186" font-family="system-ui" font-size="13" font-weight="600" fill="#2c241b">All Members</text>
+  <!-- Table header -->
+  <rect x="280" y="204" width="884" height="36" fill="#f7f5f0"/>
+  <text x="300" y="226" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">MEMBER</text>
+  <text x="440" y="226" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">ID</text>
+  <text x="560" y="226" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">CONTACT</text>
+  <text x="720" y="226" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">STATUS</text>
+  <text x="840" y="226" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">SAVINGS</text>
+  <text x="960" y="226" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">LOANS</text>
+  <text x="1080" y="226" font-family="system-ui" font-size="10" font-weight="600" fill="#aea398">JOINED</text>
+  <!-- Row 1 -->
+  <rect x="280" y="240" width="884" height="48" fill="#ffffff"/>
+  <circle cx="316" cy="264" r="16" fill="#f0f7ef"/>
+  <text x="316" y="269" font-family="system-ui" font-size="11" font-weight="500" fill="#5b8c5a">JC</text>
+  <text x="344" y="260" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">Juan Cruz</text>
+  <text x="344" y="274" font-family="system-ui" font-size="10" fill="#aea398">M-001</text>
+  <text x="560" y="264" font-family="system-ui" font-size="12" fill="#6e6358">0917-555-0101</text>
+  <rect x="716" y="254" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="724" y="267" font-family="system-ui" font-size="9" font-weight="500" fill="#059669">Active</text>
+  <text x="840" y="264" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱25,000</text>
+  <text x="960" y="264" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱150,000</text>
+  <text x="1080" y="264" font-family="system-ui" font-size="11" fill="#aea398">Jan 2023</text>
+  <rect x="280" y="288" width="884" height="1" fill="#e8e0d5"/>
+  <!-- Row 2 -->
+  <rect x="280" y="289" width="884" height="48" fill="#ffffff"/>
+  <circle cx="316" cy="313" r="16" fill="#fef2f2"/>
+  <text x="316" y="318" font-family="system-ui" font-size="11" font-weight="500" fill="#dc2626">MR</text>
+  <text x="344" y="309" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">Maria Reyes</text>
+  <text x="344" y="323" font-family="system-ui" font-size="10" fill="#aea398">M-002</text>
+  <text x="560" y="313" font-family="system-ui" font-size="12" fill="#6e6358">0917-555-0102</text>
+  <rect x="716" y="303" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="724" y="316" font-family="system-ui" font-size="9" font-weight="500" fill="#059669">Active</text>
+  <text x="840" y="313" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱50,000</text>
+  <text x="960" y="313" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱300,000</text>
+  <text x="1080" y="313" font-family="system-ui" font-size="11" fill="#aea398">Mar 2023</text>
+  <rect x="280" y="337" width="884" height="1" fill="#e8e0d5"/>
+  <!-- Row 3 -->
+  <rect x="280" y="338" width="884" height="48" fill="#ffffff"/>
+  <circle cx="316" cy="362" r="16" fill="#f0f7ef"/>
+  <text x="316" y="367" font-family="system-ui" font-size="11" font-weight="500" fill="#5b8c5a">PS</text>
+  <text x="344" y="358" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">Pedro Santos</text>
+  <text x="344" y="372" font-family="system-ui" font-size="10" fill="#aea398">M-003</text>
+  <text x="560" y="362" font-family="system-ui" font-size="12" fill="#6e6358">0917-555-0103</text>
+  <rect x="716" y="352" width="50" height="18" rx="9" fill="#fffbeb"/>
+  <text x="722" y="365" font-family="system-ui" font-size="9" font-weight="500" fill="#d97706">Inactive</text>
+  <text x="840" y="362" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱10,000</text>
+  <text x="960" y="362" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱75,000</text>
+  <text x="1080" y="362" font-family="system-ui" font-size="11" fill="#aea398">Jun 2023</text>
+  <rect x="280" y="386" width="884" height="1" fill="#e8e0d5"/>
+  <!-- Row 4 -->
+  <rect x="280" y="387" width="884" height="48" fill="#ffffff"/>
+  <circle cx="316" cy="411" r="16" fill="#fef2f2"/>
+  <text x="316" y="416" font-family="system-ui" font-size="11" font-weight="500" fill="#dc2626">AL</text>
+  <text x="344" y="407" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">Ana Lopez</text>
+  <text x="344" y="421" font-family="system-ui" font-size="10" fill="#aea398">M-004</text>
+  <text x="560" y="411" font-family="system-ui" font-size="12" fill="#6e6358">0917-555-0104</text>
+  <rect x="716" y="401" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="724" y="414" font-family="system-ui" font-size="9" font-weight="500" fill="#059669">Active</text>
+  <text x="840" y="411" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱100,000</text>
+  <text x="960" y="411" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱500,000</text>
+  <text x="1080" y="411" font-family="system-ui" font-size="11" fill="#aea398">Sep 2022</text>
+  <rect x="280" y="435" width="884" height="1" fill="#e8e0d5"/>
+  <!-- Row 5 -->
+  <rect x="280" y="436" width="884" height="48" fill="#ffffff"/>
+  <circle cx="316" cy="460" r="16" fill="#f0f7ef"/>
+  <text x="316" y="465" font-family="system-ui" font-size="11" font-weight="500" fill="#5b8c5a">CG</text>
+  <text x="344" y="456" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">Carlos Garcia</text>
+  <text x="344" y="470" font-family="system-ui" font-size="10" fill="#aea398">M-005</text>
+  <text x="560" y="460" font-family="system-ui" font-size="12" fill="#6e6358">0917-555-0105</text>
+  <rect x="716" y="450" width="60" height="18" rx="9" fill="#ecfdf5"/>
+  <text x="724" y="463" font-family="system-ui" font-size="9" font-weight="500" fill="#059669">Active</text>
+  <text x="840" y="460" font-family="system-ui" font-size="12" font-weight="500" fill="#2c241b">₱30,000</text>
+  <text x="960" y="460" font-family="system-ui" font-size="12" font-weight="500" fill="#aea398">—</text>
+  <text x="1080" y="460" font-family="system-ui" font-size="11" fill="#aea398">Jan 2024</text>
+</svg>

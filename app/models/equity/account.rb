@@ -27,12 +27,12 @@ module Equity
     end
 
     def remaining_required_shares
-      [share_product.minimum_required_shares - shares_owned, 0].max
+      [ share_product.minimum_required_shares - shares_owned, 0 ].max
     end
 
     def progress_percentage
       return 100 if share_product.minimum_required_shares.zero?
-      [(shares_owned.to_f / share_product.minimum_required_shares * 100).round, 100].min
+      [ (shares_owned.to_f / share_product.minimum_required_shares * 100).round, 100 ].min
     end
 
     def current_share_value

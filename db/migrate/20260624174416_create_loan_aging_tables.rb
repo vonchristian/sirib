@@ -10,8 +10,8 @@ class CreateLoanAgingTables < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :loan_aging_groups, :cooperative_id
-    add_index :loan_aging_groups, [:cooperative_id, :display_order]
-    add_index :loan_aging_groups, [:cooperative_id, :name], unique: true
+    add_index :loan_aging_groups, [ :cooperative_id, :display_order ]
+    add_index :loan_aging_groups, [ :cooperative_id, :name ], unique: true
 
     create_table :loan_agings do |t|
       t.bigint :cooperative_id, null: false
@@ -45,7 +45,7 @@ class CreateLoanAgingTables < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :loan_aging_snapshots, :cooperative_id
-    add_index :loan_aging_snapshots, [:snapshot_date, :loan_aging_group_id], unique: true
+    add_index :loan_aging_snapshots, [ :snapshot_date, :loan_aging_group_id ], unique: true
     add_index :loan_aging_snapshots, :snapshot_date
     add_foreign_key :loan_aging_snapshots, :loan_aging_groups
   end

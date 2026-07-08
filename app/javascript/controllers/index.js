@@ -26,6 +26,15 @@ application.register("rail", RailController)
 import SidebarController from "controllers/sidebar_controller"
 application.register("sidebar", SidebarController)
 
+import RevealController from "controllers/reveal_controller"
+application.register("reveal", RevealController)
+
+import CounterController from "controllers/counter_controller"
+application.register("counter", CounterController)
+
+import PageTransitionController from "controllers/page_transition_controller"
+application.register("page-transition", PageTransitionController)
+
 import ChartOfAccountsController from "controllers/chart_of_accounts_controller"
 application.register("chart-of-accounts", ChartOfAccountsController)
 

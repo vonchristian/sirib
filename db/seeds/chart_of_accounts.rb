@@ -14,7 +14,7 @@ CONTRA_PREFIXES = [
   "Sales Returns",
   "Sales Discounts",
   "Treasury Shares Capital",
-  "Unrealized Gross Margin",
+  "Unrealized Gross Margin"
 ].freeze
 
 def account_type_for(code)
@@ -84,7 +84,7 @@ ACCOUNTS = [
   { code: "11250", name: "Accounts Receivable Trade — Current",      ledger: "112" },
   { code: "11260", name: "Accounts Receivable Trade — Past Due",     ledger: "112" },
   { code: "11270", name: "Accounts Receivable Trade — Restructured", ledger: "112" },
-  { code: "11280", name: "Accounts Receivable Trade — in Litigation",ledger: "112" },
+  { code: "11280", name: "Accounts Receivable Trade — in Litigation", ledger: "112" },
   { code: "11281", name: "Allowance for Probable Losses — Accounts Receivable Trade", ledger: "112" },
   { code: "11290", name: "Installment Receivables — Current",        ledger: "112" },
   { code: "11300", name: "Installment Receivables — Past Due",       ledger: "112" },
@@ -307,10 +307,10 @@ ACCOUNTS = [
 
   { code: "70100", name: "Finance Income",        ledger: "700" },
   { code: "70200", name: "Finance Cost",          ledger: "700" },
-  { code: "70300", name: "Gain on Sale of Assets",ledger: "700" },
-  { code: "70400", name: "Loss on Sale of Assets",ledger: "700" },
+  { code: "70300", name: "Gain on Sale of Assets", ledger: "700" },
+  { code: "70400", name: "Loss on Sale of Assets", ledger: "700" },
   { code: "70500", name: "Extraordinary Gains",   ledger: "700" },
-  { code: "70600", name: "Extraordinary Losses",  ledger: "700" },
+  { code: "70600", name: "Extraordinary Losses",  ledger: "700" }
 ].freeze
 
 puts "Seeding chart of accounts..."

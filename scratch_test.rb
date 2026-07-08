@@ -9,7 +9,7 @@ puts "Expense DR=#{dr} CR=#{cr} DIFF=#{dr - cr}"
 puts "Count: #{exp_lines.count}"
 
 # Check each type
-["SAL", "RNT", "UTL", "TEL"].each do |type|
+[ "SAL", "RNT", "UTL", "TEL" ].each do |type|
   lines = Accounting::AmountLine.joins(:entry).where(cooperative_id: coop.id).where("entries.reference_number LIKE ?", "#{type}-%")
   dr_t = lines.debit.sum(:amount_cents) || 0
   cr_t = lines.credit.sum(:amount_cents) || 0

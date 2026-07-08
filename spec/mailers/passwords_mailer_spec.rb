@@ -7,8 +7,8 @@ RSpec.describe PasswordsMailer do
 
     it "renders the headers" do
       expect(mail.subject).to eq("Reset your password")
-      expect(mail.to).to eq([user.email_address])
-      expect(mail.from).to eq(["from@example.com"])
+      expect(mail.to).to eq([ user.email_address ])
+      expect(mail.from).to eq([ "from@example.com" ])
     end
 
     it "renders the body" do

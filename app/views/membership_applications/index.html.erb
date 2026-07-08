@@ -1,1 +1,43 @@
-<% content_for :page_title,"Membership Applications" %> <% content_for :page_subtitle,"Manage member registration applications" %> <div class="animate-fade-in"> <div class="mb-4 flex items-center justify-between"> <span class="text-sm text-text-secondary"><%= @applications.size %> application(s)</span> <%= link_to"New Application", new_membership_application_path, class:"inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors" %> </div> <div class="rounded-lg border border-border bg-surface overflow-hidden"> <div class="overflow-x-auto"> <table class="min-w-full text-sm"> <thead> <tr class="border-b border-border bg-surface-alt"> <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Application ID</th> <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Name</th> <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Status</th> <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Created</th> <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Actions</th> </tr> </thead> <tbody class="divide-y divide-border"> <% if @applications.any? %> <% @applications.each do |app| %> <tr class="hover:bg-surface-alt /30 transition-colors"> <td class="px-4 py-3"> <code class="rounded bg-surface-alt px-1.5 py-0.5 text-xs font-mono"><%= app.uuid.first(8).upcase %></code> </td> <td class="px-4 py-3"> <span class="font-medium text-text-primary"><%= [app.first_name, app.last_name].compact.join("").presence ||"—" %></span> </td> <td class="px-4 py-3"> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= case app.status when 'draft' then 'bg-warning-50 text-warning dark:bg-amber-900/30 dark:text-amber-400' when 'completed' then 'bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300' when 'approved' then 'bg-positive-50 text-positive dark:bg-emerald-900/30 dark:text-emerald-400' end %>"> <%= app.status %> </span> </td> <td class="px-4 py-3 text-sm text-text-secondary"><%= app.created_at.strftime("%b %d, %Y") %></td> <td class="px-4 py-3 text-right"> <%= link_to"View", membership_application_path(app.uuid), class:"text-sm font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors" %> </td> </tr> <% end %> <% else %> <tr> <td colspan="5" class="px-4 py-12 text-center text-sm text-text-tertiary"> No applications yet. <%= link_to"Create the first application", new_membership_application_path, class:"font-medium text-primary hover:text-primary-700 dark:text-primary-400" %>. </td> </tr> <% end %> </tbody> </table> </div> </div> </div> 
+<% content_for :page_title,"Membership Applications" %> <% content_for :page_subtitle,"Manage member registration applications" %> 
+<div class="animate-fade-in"> 
+  <div class="mb-4 flex items-center justify-between"> <span class="text-sm text-text-secondary"><%= @applications.size %> application(s)</span> <%= link_to"New Application", new_membership_application_path, class:"inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors" %> </div>
+ 
+  <div class="rounded-lg border border-border bg-surface overflow-hidden"> 
+    <div class="overflow-x-auto"> 
+      <table class="min-w-full text-sm"> 
+        <thead> 
+          <tr class="border-b border-border bg-surface-alt"> 
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Application ID</th>
+ 
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Name</th>
+ 
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Status</th>
+ 
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-tertiary">Created</th>
+ 
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-text-tertiary">Actions</th>
+ </tr>
+ </thead>
+ 
+        <tbody class="divide-y divide-border"> <% if @applications.any? %> <% @applications.each do |app| %> 
+              <tr class="hover:bg-surface-alt /30 transition-colors"> 
+                <td class="px-4 py-3"> <code class="rounded bg-surface-alt px-1.5 py-0.5 text-xs font-mono"><%= app.uuid.first(8).upcase %></code> </td>
+ 
+                <td class="px-4 py-3"> <span class="font-medium text-text-primary"><%= [app.first_name, app.last_name].compact.join("").presence ||"—" %></span> </td>
+ 
+                <td class="px-4 py-3"> <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize <%= case app.status when 'draft' then 'bg-warning-50 text-warning dark:bg-warning-900/30 dark:text-warning-400' when 'completed' then 'bg-primary-50 text-primary dark:bg-primary-900/30 dark:text-primary-300' when 'approved' then 'bg-positive-50 text-positive dark:bg-emerald-900/30 dark:text-emerald-400' end %>"> <%= app.status %> </span> </td>
+ 
+                <td class="px-4 py-3 text-sm text-text-secondary"><%= app.created_at.strftime("%b %d, %Y") %></td>
+ 
+                <td class="px-4 py-3 text-right"> <%= link_to"View", membership_application_path(app.uuid), class:"text-sm font-medium text-primary hover:text-primary-700 dark:text-primary-400 transition-colors" %> </td>
+ </tr>
+ <% end %> <% else %> 
+            <tr> 
+              <td colspan="5" class="px-4 py-12 text-center text-sm text-text-tertiary"> No applications yet. <%= link_to"Create the first application", new_membership_application_path, class:"font-medium text-primary hover:text-primary-700 dark:text-primary-400" %>. </td>
+ </tr>
+ <% end %> </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+ 

@@ -1,6 +1,6 @@
 class ConsolidateTables < ActiveRecord::Migration[8.0]
   def up
-    create_enum "account_type", ["asset", "equity", "liability", "revenue", "expense"]
+    create_enum "account_type", [ "asset", "equity", "liability", "revenue", "expense" ]
 
     create_table "cooperatives", force: :cascade do |t|
       t.string "name", null: false
@@ -13,7 +13,7 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "status", default: "inactive", null: false
       t.string "locale", default: "en"
       t.string "timezone", default: "UTC"
-      t.index ["vault_account_id"], name: "index_cooperatives_on_vault_account_id"
+      t.index [ "vault_account_id" ], name: "index_cooperatives_on_vault_account_id"
     end
 
     create_table "users", force: :cascade do |t|
@@ -30,9 +30,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "status"
       t.jsonb "permission_overrides"
       t.bigint "cooperative_id", null: false
-      t.index ["cooperative_id"], name: "index_users_on_cooperative_id"
-      t.index ["email_address"], name: "index_users_on_email_address", unique: true
-      t.index ["employee_id"], name: "index_users_on_employee_id", unique: true
+      t.index [ "cooperative_id" ], name: "index_users_on_cooperative_id"
+      t.index [ "email_address" ], name: "index_users_on_email_address", unique: true
+      t.index [ "employee_id" ], name: "index_users_on_employee_id", unique: true
     end
 
     create_table "active_storage_blobs", force: :cascade do |t|
@@ -44,7 +44,7 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "byte_size", null: false
       t.string "checksum"
       t.datetime "created_at", null: false
-      t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+      t.index [ "key" ], name: "index_active_storage_blobs_on_key", unique: true
     end
 
     create_table "active_storage_attachments", force: :cascade do |t|
@@ -53,14 +53,14 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "record_id", null: false
       t.bigint "blob_id", null: false
       t.datetime "created_at", null: false
-      t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
-      t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+      t.index [ "blob_id" ], name: "index_active_storage_attachments_on_blob_id"
+      t.index [ "record_type", "record_id", "name", "blob_id" ], name: "index_active_storage_attachments_uniqueness", unique: true
     end
 
     create_table "active_storage_variant_records", force: :cascade do |t|
       t.bigint "blob_id", null: false
       t.string "variation_digest", null: false
-      t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+      t.index [ "blob_id", "variation_digest" ], name: "index_active_storage_variant_records_uniqueness", unique: true
     end
 
     create_table "backup_codes", force: :cascade do |t|
@@ -69,8 +69,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "used_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["user_id", "used_at"], name: "index_backup_codes_on_user_id_and_used_at"
-      t.index ["user_id"], name: "index_backup_codes_on_user_id"
+      t.index [ "user_id", "used_at" ], name: "index_backup_codes_on_user_id_and_used_at"
+      t.index [ "user_id" ], name: "index_backup_codes_on_user_id"
     end
 
     create_table "sessions", force: :cascade do |t|
@@ -82,7 +82,7 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "revoked_at"
       t.datetime "last_activity_at"
       t.datetime "mfa_verified_at"
-      t.index ["user_id"], name: "index_sessions_on_user_id"
+      t.index [ "user_id" ], name: "index_sessions_on_user_id"
     end
 
     create_table "trusted_devices", force: :cascade do |t|
@@ -94,9 +94,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "ip_address"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["expires_at"], name: "index_trusted_devices_on_expires_at"
-      t.index ["user_id", "device_fingerprint_hash"], name: "index_trusted_devices_on_user_id_and_device_fingerprint_hash", unique: true
-      t.index ["user_id"], name: "index_trusted_devices_on_user_id"
+      t.index [ "expires_at" ], name: "index_trusted_devices_on_expires_at"
+      t.index [ "user_id", "device_fingerprint_hash" ], name: "index_trusted_devices_on_user_id_and_device_fingerprint_hash", unique: true
+      t.index [ "user_id" ], name: "index_trusted_devices_on_user_id"
     end
 
     create_table "mfa_attempt_logs", force: :cascade do |t|
@@ -110,10 +110,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.jsonb "metadata", default: {}
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["action"], name: "index_mfa_attempt_logs_on_action"
-      t.index ["created_at"], name: "index_mfa_attempt_logs_on_created_at"
-      t.index ["user_id", "created_at"], name: "index_mfa_attempt_logs_on_user_id_and_created_at"
-      t.index ["user_id"], name: "index_mfa_attempt_logs_on_user_id"
+      t.index [ "action" ], name: "index_mfa_attempt_logs_on_action"
+      t.index [ "created_at" ], name: "index_mfa_attempt_logs_on_created_at"
+      t.index [ "user_id", "created_at" ], name: "index_mfa_attempt_logs_on_user_id_and_created_at"
+      t.index [ "user_id" ], name: "index_mfa_attempt_logs_on_user_id"
     end
 
     create_table "members", force: :cascade do |t|
@@ -136,9 +136,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "portal_status", default: "inactive", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_members_on_cooperative_id"
-      t.index ["email_address"], name: "index_members_on_email_address", unique: true
-      t.index ["member_identifier"], name: "index_members_on_member_identifier", unique: true
+      t.index [ "cooperative_id" ], name: "index_members_on_cooperative_id"
+      t.index [ "email_address" ], name: "index_members_on_email_address", unique: true
+      t.index [ "member_identifier" ], name: "index_members_on_member_identifier", unique: true
     end
 
     create_table "membership_applications", force: :cascade do |t|
@@ -167,8 +167,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.jsonb "sources_of_income", default: [], null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_membership_applications_on_cooperative_id"
-      t.index ["uuid"], name: "index_membership_applications_on_uuid", unique: true
+      t.index [ "cooperative_id" ], name: "index_membership_applications_on_cooperative_id"
+      t.index [ "uuid" ], name: "index_membership_applications_on_uuid", unique: true
     end
 
     create_table "ledgers", force: :cascade do |t|
@@ -180,9 +180,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "ancestry"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id", "account_code"], name: "index_ledgers_on_cooperative_id_and_account_code", unique: true
-      t.index ["ancestry"], name: "index_ledgers_on_ancestry"
-      t.index ["cooperative_id"], name: "index_ledgers_on_cooperative_id"
+      t.index [ "cooperative_id", "account_code" ], name: "index_ledgers_on_cooperative_id_and_account_code", unique: true
+      t.index [ "ancestry" ], name: "index_ledgers_on_ancestry"
+      t.index [ "cooperative_id" ], name: "index_ledgers_on_cooperative_id"
     end
 
     create_table "accounts", force: :cascade do |t|
@@ -194,9 +194,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.enum "account_type", null: false, enum_type: "account_type"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id", "account_code"], name: "index_accounts_on_cooperative_id_and_account_code", unique: true
-      t.index ["cooperative_id"], name: "index_accounts_on_cooperative_id"
-      t.index ["ledger_id"], name: "index_accounts_on_ledger_id"
+      t.index [ "cooperative_id", "account_code" ], name: "index_accounts_on_cooperative_id_and_account_code", unique: true
+      t.index [ "cooperative_id" ], name: "index_accounts_on_cooperative_id"
+      t.index [ "ledger_id" ], name: "index_accounts_on_ledger_id"
     end
 
     create_table "entries", force: :cascade do |t|
@@ -216,15 +216,15 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.boolean "inter_branch", default: false, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_entries_on_cooperative_id"
-      t.index ["created_by_id"], name: "index_entries_on_created_by_id"
-      t.index ["posted_at", "branch_id"], name: "index_entries_on_posted_at_and_branch_id"
-      t.index ["posted_at"], name: "index_entries_on_posted_at"
-      t.index ["reference_number"], name: "index_entries_on_reference_number", unique: true
-      t.index ["reversal_of_id"], name: "index_entries_on_reversal_of_id"
-      t.index ["source_module"], name: "index_entries_on_source_module"
-      t.index ["status", "entry_type"], name: "index_entries_on_status_and_entry_type"
-      t.index ["template_id"], name: "index_entries_on_template_id"
+      t.index [ "cooperative_id" ], name: "index_entries_on_cooperative_id"
+      t.index [ "created_by_id" ], name: "index_entries_on_created_by_id"
+      t.index [ "posted_at", "branch_id" ], name: "index_entries_on_posted_at_and_branch_id"
+      t.index [ "posted_at" ], name: "index_entries_on_posted_at"
+      t.index [ "reference_number" ], name: "index_entries_on_reference_number", unique: true
+      t.index [ "reversal_of_id" ], name: "index_entries_on_reversal_of_id"
+      t.index [ "source_module" ], name: "index_entries_on_source_module"
+      t.index [ "status", "entry_type" ], name: "index_entries_on_status_and_entry_type"
+      t.index [ "template_id" ], name: "index_entries_on_template_id"
     end
 
     create_table "entry_templates", force: :cascade do |t|
@@ -236,9 +236,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "updated_at", null: false
       t.bigint "entry_id"
       t.bigint "cooperative_id", null: false
-      t.index ["cooperative_id"], name: "index_entry_templates_on_cooperative_id"
-      t.index ["entry_id"], name: "index_entry_templates_on_entry_id"
-      t.index ["is_active"], name: "index_entry_templates_on_is_active"
+      t.index [ "cooperative_id" ], name: "index_entry_templates_on_cooperative_id"
+      t.index [ "entry_id" ], name: "index_entry_templates_on_entry_id"
+      t.index [ "is_active" ], name: "index_entry_templates_on_is_active"
     end
 
     create_table "entry_template_lines", force: :cascade do |t|
@@ -251,9 +251,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.bigint "cooperative_id", null: false
-      t.index ["account_id"], name: "index_entry_template_lines_on_account_id"
-      t.index ["cooperative_id"], name: "index_entry_template_lines_on_cooperative_id"
-      t.index ["entry_template_id"], name: "index_entry_template_lines_on_entry_template_id"
+      t.index [ "account_id" ], name: "index_entry_template_lines_on_account_id"
+      t.index [ "cooperative_id" ], name: "index_entry_template_lines_on_cooperative_id"
+      t.index [ "entry_template_id" ], name: "index_entry_template_lines_on_entry_template_id"
     end
 
     create_table "amount_lines", force: :cascade do |t|
@@ -265,10 +265,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "amount_currency", limit: 3, default: "PHP", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["account_id", "entry_id"], name: "index_amount_lines_on_account_id_and_entry_id"
-      t.index ["account_id"], name: "index_amount_lines_on_account_id"
-      t.index ["cooperative_id"], name: "index_amount_lines_on_cooperative_id"
-      t.index ["entry_id"], name: "index_amount_lines_on_entry_id"
+      t.index [ "account_id", "entry_id" ], name: "index_amount_lines_on_account_id_and_entry_id"
+      t.index [ "account_id" ], name: "index_amount_lines_on_account_id"
+      t.index [ "cooperative_id" ], name: "index_amount_lines_on_cooperative_id"
+      t.index [ "entry_id" ], name: "index_amount_lines_on_entry_id"
     end
 
     create_table "running_balances", force: :cascade do |t|
@@ -280,11 +280,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "balance_currency", limit: 3, default: "PHP", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["account_id", "as_of_date"], name: "idx_running_balances_on_account_date", unique: true, where: "(account_id IS NOT NULL)"
-      t.index ["account_id"], name: "index_running_balances_on_account_id"
-      t.index ["cooperative_id"], name: "index_running_balances_on_cooperative_id"
-      t.index ["ledger_id", "as_of_date"], name: "idx_running_balances_on_ledger_date", unique: true, where: "(account_id IS NULL)"
-      t.index ["ledger_id"], name: "index_running_balances_on_ledger_id"
+      t.index [ "account_id", "as_of_date" ], name: "idx_running_balances_on_account_date", unique: true, where: "(account_id IS NOT NULL)"
+      t.index [ "account_id" ], name: "index_running_balances_on_account_id"
+      t.index [ "cooperative_id" ], name: "index_running_balances_on_cooperative_id"
+      t.index [ "ledger_id", "as_of_date" ], name: "idx_running_balances_on_ledger_date", unique: true, where: "(account_id IS NULL)"
+      t.index [ "ledger_id" ], name: "index_running_balances_on_ledger_id"
     end
 
     create_table "accounting_cash_accounts", force: :cascade do |t|
@@ -293,9 +293,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "account_id", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["account_id"], name: "index_accounting_cash_accounts_on_account_id"
-      t.index ["cooperative_id"], name: "index_accounting_cash_accounts_on_cooperative_id"
-      t.index ["user_id", "account_id"], name: "index_accounting_cash_accounts_on_user_id_and_account_id", unique: true
+      t.index [ "account_id" ], name: "index_accounting_cash_accounts_on_account_id"
+      t.index [ "cooperative_id" ], name: "index_accounting_cash_accounts_on_cooperative_id"
+      t.index [ "user_id", "account_id" ], name: "index_accounting_cash_accounts_on_user_id_and_account_id", unique: true
     end
 
     create_table "equity_products", force: :cascade do |t|
@@ -317,9 +317,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "equity_ledger_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_equity_products_on_cooperative_id"
-      t.index ["equity_ledger_id"], name: "index_equity_products_on_equity_ledger_id"
-      t.index ["cooperative_id", "product_code"], name: "index_equity_products_on_cooperative_id_and_product_code", unique: true
+      t.index [ "cooperative_id" ], name: "index_equity_products_on_cooperative_id"
+      t.index [ "equity_ledger_id" ], name: "index_equity_products_on_equity_ledger_id"
+      t.index [ "cooperative_id", "product_code" ], name: "index_equity_products_on_cooperative_id_and_product_code", unique: true
     end
 
     create_table "equity_accounts", force: :cascade do |t|
@@ -337,13 +337,13 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.bigint "equity_account_id"
-      t.index ["cooperative_id", "account_number"], name: "index_equity_accounts_on_cooperative_id_and_account_number", unique: true
-      t.index ["cooperative_id"], name: "index_equity_accounts_on_cooperative_id"
-      t.index ["equity_account_id"], name: "index_equity_accounts_on_equity_account_id"
-      t.index ["member_id", "share_product_id"], name: "index_equity_accounts_on_member_id_and_share_product_id", unique: true
-      t.index ["member_id"], name: "index_equity_accounts_on_member_id"
-      t.index ["opened_by_id"], name: "index_equity_accounts_on_opened_by_id"
-      t.index ["share_product_id"], name: "index_equity_accounts_on_share_product_id"
+      t.index [ "cooperative_id", "account_number" ], name: "index_equity_accounts_on_cooperative_id_and_account_number", unique: true
+      t.index [ "cooperative_id" ], name: "index_equity_accounts_on_cooperative_id"
+      t.index [ "equity_account_id" ], name: "index_equity_accounts_on_equity_account_id"
+      t.index [ "member_id", "share_product_id" ], name: "index_equity_accounts_on_member_id_and_share_product_id", unique: true
+      t.index [ "member_id" ], name: "index_equity_accounts_on_member_id"
+      t.index [ "opened_by_id" ], name: "index_equity_accounts_on_opened_by_id"
+      t.index [ "share_product_id" ], name: "index_equity_accounts_on_share_product_id"
     end
 
     create_table "equity_transactions", force: :cascade do |t|
@@ -362,12 +362,12 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.text "notes"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cash_account_id"], name: "index_equity_transactions_on_cash_account_id"
-      t.index ["cooperative_id"], name: "index_equity_transactions_on_cooperative_id"
-      t.index ["entry_id"], name: "index_equity_transactions_on_entry_id"
-      t.index ["posted_by_id"], name: "index_equity_transactions_on_posted_by_id"
-      t.index ["reference_number"], name: "index_equity_transactions_on_reference_number", unique: true
-      t.index ["share_capital_account_id"], name: "index_equity_transactions_on_share_capital_account_id"
+      t.index [ "cash_account_id" ], name: "index_equity_transactions_on_cash_account_id"
+      t.index [ "cooperative_id" ], name: "index_equity_transactions_on_cooperative_id"
+      t.index [ "entry_id" ], name: "index_equity_transactions_on_entry_id"
+      t.index [ "posted_by_id" ], name: "index_equity_transactions_on_posted_by_id"
+      t.index [ "reference_number" ], name: "index_equity_transactions_on_reference_number", unique: true
+      t.index [ "share_capital_account_id" ], name: "index_equity_transactions_on_share_capital_account_id"
     end
 
     create_table "loan_products", force: :cascade do |t|
@@ -381,7 +381,7 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "status", default: "active", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_loan_products_on_cooperative_id"
+      t.index [ "cooperative_id" ], name: "index_loan_products_on_cooperative_id"
     end
 
     create_table "loan_applications", force: :cascade do |t|
@@ -402,11 +402,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "reference_number"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_loan_applications_on_cooperative_id"
-      t.index ["loan_product_id"], name: "index_loan_applications_on_loan_product_id"
-      t.index ["member_id"], name: "index_loan_applications_on_member_id"
-      t.index ["reference_number"], name: "index_loan_applications_on_reference_number", unique: true
-      t.index ["uuid"], name: "index_loan_applications_on_uuid", unique: true
+      t.index [ "cooperative_id" ], name: "index_loan_applications_on_cooperative_id"
+      t.index [ "loan_product_id" ], name: "index_loan_applications_on_loan_product_id"
+      t.index [ "member_id" ], name: "index_loan_applications_on_member_id"
+      t.index [ "reference_number" ], name: "index_loan_applications_on_reference_number", unique: true
+      t.index [ "uuid" ], name: "index_loan_applications_on_uuid", unique: true
     end
 
     create_table "loan_charges", force: :cascade do |t|
@@ -417,8 +417,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.decimal "value", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_loan_charges_on_cooperative_id"
-      t.index ["loan_product_id"], name: "index_loan_charges_on_loan_product_id"
+      t.index [ "cooperative_id" ], name: "index_loan_charges_on_cooperative_id"
+      t.index [ "loan_product_id" ], name: "index_loan_charges_on_loan_product_id"
     end
 
     create_table "loan_repayment_schedules", force: :cascade do |t|
@@ -432,9 +432,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "interest_currency", default: "PHP"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_loan_repayment_schedules_on_cooperative_id"
-      t.index ["loan_application_id", "sequence"], name: "idx_on_loan_application_id_sequence_2316d64776", unique: true
-      t.index ["loan_application_id"], name: "index_loan_repayment_schedules_on_loan_application_id"
+      t.index [ "cooperative_id" ], name: "index_loan_repayment_schedules_on_cooperative_id"
+      t.index [ "loan_application_id", "sequence" ], name: "idx_on_loan_application_id_sequence_2316d64776", unique: true
+      t.index [ "loan_application_id" ], name: "index_loan_repayment_schedules_on_loan_application_id"
     end
 
     create_table "loan_collaterals", force: :cascade do |t|
@@ -451,8 +451,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.jsonb "details", default: "{}"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_loan_collaterals_on_cooperative_id"
-      t.index ["loan_application_id"], name: "index_loan_collaterals_on_loan_application_id"
+      t.index [ "cooperative_id" ], name: "index_loan_collaterals_on_cooperative_id"
+      t.index [ "loan_application_id" ], name: "index_loan_collaterals_on_loan_application_id"
     end
 
     create_table "loan_co_makers", force: :cascade do |t|
@@ -461,10 +461,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "member_id", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_loan_co_makers_on_cooperative_id"
-      t.index ["loan_application_id", "member_id"], name: "index_loan_co_makers_on_loan_application_id_and_member_id", unique: true
-      t.index ["loan_application_id"], name: "index_loan_co_makers_on_loan_application_id"
-      t.index ["member_id"], name: "index_loan_co_makers_on_member_id"
+      t.index [ "cooperative_id" ], name: "index_loan_co_makers_on_cooperative_id"
+      t.index [ "loan_application_id", "member_id" ], name: "index_loan_co_makers_on_loan_application_id_and_member_id", unique: true
+      t.index [ "loan_application_id" ], name: "index_loan_co_makers_on_loan_application_id"
+      t.index [ "member_id" ], name: "index_loan_co_makers_on_member_id"
     end
 
     create_table "loans", force: :cascade do |t|
@@ -484,11 +484,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "reference_number"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_loans_on_cooperative_id"
-      t.index ["loan_application_id"], name: "index_loans_on_loan_application_id"
-      t.index ["loan_product_id"], name: "index_loans_on_loan_product_id"
-      t.index ["member_id"], name: "index_loans_on_member_id"
-      t.index ["reference_number"], name: "index_loans_on_reference_number", unique: true
+      t.index [ "cooperative_id" ], name: "index_loans_on_cooperative_id"
+      t.index [ "loan_application_id" ], name: "index_loans_on_loan_application_id"
+      t.index [ "loan_product_id" ], name: "index_loans_on_loan_product_id"
+      t.index [ "member_id" ], name: "index_loans_on_member_id"
+      t.index [ "reference_number" ], name: "index_loans_on_reference_number", unique: true
     end
 
     create_table "loan_payments", force: :cascade do |t|
@@ -507,10 +507,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "entry_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_loan_payments_on_cooperative_id"
-      t.index ["entry_id"], name: "index_loan_payments_on_entry_id"
-      t.index ["loan_id"], name: "index_loan_payments_on_loan_id"
-      t.index ["reference_number"], name: "index_loan_payments_on_reference_number", unique: true
+      t.index [ "cooperative_id" ], name: "index_loan_payments_on_cooperative_id"
+      t.index [ "entry_id" ], name: "index_loan_payments_on_entry_id"
+      t.index [ "loan_id" ], name: "index_loan_payments_on_loan_id"
+      t.index [ "reference_number" ], name: "index_loan_payments_on_reference_number", unique: true
     end
 
     create_table "management_branches", force: :cascade do |t|
@@ -529,8 +529,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.integer "children_count", default: 0
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id", "code"], name: "index_management_branches_on_cooperative_id_and_code", unique: true
-      t.index ["cooperative_id"], name: "index_management_branches_on_cooperative_id"
+      t.index [ "cooperative_id", "code" ], name: "index_management_branches_on_cooperative_id_and_code", unique: true
+      t.index [ "cooperative_id" ], name: "index_management_branches_on_cooperative_id"
     end
 
     create_table "management_roles", force: :cascade do |t|
@@ -541,8 +541,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.integer "rank", default: 0, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id", "code"], name: "index_management_roles_on_cooperative_id_and_code", unique: true
-      t.index ["cooperative_id"], name: "index_management_roles_on_cooperative_id"
+      t.index [ "cooperative_id", "code" ], name: "index_management_roles_on_cooperative_id_and_code", unique: true
+      t.index [ "cooperative_id" ], name: "index_management_roles_on_cooperative_id"
     end
 
     create_table "management_permissions", force: :cascade do |t|
@@ -552,8 +552,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.text "description"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id", "action", "subject"], name: "index_management_permissions_on_cooperative_id_action_subject", unique: true
-      t.index ["cooperative_id"], name: "index_management_permissions_on_cooperative_id"
+      t.index [ "cooperative_id", "action", "subject" ], name: "index_management_permissions_on_cooperative_id_action_subject", unique: true
+      t.index [ "cooperative_id" ], name: "index_management_permissions_on_cooperative_id"
     end
 
     create_table "management_departments", force: :cascade do |t|
@@ -564,9 +564,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.text "description"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["branch_id", "code"], name: "index_management_departments_on_branch_id_and_code", unique: true
-      t.index ["branch_id"], name: "index_management_departments_on_branch_id"
-      t.index ["cooperative_id"], name: "index_management_departments_on_cooperative_id"
+      t.index [ "branch_id", "code" ], name: "index_management_departments_on_branch_id_and_code", unique: true
+      t.index [ "branch_id" ], name: "index_management_departments_on_branch_id"
+      t.index [ "cooperative_id" ], name: "index_management_departments_on_cooperative_id"
     end
 
     create_table "management_approval_workflows", force: :cascade do |t|
@@ -577,7 +577,7 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "status", default: "active", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_management_approval_workflows_on_cooperative_id"
+      t.index [ "cooperative_id" ], name: "index_management_approval_workflows_on_cooperative_id"
     end
 
     create_table "management_approval_workflow_steps", force: :cascade do |t|
@@ -591,11 +591,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "condition"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["approval_workflow_id", "sequence"], name: "idx_on_approval_workflow_id_sequence_340a85b293", unique: true
-      t.index ["approval_workflow_id"], name: "idx_on_approval_workflow_id_a1ea19780b"
-      t.index ["approver_role_id"], name: "index_management_approval_workflow_steps_on_approver_role_id"
-      t.index ["approver_user_id"], name: "index_management_approval_workflow_steps_on_approver_user_id"
-      t.index ["cooperative_id"], name: "index_management_approval_workflow_steps_on_cooperative_id"
+      t.index [ "approval_workflow_id", "sequence" ], name: "idx_on_approval_workflow_id_sequence_340a85b293", unique: true
+      t.index [ "approval_workflow_id" ], name: "idx_on_approval_workflow_id_a1ea19780b"
+      t.index [ "approver_role_id" ], name: "index_management_approval_workflow_steps_on_approver_role_id"
+      t.index [ "approver_user_id" ], name: "index_management_approval_workflow_steps_on_approver_user_id"
+      t.index [ "cooperative_id" ], name: "index_management_approval_workflow_steps_on_cooperative_id"
     end
 
     create_table "management_approval_requests", force: :cascade do |t|
@@ -609,10 +609,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.text "reason"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_management_approval_requests_on_cooperative_id"
-      t.index ["requested_by_id"], name: "index_management_approval_requests_on_requested_by_id"
-      t.index ["status"], name: "index_management_approval_requests_on_status"
-      t.index ["workflow_id"], name: "index_management_approval_requests_on_workflow_id"
+      t.index [ "cooperative_id" ], name: "index_management_approval_requests_on_cooperative_id"
+      t.index [ "requested_by_id" ], name: "index_management_approval_requests_on_requested_by_id"
+      t.index [ "status" ], name: "index_management_approval_requests_on_status"
+      t.index [ "workflow_id" ], name: "index_management_approval_requests_on_workflow_id"
     end
 
     create_table "management_approvals", force: :cascade do |t|
@@ -625,10 +625,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "signed_at", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["approval_request_id"], name: "index_management_approvals_on_approval_request_id"
-      t.index ["approver_id"], name: "index_management_approvals_on_approver_id"
-      t.index ["cooperative_id"], name: "index_management_approvals_on_cooperative_id"
-      t.index ["step_id"], name: "index_management_approvals_on_step_id"
+      t.index [ "approval_request_id" ], name: "index_management_approvals_on_approval_request_id"
+      t.index [ "approver_id" ], name: "index_management_approvals_on_approver_id"
+      t.index [ "cooperative_id" ], name: "index_management_approvals_on_cooperative_id"
+      t.index [ "step_id" ], name: "index_management_approvals_on_step_id"
     end
 
     create_table "management_alerts", force: :cascade do |t|
@@ -645,10 +645,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "resolved_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["alert_type"], name: "index_management_alerts_on_alert_type"
-      t.index ["cooperative_id"], name: "index_management_alerts_on_cooperative_id"
-      t.index ["resolved_by_id"], name: "index_management_alerts_on_resolved_by_id"
-      t.index ["status"], name: "index_management_alerts_on_status"
+      t.index [ "alert_type" ], name: "index_management_alerts_on_alert_type"
+      t.index [ "cooperative_id" ], name: "index_management_alerts_on_cooperative_id"
+      t.index [ "resolved_by_id" ], name: "index_management_alerts_on_resolved_by_id"
+      t.index [ "status" ], name: "index_management_alerts_on_status"
     end
 
     create_table "management_alert_subscriptions", force: :cascade do |t|
@@ -659,9 +659,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.boolean "active", default: true, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_management_alert_subscriptions_on_cooperative_id"
-      t.index ["user_id", "alert_type", "channel"], name: "idx_on_user_id_alert_type_channel_8c88c19464", unique: true
-      t.index ["user_id"], name: "index_management_alert_subscriptions_on_user_id"
+      t.index [ "cooperative_id" ], name: "index_management_alert_subscriptions_on_cooperative_id"
+      t.index [ "user_id", "alert_type", "channel" ], name: "idx_on_user_id_alert_type_channel_8c88c19464", unique: true
+      t.index [ "user_id" ], name: "index_management_alert_subscriptions_on_user_id"
     end
 
     create_table "management_audit_logs", force: :cascade do |t|
@@ -679,10 +679,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.jsonb "approval_chain"
       t.string "config_version"
       t.datetime "created_at", null: false
-      t.index ["action"], name: "index_management_audit_logs_on_action"
-      t.index ["branch_id"], name: "index_management_audit_logs_on_branch_id"
-      t.index ["cooperative_id"], name: "index_management_audit_logs_on_cooperative_id"
-      t.index ["created_at"], name: "index_management_audit_logs_on_created_at"
+      t.index [ "action" ], name: "index_management_audit_logs_on_action"
+      t.index [ "branch_id" ], name: "index_management_audit_logs_on_branch_id"
+      t.index [ "cooperative_id" ], name: "index_management_audit_logs_on_cooperative_id"
+      t.index [ "created_at" ], name: "index_management_audit_logs_on_created_at"
     end
 
     create_table "management_branch_performance_snapshots", force: :cascade do |t|
@@ -692,9 +692,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.jsonb "metrics", default: {}, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["branch_id", "snapshot_date"], name: "idx_on_branch_id_snapshot_date_c28cd56a00", unique: true
-      t.index ["branch_id"], name: "index_management_branch_performance_snapshots_on_branch_id"
-      t.index ["cooperative_id"], name: "idx_on_cooperative_id_5cfce3d3e1"
+      t.index [ "branch_id", "snapshot_date" ], name: "idx_on_branch_id_snapshot_date_c28cd56a00", unique: true
+      t.index [ "branch_id" ], name: "index_management_branch_performance_snapshots_on_branch_id"
+      t.index [ "cooperative_id" ], name: "idx_on_cooperative_id_5cfce3d3e1"
     end
 
     create_table "management_configurations", force: :cascade do |t|
@@ -710,10 +710,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "approved_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["approved_by_id"], name: "index_management_configurations_on_approved_by_id"
-      t.index ["changed_by_id"], name: "index_management_configurations_on_changed_by_id"
-      t.index ["cooperative_id"], name: "index_management_configurations_on_cooperative_id"
-      t.index ["key", "configurable_type", "configurable_id"], name: "idx_on_key_configurable_type_configurable_id_f945d90a9e", unique: true
+      t.index [ "approved_by_id" ], name: "index_management_configurations_on_approved_by_id"
+      t.index [ "changed_by_id" ], name: "index_management_configurations_on_changed_by_id"
+      t.index [ "cooperative_id" ], name: "index_management_configurations_on_cooperative_id"
+      t.index [ "key", "configurable_type", "configurable_id" ], name: "idx_on_key_configurable_type_configurable_id_f945d90a9e", unique: true
     end
 
     create_table "management_configuration_versions", force: :cascade do |t|
@@ -725,10 +725,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.text "change_reason"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["changed_by_id"], name: "index_management_configuration_versions_on_changed_by_id"
-      t.index ["configuration_id", "version"], name: "idx_on_configuration_id_version_a1261d1f20", unique: true
-      t.index ["configuration_id"], name: "index_management_configuration_versions_on_configuration_id"
-      t.index ["cooperative_id"], name: "index_management_configuration_versions_on_cooperative_id"
+      t.index [ "changed_by_id" ], name: "index_management_configuration_versions_on_changed_by_id"
+      t.index [ "configuration_id", "version" ], name: "idx_on_configuration_id_version_a1261d1f20", unique: true
+      t.index [ "configuration_id" ], name: "index_management_configuration_versions_on_configuration_id"
+      t.index [ "cooperative_id" ], name: "index_management_configuration_versions_on_cooperative_id"
     end
 
     create_table "management_policies", force: :cascade do |t|
@@ -748,10 +748,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "approved_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["approved_by_id"], name: "index_management_policies_on_approved_by_id"
-      t.index ["cooperative_id", "code"], name: "index_management_policies_on_cooperative_id_and_code", unique: true
-      t.index ["cooperative_id"], name: "index_management_policies_on_cooperative_id"
-      t.index ["created_by_id"], name: "index_management_policies_on_created_by_id"
+      t.index [ "approved_by_id" ], name: "index_management_policies_on_approved_by_id"
+      t.index [ "cooperative_id", "code" ], name: "index_management_policies_on_cooperative_id_and_code", unique: true
+      t.index [ "cooperative_id" ], name: "index_management_policies_on_cooperative_id"
+      t.index [ "created_by_id" ], name: "index_management_policies_on_created_by_id"
     end
 
     create_table "management_policy_rules", force: :cascade do |t|
@@ -763,8 +763,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "effect", default: "deny", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_management_policy_rules_on_cooperative_id"
-      t.index ["policy_id"], name: "index_management_policy_rules_on_policy_id"
+      t.index [ "cooperative_id" ], name: "index_management_policy_rules_on_cooperative_id"
+      t.index [ "policy_id" ], name: "index_management_policy_rules_on_policy_id"
     end
 
     create_table "management_risk_indicators", force: :cascade do |t|
@@ -777,9 +777,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.date "as_of_date", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["branch_id", "indicator_type", "as_of_date"], name: "idx_on_branch_id_indicator_type_as_of_date_48924e88f2", unique: true
-      t.index ["branch_id"], name: "index_management_risk_indicators_on_branch_id"
-      t.index ["cooperative_id"], name: "index_management_risk_indicators_on_cooperative_id"
+      t.index [ "branch_id", "indicator_type", "as_of_date" ], name: "idx_on_branch_id_indicator_type_as_of_date_48924e88f2", unique: true
+      t.index [ "branch_id" ], name: "index_management_risk_indicators_on_branch_id"
+      t.index [ "cooperative_id" ], name: "index_management_risk_indicators_on_cooperative_id"
     end
 
     create_table "management_role_assignments", force: :cascade do |t|
@@ -792,11 +792,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.date "active_until"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["branch_id"], name: "index_management_role_assignments_on_branch_id"
-      t.index ["cooperative_id"], name: "index_management_role_assignments_on_cooperative_id"
-      t.index ["department_id"], name: "index_management_role_assignments_on_department_id"
-      t.index ["role_id"], name: "index_management_role_assignments_on_role_id"
-      t.index ["user_id"], name: "index_management_role_assignments_on_user_id"
+      t.index [ "branch_id" ], name: "index_management_role_assignments_on_branch_id"
+      t.index [ "cooperative_id" ], name: "index_management_role_assignments_on_cooperative_id"
+      t.index [ "department_id" ], name: "index_management_role_assignments_on_department_id"
+      t.index [ "role_id" ], name: "index_management_role_assignments_on_role_id"
+      t.index [ "user_id" ], name: "index_management_role_assignments_on_user_id"
     end
 
     create_table "management_role_permissions", force: :cascade do |t|
@@ -806,10 +806,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.jsonb "constraints", default: {}
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_management_role_permissions_on_cooperative_id"
-      t.index ["permission_id"], name: "index_management_role_permissions_on_permission_id"
-      t.index ["role_id", "permission_id"], name: "index_management_role_permissions_on_role_id_and_permission_id", unique: true
-      t.index ["role_id"], name: "index_management_role_permissions_on_role_id"
+      t.index [ "cooperative_id" ], name: "index_management_role_permissions_on_cooperative_id"
+      t.index [ "permission_id" ], name: "index_management_role_permissions_on_permission_id"
+      t.index [ "role_id", "permission_id" ], name: "index_management_role_permissions_on_role_id_and_permission_id", unique: true
+      t.index [ "role_id" ], name: "index_management_role_permissions_on_role_id"
     end
 
     create_table "management_system_health_snapshots", force: :cascade do |t|
@@ -821,8 +821,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "captured_at", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_management_system_health_snapshots_on_cooperative_id"
-      t.index ["metric_name", "captured_at"], name: "idx_on_metric_name_captured_at_597dc63458"
+      t.index [ "cooperative_id" ], name: "index_management_system_health_snapshots_on_cooperative_id"
+      t.index [ "metric_name", "captured_at" ], name: "idx_on_metric_name_captured_at_597dc63458"
     end
 
     create_table "management_teams", force: :cascade do |t|
@@ -832,8 +832,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.text "description"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_management_teams_on_cooperative_id"
-      t.index ["department_id"], name: "index_management_teams_on_department_id"
+      t.index [ "cooperative_id" ], name: "index_management_teams_on_cooperative_id"
+      t.index [ "department_id" ], name: "index_management_teams_on_department_id"
     end
 
     create_table "member_addresses", force: :cascade do |t|
@@ -847,8 +847,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "zip_code"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_member_addresses_on_cooperative_id"
-      t.index ["member_id"], name: "index_member_addresses_on_member_id"
+      t.index [ "cooperative_id" ], name: "index_member_addresses_on_cooperative_id"
+      t.index [ "member_id" ], name: "index_member_addresses_on_member_id"
     end
 
     create_table "member_identifications", force: :cascade do |t|
@@ -858,9 +858,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "id_number", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_member_identifications_on_cooperative_id"
-      t.index ["id_type", "id_number"], name: "index_member_identifications_on_id_type_and_id_number", unique: true
-      t.index ["member_id"], name: "index_member_identifications_on_member_id"
+      t.index [ "cooperative_id" ], name: "index_member_identifications_on_cooperative_id"
+      t.index [ "id_type", "id_number" ], name: "index_member_identifications_on_id_type_and_id_number", unique: true
+      t.index [ "member_id" ], name: "index_member_identifications_on_member_id"
     end
 
     create_table "messaging_channels", force: :cascade do |t|
@@ -869,8 +869,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.boolean "enabled", default: true, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_messaging_channels_on_cooperative_id"
-      t.index ["name"], name: "index_messaging_channels_on_name", unique: true
+      t.index [ "cooperative_id" ], name: "index_messaging_channels_on_cooperative_id"
+      t.index [ "name" ], name: "index_messaging_channels_on_name", unique: true
     end
 
     create_table "messaging_messages", force: :cascade do |t|
@@ -883,10 +883,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "scheduled_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_messaging_messages_on_cooperative_id"
-      t.index ["message_type"], name: "index_messaging_messages_on_message_type"
-      t.index ["recipient_type", "recipient_id"], name: "index_messaging_messages_on_recipient_type_and_recipient_id"
-      t.index ["status"], name: "index_messaging_messages_on_status"
+      t.index [ "cooperative_id" ], name: "index_messaging_messages_on_cooperative_id"
+      t.index [ "message_type" ], name: "index_messaging_messages_on_message_type"
+      t.index [ "recipient_type", "recipient_id" ], name: "index_messaging_messages_on_recipient_type_and_recipient_id"
+      t.index [ "status" ], name: "index_messaging_messages_on_status"
     end
 
     create_table "messaging_providers", force: :cascade do |t|
@@ -897,9 +897,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.boolean "enabled", default: true, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["channel_id", "name"], name: "index_messaging_providers_on_channel_id_and_name", unique: true
-      t.index ["channel_id"], name: "index_messaging_providers_on_channel_id"
-      t.index ["cooperative_id"], name: "index_messaging_providers_on_cooperative_id"
+      t.index [ "channel_id", "name" ], name: "index_messaging_providers_on_channel_id_and_name", unique: true
+      t.index [ "channel_id" ], name: "index_messaging_providers_on_channel_id"
+      t.index [ "cooperative_id" ], name: "index_messaging_providers_on_cooperative_id"
     end
 
     create_table "messaging_message_deliveries", force: :cascade do |t|
@@ -915,11 +915,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "delivered_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["channel_id"], name: "index_messaging_message_deliveries_on_channel_id"
-      t.index ["cooperative_id"], name: "index_messaging_message_deliveries_on_cooperative_id"
-      t.index ["message_id"], name: "index_messaging_message_deliveries_on_message_id"
-      t.index ["provider_id"], name: "index_messaging_message_deliveries_on_provider_id"
-      t.index ["status"], name: "index_messaging_message_deliveries_on_status"
+      t.index [ "channel_id" ], name: "index_messaging_message_deliveries_on_channel_id"
+      t.index [ "cooperative_id" ], name: "index_messaging_message_deliveries_on_cooperative_id"
+      t.index [ "message_id" ], name: "index_messaging_message_deliveries_on_message_id"
+      t.index [ "provider_id" ], name: "index_messaging_message_deliveries_on_provider_id"
+      t.index [ "status" ], name: "index_messaging_message_deliveries_on_status"
     end
 
     create_table "messaging_provider_webhooks", force: :cascade do |t|
@@ -930,9 +930,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "processed_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_messaging_provider_webhooks_on_cooperative_id"
-      t.index ["provider_id", "event_type"], name: "idx_on_provider_id_event_type_114a5f5c88", unique: true
-      t.index ["provider_id"], name: "index_messaging_provider_webhooks_on_provider_id"
+      t.index [ "cooperative_id" ], name: "index_messaging_provider_webhooks_on_cooperative_id"
+      t.index [ "provider_id", "event_type" ], name: "idx_on_provider_id_event_type_114a5f5c88", unique: true
+      t.index [ "provider_id" ], name: "index_messaging_provider_webhooks_on_provider_id"
     end
 
     create_table "portal_announcements", force: :cascade do |t|
@@ -944,10 +944,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "author_id", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["author_id"], name: "index_portal_announcements_on_author_id"
-      t.index ["cooperative_id"], name: "index_portal_announcements_on_cooperative_id"
-      t.index ["published_at"], name: "index_portal_announcements_on_published_at"
-      t.index ["status"], name: "index_portal_announcements_on_status"
+      t.index [ "author_id" ], name: "index_portal_announcements_on_author_id"
+      t.index [ "cooperative_id" ], name: "index_portal_announcements_on_cooperative_id"
+      t.index [ "published_at" ], name: "index_portal_announcements_on_published_at"
+      t.index [ "status" ], name: "index_portal_announcements_on_status"
     end
 
     create_table "portal_enrollment_tokens", force: :cascade do |t|
@@ -958,9 +958,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "used_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_portal_enrollment_tokens_on_cooperative_id"
-      t.index ["member_id"], name: "index_portal_enrollment_tokens_on_member_id"
-      t.index ["token"], name: "index_portal_enrollment_tokens_on_token", unique: true
+      t.index [ "cooperative_id" ], name: "index_portal_enrollment_tokens_on_cooperative_id"
+      t.index [ "member_id" ], name: "index_portal_enrollment_tokens_on_member_id"
+      t.index [ "token" ], name: "index_portal_enrollment_tokens_on_token", unique: true
     end
 
     create_table "portal_sessions", force: :cascade do |t|
@@ -973,11 +973,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "mfa_verified_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_portal_sessions_on_cooperative_id"
-      t.index ["last_activity_at"], name: "index_portal_sessions_on_last_activity_at"
-      t.index ["member_id", "revoked_at"], name: "index_portal_sessions_on_member_id_and_revoked_at"
-      t.index ["member_id"], name: "index_portal_sessions_on_member_id"
-      t.index ["revoked_at"], name: "index_portal_sessions_on_revoked_at"
+      t.index [ "cooperative_id" ], name: "index_portal_sessions_on_cooperative_id"
+      t.index [ "last_activity_at" ], name: "index_portal_sessions_on_last_activity_at"
+      t.index [ "member_id", "revoked_at" ], name: "index_portal_sessions_on_member_id_and_revoked_at"
+      t.index [ "member_id" ], name: "index_portal_sessions_on_member_id"
+      t.index [ "revoked_at" ], name: "index_portal_sessions_on_revoked_at"
     end
 
     create_table "saved_filters", force: :cascade do |t|
@@ -991,12 +991,12 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.boolean "is_default", default: false, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_saved_filters_on_cooperative_id"
-      t.index ["filter_type"], name: "index_saved_filters_on_filter_type"
-      t.index ["is_default"], name: "index_saved_filters_on_is_default"
-      t.index ["is_shared"], name: "index_saved_filters_on_is_shared"
-      t.index ["name"], name: "index_saved_filters_on_name"
-      t.index ["user_id"], name: "index_saved_filters_on_user_id"
+      t.index [ "cooperative_id" ], name: "index_saved_filters_on_cooperative_id"
+      t.index [ "filter_type" ], name: "index_saved_filters_on_filter_type"
+      t.index [ "is_default" ], name: "index_saved_filters_on_is_default"
+      t.index [ "is_shared" ], name: "index_saved_filters_on_is_shared"
+      t.index [ "name" ], name: "index_saved_filters_on_name"
+      t.index [ "user_id" ], name: "index_saved_filters_on_user_id"
     end
 
     create_table "treasury_cash_sessions", force: :cascade do |t|
@@ -1013,10 +1013,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.jsonb "counts", default: "[]"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cash_account_id"], name: "index_treasury_cash_sessions_on_cash_account_id"
-      t.index ["cooperative_id"], name: "index_treasury_cash_sessions_on_cooperative_id"
-      t.index ["user_id", "cash_account_id", "date"], name: "idx_on_user_id_cash_account_id_date_98598fc1bb", unique: true
-      t.index ["user_id"], name: "index_treasury_cash_sessions_on_user_id"
+      t.index [ "cash_account_id" ], name: "index_treasury_cash_sessions_on_cash_account_id"
+      t.index [ "cooperative_id" ], name: "index_treasury_cash_sessions_on_cooperative_id"
+      t.index [ "user_id", "cash_account_id", "date" ], name: "idx_on_user_id_cash_account_id_date_98598fc1bb", unique: true
+      t.index [ "user_id" ], name: "index_treasury_cash_sessions_on_user_id"
     end
 
     create_table "treasury_savings_products", force: :cascade do |t|
@@ -1028,9 +1028,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "interest_expense_ledger_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_treasury_savings_products_on_cooperative_id"
-      t.index ["interest_expense_ledger_id"], name: "index_treasury_savings_products_on_interest_expense_ledger_id"
-      t.index ["liability_ledger_id"], name: "index_treasury_savings_products_on_liability_ledger_id"
+      t.index [ "cooperative_id" ], name: "index_treasury_savings_products_on_cooperative_id"
+      t.index [ "interest_expense_ledger_id" ], name: "index_treasury_savings_products_on_interest_expense_ledger_id"
+      t.index [ "liability_ledger_id" ], name: "index_treasury_savings_products_on_liability_ledger_id"
     end
 
     create_table "treasury_savings_product_interest_rates", force: :cascade do |t|
@@ -1040,8 +1040,8 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.boolean "current", default: true, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "idx_on_cooperative_id_d0876bcbb5"
-      t.index ["savings_product_id"], name: "idx_on_savings_product_id_06a7ca0e75"
+      t.index [ "cooperative_id" ], name: "idx_on_cooperative_id_d0876bcbb5"
+      t.index [ "savings_product_id" ], name: "idx_on_savings_product_id_06a7ca0e75"
     end
 
     create_table "treasury_savings_accounts", force: :cascade do |t|
@@ -1058,12 +1058,12 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "interest_expense_account_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id", "account_number"], name: "idx_treasury_savings_accounts_on_coop_account_number", unique: true
-      t.index ["cooperative_id"], name: "index_treasury_savings_accounts_on_cooperative_id"
-      t.index ["depositor_type", "depositor_id"], name: "idx_on_depositor_type_depositor_id_b642e154d8"
-      t.index ["interest_expense_account_id"], name: "index_treasury_savings_accounts_on_interest_expense_account_id"
-      t.index ["liability_account_id"], name: "index_treasury_savings_accounts_on_liability_account_id"
-      t.index ["savings_product_id"], name: "index_treasury_savings_accounts_on_savings_product_id"
+      t.index [ "cooperative_id", "account_number" ], name: "idx_treasury_savings_accounts_on_coop_account_number", unique: true
+      t.index [ "cooperative_id" ], name: "index_treasury_savings_accounts_on_cooperative_id"
+      t.index [ "depositor_type", "depositor_id" ], name: "idx_on_depositor_type_depositor_id_b642e154d8"
+      t.index [ "interest_expense_account_id" ], name: "index_treasury_savings_accounts_on_interest_expense_account_id"
+      t.index [ "liability_account_id" ], name: "index_treasury_savings_accounts_on_liability_account_id"
+      t.index [ "savings_product_id" ], name: "index_treasury_savings_accounts_on_savings_product_id"
     end
 
     create_table "treasury_savings_transactions", force: :cascade do |t|
@@ -1080,11 +1080,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "posted_at", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cash_account_id"], name: "index_treasury_savings_transactions_on_cash_account_id"
-      t.index ["cooperative_id"], name: "index_treasury_savings_transactions_on_cooperative_id"
-      t.index ["entry_id"], name: "index_treasury_savings_transactions_on_entry_id"
-      t.index ["reference_number"], name: "index_treasury_savings_transactions_on_reference_number", unique: true
-      t.index ["savings_account_id"], name: "index_treasury_savings_transactions_on_savings_account_id"
+      t.index [ "cash_account_id" ], name: "index_treasury_savings_transactions_on_cash_account_id"
+      t.index [ "cooperative_id" ], name: "index_treasury_savings_transactions_on_cooperative_id"
+      t.index [ "entry_id" ], name: "index_treasury_savings_transactions_on_entry_id"
+      t.index [ "reference_number" ], name: "index_treasury_savings_transactions_on_reference_number", unique: true
+      t.index [ "savings_account_id" ], name: "index_treasury_savings_transactions_on_savings_account_id"
     end
 
     create_table "treasury_time_deposit_products", force: :cascade do |t|
@@ -1098,7 +1098,7 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.string "status", default: "active", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_treasury_time_deposit_products_on_cooperative_id"
+      t.index [ "cooperative_id" ], name: "index_treasury_time_deposit_products_on_cooperative_id"
     end
 
     create_table "treasury_time_deposits", force: :cascade do |t|
@@ -1117,9 +1117,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.datetime "closed_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_treasury_time_deposits_on_cooperative_id"
-      t.index ["depositor_type", "depositor_id"], name: "idx_on_depositor_type_depositor_id_95e40b9cf8"
-      t.index ["time_deposit_product_id"], name: "index_treasury_time_deposits_on_time_deposit_product_id"
+      t.index [ "cooperative_id" ], name: "index_treasury_time_deposits_on_cooperative_id"
+      t.index [ "depositor_type", "depositor_id" ], name: "idx_on_depositor_type_depositor_id_95e40b9cf8"
+      t.index [ "time_deposit_product_id" ], name: "index_treasury_time_deposits_on_time_deposit_product_id"
     end
 
     create_table "treasury_vault_transfers", force: :cascade do |t|
@@ -1134,10 +1134,10 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "voucher_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["approved_by_id"], name: "index_treasury_vault_transfers_on_approved_by_id"
-      t.index ["cash_session_id"], name: "index_treasury_vault_transfers_on_cash_session_id"
-      t.index ["cooperative_id"], name: "index_treasury_vault_transfers_on_cooperative_id"
-      t.index ["voucher_id"], name: "index_treasury_vault_transfers_on_voucher_id"
+      t.index [ "approved_by_id" ], name: "index_treasury_vault_transfers_on_approved_by_id"
+      t.index [ "cash_session_id" ], name: "index_treasury_vault_transfers_on_cash_session_id"
+      t.index [ "cooperative_id" ], name: "index_treasury_vault_transfers_on_cooperative_id"
+      t.index [ "voucher_id" ], name: "index_treasury_vault_transfers_on_voucher_id"
     end
 
     create_table "treasury_vouchers", force: :cascade do |t|
@@ -1159,15 +1159,15 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.integer "transactable_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cash_account_id"], name: "index_treasury_vouchers_on_cash_account_id"
-      t.index ["cash_session_id"], name: "index_treasury_vouchers_on_cash_session_id"
-      t.index ["cooperative_id"], name: "index_treasury_vouchers_on_cooperative_id"
-      t.index ["counterparty_type", "counterparty_id"], name: "idx_on_counterparty_type_counterparty_id_e5b6172d0a"
-      t.index ["entry_id"], name: "index_treasury_vouchers_on_entry_id"
-      t.index ["status"], name: "index_treasury_vouchers_on_status"
-      t.index ["transactable_type", "transactable_id"], name: "idx_on_transactable_type_transactable_id_bb0ab59b28"
-      t.index ["type"], name: "index_treasury_vouchers_on_type"
-      t.index ["voucher_number"], name: "index_treasury_vouchers_on_voucher_number", unique: true
+      t.index [ "cash_account_id" ], name: "index_treasury_vouchers_on_cash_account_id"
+      t.index [ "cash_session_id" ], name: "index_treasury_vouchers_on_cash_session_id"
+      t.index [ "cooperative_id" ], name: "index_treasury_vouchers_on_cooperative_id"
+      t.index [ "counterparty_type", "counterparty_id" ], name: "idx_on_counterparty_type_counterparty_id_e5b6172d0a"
+      t.index [ "entry_id" ], name: "index_treasury_vouchers_on_entry_id"
+      t.index [ "status" ], name: "index_treasury_vouchers_on_status"
+      t.index [ "transactable_type", "transactable_id" ], name: "idx_on_transactable_type_transactable_id_bb0ab59b28"
+      t.index [ "type" ], name: "index_treasury_vouchers_on_type"
+      t.index [ "voucher_number" ], name: "index_treasury_vouchers_on_voucher_number", unique: true
     end
 
     create_table "external_banks", force: :cascade do |t|
@@ -1181,13 +1181,13 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "cash_on_hand_account_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cash_on_hand_account_id"], name: "index_external_banks_on_cash_on_hand_account_id"
-      t.index ["cash_on_hand_ledger_id"], name: "index_external_banks_on_cash_on_hand_ledger_id"
-      t.index ["code"], name: "index_external_banks_on_code"
-      t.index ["cooperative_id"], name: "index_external_banks_on_cooperative_id"
-      t.index ["interest_income_ledger_id"], name: "index_external_banks_on_interest_income_ledger_id"
-      t.index ["name"], name: "index_external_banks_on_name"
-      t.index ["status"], name: "index_external_banks_on_status"
+      t.index [ "cash_on_hand_account_id" ], name: "index_external_banks_on_cash_on_hand_account_id"
+      t.index [ "cash_on_hand_ledger_id" ], name: "index_external_banks_on_cash_on_hand_ledger_id"
+      t.index [ "code" ], name: "index_external_banks_on_code"
+      t.index [ "cooperative_id" ], name: "index_external_banks_on_cooperative_id"
+      t.index [ "interest_income_ledger_id" ], name: "index_external_banks_on_interest_income_ledger_id"
+      t.index [ "name" ], name: "index_external_banks_on_name"
+      t.index [ "status" ], name: "index_external_banks_on_status"
     end
 
     create_table "external_bank_accounts", force: :cascade do |t|
@@ -1206,11 +1206,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "interest_income_account_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cash_on_hand_account_id"], name: "index_external_bank_accounts_on_cash_on_hand_account_id"
-      t.index ["cooperative_id"], name: "index_external_bank_accounts_on_cooperative_id"
-      t.index ["external_bank_id"], name: "index_external_bank_accounts_on_external_bank_id"
-      t.index ["interest_income_account_id"], name: "index_external_bank_accounts_on_interest_income_account_id"
-      t.index ["status"], name: "index_external_bank_accounts_on_status"
+      t.index [ "cash_on_hand_account_id" ], name: "index_external_bank_accounts_on_cash_on_hand_account_id"
+      t.index [ "cooperative_id" ], name: "index_external_bank_accounts_on_cooperative_id"
+      t.index [ "external_bank_id" ], name: "index_external_bank_accounts_on_external_bank_id"
+      t.index [ "interest_income_account_id" ], name: "index_external_bank_accounts_on_interest_income_account_id"
+      t.index [ "status" ], name: "index_external_bank_accounts_on_status"
     end
 
     create_table "external_bank_documents", force: :cascade do |t|
@@ -1224,9 +1224,9 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.text "error_message"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_external_bank_documents_on_cooperative_id"
-      t.index ["external_bank_account_id"], name: "index_external_bank_documents_on_external_bank_account_id"
-      t.index ["processing_status"], name: "index_external_bank_documents_on_processing_status"
+      t.index [ "cooperative_id" ], name: "index_external_bank_documents_on_cooperative_id"
+      t.index [ "external_bank_account_id" ], name: "index_external_bank_documents_on_external_bank_account_id"
+      t.index [ "processing_status" ], name: "index_external_bank_documents_on_processing_status"
     end
 
     create_table "external_bank_transactions", force: :cascade do |t|
@@ -1247,12 +1247,12 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.jsonb "metadata", default: "{}"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_external_bank_transactions_on_cooperative_id"
-      t.index ["external_bank_account_id", "transaction_date"], name: "idx_on_external_bank_account_id_transaction_date_213f021c2b"
-      t.index ["external_bank_account_id"], name: "index_external_bank_transactions_on_external_bank_account_id"
-      t.index ["external_bank_document_id"], name: "index_external_bank_transactions_on_external_bank_document_id"
-      t.index ["hash_signature"], name: "index_external_bank_transactions_on_hash_signature", unique: true
-      t.index ["transaction_date"], name: "index_external_bank_transactions_on_transaction_date"
+      t.index [ "cooperative_id" ], name: "index_external_bank_transactions_on_cooperative_id"
+      t.index [ "external_bank_account_id", "transaction_date" ], name: "idx_on_external_bank_account_id_transaction_date_213f021c2b"
+      t.index [ "external_bank_account_id" ], name: "index_external_bank_transactions_on_external_bank_account_id"
+      t.index [ "external_bank_document_id" ], name: "index_external_bank_transactions_on_external_bank_document_id"
+      t.index [ "hash_signature" ], name: "index_external_bank_transactions_on_hash_signature", unique: true
+      t.index [ "transaction_date" ], name: "index_external_bank_transactions_on_transaction_date"
     end
 
     create_table "external_bank_transaction_allocations", force: :cascade do |t|
@@ -1267,11 +1267,11 @@ class ConsolidateTables < ActiveRecord::Migration[8.0]
       t.bigint "created_by_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["cooperative_id"], name: "index_external_bank_transaction_allocations_on_cooperative_id"
-      t.index ["created_by_id"], name: "index_external_bank_transaction_allocations_on_created_by_id"
-      t.index ["external_bank_transaction_id"], name: "idx_on_external_bank_transaction_id_be9fd773f0"
-      t.index ["journal_entry_id"], name: "idx_on_journal_entry_id_313b3a4665"
-      t.index ["status"], name: "index_external_bank_transaction_allocations_on_status"
+      t.index [ "cooperative_id" ], name: "index_external_bank_transaction_allocations_on_cooperative_id"
+      t.index [ "created_by_id" ], name: "index_external_bank_transaction_allocations_on_created_by_id"
+      t.index [ "external_bank_transaction_id" ], name: "idx_on_external_bank_transaction_id_be9fd773f0"
+      t.index [ "journal_entry_id" ], name: "idx_on_journal_entry_id_313b3a4665"
+      t.index [ "status" ], name: "index_external_bank_transaction_allocations_on_status"
     end
 
     add_foreign_key "accounting_cash_accounts", "accounts"
