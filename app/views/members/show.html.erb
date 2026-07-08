@@ -1,1 +1,42 @@
-<% content_for :page_title, @member.name %> <% content_for :page_subtitle,"Member profile" %> <div class="animate-fade-in space-y-6"> <nav class="flex items-center gap-2 text-sm text-text-tertiary"> <%= link_to"Members", members_path, class:"hover:text-text-primary transition-colors" %> <span>/</span> <span class="text-text-primary font-medium"><%= @member.name %></span> </nav> <%= render"members/components/member_header", member: @member %> <%= render"members/components/summary_cards", summary: @summary %> <div data-controller="member-tabs" class="space-y-6"> <div class="flex gap-6 border-b border-border" role="tablist"> <% { overview:"Overview", savings:"Savings", time_deposits:"Time Deposits", loans:"Loans", share_capital:"Share Capital", settings:"Settings" }.each do |key, label| %> <%= link_to member_path(@member, tab: key), class:"pb-3 text-sm font-medium transition-colors border-b-2 #{params[:tab] == key.to_s || (key == :overview && params[:tab].blank?) ? 'border-primary text-primary' : 'border-transparent text-text-tertiary hover:text-text-secondary'}", data: {"member-tabs-target":"tab", tab: key, turbo_frame:"member-tab-content", turbo_action:"advance" } do %> <%= label %> <% end %> <% end %> </div> <%= turbo_frame_tag"member-tab-content" do %> <% case params[:tab] %> <% when "savings" %> <%= render"members/tabs/savings", savings_summary: @savings_summary %> <% when "time_deposits" %> <%= render"members/tabs/time_deposits" %> <% when "loans" %> <%= render"members/tabs/loans" %> <% when "share_capital" %> <%= render"members/tabs/share_capital" %> <% when "settings" %> <%= render"members/tabs/settings" %> <% else %> <%= render"members/tabs/overview", summary: @summary, recent_activity: @recent_activity %> <% end %> <% end %> </div> </div> 
+<% content_for :page_title, @member.name %>
+<% content_for :page_subtitle, "Member profile" %>
+
+<div class="animate-fade-in space-y-6">
+  <nav class="flex items-center gap-2 text-sm text-text-tertiary">
+    <%= link_to "Members", members_path, class: "hover:text-text-primary transition-colors" %>
+    <span>/</span>
+    <span class="text-text-primary font-medium"><%= @member.name %></span>
+  </nav>
+
+  <%= render "members/components/member_header", member: @member %>
+  <%= render "members/components/summary_cards", summary: @summary %>
+
+  <div data-controller="member-tabs" class="space-y-6">
+    <div class="flex gap-6 border-b border-border" role="tablist">
+      <% { overview: "Overview", savings: "Savings", time_deposits: "Time Deposits", loans: "Loans", share_capital: "Share Capital", settings: "Settings" }.each do |key, label| %>
+        <%= link_to member_path(@member, tab: key),
+              class: "pb-3 text-sm font-medium transition-colors border-b-2 #{params[:tab] == key.to_s || (key == :overview && params[:tab].blank?) ? 'border-primary text-primary' : 'border-transparent text-text-tertiary hover:text-text-secondary'}",
+              data: { "member-tabs-target": "tab", tab: key, turbo_frame: "member-tab-content", turbo_action: "advance" } do %>
+          <%= label %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= turbo_frame_tag "member-tab-content" do %>
+      <% case params[:tab] %>
+      <% when "savings" %>
+        <%= render "members/tabs/savings", savings_summary: @savings_summary %>
+      <% when "time_deposits" %>
+        <%= render "members/tabs/time_deposits" %>
+      <% when "loans" %>
+        <%= render "members/tabs/loans" %>
+      <% when "share_capital" %>
+        <%= render "members/tabs/share_capital" %>
+      <% when "settings" %>
+        <%= render "members/tabs/settings" %>
+      <% else %>
+        <%= render "members/tabs/overview", summary: @summary, recent_activity: @recent_activity %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
