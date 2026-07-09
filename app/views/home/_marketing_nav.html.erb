@@ -1,7 +1,9 @@
 <nav class="fixed top-0 left-0 right-0 z-50 landing-border border-b landing-nav-bg backdrop-blur-sm" data-controller="mobile-nav" data-action="keydown@window->mobile-nav#closeKeydown">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
     <div class="flex items-center gap-3">
-      <a href="/" class="text-lg font-semibold tracking-tight landing-text transition-opacity hover:opacity-80">Sirib</a>
+      <a href="/" class="flex items-center gap-2">
+          <%= render "shared/logo", size: "sm", class: "text-primary" %>
+        </a>
     </div>
     <%# Desktop nav %>
     <div class="hidden md:flex md:items-center md:gap-0">

@@ -1,0 +1,14 @@
+<%# Logo — typographic wordmark, widely tracked, compact, no bg %>
+<%
+  case local_assigns[:size]
+  when "xl"  then cls = "h-14 w-auto"
+  when "lg"  then cls = "h-12 w-auto"
+  when "md"  then cls = "h-10 w-auto"
+  when "sm"  then cls = "h-7 w-auto"
+  else            cls = "h-8 w-auto"
+  end
+  cls = [cls, local_assigns[:class]].compact.join(" ")
+%>
+<svg class="<%= cls %>" viewBox="0 0 400 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SIRIB">
+  <text x="200" y="76" text-anchor="middle" fill="currentColor" font-family="Inter,Helvetica Neue,sans-serif" font-weight="800" font-size="68" letter-spacing="5">SIRIB</text>
+</svg>

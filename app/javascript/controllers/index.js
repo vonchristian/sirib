@@ -44,3 +44,9 @@ application.register("member-autocomplete", MemberAutocompleteController)
 import RestructureFormController from "controllers/restructure_form_controller"
 application.register("restructure-form", RestructureFormController)
 
+import PasswordVisibilityController from "controllers/password_visibility_controller"
+application.register("password-visibility", PasswordVisibilityController)
+
+import DismissController from "controllers/dismiss_controller"
+application.register("dismiss", DismissController)
+
