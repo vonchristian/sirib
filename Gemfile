@@ -89,4 +89,4 @@ gem "grover", ">= 1.1"
 
 # Security gems
 gem "rack-attack"
-gem "lograge", "~> 0.14"
+gem "lograge", "~> 0.15"
