@@ -9,6 +9,6 @@ Rails.application.config.after_initialize do
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.set_callback(:checkout, :after) do |conn|
     conn.execute("SET lock_timeout = '5s'")
   end
-rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad
+rescue ActiveRecord::NoDatabaseError, ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
   # Swallow errors during asset precompile / rake tasks where DB may not exist
 end
