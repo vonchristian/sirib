@@ -92,7 +92,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
   Membership::Member.where(cooperative: coop).find_each.with_index do |member, member_idx|
     next if member.password_digest.present?
 
-    member.update!(
+    member.reload.update!(
       member_identifier: "MBR-#{coop.name.parameterize.upcase}-#{format('%04d', member_idx + 1)}",
       password: "password123",
       portal_status: "active"
