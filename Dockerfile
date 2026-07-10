@@ -41,7 +41,7 @@ RUN bundle install && \
 
 # Install Node.js dependencies
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN PUPPETEER_SKIP_DOWNLOAD=true npm ci
 
 # Copy application code
 COPY . .
