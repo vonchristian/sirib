@@ -84,6 +84,8 @@ production:
     database: sirib_production
     username: sirib
     password: <%= ENV["SIRIB_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("SIRIB_DATABASE_HOST") { "sirib-db" } %>
+    port: <%= ENV.fetch("SIRIB_DATABASE_PORT") { 5432 } %>
   cache:
     <<: *primary_production
     database: sirib_production_cache
