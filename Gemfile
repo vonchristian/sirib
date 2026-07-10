@@ -26,7 +26,7 @@ gem "ancestry"
 gem "pg_search"
 gem "rotp"
 gem "rqrcode"
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.6"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
