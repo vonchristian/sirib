@@ -26,6 +26,12 @@ module Lending
       loan_link_created
       payoff_computed
       ledger_entry_posted
+      loan_disbursed
+      loan_payment_received
+      loan_restructured
+      loan_approved
+      loan_closed
+      loan_written_off
     ].freeze
 
     validates :event_type, inclusion: { in: EVENT_TYPES }

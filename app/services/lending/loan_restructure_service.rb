@@ -26,17 +26,13 @@ module Lending
 
         restructure_case = create_restructure_case
 
-        Lending::LoanEvent.create!(
-          cooperative: @loan.cooperative,
-          loan: @loan,
+        RestructureRequested.new(
+          aggregate: @loan,
           actor: @requested_by || User.first,
-          event_type: "restructure_requested",
-          metadata: {
-            restructure_type: @type,
-            restructure_case_id: restructure_case.id,
-            proposed_changes: @proposed_changes
-          }
-        )
+          restructure_type: @type,
+          restructure_case_id: restructure_case.id,
+          proposed_changes: @proposed_changes
+        ).tap(&:validate!).save!
 
         restructure_case
       end

@@ -26,7 +26,8 @@ module Sirib
 
     config.autoload_paths << Rails.root.join("app/middleware")
     config.autoload_paths << Rails.root.join("app/constraints")
+    config.autoload_paths << Rails.root.join("app/events")
 
-    config.middleware.use Rack::Attack
+    # Middleware added via initializer (CorrelationId) to ensure autoloader is ready
   end
 end
