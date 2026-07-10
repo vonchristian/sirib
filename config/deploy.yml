@@ -7,16 +7,16 @@ servers:
     hosts:
       - 146.190.83.79
     options:
-      memory: 192m
+      memory: 512m
     env:
       clear:
-        RAILS_MAX_THREADS: 2
+        RAILS_MAX_THREADS: 5
   job:
     hosts:
       - 146.190.83.79
     cmd: bin/jobs
     options:
-      memory: 192m
+      memory: 512m
     env:
       clear:
         RAILS_MAX_THREADS: 5
@@ -36,12 +36,7 @@ env:
   clear:
     WEB_CONCURRENCY: 0
     JOB_CONCURRENCY: 1
-    RUBY_GC_HEAP_INIT_SLOTS: 10000
-    RUBY_GC_HEAP_FREE_SLOTS: 2048
-    RUBY_GC_HEAP_GROWTH_FACTOR: 1.02
-    RUBY_GC_HEAP_OLDOBJECT_LIMIT_FACTOR: 2
-    RUBY_GC_MALLOC_LIMIT: 50000000
-    RUBY_GC_MALLOC_LIMIT_MAX: 100000000
+    RUBY_YJIT_ENABLE: 1
     MALLOC_ARENA_MAX: 2
 
 aliases:
@@ -70,7 +65,7 @@ accessories:
       secret:
         - POSTGRES_PASSWORD
     options:
-      memory: 128m
+      memory: 512m
     files:
       - config/postgresql.production.conf:/etc/postgresql/postgresql.conf
     cmd: "postgres -c config_file=/etc/postgresql/postgresql.conf"
