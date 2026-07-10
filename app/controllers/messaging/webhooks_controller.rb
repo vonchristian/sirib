@@ -1,7 +1,7 @@
 module Messaging
   class WebhooksController < ApplicationController
     skip_before_action :require_authentication
-    skip_before_action :require_permission!
+    skip_before_action :require_permission!, raise: false
 
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
