@@ -88,5 +88,7 @@ Rails.application.configure do
   config.hosts << /\A\d+\.\d+\.\d+\.\d+\z/
 
   # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # Also allow Docker container hostnames (hex strings from kamal-proxy health checks)
+  config.hosts << /\A[a-f0-9]{12}:80\z/
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
