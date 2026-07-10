@@ -12,6 +12,7 @@ module Management
       @member_count = Membership::Member.count
       @recent_alerts = Management::Alert.active.by_severity.limit(5)
       @pending_approvals = Management::ApprovalRequest.pending.includes(:workflow, :requested_by).limit(5)
+      @recent_reconciliation_results = Reconciliation::Result.recent.limit(5)
 
       user_branch = find_user_branch
       if user_branch

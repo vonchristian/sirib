@@ -40,7 +40,17 @@ module AutoAudit
       changes: { before: before_state, after: after_state }
     )
   rescue => e
-    Rails.logger.warn "Audit failed for #{self.class} ##{id}: #{e.message}"
+    Rails.logger.error(
+      event: "audit_failure",
+      resource_type: self.class.name,
+      resource_id: id,
+      action: action,
+      error: e.class.name,
+      error_message: e.message,
+      backtrace: e.backtrace&.first(5),
+      request_id: Current.request_id
+    )
+    raise
   end
 
   def to_audit_hash

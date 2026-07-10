@@ -83,7 +83,7 @@ module Accounting
     end
 
     def drop_old_table
-      execute_sql("DROP TABLE IF EXISTS running_balances_old")
+      execute_sql("DROP TABLE IF EXISTS running_balances_old CASCADE")
     end
 
     def execute_sql(sql)

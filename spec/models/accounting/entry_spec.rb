@@ -1,13 +1,13 @@
 require "rails_helper"
 
 RSpec.describe Accounting::Entry do
-  subject(:entry) { build(:accounting_entry) }
+  subject(:entry) { build(:accounting_entry, cooperative_id: Current.cooperative.id) }
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:reference_number) }
     it { is_expected.to validate_presence_of(:description) }
     it { is_expected.to validate_presence_of(:posted_at) }
-    it { is_expected.to validate_uniqueness_of(:reference_number) }
+    it { is_expected.to validate_uniqueness_of(:reference_number).scoped_to(:cooperative_id) }
   end
 
   describe "associations" do
@@ -17,21 +17,21 @@ RSpec.describe Accounting::Entry do
 
   describe "custom validations" do
     it "requires at least one debit amount line" do
-      entry = build(:accounting_entry)
+      entry = build(:accounting_entry, create_lines: false)
       entry.amount_lines.build(account: build(:accounting_account), amount_cents: 100, amount_type: :credit)
       entry.valid?
       expect(entry.errors[:base]).to include("must have at least one debit amount")
     end
 
     it "requires at least one credit amount line" do
-      entry = build(:accounting_entry)
+      entry = build(:accounting_entry, create_lines: false)
       entry.amount_lines.build(account: build(:accounting_account), amount_cents: 100, amount_type: :debit)
       entry.valid?
       expect(entry.errors[:base]).to include("must have at least one credit amount")
     end
 
     it "validates debits equal credits" do
-      entry = build(:accounting_entry)
+      entry = build(:accounting_entry, create_lines: false)
       entry.amount_lines.build(account: build(:accounting_account), amount_cents: 100, amount_type: :debit)
       entry.amount_lines.build(account: build(:accounting_account), amount_cents: 50, amount_type: :credit)
       entry.valid?
@@ -98,4 +98,6 @@ RSpec.describe Accounting::Entry do
       expect(build(:accounting_entry)).to be_valid
     end
   end
+
+
 end

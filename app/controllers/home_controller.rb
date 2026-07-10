@@ -12,4 +12,10 @@ class HomeController < ApplicationController
   def landing
     redirect_to dashboard_path if authenticated?
   end
+
+  def tellers
+  end
+
+  def loan_officers
+  end
 end

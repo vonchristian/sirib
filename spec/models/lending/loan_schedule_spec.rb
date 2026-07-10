@@ -54,4 +54,11 @@ RSpec.describe Lending::LoanSchedule do
       expect(build(:lending_loan_schedule)).to be_valid
     end
   end
+
+  describe "optimistic locking" do
+    it_behaves_like "an optimistically locked model" do
+      let(:factory) { :lending_loan_schedule }
+      let(:update_attrs) { { status: "superseded" } }
+    end
+  end
 end

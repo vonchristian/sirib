@@ -15,13 +15,29 @@ module Accounting
       @comparison = params[:comparison].presence_in(%w[none prior_period prior_quarter prior_year]) || "none"
       @compare_date = compute_compare_date
 
-      @amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @as_of_date, cooperative: Current.cooperative).load_amounts
+      if use_materialized_view?
+        @amounts = load_from_materialized_view
+      else
+        @amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @as_of_date, cooperative: Current.cooperative).load_amounts
+      end
       @compare_amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @compare_date, cooperative: Current.cooperative).load_amounts if @compare_date
 
       @report = build_report
     end
 
     private
+
+    def use_materialized_view?
+      @as_of_date == Date.current && Reporting::BalanceSheet.by_cooperative(Current.cooperative).any?
+    end
+
+    def load_from_materialized_view
+      amounts = {}
+      Reporting::BalanceSheet.by_cooperative(Current.cooperative).with_balance.find_each do |row|
+        amounts[row.account_id] = row.balance_cents
+      end
+      amounts
+    end
 
     def parse_date(str)
       Date.parse(str)
@@ -66,7 +82,11 @@ module Accounting
 
     def build_account_rows(accounts)
       accounts.order(:account_code).map do |account|
-        balance = Accounting::AccountBalance.balance(account, @amounts)
+        balance = if use_materialized_view?
+                    Money.new(@amounts[account.id] || 0, "PHP")
+        else
+                    Accounting::AccountBalance.balance(account, @amounts)
+        end
         balance_cmp = @compare_date ? Accounting::AccountBalance.balance(account, @compare_amounts) : nil
 
         { account: account, balance: balance, balance_compare: balance_cmp }

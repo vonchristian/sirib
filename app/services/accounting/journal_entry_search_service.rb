@@ -20,7 +20,7 @@ module Accounting
         base.search(query)
       end
 
-      scope.order(posted_at: :desc)
+      scope.reorder(posted_at: :desc)
     end
 
     private

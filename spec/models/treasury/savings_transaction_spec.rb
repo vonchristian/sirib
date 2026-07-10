@@ -38,4 +38,5 @@ RSpec.describe Treasury::SavingsTransaction do
       expect(txn.reference_number).to match(/\ASW-\d{8}-[A-F0-9]{6}\z/)
     end
   end
+
 end

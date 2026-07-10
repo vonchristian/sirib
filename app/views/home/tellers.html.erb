@@ -1,115 +1,245 @@
 <%= render "marketing_nav" %>
-<section class="relative overflow-hidden landing-border border-b pt-32 pb-24">
-  <div class="landing-grid-bg pointer-events-none absolute inset-0"></div>
-  <div class="relative mx-auto max-w-4xl px-6">
-    <p class="landing-label mb-4">For Tellers</p>
-    <h1 class="landing-hero-title text-4xl font-light tracking-[-0.03em] landing-text sm:text-5xl">
-      Process a transaction once.<br>
-      <span class="landing-accent">Let the system handle the rest.</span>
-    </h1>
-    <p class="mt-4 max-w-2xl text-base leading-relaxed landing-muted">
-      Every transaction your tellers process today — deposit, withdrawal, payment — gets entered 
-      multiple times across different systems. Sirib records it once and updates everything: the 
-      member's passbook, the cash position, the day's totals, and the general ledger.
+
+<%# Hero — teller-focused, green drench with gradient blobs %>
+<section class="relative overflow-hidden landing-hero-drench pt-24 pb-20" data-controller="reveal">
+  <div class="landing-hero-pattern"></div>
+  <div class="landing-blob landing-blob-1"></div>
+  <div class="landing-blob landing-blob-2"></div>
+  <div class="relative z-10 mx-auto max-w-7xl px-6 pt-16">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+      <div>
+        <p class="text-xs font-medium tracking-widest text-[#b8d4b5] uppercase mb-4" style="font-family: var(--font-mono);">For Tellers</p>
+        <h1 class="landing-hero-title text-balance text-5xl leading-none sm:text-6xl lg:text-7xl">
+          Process once.<br>
+          <span class="landing-hero-accent">The system handles the rest.</span>
+        </h1>
+        <p class="landing-hero-body mt-6 max-w-xl text-balance text-lg leading-relaxed">
+          Every deposit, withdrawal, and payment is entered once. Cash position, member balance,
+          passbook, journal entry, and daily totals — all update simultaneously. Your tellers
+          do their actual job instead of re-entering data.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-4">
+          <a href="#demo" class="landing-hero-cta landing-hero-cta-primary">See It in Action</a>
+          <a href="/session/new" class="landing-hero-cta landing-hero-cta-outline">Try a Demo</a>
+        </div>
+      </div>
+      <div class="hidden lg:block">
+        <div class="landing-browser-frame">
+          <div class="landing-browser-toolbar">
+            <span class="landing-browser-dot" style="background:#ff5f57"></span>
+            <span class="landing-browser-dot" style="background:#ffbd2e"></span>
+            <span class="landing-browser-dot" style="background:#28c840"></span>
+          </div>
+          <img src="<%= image_path('screenshots/cash_sessions.svg') %>" alt="Teller cash session screen in Sirib">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# Stats Strip — teller-specific metrics %>
+<section class="bg-[#f0f7ef] border-b border-[#e7e5e4] py-12" data-controller="reveal">
+  <div class="mx-auto max-w-7xl px-6">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
+      <div class="text-center">
+        <p class="landing-stats-value">500+</p>
+        <p class="landing-stats-label">transactions per teller per day</p>
+      </div>
+      <div class="text-center">
+        <p class="landing-stats-value">30 min</p>
+        <p class="landing-stats-label">saved per teller each day</p>
+      </div>
+      <div class="text-center">
+        <p class="landing-stats-value">90%</p>
+        <p class="landing-stats-label">reduction in reconciliation time</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# Transaction Flow — horizontal 4-step visual %>
+<section class="border-b border-[#e7e5e4] py-24 bg-white relative overflow-hidden" data-controller="reveal">
+  <div class="landing-blob landing-blob-3" style="top: -5rem; right: 15%; opacity: 0.6;"></div>
+  <div class="mx-auto max-w-7xl px-6 relative z-10">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <p class="text-xs font-medium tracking-widest text-[#5b8c5a] uppercase mb-3" style="font-family: var(--font-mono);">The Flow</p>
+      <h2 class="text-balance text-3xl font-normal tracking-[-0.03em] text-[#1c1917] sm:text-4xl">
+        What a teller's transaction looks like in Sirib
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-4" data-reveal-item>
+      <div class="text-center relative">
+        <div class="mx-auto w-14 h-14 rounded-full bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <p class="text-xs font-medium text-[#3d6b3c] mb-2" style="font-family: var(--font-mono); letter-spacing: 0.1em;">STEP 1</p>
+        <h3 class="text-base font-medium text-[#1c1917] mb-2">Member walks in</h3>
+        <p class="text-sm leading-relaxed text-[#6e6358]">Teller looks up member by name, account number, or ID. All information — savings, loans, share capital — on one screen.</p>
+      </div>
+      <div class="text-center relative">
+        <div class="mx-auto w-14 h-14 rounded-full bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/><path d="M9 12h6M9 12a2 2 0 1 0 0 4h6a2 2 0 1 0 0-4M9 12v4"/></svg>
+        </div>
+        <p class="text-xs font-medium text-[#3d6b3c] mb-2" style="font-family: var(--font-mono); letter-spacing: 0.1em;">STEP 2</p>
+        <h3 class="text-base font-medium text-[#1c1917] mb-2">Transaction entered</h3>
+        <p class="text-sm leading-relaxed text-[#6e6358]">Deposit, withdrawal, or payment. Sirib validates against account limits, cash position, and member standing before proceeding.</p>
+      </div>
+      <div class="text-center relative">
+        <div class="mx-auto w-14 h-14 rounded-full bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        </div>
+        <p class="text-xs font-medium text-[#3d6b3c] mb-2" style="font-family: var(--font-mono); letter-spacing: 0.1em;">STEP 3</p>
+        <h3 class="text-base font-medium text-[#1c1917] mb-2">Passbook prints</h3>
+        <p class="text-sm leading-relaxed text-[#6e6358]">Updated balance prints automatically. No handwriting, no errors. Each line is clear and matches exactly what's in the system.</p>
+      </div>
+      <div class="text-center relative">
+        <div class="mx-auto w-14 h-14 rounded-full bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/></svg>
+        </div>
+        <p class="text-xs font-medium text-[#3d6b3c] mb-2" style="font-family: var(--font-mono); letter-spacing: 0.1em;">STEP 4</p>
+        <h3 class="text-base font-medium text-[#1c1917] mb-2">Everything updates</h3>
+        <p class="text-sm leading-relaxed text-[#6e6358]">Cash position, daily totals, and journal entry — all as part of the same action. No separate entries, no end-of-day catch-up.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# What Gets Automated — 4-card grid %>
+<section class="border-b border-[#e7e5e4] py-24 bg-[#faf9f7]" data-controller="reveal">
+  <div class="mx-auto max-w-7xl px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <p class="text-xs font-medium tracking-widest text-[#5b8c5a] uppercase mb-3" style="font-family: var(--font-mono);">What Gets Automated</p>
+      <h2 class="text-balance text-3xl font-normal tracking-[-0.03em] text-[#1c1917] sm:text-4xl">
+        The tasks Sirib handles so your tellers don't have to
+      </h2>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal-item>
+      <div class="bg-white rounded-xl border border-[#e7e5e4] p-6 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-lg bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        </div>
+        <h3 class="text-sm font-medium text-[#1c1917]">Passbook printing</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#6e6358]">No more handwriting entries. Each transaction prints clearly — type, amount, running balance — the moment it's recorded.</p>
+      </div>
+      <div class="bg-white rounded-xl border border-[#e7e5e4] p-6 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-lg bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M6 12h12"/></svg>
+        </div>
+        <h3 class="text-sm font-medium text-[#1c1917]">Cash position tracking</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#6e6358]">Every deposit and withdrawal updates counts in real time. Teller knows their position without counting. Manager sees totals across all tellers and the vault.</p>
+      </div>
+      <div class="bg-white rounded-xl border border-[#e7e5e4] p-6 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-lg bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h3 class="text-sm font-medium text-[#1c1917]">End-of-day reconciliation</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#6e6358]">One click instead of 30 minutes of counting. The system compares expected vs actual cash and flags discrepancies immediately.</p>
+      </div>
+      <div class="bg-white rounded-xl border border-[#e7e5e4] p-6 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-lg bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01"/></svg>
+        </div>
+        <h3 class="text-sm font-medium text-[#1c1917]">Vault transfers</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#6e6358]">Moving cash between tellers or to vault is recorded instantly. No paper slips. Audit trail shows every movement and who approved it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# Manual Tasks Offloaded — clean bullet list %>
+<section class="border-b border-[#e7e5e4] py-24 bg-white" data-controller="reveal">
+  <div class="mx-auto max-w-4xl px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <p class="text-xs font-medium tracking-widest text-[#5b8c5a] uppercase mb-3" style="font-family: var(--font-mono);">Manual Tasks Offloaded</p>
+      <h2 class="text-balance text-3xl font-normal tracking-[-0.03em] text-[#1c1917] sm:text-4xl">
+        What your tellers won't have to do anymore
+      </h2>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2" data-reveal-item>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Writing passbook entries by hand — each line is printed automatically</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Counting cash multiple times a day — the system tracks it in real time</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Reconciling at end of day manually — one click compares expected vs actual</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Logging transactions in separate books — one entry updates everything</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Preparing reports for the manager — the dashboard shows real-time numbers</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Transferring cash with paper slips — everything is recorded digitally</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# Testimonial with metric %>
+<section class="border-b border-[#e7e5e4] py-24 bg-[#f0f7ef] relative overflow-hidden" data-controller="reveal">
+  <div class="landing-blob landing-blob-4" style="bottom: -8rem; left: 10%; opacity: 0.5;"></div>
+  <div class="mx-auto max-w-4xl px-6 relative z-10">
+    <div class="text-center" data-reveal-item>
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#b8d4b5] mb-8">
+        <span class="landing-metric">45 min → 90 sec</span>
+      </div>
+      <blockquote class="text-2xl font-normal tracking-[-0.02em] text-[#1c1917] leading-relaxed">
+        "Our tellers had been handwriting passbooks for decades. They were the most skeptical when we started. By day two, they were showing me how end-of-day reconciliation used to take 45 minutes — now it's done in 90 seconds before the last member leaves."
+      </blockquote>
+      <div class="mt-8">
+        <p class="text-sm font-medium text-[#1c1917]">General Manager</p>
+        <p class="text-xs text-[#6e6358]">Luzon Cooperative</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# CTA %>
+<section id="demo" class="landing-cta-band border-b border-[#e7e5e4] relative overflow-hidden" data-controller="reveal">
+  <div class="landing-blob landing-blob-1" style="opacity: 0.15;"></div>
+  <div class="landing-blob landing-blob-2" style="opacity: 0.15;"></div>
+  <div class="relative z-10 mx-auto max-w-3xl px-6 py-24 text-center">
+    <h2 class="landing-cta-title text-balance text-3xl font-normal tracking-[-0.03em] sm:text-4xl" data-reveal-item>
+      Your tellers already know how to do their jobs.<br>
+      Sirib removes the parts they shouldn't have to do twice.
+    </h2>
+    <div class="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row" data-reveal-item>
+      <a href="/tellers" class="landing-cta-primary">Watch the Teller Walkthrough</a>
+      <a href="/session/new" class="landing-cta-outline">Get Started</a>
+    </div>
+    <p class="landing-cta-subtle mt-6 text-xs" data-reveal-item>
+      Already with Sirib? <a href="<%= new_session_path %>" class="underline transition-opacity hover:opacity-80">Sign in</a>
     </p>
   </div>
 </section>
-<section class="landing-border border-b landing-bg-alt">
-  <div class="mx-auto max-w-4xl px-6 py-24">
-    <p class="landing-label mb-2">The Flow</p>
-    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">What a teller's transaction looks like</h2>
-    <div class="mt-10 space-y-4">
-      <div class="landing-card border p-6 flex items-start gap-5">
-        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">1</span>
-        <div>
-          <p class="text-sm font-medium landing-text">Member walks in</p>
-          <p class="mt-1 text-sm leading-relaxed landing-muted">Teller looks up the member by name, account number, or ID. All member information — savings, loans, share capital — is on one screen.</p>
-        </div>
-      </div>
-      <div class="landing-card border p-6 flex items-start gap-5">
-        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">2</span>
-        <div>
-          <p class="text-sm font-medium landing-text">Transaction is selected and entered</p>
-          <p class="mt-1 text-sm leading-relaxed landing-muted">Deposit, withdrawal, payment — the teller chooses the type and enters the amount. Sirib validates against account limits, cash position, and member standing before proceeding.</p>
-        </div>
-      </div>
-      <div class="landing-card border p-6 flex items-start gap-5">
-        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">3</span>
-        <div>
-          <p class="text-sm font-medium landing-text">Passbook prints automatically</p>
-          <p class="mt-1 text-sm leading-relaxed landing-muted">The updated balance prints on the passbook. No handwriting, no transcription errors. Each line is clear and matches exactly what's in the system.</p>
-        </div>
-      </div>
-      <div class="landing-card border p-6 flex items-start gap-5">
-        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">4</span>
-        <div>
-          <p class="text-sm font-medium landing-text">Cash position and totals update in real time</p>
-          <p class="mt-1 text-sm leading-relaxed landing-muted">The teller's cash position adjusts. The day's total for that transaction type increments. The general ledger receives the journal entry. All of this happens as part of the same action — no separate data entry, no end-of-day catch-up.</p>
-        </div>
-      </div>
+
+<%# Footer %>
+<footer class="landing-footer" data-controller="reveal">
+  <div class="mx-auto max-w-7xl px-6 py-12">
+    <div class="flex flex-col items-center justify-between gap-6 sm:flex-row">
+      <a href="/" class="text-sm font-medium text-white/60 hover:text-white transition-colors">← Back to Sirib</a>
+      <p class="text-xs text-white/40">Built for Philippine cooperatives. · Sirib</p>
     </div>
-  </div>
-</section>
-<section class="landing-border border-b">
-  <div class="mx-auto max-w-7xl px-6 py-16">
-    <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
-      <img src="<%= image_path('screenshots/cash_sessions.png') %>" alt="Teller cash session screen in Sirib" class="w-full">
-    </div>
-  </div>
-</section>
-<section class="landing-border border-b landing-bg-alt">
-  <div class="mx-auto max-w-4xl px-6 py-24">
-    <p class="landing-label mb-2">What Gets Automated</p>
-    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">The tasks Sirib handles so your tellers don't have to</h2>
-    <div class="mt-10 grid gap-px sm:grid-cols-2">
-      <div class="landing-card border p-6">
-        <p class="text-sm font-medium landing-text">Passbook printing</p>
-        <p class="mt-1 text-sm leading-relaxed landing-muted">No more handwriting passbook entries. Each transaction prints clearly — type, amount, running balance — the moment it's recorded.</p>
-      </div>
-      <div class="landing-card border p-6">
-        <p class="text-sm font-medium landing-text">Cash position tracking</p>
-        <p class="mt-1 text-sm leading-relaxed landing-muted">Every deposit and withdrawal updates cash counts in real time. Teller knows their position without counting. Manager sees totals across all tellers and the vault.</p>
-      </div>
-      <div class="landing-card border p-6">
-        <p class="text-sm font-medium landing-text">End-of-day reconciliation</p>
-        <p class="mt-1 text-sm leading-relaxed landing-muted">One click instead of 30 minutes of counting and cross-referencing. The system compares expected vs actual cash and flags discrepancies immediately.</p>
-      </div>
-      <div class="landing-card border p-6">
-        <p class="text-sm font-medium landing-text">Vault transfers</p>
-        <p class="mt-1 text-sm leading-relaxed landing-muted">Moving cash between tellers or to the vault is recorded in the system. No paper slips. The audit trail shows every movement and who approved it.</p>
-      </div>
-    </div>
-  </div>
-</section>
-<section class="landing-border border-b landing-bg-alt">
-  <div class="mx-auto max-w-4xl px-6 py-24">
-    <p class="landing-label mb-2">Manual Tasks Offloaded</p>
-    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">What your tellers won't have to do anymore</h2>
-    <ul class="mt-10 space-y-3 text-sm leading-relaxed landing-muted">
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Writing passbook entries by hand — each line is printed automatically</li>
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Counting cash multiple times a day to verify position — the system tracks it</li>
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Reconciling at end of day manually — one click compares expected vs actual</li>
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Logging transactions in separate books or spreadsheets — one entry updates everything</li>
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Preparing reports for the manager — the dashboard shows real-time numbers</li>
-    </ul>
-  </div>
-</section>
-<section class="landing-border border-b">
-  <div class="mx-auto max-w-3xl px-6 py-24 text-center">
-    <p class="landing-label mb-4">See it in action</p>
-    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">
-      Your tellers already know how to do their jobs.<br>
-      <span class="landing-accent">Sirib removes the parts they shouldn't have to do twice.</span>
-    </h2>
-    <div class="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-      <a href="/#demo" class="landing-btn-accent px-8 py-3 text-sm font-semibold tracking-wide uppercase transition-colors">Watch the Walkthrough</a>
-      <a href="/#" class="landing-border-muted border px-8 py-3 text-sm font-medium tracking-wide landing-muted uppercase transition-colors hover:landing-btn-outline">Talk to a Fellow Coop Manager</a>
-    </div>
-  </div>
-</section>
-<footer class="landing-bg">
-  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-12 sm:flex-row">
-    <a href="/" class="text-sm font-medium tracking-tight landing-muted transition-colors hover:landing-text">← Back to Sirib</a>
-    <p class="text-xs landing-dim">Built for Philippine cooperatives.</p>
   </div>
 </footer>

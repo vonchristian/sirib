@@ -209,6 +209,41 @@
     transform: scale(1.08);
   }
 
+  /* ── Data flow hub pulse ────────────────────────────────────────── */
+  @keyframes hub-pulse {
+    0%, 100% { opacity: 0.08; r: 26; }
+    50% { opacity: 0.18; r: 32; }
+  }
+
+  .animate-hub-pulse {
+    animation: hub-pulse 3s var(--ease-out) infinite;
+  }
+
+  @keyframes data-flow-dot {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .animate-data-dot {
+    animation: data-flow-dot 2.5s var(--ease-out) infinite;
+  }
+
+  .animate-data-dot-2 {
+    animation: data-flow-dot 2.5s var(--ease-out) 1.25s infinite;
+  }
+
+  @keyframes node-label {
+    0%, 100% { opacity: 0.08; transform: scale(1); }
+    50% { opacity: 0.18; transform: scale(1.03); }
+  }
+
+  .animate-node-pulse {
+    animation: node-label 4s var(--ease-out) infinite;
+    transform-origin: center;
+  }
+
   /* ── Button hover glow ─────────────────────────────────────────────── */
   .btn-primary, .btn-danger, .btn-positive {
     position: relative;

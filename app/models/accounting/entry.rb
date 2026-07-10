@@ -12,6 +12,7 @@ module Accounting
     belongs_to :template, class_name: "Accounting::EntryTemplate", foreign_key: :template_id, optional: true
     belongs_to :reversal_of, class_name: "Accounting::Entry", foreign_key: :reversal_of_id, optional: true
     has_one :reversed_entry, class_name: "Accounting::Entry", foreign_key: :reversal_of_id
+    has_many :reversal_entries, class_name: "Accounting::Entry", foreign_key: :reversal_of_id
 
     has_many :entry_templates, class_name: "Accounting::EntryTemplate", dependent: :nullify
     has_many :amount_lines, dependent: :restrict_with_error, autosave: true
@@ -83,24 +84,45 @@ module Accounting
     end
 
     def reversible?
-      posted? && !reversed?
+      posted? && reversal_of_id.nil? && !reversed?
     end
 
     def reversed?
-      status == :reversed || reversed_at.present?
+      status == :reversed || reversed_at.present? || reversal_entries.exists?
     end
 
     # Lock ordering: Entry/Amount Line (6) — see app/docs/prds/concurrency_locking.prd
     def reverse!(reversed_by:, reason: nil)
-      return false unless reversible?
+      raise Accounting::Error, "Entry is not reversible" unless reversible?
 
-      with_lock do
-        update!(
-          status: :reversed,
-          reversed_at: Time.current
+      transaction do
+        reversal = self.class.new(
+          cooperative: cooperative,
+          branch: branch,
+          entry_type: :reversal_entry,
+          status: :posted,
+          description: "Reversal of #{reference_number}: #{description}",
+          reference_number: "REV-#{Time.current.strftime("%Y%m%d-%H%M%S")}-#{SecureRandom.hex(4).upcase}",
+          source_module: source_module,
+          posted_at: Time.current,
+          reversal_of: self,
+          reversal_reason: reason,
+          created_by: reversed_by
         )
+
+        amount_lines.each do |line|
+          reversal.amount_lines.build(
+            account: line.account,
+            amount_type: line.debit? ? :credit : :debit,
+            amount_cents: line.amount_cents,
+            cooperative: cooperative
+          )
+        end
+
+        reversal.save!
+        update!(status: :reversed, reversed_at: Time.current)
+        reversal
       end
-      true
     end
 
     def self.build(description:, reference_number: nil, posted_at: nil,

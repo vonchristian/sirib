@@ -12,6 +12,6 @@ module CooperativeScoped
   private
 
   def auto_set_cooperative
-    self.cooperative ||= Current.cooperative
+    self.cooperative = Current.cooperative if cooperative_id.nil?
   end
 end

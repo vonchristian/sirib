@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_10_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   # Custom types defined in this database.
   # Note that some types may not work with other database engines. Be careful if changing database.
@@ -22,8 +23,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cooperative_id", null: false
     t.bigint "user_id", null: false
     t.bigint "account_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["account_id"], name: "index_accounting_cash_accounts_on_account_id"
     t.index ["cooperative_id"], name: "index_accounting_cash_accounts_on_cooperative_id"
     t.index ["user_id", "account_id"], name: "index_accounting_cash_accounts_on_user_id_and_account_id", unique: true
@@ -36,8 +37,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "account_code", null: false
     t.boolean "contra", default: false
     t.enum "account_type", null: false, enum_type: "account_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.string "status"
     t.boolean "postable"
     t.uuid "created_by_id"
@@ -54,7 +55,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "record_type", null: false
     t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
-    t.datetime "created_at", null: false
+    t.timestamptz "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
@@ -67,7 +68,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
-    t.datetime "created_at", null: false
+    t.timestamptz "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -81,15 +82,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cooperative_id", null: false
     t.bigint "agent_id", null: false
     t.bigint "branch_id"
-    t.datetime "started_at", null: false
-    t.datetime "completed_at"
+    t.timestamptz "started_at", null: false
+    t.timestamptz "completed_at"
     t.string "status", default: "running", null: false
     t.integer "tokens_used", default: 0
     t.integer "execution_time_ms", default: 0
     t.jsonb "result", default: {}
     t.text "error_message"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["agent_id", "started_at"], name: "index_ai_agent_runs_on_agent_id_and_started_at"
     t.index ["agent_id"], name: "index_ai_agent_runs_on_agent_id"
     t.index ["branch_id"], name: "index_ai_agent_runs_on_branch_id"
@@ -103,8 +104,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.text "description"
     t.boolean "enabled", default: true, null: false
     t.string "schedule", default: "daily", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id", "name"], name: "index_ai_agents_on_cooperative_id_and_name", unique: true
     t.index ["cooperative_id"], name: "index_ai_agents_on_cooperative_id"
   end
@@ -113,15 +114,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cooperative_id", null: false
     t.bigint "branch_id", null: false
     t.bigint "agent_run_id"
-    t.datetime "generated_at", null: false
+    t.timestamptz "generated_at", null: false
     t.text "summary"
     t.text "risk_summary"
     t.text "recommendations_summary"
     t.jsonb "metrics", default: {}
     t.integer "observation_count", default: 0
     t.integer "recommendation_count", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["agent_run_id"], name: "index_ai_digests_on_agent_run_id"
     t.index ["branch_id", "generated_at"], name: "index_ai_digests_on_branch_id_and_generated_at"
     t.index ["branch_id"], name: "index_ai_digests_on_branch_id"
@@ -137,10 +138,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "title", null: false
     t.text "summary"
     t.jsonb "metadata", default: {}
-    t.datetime "detected_at", null: false
-    t.datetime "resolved_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "detected_at", null: false
+    t.timestamptz "resolved_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["agent_run_id"], name: "index_ai_observations_on_agent_run_id"
     t.index ["branch_id", "detected_at"], name: "index_ai_observations_on_branch_id_and_detected_at"
     t.index ["branch_id", "resolved_at"], name: "index_ai_observations_on_branch_id_and_resolved_at"
@@ -161,12 +162,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.text "action_text"
     t.decimal "confidence_score", default: "0.0"
     t.string "status", default: "open", null: false
-    t.datetime "dismissed_at"
-    t.datetime "completed_at"
-    t.datetime "acknowledged_at"
+    t.timestamptz "dismissed_at"
+    t.timestamptz "completed_at"
+    t.timestamptz "acknowledged_at"
     t.bigint "acknowledged_by_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["agent_run_id"], name: "index_ai_recommendations_on_agent_run_id"
     t.index ["branch_id", "status"], name: "index_ai_recommendations_on_branch_id_and_status"
     t.index ["branch_id"], name: "index_ai_recommendations_on_branch_id"
@@ -183,21 +184,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "amount_type", null: false
     t.integer "amount_cents", null: false
     t.string "amount_currency", limit: 3, default: "PHP", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "lock_version", default: 0, null: false
     t.index ["account_id", "entry_id"], name: "index_amount_lines_on_account_id_and_entry_id"
     t.index ["account_id"], name: "index_amount_lines_on_account_id"
     t.index ["cooperative_id"], name: "index_amount_lines_on_cooperative_id"
     t.index ["entry_id"], name: "index_amount_lines_on_entry_id"
+    t.check_constraint "amount_cents > 0", name: "chk_amount_lines_amount_cents_positive"
+    t.check_constraint "amount_type = ANY (ARRAY[0, 1])", name: "chk_amount_lines_amount_type_valid"
   end
 
   create_table "backup_codes", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "code_digest", null: false
-    t.datetime "used_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "used_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["user_id", "used_at"], name: "index_backup_codes_on_user_id_and_used_at"
     t.index ["user_id"], name: "index_backup_codes_on_user_id"
   end
@@ -210,8 +213,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.boolean "active"
     t.jsonb "config"
     t.bigint "cooperative_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_compliance_controls_on_cooperative_id"
   end
 
@@ -220,13 +223,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "status"
     t.string "evidence_type"
     t.jsonb "metadata"
-    t.datetime "verified_at"
+    t.timestamptz "verified_at"
     t.string "verified_by_type"
     t.bigint "verified_by_id"
-    t.datetime "expires_at"
+    t.timestamptz "expires_at"
     t.bigint "cooperative_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["control_id"], name: "index_compliance_evidences_on_control_id"
     t.index ["cooperative_id"], name: "index_compliance_evidences_on_cooperative_id"
     t.index ["verified_by_type", "verified_by_id"], name: "index_compliance_evidences_on_verified_by"
@@ -234,8 +237,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
 
   create_table "cooperatives", force: :cascade do |t|
     t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.string "address"
     t.string "contact_number"
     t.string "registration_number"
@@ -250,20 +253,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cooperative_id", null: false
     t.string "reference_number", null: false
     t.text "description", null: false
-    t.datetime "posted_at", null: false
+    t.timestamptz "posted_at", null: false
     t.bigint "branch_id"
     t.string "status", default: "posted", null: false
     t.string "entry_type", default: "manual_entry", null: false
     t.string "source_module", default: "source_manual", null: false
-    t.datetime "reversed_at"
+    t.timestamptz "reversed_at"
     t.bigint "reversal_of_id"
     t.bigint "created_by_id"
     t.bigint "template_id"
     t.boolean "has_attachments", default: false, null: false
     t.boolean "inter_branch", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "lock_version", default: 0, null: false
+    t.text "reversal_reason"
     t.index ["cooperative_id"], name: "index_entries_on_cooperative_id"
     t.index ["created_by_id"], name: "index_entries_on_created_by_id"
     t.index ["posted_at", "branch_id"], name: "index_entries_on_posted_at_and_branch_id"
@@ -273,6 +277,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.index ["source_module"], name: "index_entries_on_source_module"
     t.index ["status", "entry_type"], name: "index_entries_on_status_and_entry_type"
     t.index ["template_id"], name: "index_entries_on_template_id"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'posted'::character varying::text, 'reversed'::character varying::text])", name: "chk_entries_status_valid"
   end
 
   create_table "entry_template_lines", force: :cascade do |t|
@@ -282,8 +287,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "amount_mode", default: "variable", null: false
     t.decimal "fixed_amount", precision: 20, scale: 4
     t.integer "sequence_index", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.bigint "cooperative_id", null: false
     t.index ["account_id"], name: "index_entry_template_lines_on_account_id"
     t.index ["cooperative_id"], name: "index_entry_template_lines_on_cooperative_id"
@@ -295,8 +300,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.text "description"
     t.boolean "is_active", default: true, null: false
     t.jsonb "metadata", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.bigint "entry_id"
     t.bigint "cooperative_id", null: false
     t.index ["cooperative_id"], name: "index_entry_templates_on_cooperative_id"
@@ -310,14 +315,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "share_product_id", null: false
     t.string "account_number", null: false
     t.string "status", default: "active", null: false
-    t.datetime "opened_at", null: false
+    t.timestamptz "opened_at", null: false
     t.bigint "opened_by_id", null: false
     t.string "branch"
     t.text "remarks"
     t.integer "shares_owned", default: 0, null: false
     t.integer "paid_up_shares", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.bigint "equity_account_id"
     t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id", "account_number"], name: "index_equity_accounts_on_cooperative_id_and_account_number", unique: true
@@ -346,8 +351,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.boolean "dividend_eligible", default: true, null: false
     t.boolean "voting_rights", default: true, null: false
     t.bigint "equity_ledger_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id", "product_code"], name: "index_equity_products_on_cooperative_id_and_product_code", unique: true
     t.index ["cooperative_id"], name: "index_equity_products_on_cooperative_id"
     t.index ["equity_ledger_id"], name: "index_equity_products_on_equity_ledger_id"
@@ -364,11 +369,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "entry_id"
     t.string "reference_number", null: false
     t.string "status", default: "completed", null: false
-    t.datetime "posted_at", null: false
+    t.timestamptz "posted_at", null: false
     t.bigint "posted_by_id", null: false
     t.text "notes"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "lock_version", default: 0, null: false
     t.index ["cash_account_id"], name: "index_equity_transactions_on_cash_account_id"
     t.index ["cooperative_id"], name: "index_equity_transactions_on_cooperative_id"
@@ -376,6 +381,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.index ["posted_by_id"], name: "index_equity_transactions_on_posted_by_id"
     t.index ["reference_number"], name: "index_equity_transactions_on_reference_number", unique: true
     t.index ["share_capital_account_id"], name: "index_equity_transactions_on_share_capital_account_id"
+    t.check_constraint "shares > 0", name: "chk_equity_transactions_shares_positive"
   end
 
   create_table "external_bank_accounts", force: :cascade do |t|
@@ -387,12 +393,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "currency", default: "PHP", null: false
     t.integer "balance_cents", default: 0, null: false
     t.string "current_balance_currency", default: "PHP", null: false
-    t.datetime "last_synced_at"
+    t.timestamptz "last_synced_at"
     t.string "status", default: "active", null: false
     t.bigint "cash_on_hand_account_id"
     t.bigint "interest_income_account_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cash_on_hand_account_id"], name: "index_external_bank_accounts_on_cash_on_hand_account_id"
     t.index ["cooperative_id"], name: "index_external_bank_accounts_on_cooperative_id"
     t.index ["external_bank_id"], name: "index_external_bank_accounts_on_external_bank_id"
@@ -409,8 +415,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "processing_status", default: "pending", null: false
     t.jsonb "metadata", default: "{}"
     t.text "error_message"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_external_bank_documents_on_cooperative_id"
     t.index ["external_bank_account_id"], name: "index_external_bank_documents_on_external_bank_account_id"
     t.index ["processing_status"], name: "index_external_bank_documents_on_processing_status"
@@ -426,8 +432,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "status", default: "suggested", null: false
     t.decimal "confidence_score"
     t.bigint "created_by_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_external_bank_transaction_allocations_on_cooperative_id"
     t.index ["created_by_id"], name: "index_external_bank_transaction_allocations_on_created_by_id"
     t.index ["external_bank_transaction_id"], name: "idx_on_external_bank_transaction_id_be9fd773f0"
@@ -449,8 +455,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "running_balance_currency", default: "PHP"
     t.string "hash_signature", null: false
     t.jsonb "metadata", default: "{}"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_external_bank_transactions_on_cooperative_id"
     t.index ["external_bank_account_id", "transaction_date"], name: "idx_on_external_bank_account_id_transaction_date_213f021c2b"
     t.index ["external_bank_account_id"], name: "index_external_bank_transactions_on_external_bank_account_id"
@@ -468,8 +474,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cash_on_hand_ledger_id"
     t.bigint "interest_income_ledger_id"
     t.bigint "cash_on_hand_account_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cash_on_hand_account_id"], name: "index_external_banks_on_cash_on_hand_account_id"
     t.index ["cash_on_hand_ledger_id"], name: "index_external_banks_on_cash_on_hand_ledger_id"
     t.index ["code"], name: "index_external_banks_on_code"
@@ -487,13 +493,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.jsonb "metadata"
     t.string "actor_type", null: false
     t.bigint "actor_id", null: false
-    t.datetime "resolved_at"
+    t.timestamptz "resolved_at"
     t.string "resolved_by_type"
     t.bigint "resolved_by_id"
     t.string "resolution"
     t.bigint "cooperative_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["actor_type", "actor_id"], name: "index_fraud_incidents_on_actor"
     t.index ["cooperative_id"], name: "index_fraud_incidents_on_cooperative_id"
     t.index ["resolved_by_type", "resolved_by_id"], name: "index_fraud_incidents_on_resolved_by"
@@ -508,8 +514,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "severity"
     t.boolean "active"
     t.bigint "cooperative_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_fraud_rules_on_cooperative_id"
   end
 
@@ -519,9 +525,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "service", null: false
     t.string "resource_type"
     t.bigint "resource_id"
-    t.datetime "expires_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "expires_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_idempotency_keys_on_cooperative_id"
     t.index ["expires_at"], name: "index_idempotency_keys_on_expires_at"
     t.index ["key", "cooperative_id"], name: "index_idempotency_keys_on_key_and_cooperative_id", unique: true
@@ -534,8 +540,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.boolean "contra", default: false
     t.enum "account_type", null: false, enum_type: "account_type"
     t.string "ancestry"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["ancestry"], name: "index_ledgers_on_ancestry"
     t.index ["cooperative_id", "account_code"], name: "index_ledgers_on_cooperative_id_and_account_code", unique: true
     t.index ["cooperative_id"], name: "index_ledgers_on_cooperative_id"
@@ -548,8 +554,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "max_days"
     t.integer "display_order", default: 0, null: false
     t.boolean "active", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id", "display_order"], name: "index_loan_aging_groups_on_cooperative_id_and_display_order"
     t.index ["cooperative_id", "name"], name: "index_loan_aging_groups_on_cooperative_id_and_name", unique: true
     t.index ["cooperative_id"], name: "index_loan_aging_groups_on_cooperative_id"
@@ -564,8 +570,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.decimal "principal_amount_cents", default: "0.0", null: false
     t.decimal "interest_amount_cents", default: "0.0", null: false
     t.decimal "total_exposure_cents", default: "0.0", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_loan_aging_snapshots_on_cooperative_id"
     t.index ["snapshot_date", "loan_aging_group_id"], name: "idx_on_snapshot_date_loan_aging_group_id_0bac11c8fd", unique: true
     t.index ["snapshot_date"], name: "index_loan_aging_snapshots_on_snapshot_date"
@@ -581,9 +587,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.decimal "outstanding_interest_cents", default: "0.0", null: false
     t.decimal "penalty_amount_cents", default: "0.0", null: false
     t.decimal "total_exposure_cents", default: "0.0", null: false
-    t.datetime "calculated_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "calculated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_loan_agings_on_cooperative_id"
     t.index ["days_past_due"], name: "index_loan_agings_on_days_past_due"
     t.index ["loan_aging_group_id"], name: "index_loan_agings_on_loan_aging_group_id"
@@ -606,8 +612,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.text "notes"
     t.jsonb "sources_of_income", default: "[]"
     t.string "reference_number"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_loan_applications_on_cooperative_id"
     t.index ["loan_product_id"], name: "index_loan_applications_on_loan_product_id"
     t.index ["member_id"], name: "index_loan_applications_on_member_id"
@@ -621,8 +627,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "name", null: false
     t.string "charge_type", default: "fixed", null: false
     t.decimal "value", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_loan_charges_on_cooperative_id"
     t.index ["loan_product_id"], name: "index_loan_charges_on_loan_product_id"
   end
@@ -631,8 +637,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cooperative_id", null: false
     t.bigint "loan_application_id", null: false
     t.bigint "member_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_loan_co_makers_on_cooperative_id"
     t.index ["loan_application_id", "member_id"], name: "index_loan_co_makers_on_loan_application_id_and_member_id", unique: true
     t.index ["loan_application_id"], name: "index_loan_co_makers_on_loan_application_id"
@@ -651,8 +657,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.decimal "pin_lng"
     t.string "address"
     t.jsonb "details", default: "{}"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_loan_collaterals_on_cooperative_id"
     t.index ["loan_application_id"], name: "index_loan_collaterals_on_loan_application_id"
   end
@@ -664,9 +670,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "event_type", null: false
     t.string "status", default: "completed", null: false
     t.jsonb "metadata", default: {}, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.bigint "cooperative_id"
+    t.integer "lock_version", default: 0, null: false
     t.index ["actor_type", "actor_id"], name: "index_loan_events_on_actor"
     t.index ["cooperative_id"], name: "index_loan_events_on_cooperative_id"
     t.index ["loan_id", "created_at"], name: "index_loan_events_on_loan_id_and_created_at"
@@ -681,8 +688,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.decimal "amount_cents", precision: 20, scale: 2, default: "0.0", null: false
     t.string "amount_currency", default: "PHP", null: false
     t.text "reason"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.bigint "cooperative_id"
     t.index ["cooperative_id"], name: "index_loan_links_on_cooperative_id"
     t.index ["from_loan_id", "link_type"], name: "index_loan_links_on_from_loan_id_and_link_type"
@@ -706,13 +713,28 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "penalty_currency", default: "PHP"
     t.date "payment_date", null: false
     t.bigint "entry_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id"], name: "index_loan_payments_on_cooperative_id"
     t.index ["entry_id"], name: "index_loan_payments_on_entry_id"
     t.index ["loan_id"], name: "index_loan_payments_on_loan_id"
     t.index ["reference_number"], name: "index_loan_payments_on_reference_number", unique: true
+    t.check_constraint "(principal_cents + interest_cents + penalty_cents) = amount_cents", name: "chk_loan_payments_allocation_equals_amount"
+    t.check_constraint "amount_cents > 0", name: "chk_loan_payments_amount_cents_positive"
+  end
+
+  create_table "loan_product_versions", force: :cascade do |t|
+    t.bigint "loan_product_id", null: false
+    t.integer "version", null: false
+    t.jsonb "snapshot", default: {}, null: false
+    t.bigint "modified_by_id"
+    t.text "change_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["loan_product_id", "version"], name: "idx_loan_product_versions_on_product_and_version", unique: true
+    t.index ["loan_product_id"], name: "index_loan_product_versions_on_loan_product_id"
+    t.index ["modified_by_id"], name: "index_loan_product_versions_on_modified_by_id"
   end
 
   create_table "loan_products", force: :cascade do |t|
@@ -724,8 +746,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "max_term_months", default: 12, null: false
     t.boolean "requires_collateral", default: false
     t.string "status", default: "active", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
+    t.integer "version", default: 1, null: false
     t.index ["cooperative_id"], name: "index_loan_products_on_cooperative_id"
   end
 
@@ -738,8 +761,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "principal_currency", default: "PHP"
     t.decimal "interest_cents", null: false
     t.string "interest_currency", default: "PHP"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_loan_repayment_schedules_on_cooperative_id"
     t.index ["loan_application_id", "sequence"], name: "idx_on_loan_application_id_sequence_2316d64776", unique: true
     t.index ["loan_application_id"], name: "index_loan_repayment_schedules_on_loan_application_id"
@@ -757,11 +780,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.text "notes"
     t.bigint "requested_by_id"
     t.bigint "approved_by_id"
-    t.datetime "submitted_at"
-    t.datetime "reviewed_at"
-    t.datetime "executed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "submitted_at"
+    t.timestamptz "reviewed_at"
+    t.timestamptz "executed_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.bigint "cooperative_id"
     t.index ["approved_by_id"], name: "index_loan_restructure_cases_on_approved_by_id"
     t.index ["cooperative_id"], name: "index_loan_restructure_cases_on_cooperative_id"
@@ -777,10 +800,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "version", default: 1, null: false
     t.string "status", default: "active", null: false
     t.jsonb "schedule_data", default: [], null: false
-    t.datetime "superseded_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "superseded_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.bigint "cooperative_id"
+    t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id"], name: "index_loan_schedules_on_cooperative_id"
     t.index ["loan_id", "status"], name: "index_loan_schedules_on_loan_id_and_status"
     t.index ["loan_id", "version"], name: "index_loan_schedules_on_loan_id_and_version", unique: true
@@ -802,16 +826,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "status", default: "active", null: false
     t.date "disbursed_at"
     t.string "reference_number"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "restructures_count", default: 0, null: false
     t.integer "max_restructures", default: 2, null: false
     t.integer "lock_version", default: 0, null: false
+    t.jsonb "product_snapshot", default: {}, null: false
     t.index ["cooperative_id"], name: "index_loans_on_cooperative_id"
     t.index ["loan_application_id"], name: "index_loans_on_loan_application_id"
     t.index ["loan_product_id"], name: "index_loans_on_loan_product_id"
     t.index ["member_id"], name: "index_loans_on_member_id"
     t.index ["reference_number"], name: "index_loans_on_reference_number", unique: true
+    t.check_constraint "outstanding_principal_cents >= 0", name: "chk_loans_outstanding_principal_non_negative"
+    t.check_constraint "principal_cents > 0", name: "chk_loans_principal_cents_positive"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying::text, 'paid'::character varying::text, 'defaulted'::character varying::text, 'written_off'::character varying::text, 'refinanced'::character varying::text, 'modified'::character varying::text, 'hybrid_restructured'::character varying::text, 'restructure_requested'::character varying::text, 'under_review'::character varying::text])", name: "chk_loans_status_valid"
+    t.check_constraint "term_months > 0", name: "chk_loans_term_months_positive"
   end
 
   create_table "management_alert_subscriptions", force: :cascade do |t|
@@ -820,8 +849,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "alert_type", null: false
     t.string "channel", null: false
     t.boolean "active", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_management_alert_subscriptions_on_cooperative_id"
     t.index ["user_id", "alert_type", "channel"], name: "idx_on_user_id_alert_type_channel_8c88c19464", unique: true
     t.index ["user_id"], name: "index_management_alert_subscriptions_on_user_id"
@@ -838,9 +867,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "triggered_by_type"
     t.integer "triggered_by_id"
     t.bigint "resolved_by_id"
-    t.datetime "resolved_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "resolved_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["alert_type"], name: "index_management_alerts_on_alert_type"
     t.index ["cooperative_id"], name: "index_management_alerts_on_cooperative_id"
     t.index ["resolved_by_id"], name: "index_management_alerts_on_resolved_by_id"
@@ -856,8 +885,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "requested_by_id", null: false
     t.integer "current_step", default: 1, null: false
     t.text "reason"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id"], name: "index_management_approval_requests_on_cooperative_id"
     t.index ["requested_by_id"], name: "index_management_approval_requests_on_requested_by_id"
     t.index ["status"], name: "index_management_approval_requests_on_status"
@@ -873,8 +903,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "threshold_cents_min"
     t.integer "threshold_cents_max"
     t.string "condition"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["approval_workflow_id", "sequence"], name: "idx_on_approval_workflow_id_sequence_340a85b293", unique: true
     t.index ["approval_workflow_id"], name: "idx_on_approval_workflow_id_a1ea19780b"
     t.index ["approver_role_id"], name: "index_management_approval_workflow_steps_on_approver_role_id"
@@ -888,8 +918,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "description"
     t.string "applicable_entity_type"
     t.string "status", default: "active", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_management_approval_workflows_on_cooperative_id"
   end
 
@@ -900,9 +930,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "approver_id", null: false
     t.string "status", null: false
     t.text "comment"
-    t.datetime "signed_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "signed_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["approval_request_id"], name: "index_management_approvals_on_approval_request_id"
     t.index ["approver_id"], name: "index_management_approvals_on_approver_id"
     t.index ["cooperative_id"], name: "index_management_approvals_on_cooperative_id"
@@ -923,7 +953,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.jsonb "after_state"
     t.jsonb "approval_chain"
     t.string "config_version"
-    t.datetime "created_at", null: false
+    t.timestamptz "created_at", null: false
     t.index ["action"], name: "index_management_audit_logs_on_action"
     t.index ["branch_id"], name: "index_management_audit_logs_on_branch_id"
     t.index ["cooperative_id"], name: "index_management_audit_logs_on_cooperative_id"
@@ -935,8 +965,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "branch_id", null: false
     t.date "snapshot_date", null: false
     t.jsonb "metrics", default: {}, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["branch_id", "snapshot_date"], name: "idx_on_branch_id_snapshot_date_c28cd56a00", unique: true
     t.index ["branch_id"], name: "index_management_branch_performance_snapshots_on_branch_id"
     t.index ["cooperative_id"], name: "idx_on_cooperative_id_5cfce3d3e1"
@@ -956,8 +986,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "rgt"
     t.integer "depth", default: 0
     t.integer "children_count", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id", "code"], name: "index_management_branches_on_cooperative_id_and_code", unique: true
     t.index ["cooperative_id"], name: "index_management_branches_on_cooperative_id"
   end
@@ -969,8 +999,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.jsonb "value", default: {}, null: false
     t.bigint "changed_by_id"
     t.text "change_reason"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["changed_by_id"], name: "index_management_configuration_versions_on_changed_by_id"
     t.index ["configuration_id", "version"], name: "idx_on_configuration_id_version_a1261d1f20", unique: true
     t.index ["configuration_id"], name: "index_management_configuration_versions_on_configuration_id"
@@ -987,9 +1017,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "configurable_id"
     t.bigint "changed_by_id"
     t.bigint "approved_by_id"
-    t.datetime "approved_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "approved_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["approved_by_id"], name: "index_management_configurations_on_approved_by_id"
     t.index ["changed_by_id"], name: "index_management_configurations_on_changed_by_id"
     t.index ["cooperative_id"], name: "index_management_configurations_on_cooperative_id"
@@ -1002,8 +1032,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "name", null: false
     t.string "code", null: false
     t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["branch_id", "code"], name: "index_management_departments_on_branch_id_and_code", unique: true
     t.index ["branch_id"], name: "index_management_departments_on_branch_id"
     t.index ["cooperative_id"], name: "index_management_departments_on_cooperative_id"
@@ -1014,8 +1044,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.date "date", null: false
     t.string "name", null: false
     t.boolean "recurring", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id", "date"], name: "index_management_holidays_on_cooperative_id_and_date", unique: true
     t.index ["cooperative_id"], name: "index_management_holidays_on_cooperative_id"
   end
@@ -1025,8 +1055,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "action", null: false
     t.string "subject", null: false
     t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id", "action", "subject"], name: "index_management_permissions_on_cooperative_id_action_subject", unique: true
     t.index ["cooperative_id"], name: "index_management_permissions_on_cooperative_id"
   end
@@ -1045,9 +1075,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "target_entity_id"
     t.bigint "created_by_id"
     t.bigint "approved_by_id"
-    t.datetime "approved_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "approved_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["approved_by_id"], name: "index_management_policies_on_approved_by_id"
     t.index ["cooperative_id", "code"], name: "index_management_policies_on_cooperative_id_and_code", unique: true
     t.index ["cooperative_id"], name: "index_management_policies_on_cooperative_id"
@@ -1061,8 +1091,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "operator", null: false
     t.string "value", null: false
     t.string "effect", default: "deny", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_management_policy_rules_on_cooperative_id"
     t.index ["policy_id"], name: "index_management_policy_rules_on_policy_id"
   end
@@ -1075,8 +1105,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.decimal "threshold"
     t.string "status", default: "normal", null: false
     t.date "as_of_date", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["branch_id", "indicator_type", "as_of_date"], name: "idx_on_branch_id_indicator_type_as_of_date_48924e88f2", unique: true
     t.index ["branch_id"], name: "index_management_risk_indicators_on_branch_id"
     t.index ["cooperative_id"], name: "index_management_risk_indicators_on_cooperative_id"
@@ -1090,8 +1120,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "department_id"
     t.date "active_from", null: false
     t.date "active_until"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["branch_id"], name: "index_management_role_assignments_on_branch_id"
     t.index ["cooperative_id"], name: "index_management_role_assignments_on_cooperative_id"
     t.index ["department_id"], name: "index_management_role_assignments_on_department_id"
@@ -1104,8 +1134,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "role_id", null: false
     t.bigint "permission_id", null: false
     t.jsonb "constraints", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_management_role_permissions_on_cooperative_id"
     t.index ["permission_id"], name: "index_management_role_permissions_on_permission_id"
     t.index ["role_id", "permission_id"], name: "index_management_role_permissions_on_role_id_and_permission_id", unique: true
@@ -1118,8 +1148,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "code", null: false
     t.text "description"
     t.integer "rank", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id", "code"], name: "index_management_roles_on_cooperative_id_and_code", unique: true
     t.index ["cooperative_id"], name: "index_management_roles_on_cooperative_id"
   end
@@ -1130,9 +1160,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.decimal "value"
     t.string "unit"
     t.string "status", default: "healthy", null: false
-    t.datetime "captured_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "captured_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_management_system_health_snapshots_on_cooperative_id"
     t.index ["metric_name", "captured_at"], name: "idx_on_metric_name_captured_at_597dc63458"
   end
@@ -1142,8 +1172,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "department_id", null: false
     t.string "name", null: false
     t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_management_teams_on_cooperative_id"
     t.index ["department_id"], name: "index_management_teams_on_department_id"
   end
@@ -1157,8 +1187,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "province", null: false
     t.string "region", null: false
     t.string "zip_code"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_member_addresses_on_cooperative_id"
     t.index ["member_id"], name: "index_member_addresses_on_member_id"
   end
@@ -1168,8 +1198,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "member_id", null: false
     t.string "id_type", null: false
     t.string "id_number", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_member_identifications_on_cooperative_id"
     t.index ["id_type", "id_number"], name: "index_member_identifications_on_id_type_and_id_number", unique: true
     t.index ["member_id"], name: "index_member_identifications_on_member_id"
@@ -1190,12 +1220,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "password_digest"
     t.string "otp_secret"
     t.boolean "otp_enabled", default: false, null: false
-    t.datetime "otp_verified_at"
-    t.datetime "last_login_at"
+    t.timestamptz "otp_verified_at"
+    t.timestamptz "last_login_at"
     t.string "portal_status", default: "inactive", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.bigint "branch_id"
+    t.integer "lock_version", default: 0, null: false
     t.index ["branch_id"], name: "index_members_on_branch_id"
     t.index ["cooperative_id"], name: "index_members_on_cooperative_id"
     t.index ["email_address"], name: "index_members_on_email_address", unique: true
@@ -1226,8 +1257,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "current_step", default: 0, null: false
     t.jsonb "profile_images", default: [], null: false
     t.jsonb "sources_of_income", default: [], null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_membership_applications_on_cooperative_id"
     t.index ["uuid"], name: "index_membership_applications_on_uuid", unique: true
   end
@@ -1236,8 +1267,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cooperative_id", null: false
     t.string "name", null: false
     t.boolean "enabled", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_messaging_channels_on_cooperative_id"
     t.index ["name"], name: "index_messaging_channels_on_name", unique: true
   end
@@ -1251,10 +1282,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "attempts_count", default: 0
     t.text "last_error"
     t.string "provider_message_id"
-    t.datetime "sent_at"
-    t.datetime "delivered_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "sent_at"
+    t.timestamptz "delivered_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["channel_id"], name: "index_messaging_message_deliveries_on_channel_id"
     t.index ["cooperative_id"], name: "index_messaging_message_deliveries_on_cooperative_id"
     t.index ["message_id"], name: "index_messaging_message_deliveries_on_message_id"
@@ -1269,9 +1300,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "recipient_id", null: false
     t.jsonb "payload", default: {}
     t.string "status", default: "pending", null: false
-    t.datetime "scheduled_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "scheduled_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_messaging_messages_on_cooperative_id"
     t.index ["message_type"], name: "index_messaging_messages_on_message_type"
     t.index ["recipient_type", "recipient_id"], name: "index_messaging_messages_on_recipient_type_and_recipient_id"
@@ -1283,9 +1314,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "provider_id", null: false
     t.string "event_type", null: false
     t.jsonb "payload", default: {}
-    t.datetime "processed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "processed_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_messaging_provider_webhooks_on_cooperative_id"
     t.index ["provider_id", "event_type"], name: "idx_on_provider_id_event_type_114a5f5c88", unique: true
     t.index ["provider_id"], name: "index_messaging_provider_webhooks_on_provider_id"
@@ -1297,8 +1328,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "name", null: false
     t.jsonb "config", default: {}
     t.boolean "enabled", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["channel_id", "name"], name: "index_messaging_providers_on_channel_id_and_name", unique: true
     t.index ["channel_id"], name: "index_messaging_providers_on_channel_id"
     t.index ["cooperative_id"], name: "index_messaging_providers_on_cooperative_id"
@@ -1313,8 +1344,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "device_fingerprint"
     t.string "failure_reason"
     t.jsonb "metadata", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["action"], name: "index_mfa_attempt_logs_on_action"
     t.index ["created_at"], name: "index_mfa_attempt_logs_on_created_at"
     t.index ["user_id", "created_at"], name: "index_mfa_attempt_logs_on_user_id_and_created_at"
@@ -1326,10 +1357,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "title", null: false
     t.text "body", null: false
     t.string "status", default: "draft", null: false
-    t.datetime "published_at"
+    t.timestamptz "published_at"
     t.bigint "author_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["author_id"], name: "index_portal_announcements_on_author_id"
     t.index ["cooperative_id"], name: "index_portal_announcements_on_cooperative_id"
     t.index ["published_at"], name: "index_portal_announcements_on_published_at"
@@ -1340,10 +1371,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cooperative_id", null: false
     t.bigint "member_id", null: false
     t.string "token", null: false
-    t.datetime "expires_at", null: false
-    t.datetime "used_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "expires_at", null: false
+    t.timestamptz "used_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_portal_enrollment_tokens_on_cooperative_id"
     t.index ["member_id"], name: "index_portal_enrollment_tokens_on_member_id"
     t.index ["token"], name: "index_portal_enrollment_tokens_on_token", unique: true
@@ -1354,16 +1385,32 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "member_id", null: false
     t.string "ip_address"
     t.text "user_agent"
-    t.datetime "revoked_at"
-    t.datetime "last_activity_at"
-    t.datetime "mfa_verified_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "revoked_at"
+    t.timestamptz "last_activity_at"
+    t.timestamptz "mfa_verified_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_portal_sessions_on_cooperative_id"
     t.index ["last_activity_at"], name: "index_portal_sessions_on_last_activity_at"
     t.index ["member_id", "revoked_at"], name: "index_portal_sessions_on_member_id_and_revoked_at"
     t.index ["member_id"], name: "index_portal_sessions_on_member_id"
     t.index ["revoked_at"], name: "index_portal_sessions_on_revoked_at"
+  end
+
+  create_table "reconciliation_results", force: :cascade do |t|
+    t.string "check_name", null: false
+    t.string "status", null: false
+    t.integer "total_checked", default: 0
+    t.integer "failures_count", default: 0
+    t.jsonb "failures", default: []
+    t.text "error_message"
+    t.bigint "cooperative_id", null: false
+    t.datetime "checked_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["check_name", "checked_at"], name: "index_reconciliation_results_on_check_name_and_checked_at"
+    t.index ["checked_at"], name: "index_reconciliation_results_on_checked_at"
+    t.index ["cooperative_id"], name: "index_reconciliation_results_on_cooperative_id"
   end
 
   create_table "running_balances", force: :cascade do |t|
@@ -1373,8 +1420,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.date "as_of_date", null: false
     t.integer "balance_cents", null: false
     t.string "balance_currency", limit: 3, default: "PHP", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "lock_version", default: 0, null: false
     t.index ["account_id", "as_of_date"], name: "idx_running_balances_on_account_date", unique: true, where: "(account_id IS NOT NULL)"
     t.index ["account_id"], name: "index_running_balances_on_account_id"
@@ -1392,8 +1439,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cooperative_id"
     t.string "role_restriction"
     t.boolean "is_default", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_saved_filters_on_cooperative_id"
     t.index ["filter_type"], name: "index_saved_filters_on_filter_type"
     t.index ["is_default"], name: "index_saved_filters_on_is_default"
@@ -1405,8 +1452,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
   create_table "security_password_histories", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "password_digest"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["created_at"], name: "index_security_password_histories_on_created_at"
     t.index ["user_id"], name: "index_security_password_histories_on_user_id"
   end
@@ -1424,8 +1471,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "password_history_count"
     t.bigint "cooperative_id", null: false
     t.boolean "active"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_security_password_policies_on_cooperative_id"
   end
 
@@ -1433,11 +1480,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "user_id", null: false
     t.string "ip_address"
     t.string "user_agent"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "revoked_at"
-    t.datetime "last_activity_at"
-    t.datetime "mfa_verified_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
+    t.timestamptz "revoked_at"
+    t.timestamptz "last_activity_at"
+    t.timestamptz "mfa_verified_at"
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -1447,14 +1494,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "cash_account_id", null: false
     t.date "date", null: false
     t.string "status", default: "open", null: false
-    t.datetime "opened_at", null: false
-    t.datetime "closed_at"
+    t.timestamptz "opened_at", null: false
+    t.timestamptz "closed_at"
     t.decimal "beginning_balance_cents"
     t.decimal "ending_balance_cents"
     t.text "notes"
     t.jsonb "counts", default: "[]"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "lock_version", default: 0, null: false
     t.index ["cash_account_id"], name: "index_treasury_cash_sessions_on_cash_account_id"
     t.index ["cooperative_id"], name: "index_treasury_cash_sessions_on_cooperative_id"
@@ -1470,12 +1517,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "account_type", default: 0, null: false
     t.string "status", default: "active", null: false
     t.string "account_number", null: false
-    t.datetime "opened_at"
-    t.datetime "closed_at"
+    t.timestamptz "opened_at"
+    t.timestamptz "closed_at"
     t.bigint "liability_account_id"
     t.bigint "interest_expense_account_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "lock_version", default: 0, null: false
     t.index ["cooperative_id", "account_number"], name: "idx_treasury_savings_accounts_on_coop_account_number", unique: true
     t.index ["cooperative_id"], name: "index_treasury_savings_accounts_on_cooperative_id"
@@ -1490,8 +1537,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.bigint "savings_product_id", null: false
     t.decimal "rate", null: false
     t.boolean "current", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "idx_on_cooperative_id_d0876bcbb5"
     t.index ["savings_product_id"], name: "idx_on_savings_product_id_06a7ca0e75"
   end
@@ -1503,8 +1550,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "status", default: "active", null: false
     t.bigint "liability_ledger_id"
     t.bigint "interest_expense_ledger_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_treasury_savings_products_on_cooperative_id"
     t.index ["interest_expense_ledger_id"], name: "index_treasury_savings_products_on_interest_expense_ledger_id"
     t.index ["liability_ledger_id"], name: "index_treasury_savings_products_on_liability_ledger_id"
@@ -1521,15 +1568,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.string "reference_number", null: false
     t.text "notes"
     t.string "status", default: "completed", null: false
-    t.datetime "posted_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "posted_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "lock_version", default: 0, null: false
     t.index ["cash_account_id"], name: "index_treasury_savings_transactions_on_cash_account_id"
     t.index ["cooperative_id"], name: "index_treasury_savings_transactions_on_cooperative_id"
     t.index ["entry_id"], name: "index_treasury_savings_transactions_on_entry_id"
     t.index ["reference_number"], name: "index_treasury_savings_transactions_on_reference_number", unique: true
     t.index ["savings_account_id"], name: "index_treasury_savings_transactions_on_savings_account_id"
+    t.check_constraint "amount_cents <> 0", name: "chk_savings_transactions_amount_cents_non_zero"
   end
 
   create_table "treasury_time_deposit_products", force: :cascade do |t|
@@ -1541,8 +1589,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.decimal "interest_rate", null: false
     t.integer "term_in_days", null: false
     t.string "status", default: "active", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_treasury_time_deposit_products_on_cooperative_id"
   end
 
@@ -1558,10 +1606,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.integer "interest_earned_cents", default: 0
     t.string "interest_earned_currency", default: "PHP", null: false
     t.string "status", default: "pending", null: false
-    t.datetime "opened_at"
-    t.datetime "closed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "opened_at"
+    t.timestamptz "closed_at"
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cooperative_id"], name: "index_treasury_time_deposits_on_cooperative_id"
     t.index ["depositor_type", "depositor_id"], name: "idx_on_depositor_type_depositor_id_95e40b9cf8"
     t.index ["time_deposit_product_id"], name: "index_treasury_time_deposits_on_time_deposit_product_id"
@@ -1575,10 +1623,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.text "description"
     t.string "status", default: "pending", null: false
     t.bigint "approved_by_id"
-    t.datetime "approved_at"
+    t.timestamptz "approved_at"
     t.bigint "voucher_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["approved_by_id"], name: "index_treasury_vault_transfers_on_approved_by_id"
     t.index ["cash_session_id"], name: "index_treasury_vault_transfers_on_cash_session_id"
     t.index ["cooperative_id"], name: "index_treasury_vault_transfers_on_cooperative_id"
@@ -1596,14 +1644,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
     t.text "description"
     t.bigint "cash_account_id", null: false
     t.bigint "entry_id"
-    t.datetime "posted_at"
+    t.timestamptz "posted_at"
     t.string "counterparty_type"
     t.integer "counterparty_id"
     t.string "category", null: false
     t.string "transactable_type"
     t.integer "transactable_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["cash_account_id"], name: "index_treasury_vouchers_on_cash_account_id"
     t.index ["cash_session_id"], name: "index_treasury_vouchers_on_cash_session_id"
     t.index ["cooperative_id"], name: "index_treasury_vouchers_on_cooperative_id"
@@ -1618,12 +1666,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
   create_table "trusted_devices", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "device_fingerprint_hash", null: false
-    t.datetime "last_used_at", null: false
-    t.datetime "expires_at", null: false
+    t.timestamptz "last_used_at", null: false
+    t.timestamptz "expires_at", null: false
     t.string "user_agent"
     t.string "ip_address"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.index ["expires_at"], name: "index_trusted_devices_on_expires_at"
     t.index ["user_id", "device_fingerprint_hash"], name: "index_trusted_devices_on_user_id_and_device_fingerprint_hash", unique: true
     t.index ["user_id"], name: "index_trusted_devices_on_user_id"
@@ -1632,23 +1680,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.timestamptz "created_at", null: false
+    t.timestamptz "updated_at", null: false
     t.integer "role", default: 0, null: false
     t.string "otp_secret"
     t.boolean "otp_enabled", default: false, null: false
-    t.datetime "otp_verified_at"
+    t.timestamptz "otp_verified_at"
     t.string "employee_id"
     t.string "full_name"
     t.string "status"
     t.jsonb "permission_overrides"
     t.bigint "cooperative_id", null: false
     t.integer "failed_attempts"
-    t.datetime "locked_at"
-    t.datetime "password_changed_at"
+    t.timestamptz "locked_at"
+    t.timestamptz "password_changed_at"
     t.boolean "force_password_change"
     t.string "last_login_ip"
-    t.datetime "last_seen_at"
+    t.timestamptz "last_seen_at"
     t.string "last_device"
     t.integer "session_version"
     t.index ["cooperative_id"], name: "index_users_on_cooperative_id"
@@ -1741,6 +1789,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
   add_foreign_key "loan_payments", "cooperatives"
   add_foreign_key "loan_payments", "entries"
   add_foreign_key "loan_payments", "loans"
+  add_foreign_key "loan_product_versions", "loan_products"
+  add_foreign_key "loan_product_versions", "users", column: "modified_by_id"
   add_foreign_key "loan_products", "cooperatives"
   add_foreign_key "loan_repayment_schedules", "cooperatives"
   add_foreign_key "loan_repayment_schedules", "loan_applications"
@@ -1829,6 +1879,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_130000) do
   add_foreign_key "portal_enrollment_tokens", "members"
   add_foreign_key "portal_sessions", "cooperatives"
   add_foreign_key "portal_sessions", "members"
+  add_foreign_key "reconciliation_results", "cooperatives"
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "cooperatives"
   add_foreign_key "running_balances", "ledgers"

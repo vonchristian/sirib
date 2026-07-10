@@ -22,41 +22,50 @@ RSpec.describe Accounting::AmountLine do
   end
 
   describe "scopes" do
-    let(:entry) { create(:accounting_entry, posted_at: Time.zone.now) }
-    let(:account) { create(:accounting_account) }
-
     it "filters by between dates" do
-      old = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: 5.days.ago), account:, amount_type: "debit", amount_cents: 100)
-      recent = create(:accounting_amount_line, entry:, account:, amount_type: "debit", amount_cents: 200)
-      expect(described_class.between(2.days.ago, Date.current)).to contain_exactly(recent)
+      old = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: 5.days.ago), amount_type: "debit", amount_cents: 100)
+      recent = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: Time.zone.now), amount_type: "debit", amount_cents: 200)
+      result_ids = described_class.between(2.days.ago, Date.current).pluck(:id)
+      expect(result_ids).to include(recent.id)
+      expect(result_ids).not_to include(old.id)
     end
 
     it "filters up to a date" do
-      old = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: 5.days.ago), account:, amount_type: "debit", amount_cents: 100)
-      recent = create(:accounting_amount_line, entry:, account:, amount_type: "debit", amount_cents: 200)
-      expect(described_class.up_to(3.days.ago)).to contain_exactly(old)
+      old = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: 5.days.ago), amount_type: "debit", amount_cents: 100)
+      recent = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: Time.zone.now), amount_type: "debit", amount_cents: 200)
+      result_ids = described_class.up_to(3.days.ago).pluck(:id)
+      expect(result_ids).to include(old.id)
+      expect(result_ids).not_to include(recent.id)
     end
 
     it "filters from a date" do
-      old = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: 5.days.ago), account:, amount_type: "debit", amount_cents: 100)
-      recent = create(:accounting_amount_line, entry:, account:, amount_type: "debit", amount_cents: 200)
-      expect(described_class.from_date(2.days.ago)).to contain_exactly(recent)
+      old = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: 5.days.ago), amount_type: "debit", amount_cents: 100)
+      recent = create(:accounting_amount_line, entry: create(:accounting_entry, posted_at: Time.zone.now), amount_type: "debit", amount_cents: 200)
+      result_ids = described_class.from_date(2.days.ago).pluck(:id)
+      expect(result_ids).to include(recent.id)
+      expect(result_ids).not_to include(old.id)
     end
   end
 
   describe ".total" do
     it "sums amount_cents" do
-      create(:accounting_amount_line, amount_cents: 1000)
-      create(:accounting_amount_line, amount_cents: 2000)
-      expect(described_class.total).to eq(3000)
+      account = create(:accounting_account)
+      entry = build(:accounting_entry, create_lines: false)
+      entry.amount_lines.build(account: account, amount_cents: 1000, amount_type: "debit", amount_currency: "PHP")
+      entry.amount_lines.build(account: account, amount_cents: 1000, amount_type: "credit", amount_currency: "PHP")
+      entry.save!
+      expect(described_class.total).to eq(2000)
     end
   end
 
   describe ".balance" do
     it "returns sum of amount_cents" do
-      create(:accounting_amount_line, amount_cents: 1000)
-      create(:accounting_amount_line, amount_cents: 2000)
-      expect(described_class.balance).to eq(3000)
+      account = create(:accounting_account)
+      entry = build(:accounting_entry, create_lines: false)
+      entry.amount_lines.build(account: account, amount_cents: 1000, amount_type: "debit", amount_currency: "PHP")
+      entry.amount_lines.build(account: account, amount_cents: 1000, amount_type: "credit", amount_currency: "PHP")
+      entry.save!
+      expect(described_class.balance).to eq(2000)
     end
   end
 

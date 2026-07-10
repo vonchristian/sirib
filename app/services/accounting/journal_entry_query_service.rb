@@ -1,6 +1,6 @@
 module Accounting
   class JournalEntryQueryService
-    def initialize(cooperative:, start_date: nil, end_date: nil, branch_id: nil, account_id: nil,
+    def initialize(cooperative: Current.cooperative, start_date: nil, end_date: nil, branch_id: nil, account_id: nil,
                    entry_type: nil, status: nil, source_module: nil, amount_min: nil,
                    amount_max: nil, reference_number: nil, created_by_id: nil,
                    template_id: nil, has_attachments: nil, inter_branch: nil)

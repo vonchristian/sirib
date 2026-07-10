@@ -6,10 +6,17 @@ FactoryBot.define do
     reference_number { generate(:entry_reference_number) }
     posted_at { Time.zone.now }
 
-    after(:build) do |entry|
-      account = build(:accounting_account)
-      entry.amount_lines << build(:accounting_amount_line, entry: entry, account: account, amount_type: "debit", amount_cents: 1000, amount_currency: "PHP")
-      entry.amount_lines << build(:accounting_amount_line, entry: entry, account: account, amount_type: "credit", amount_cents: 1000, amount_currency: "PHP")
+    transient do
+      create_lines { true }
+      lines_account { nil }
+    end
+
+    after(:build) do |entry, evaluator|
+      if evaluator.create_lines
+        account = evaluator.lines_account || build(:accounting_account)
+        entry.amount_lines << build(:accounting_amount_line, entry: entry, account: account, amount_type: "debit", amount_cents: 1000, amount_currency: "PHP")
+        entry.amount_lines << build(:accounting_amount_line, entry: entry, account: account, amount_type: "credit", amount_cents: 1000, amount_currency: "PHP")
+      end
     end
   end
 end

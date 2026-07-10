@@ -6,16 +6,17 @@ RSpec.describe Accounting::TemplateResolver do
     let(:credit_account) { create(:accounting_account) }
 
     let(:template) do
-      build(:accounting_entry_template).tap do |t|
-        t.lines = [
-          build(:accounting_entry_template_line,
-            entry_template: t, account: debit_account, direction: "debit",
-            amount_mode: "variable", sequence_index: 1),
-          build(:accounting_entry_template_line,
-            entry_template: t, account: credit_account, direction: "credit",
-            amount_mode: "variable", sequence_index: 2)
-        ]
-      end
+      t = build(:accounting_entry_template)
+      t.lines = [
+        build(:accounting_entry_template_line,
+          entry_template: t, account: debit_account, direction: "debit",
+          amount_mode: "variable", sequence_index: 1),
+        build(:accounting_entry_template_line,
+          entry_template: t, account: credit_account, direction: "credit",
+          amount_mode: "variable", sequence_index: 2)
+      ]
+      t.save!
+      t
     end
 
     it "returns resolved lines with correct accounts" do
@@ -38,6 +39,7 @@ RSpec.describe Accounting::TemplateResolver do
     end
 
     it "resolves fixed amounts" do
+      template.lines.destroy_all
       template.lines = [
         build(:accounting_entry_template_line,
           entry_template: template, account: debit_account, direction: "debit",
@@ -46,6 +48,7 @@ RSpec.describe Accounting::TemplateResolver do
           entry_template: template, account: credit_account, direction: "credit",
           amount_mode: "fixed", fixed_amount: 500, sequence_index: 2)
       ]
+      template.save!
 
       resolver = described_class.new(template, { amount: 1000 })
       lines = resolver.resolve_lines
@@ -70,6 +73,7 @@ RSpec.describe Accounting::TemplateResolver do
         build(:accounting_entry_template_line, entry_template: template, account: account, direction: "debit", sequence_index: 1),
         build(:accounting_entry_template_line, entry_template: template, account: account, direction: "credit", sequence_index: 2)
       ]
+      template.save!
 
       resolver = described_class.new(template, { amount: 100 })
       expect(resolver.resolve_debits.size).to eq(1)
@@ -85,6 +89,7 @@ RSpec.describe Accounting::TemplateResolver do
         build(:accounting_entry_template_line, entry_template: template, account: account, direction: "debit", sequence_index: 1),
         build(:accounting_entry_template_line, entry_template: template, account: account, direction: "credit", sequence_index: 2)
       ]
+      template.save!
 
       resolver = described_class.new(template, { amount: 100 })
       expect(resolver.resolve_credits.size).to eq(1)

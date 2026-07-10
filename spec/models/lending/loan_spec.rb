@@ -95,9 +95,43 @@ RSpec.describe Lending::Loan do
     end
   end
 
+  describe "product snapshot" do
+    it "captures product_snapshot on create" do
+      product = create(:lending_loan_product, name: "My Product", interest_rate: 3.0)
+      loan = build(:lending_loan, loan_product: product)
+      loan.save!
+
+      expect(loan.product_snapshot).to be_present
+      expect(loan.product_snapshot["name"]).to eq("My Product")
+      expect(loan.product_snapshot["interest_rate"]).to eq("3.0")
+    end
+
+    it "captures product_snapshot at time of creation" do
+      product = create(:lending_loan_product, name: "Original")
+      loan = create(:lending_loan, loan_product: product)
+      product.update!(name: "Changed Later")
+
+      expect(loan.product_snapshot["name"]).to eq("Original")
+    end
+
+    it "#terms_at_origination returns the product snapshot" do
+      product = create(:lending_loan_product, name: "Snapshot Product")
+      loan = create(:lending_loan, loan_product: product)
+
+      expect(loan.terms_at_origination).to eq(loan.product_snapshot)
+    end
+  end
+
   describe "factory" do
     it "creates a valid record" do
       expect(build(:lending_loan)).to be_valid
+    end
+  end
+
+  describe "optimistic locking" do
+    it_behaves_like "an optimistically locked model" do
+      let(:factory) { :lending_loan }
+      let(:update_attrs) { { interest_rate: 2.0 } }
     end
   end
 end

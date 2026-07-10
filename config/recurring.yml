@@ -16,3 +16,9 @@ production:
   post_pending_entries:
     class: Accounting::PostPendingEntriesJob
     schedule: every 5 minutes
+  refresh_reporting_mvs:
+    class: Reporting::RefreshMaterializedViewsJob
+    schedule: every 15 minutes
+  daily_reconciliation:
+    class: Reconciliation::DailyReconciliationJob
+    schedule: at 3:00 every day

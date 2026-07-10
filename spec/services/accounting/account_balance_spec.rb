@@ -51,9 +51,14 @@ RSpec.describe Accounting::AccountBalance do
     subject(:strategy) { described_class.new(to_date: Date.current, to_time: Time.current) }
 
     it "loads amounts" do
-      create(:accounting_amount_line, amount_cents: 1000)
+      account = create(:accounting_account)
+      entry = build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0))
+      entry.amount_lines.build(amount_type: "debit", amount_cents: 1, account: account)
+      entry.amount_lines.build(amount_type: "credit", amount_cents: 1, account: account)
+      entry.save!
+      create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
       result = strategy.load_amounts
-      expect(result.values.sum).to eq(1000)
+      expect(result[[account.id, "debit"]]).to eq(1001)
     end
 
     it "applies scope" do
@@ -67,9 +72,14 @@ RSpec.describe Accounting::AccountBalance do
     subject(:strategy) { described_class.new(to_date: Date.current) }
 
     it "loads amounts" do
-      create(:accounting_amount_line, amount_cents: 1000)
+      account = create(:accounting_account)
+      entry = build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0))
+      entry.amount_lines.build(amount_type: "debit", amount_cents: 1, account: account)
+      entry.amount_lines.build(amount_type: "credit", amount_cents: 1, account: account)
+      entry.save!
+      create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
       result = strategy.load_amounts
-      expect(result.values.sum).to eq(1000)
+      expect(result[[account.id, "debit"]]).to eq(1001)
     end
 
     it "applies scope" do
@@ -83,9 +93,14 @@ RSpec.describe Accounting::AccountBalance do
     subject(:strategy) { described_class.new(from_date: 5.days.ago, to_date: Date.current) }
 
     it "loads amounts" do
-      create(:accounting_amount_line, amount_cents: 1000)
+      account = create(:accounting_account)
+      entry = build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0))
+      entry.amount_lines.build(amount_type: "debit", amount_cents: 1, account: account)
+      entry.amount_lines.build(amount_type: "credit", amount_cents: 1, account: account)
+      entry.save!
+      create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
       result = strategy.load_amounts
-      expect(result.values.sum).to eq(1000)
+      expect(result[[account.id, "debit"]]).to eq(1001)
     end
 
     it "applies scope" do
@@ -99,9 +114,14 @@ RSpec.describe Accounting::AccountBalance do
     subject(:strategy) { described_class.new }
 
     it "loads amounts" do
-      create(:accounting_amount_line, amount_cents: 1000)
+      account = create(:accounting_account)
+      entry = build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0))
+      entry.amount_lines.build(amount_type: "debit", amount_cents: 1, account: account)
+      entry.amount_lines.build(amount_type: "credit", amount_cents: 1, account: account)
+      entry.save!
+      create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
       result = strategy.load_amounts
-      expect(result.values.sum).to eq(1000)
+      expect(result[[account.id, "debit"]]).to eq(1001)
     end
 
     it "applies scope" do

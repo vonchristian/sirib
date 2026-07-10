@@ -1,116 +1,237 @@
 <%= render "marketing_nav" %>
-<section class="relative overflow-hidden landing-border border-b pt-32 pb-24">
-  <div class="landing-grid-bg pointer-events-none absolute inset-0"></div>
-  <div class="relative mx-auto max-w-4xl px-6">
-    <p class="landing-label mb-4">For Finance</p>
-    <h1 class="landing-hero-title text-4xl font-light tracking-[-0.03em] landing-text sm:text-5xl">
-      Every transaction posts to the GL.<br>
-      <span class="landing-accent">Trial balance is current. Always.</span>
-    </h1>
-    <p class="mt-4 max-w-2xl text-base leading-relaxed landing-muted">
-      Your finance team reconciles because transactions happen in different systems — teller 
-      operations, loans, savings — and someone has to make them match. Sirib treats the 
-      cooperative as one system. Every transaction creates its journal entry automatically. 
-      Month-end becomes a review instead of a reconciliation marathon.
+
+<section class="relative overflow-hidden landing-hero-drench pt-24 pb-20" data-controller="reveal">
+  <div class="landing-hero-pattern"></div>
+  <div class="landing-blob landing-blob-1"></div>
+  <div class="landing-blob landing-blob-2"></div>
+  <div class="relative z-10 mx-auto max-w-7xl px-6 pt-16">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+      <div>
+        <p class="text-xs font-medium tracking-widest text-[#b8d4b5] uppercase mb-4" style="font-family: var(--font-mono);">For Finance Officers</p>
+        <h1 class="landing-hero-title text-balance text-5xl leading-none sm:text-6xl lg:text-7xl">
+          Your financial position.<br>
+          <span class="landing-hero-accent">Always current.</span>
+        </h1>
+        <p class="landing-hero-body mt-6 max-w-xl text-balance text-lg leading-relaxed">
+          Every transaction flows directly into your books — no re-entry, no spreadsheet reconciliation,
+          no waiting for branch reports. Trial balance, income statement, balance sheet — all ready
+          when you need them, not at the end of the month.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-4">
+          <a href="#demo" class="landing-hero-cta landing-hero-cta-primary">See It in Action</a>
+          <a href="/session/new" class="landing-hero-cta landing-hero-cta-outline">Try a Demo</a>
+        </div>
+      </div>
+      <div class="hidden lg:block">
+        <div class="landing-browser-frame">
+          <div class="landing-browser-toolbar">
+            <span class="landing-browser-dot" style="background:#ff5f57"></span>
+            <span class="landing-browser-dot" style="background:#ffbd2e"></span>
+            <span class="landing-browser-dot" style="background:#28c840"></span>
+          </div>
+          <img src="<%= image_path('screenshots/dashboard.svg') %>" alt="Financial dashboard in Sirib">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-[#f0f7ef] border-b border-[#e7e5e4] py-12" data-controller="reveal">
+  <div class="mx-auto max-w-7xl px-6">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
+      <div class="text-center">
+        <p class="landing-stats-value">200+</p>
+        <p class="landing-stats-label">journal entries recorded per day</p>
+      </div>
+      <div class="text-center">
+        <p class="landing-stats-value">2 hrs</p>
+        <p class="landing-stats-label">month-end close time</p>
+      </div>
+      <div class="text-center">
+        <p class="landing-stats-value">0</p>
+        <p class="landing-stats-label">manual reconciliation errors</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="border-b border-[#e7e5e4] py-24 bg-white relative overflow-hidden" data-controller="reveal">
+  <div class="landing-blob landing-blob-3" style="top: -5rem; right: 15%; opacity: 0.6;"></div>
+  <div class="mx-auto max-w-7xl px-6 relative z-10">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <p class="text-xs font-medium tracking-widest text-[#5b8c5a] uppercase mb-3" style="font-family: var(--font-mono);">The Flow</p>
+      <h2 class="text-balance text-3xl font-normal tracking-[-0.03em] text-[#1c1917] sm:text-4xl">
+        How transactions flow into your financial statements
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-4" data-reveal-item>
+      <div class="text-center relative">
+        <div class="mx-auto w-14 h-14 rounded-full bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <p class="text-xs font-medium text-[#3d6b3c] mb-2" style="font-family: var(--font-mono); letter-spacing: 0.1em;">STEP 1</p>
+        <h3 class="text-base font-medium text-[#1c1917] mb-2">Transaction recorded</h3>
+        <p class="text-sm leading-relaxed text-[#6e6358]">Teller posts a transaction. Sirib immediately generates the corresponding journal entry — debit, credit, account — automatically.</p>
+      </div>
+      <div class="text-center relative">
+        <div class="mx-auto w-14 h-14 rounded-full bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>
+        </div>
+        <p class="text-xs font-medium text-[#3d6b3c] mb-2" style="font-family: var(--font-mono); letter-spacing: 0.1em;">STEP 2</p>
+        <h3 class="text-base font-medium text-[#1c1917] mb-2">Journal entry posted</h3>
+        <p class="text-sm leading-relaxed text-[#6e6358]">Double-entry posted to the general ledger in real time. Finance officer reviews or approves — no data re-entry from branch reports.</p>
+      </div>
+      <div class="text-center relative">
+        <div class="mx-auto w-14 h-14 rounded-full bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/></svg>
+        </div>
+        <p class="text-xs font-medium text-[#3d6b3c] mb-2" style="font-family: var(--font-mono); letter-spacing: 0.1em;">STEP 3</p>
+        <h3 class="text-base font-medium text-[#1c1917] mb-2">Trial balance</h3>
+        <p class="text-sm leading-relaxed text-[#6e6358]">Running trial balance always available. Balances are live, not at month-end. Officers can run it any time — it reflects everything posted that day.</p>
+      </div>
+      <div class="text-center relative">
+        <div class="mx-auto w-14 h-14 rounded-full bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v4H3zM3 10h12v4H3zM3 17h6v4H3z"/></svg>
+        </div>
+        <p class="text-xs font-medium text-[#3d6b3c] mb-2" style="font-family: var(--font-mono); letter-spacing: 0.1em;">STEP 4</p>
+        <h3 class="text-base font-medium text-[#1c1917] mb-2">Financial statements</h3>
+        <p class="text-sm leading-relaxed text-[#6e6358]">Income statement, balance sheet, cash flow statement — generated from live data. One click to produce. No spreadsheet assembly required.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="border-b border-[#e7e5e4] py-24 bg-[#faf9f7]" data-controller="reveal">
+  <div class="mx-auto max-w-7xl px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <p class="text-xs font-medium tracking-widest text-[#5b8c5a] uppercase mb-3" style="font-family: var(--font-mono);">What Gets Automated</p>
+      <h2 class="text-balance text-3xl font-normal tracking-[-0.03em] text-[#1c1917] sm:text-4xl">
+        The tasks Sirib handles so finance officers work on analysis
+      </h2>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal-item>
+      <div class="bg-white rounded-xl border border-[#e7e5e4] p-6 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-lg bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v4H4zM4 10h12v4H4zM4 16h6v4H4z"/></svg>
+        </div>
+        <h3 class="text-sm font-medium text-[#1c1917]">Recurring journal entries</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#6e6358]">Depreciation, accruals, and subscriptions — scheduled to post automatically. Finance officer reviews instead of re-entering the same entries every period.</p>
+      </div>
+      <div class="bg-white rounded-xl border border-[#e7e5e4] p-6 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-lg bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01"/></svg>
+        </div>
+        <h3 class="text-sm font-medium text-[#1c1917]">Inter-account transfers</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#6e6358]">Moving funds between accounts logged and posted as a journal entry pair. Full audit trail — who initiated, who approved, what the purpose was.</p>
+      </div>
+      <div class="bg-white rounded-xl border border-[#e7e5e4] p-6 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-lg bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 7a2 2 0 1 1 4 0v4a2 2 0 0 1-4 0V7z"/><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/></svg>
+        </div>
+        <h3 class="text-sm font-medium text-[#1c1917]">Provision calculations</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#6e6358]">IFRS 9 expected credit loss provisions computed from loan portfolio data. System calculates based on aging buckets and past-due records — officer reviews and approves.</p>
+      </div>
+      <div class="bg-white rounded-xl border border-[#e7e5e4] p-6 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-lg bg-[#f0f7ef] flex items-center justify-center mb-4 text-[#5b8c5a]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/></svg>
+        </div>
+        <h3 class="text-sm font-medium text-[#1c1917]">Cash flow projections</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#6e6358]">30/60/90-day cash flow projected from recorded transactions and scheduled payments. Available anytime — not just when the treasurer compiles the report.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="border-b border-[#e7e5e4] py-24 bg-white" data-controller="reveal">
+  <div class="mx-auto max-w-4xl px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <p class="text-xs font-medium tracking-widest text-[#5b8c5a] uppercase mb-3" style="font-family: var(--font-mono);">Manual Tasks Offloaded</p>
+      <h2 class="text-balance text-3xl font-normal tracking-[-0.03em] text-[#1c1917] sm:text-4xl">
+        What your finance officers won't have to do anymore
+      </h2>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2" data-reveal-item>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Re-entering transaction data from branch reports into the accounting system</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Reconciling bank statements manually — every transaction ties to a journal entry</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Assembling financial statements from spreadsheets — generated from live data in one click</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Posting paper ledger entries by hand — every transaction flows from source to ledger</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Calculating depreciation and accruals manually — scheduled entries post automatically</p>
+      </div>
+      <div class="flex items-start gap-3 bg-[#faf9f7] rounded-lg p-5 border border-[#e7e5e4]">
+        <div class="w-6 h-6 rounded-full bg-[#f0f7ef] flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3 h-3 text-[#5b8c5a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="text-sm text-[#6e6358]">Waiting for branch reports to close the books — everything is real time</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="border-b border-[#e7e5e4] py-24 bg-[#f0f7ef] relative overflow-hidden" data-controller="reveal">
+  <div class="landing-blob landing-blob-4" style="bottom: -8rem; left: 10%; opacity: 0.5;"></div>
+  <div class="mx-auto max-w-4xl px-6 relative z-10">
+    <div class="text-center" data-reveal-item>
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#b8d4b5] mb-8">
+        <span class="landing-metric">3 days → 2 hours</span>
+      </div>
+      <blockquote class="text-2xl font-normal tracking-[-0.02em] text-[#1c1917] leading-relaxed">
+        "Month-end used to be three days of pulling numbers from branches, reconciling, and correcting. The last few months we've been closing in two hours. Not because we work faster — because Sirib already has everything posted."
+      </blockquote>
+      <div class="mt-8">
+        <p class="text-sm font-medium text-[#1c1917]">Finance Manager</p>
+        <p class="text-xs text-[#6e6358]">Mindanao Cooperative Bank</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo" class="landing-cta-band border-b border-[#e7e5e4] relative overflow-hidden" data-controller="reveal">
+  <div class="landing-blob landing-blob-1" style="opacity: 0.15;"></div>
+  <div class="landing-blob landing-blob-2" style="opacity: 0.15;"></div>
+  <div class="relative z-10 mx-auto max-w-3xl px-6 py-24 text-center">
+    <h2 class="landing-cta-title text-balance text-3xl font-normal tracking-[-0.03em] sm:text-4xl" data-reveal-item>
+      Your finance officer's job is analysis,<br>
+      not data entry.
+    </h2>
+    <div class="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row" data-reveal-item>
+      <a href="/session/new" class="landing-cta-primary">See Financial Reporting in Action</a>
+      <a href="/session/new" class="landing-cta-outline">Start a Free Trial</a>
+    </div>
+    <p class="landing-cta-subtle mt-6 text-xs" data-reveal-item>
+      Already with Sirib? <a href="<%= new_session_path %>" class="underline transition-opacity hover:opacity-80">Sign in</a>
     </p>
   </div>
 </section>
-<section class="landing-border border-b landing-bg-alt">
-  <div class="mx-auto max-w-4xl px-6 py-24">
-    <p class="landing-label mb-2">The Flow</p>
-    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">How the books stay current without manual effort</h2>
-    <div class="mt-10 space-y-4">
-      <div class="landing-card border p-6 flex items-start gap-5">
-        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">1</span>
-        <div>
-          <p class="text-sm font-medium landing-text">A transaction happens anywhere in the coop</p>
-          <p class="mt-1 text-sm leading-relaxed landing-muted">A teller processes a deposit. A loan is disbursed. A savings account earns interest. Every action that affects the cooperative's financial position is recorded once.</p>
-        </div>
-      </div>
-      <div class="landing-card border p-6 flex items-start gap-5">
-        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">2</span>
-        <div>
-          <p class="text-sm font-medium landing-text">Journal entries are created automatically</p>
-          <p class="mt-1 text-sm leading-relaxed landing-muted">The system knows which accounts to debit and credit for each transaction type. The journal entry is created as part of the same action — no separate posting, no manual coding.</p>
-        </div>
-      </div>
-      <div class="landing-card border p-6 flex items-start gap-5">
-        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">3</span>
-        <div>
-          <p class="text-sm font-medium landing-text">Interest is computed and posted daily</p>
-          <p class="mt-1 text-sm leading-relaxed landing-muted">Savings interest and loan interest accrue daily based on current balances and product terms. The entries post automatically — no month-end catch-up, no manual calculation.</p>
-        </div>
-      </div>
-      <div class="landing-card border p-6 flex items-start gap-5">
-        <span class="font-mono text-xl font-light landing-accent shrink-0 leading-none w-8">4</span>
-        <div>
-          <p class="text-sm font-medium landing-text">Trial balance is always current</p>
-          <p class="mt-1 text-sm leading-relaxed landing-muted">Because every entry creates its journal entry automatically, there's nothing to reconcile. The trial balance at any moment reflects every transaction. Period-end is validation, not reconstruction.</p>
-        </div>
-      </div>
+
+<footer class="landing-footer" data-controller="reveal">
+  <div class="mx-auto max-w-7xl px-6 py-12">
+    <div class="flex flex-col items-center justify-between gap-6 sm:flex-row">
+      <a href="/" class="text-sm font-medium text-white/60 hover:text-white transition-colors">← Back to Sirib</a>
+      <p class="text-xs text-white/40">Built for Philippine cooperatives. · Sirib</p>
     </div>
-  </div>
-</section>
-<section class="landing-border border-b">
-  <div class="mx-auto max-w-7xl px-6 py-16">
-    <div class="overflow-hidden rounded-lg border landing-border shadow-lg">
-      <img src="<%= image_path('screenshots/chart_of_accounts.png') %>" alt="Chart of accounts in Sirib" class="w-full">
-    </div>
-  </div>
-</section>
-<section class="landing-border border-b">
-  <div class="mx-auto max-w-4xl px-6 py-24">
-    <p class="landing-label mb-2">What Gets Automated</p>
-    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">The manual accounting work Sirib eliminates</h2>
-    <div class="mt-10 grid gap-px sm:grid-cols-2">
-      <div class="landing-card border p-6">
-        <p class="text-sm font-medium landing-text">Journal entry generation</p>
-        <p class="mt-1 text-sm leading-relaxed landing-muted">Every teller transaction, loan disbursement, and collection creates the correct journal entry automatically. Debits and credits are mapped to the chart of accounts.</p>
-      </div>
-      <div class="landing-card border p-6">
-        <p class="text-sm font-medium landing-text">Daily interest computation</p>
-        <p class="mt-1 text-sm leading-relaxed landing-muted">Savings and loan interest calculated daily based on end-of-day balances. Entries post automatically through standing journals.</p>
-      </div>
-      <div class="landing-card border p-6">
-        <p class="text-sm font-medium landing-text">Real-time trial balance</p>
-        <p class="mt-1 text-sm leading-relaxed landing-muted">Built from every posted entry. No reconciliation between subsystems because there's only one system. Current at all times.</p>
-      </div>
-      <div class="landing-card border p-6">
-        <p class="text-sm font-medium landing-text">BSP report generation</p>
-        <p class="mt-1 text-sm leading-relaxed landing-muted">Financial statements and regulatory report templates pre-configured and populated from your ledger. No manual extraction, no data gathering.</p>
-      </div>
-    </div>
-  </div>
-</section>
-<section class="landing-border border-b landing-bg-alt">
-  <div class="mx-auto max-w-4xl px-6 py-24">
-    <p class="landing-label mb-2">Manual Tasks Offloaded</p>
-    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">What your finance team won't have to do anymore</h2>
-    <ul class="mt-10 space-y-3 text-sm leading-relaxed landing-muted">
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Entering journal entries from teller operations — created automatically from each transaction</li>
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Manually computing interest at month-end — accrued and posted daily</li>
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Reconciling between teller, loans, and savings systems — everything posts to the same GL</li>
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Preparing trial balance from multiple data sources — current and complete at all times</li>
-      <li class="flex items-start gap-3"><span class="landing-accent shrink-0 mt-0.5">•</span>Extracting data for BSP reports — populated from the same verified data</li>
-    </ul>
-  </div>
-</section>
-<section class="landing-border border-b">
-  <div class="mx-auto max-w-3xl px-6 py-24 text-center">
-    <p class="landing-label mb-4">See it in action</p>
-    <h2 class="text-2xl font-light tracking-[-0.03em] landing-text sm:text-3xl">
-      Your finance team already knows how to get the books right.<br>
-      <span class="landing-accent">Sirib keeps them right so your team can focus on analysis, not reconciliation.</span>
-    </h2>
-    <div class="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-      <a href="/#demo" class="landing-btn-accent px-8 py-3 text-sm font-semibold tracking-wide uppercase transition-colors">Watch the Walkthrough</a>
-      <a href="/#" class="landing-border-muted border px-8 py-3 text-sm font-medium tracking-wide landing-muted uppercase transition-colors hover:landing-btn-outline">Talk to a Fellow Coop Manager</a>
-    </div>
-  </div>
-</section>
-<footer class="landing-bg">
-  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-12 sm:flex-row">
-    <a href="/" class="text-sm font-medium tracking-tight landing-muted transition-colors hover:landing-text">← Back to Sirib</a>
-    <p class="text-xs landing-dim">Built for Philippine cooperatives.</p>
   </div>
 </footer>

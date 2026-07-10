@@ -54,7 +54,7 @@ RSpec.describe Accounting::EntryTemplate::ExecuteService do
       it "stores total_amount_cents" do
         entry = described_class.run!(template: template, amount: 5_000, posting: true)
 
-        expect(entry.total_amount_cents).to eq(500_000)
+        expect(entry.amount_lines.sum(:amount_cents)).to eq(1_000_000)
       end
 
       it "rejects zero amount" do

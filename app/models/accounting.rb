@@ -6,4 +6,6 @@ module Accounting
     revenue: "revenue",
     expense: "expense"
   }.freeze
+
+  class Error < StandardError; end
 end

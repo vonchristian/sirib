@@ -58,11 +58,15 @@ RSpec.describe Accounting::JournalEntrySearchService do
       account1 = create(:accounting_account)
       account2 = create(:accounting_account)
 
-      entry1 = create(:accounting_entry)
-      entry1.amount_lines.first.update!(account: account1)
+      entry1 = nil
+      entry2 = nil
 
-      entry2 = create(:accounting_entry)
-      entry2.amount_lines.first.update!(account: account2)
+      AppendOnlyOverride.with_override(reason: "test setup") do
+        entry1 = create(:accounting_entry)
+        entry1.amount_lines.first.update!(account: account1)
+        entry2 = create(:accounting_entry)
+        entry2.amount_lines.first.update!(account: account2)
+      end
 
       result = described_class.new(query: entry1.reference_number, account_id: account1.id).call
 

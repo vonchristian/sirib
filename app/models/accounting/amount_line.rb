@@ -15,7 +15,7 @@ module Accounting
               numericality: { greater_than: 0 }
 
     scope :between, ->(from_date, to_date) {
-      from_date(from_date).up_to(to_date)
+      joins(:entry).merge(Entry.date_range(from_date, to_date))
     }
 
     scope :up_to, ->(date) {

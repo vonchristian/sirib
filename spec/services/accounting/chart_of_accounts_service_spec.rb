@@ -81,9 +81,11 @@ RSpec.describe Accounting::ChartOfAccountsService do
 
     it "includes balance" do
       with_cooperative do
-        entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.current)
-        entry.amount_lines.first.update!(account: account, cooperative: cooperative, amount_cents: 5000)
-        entry.amount_lines.last.update!(account: account, cooperative: cooperative, amount_cents: 5000)
+        AppendOnlyOverride.with_override(reason: "test setup") do
+          entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.current)
+          entry.amount_lines.first.update!(account: account, cooperative: cooperative, amount_cents: 5000)
+          entry.amount_lines.last.update!(account: account, cooperative: cooperative, amount_cents: 5000)
+        end
       end
 
       tree = service.tree_data
@@ -146,9 +148,11 @@ RSpec.describe Accounting::ChartOfAccountsService do
 
     it "includes recent lines" do
       with_cooperative do
-        entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.current)
-        entry.amount_lines.first.update!(account: account, cooperative: cooperative)
-        entry.amount_lines.last.update!(account: account, cooperative: cooperative)
+        AppendOnlyOverride.with_override(reason: "test setup") do
+          entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.current)
+          entry.amount_lines.first.update!(account: account, cooperative: cooperative)
+          entry.amount_lines.last.update!(account: account, cooperative: cooperative)
+        end
       end
 
       inspector = service.account_inspector(account.id)
@@ -157,9 +161,11 @@ RSpec.describe Accounting::ChartOfAccountsService do
 
     it "includes debit and credit totals" do
       with_cooperative do
-        entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.current)
-        entry.amount_lines.first.update!(account: account, cooperative: cooperative, amount_type: "debit", amount_cents: 10000)
-        entry.amount_lines.last.update!(account: account, cooperative: cooperative, amount_type: "credit", amount_cents: 4000)
+        AppendOnlyOverride.with_override(reason: "test setup") do
+          entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.current)
+          entry.amount_lines.first.update!(account: account, cooperative: cooperative, amount_type: "debit", amount_cents: 10000)
+          entry.amount_lines.last.update!(account: account, cooperative: cooperative, amount_type: "credit", amount_cents: 4000)
+        end
       end
 
       inspector = service.account_inspector(account.id)

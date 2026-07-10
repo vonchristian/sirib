@@ -14,11 +14,15 @@ RSpec.describe Accounting::LedgerQueryService do
     Current.set(cooperative: cooperative) { example.run }
   end
 
+  def update_line!(line, attrs)
+    AppendOnlyOverride.with_override(reason: "test setup") { line.update!(attrs) }
+  end
+
   describe "#scope" do
     it "returns filtered amount lines for the account" do
       entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.zone.now)
       line = entry.amount_lines.first
-      line.update!(account: account, cooperative: cooperative)
+      update_line!(line, account: account, cooperative: cooperative)
 
       result = service.scope
       expect(result).to include(line)
@@ -28,7 +32,7 @@ RSpec.describe Accounting::LedgerQueryService do
       other_account = create(:accounting_account, ledger: ledger, cooperative: cooperative)
       entry = create(:accounting_entry, cooperative: cooperative)
       line = entry.amount_lines.first
-      line.update!(account: other_account, cooperative: cooperative)
+      update_line!(line, account: other_account, cooperative: cooperative)
 
       result = service.scope
       expect(result).to be_empty
@@ -40,11 +44,11 @@ RSpec.describe Accounting::LedgerQueryService do
       it "filters by date range" do
         entry_in_range = create(:accounting_entry, cooperative: cooperative, posted_at: Time.zone.local(2024, 6, 15))
         line_in_range = entry_in_range.amount_lines.first
-        line_in_range.update!(account: account, cooperative: cooperative)
+        update_line!(line_in_range, account: account, cooperative: cooperative)
 
         entry_outside = create(:accounting_entry, cooperative: cooperative, posted_at: Time.zone.local(2023, 6, 15))
         line_outside = entry_outside.amount_lines.first
-        line_outside.update!(account: account, cooperative: cooperative)
+        update_line!(line_outside, account: account, cooperative: cooperative)
 
         result = service.scope
         expect(result).to include(line_in_range)
@@ -58,11 +62,11 @@ RSpec.describe Accounting::LedgerQueryService do
       it "filters by amount range" do
         entry = create(:accounting_entry, cooperative: cooperative)
         matching_line = entry.amount_lines.first
-        matching_line.update!(account: account, cooperative: cooperative, amount_cents: 10_000)
+        update_line!(matching_line, account: account, cooperative: cooperative, amount_cents: 10_000)
 
         other_entry = create(:accounting_entry, cooperative: cooperative)
         other_line = other_entry.amount_lines.first
-        other_line.update!(account: account, cooperative: cooperative, amount_cents: 100)
+        update_line!(other_line, account: account, cooperative: cooperative, amount_cents: 100)
 
         result = service.scope
         expect(result).to include(matching_line)
@@ -76,10 +80,10 @@ RSpec.describe Accounting::LedgerQueryService do
       it "filters to only debit lines" do
         entry = create(:accounting_entry, cooperative: cooperative)
         debit_line = entry.amount_lines.where(amount_type: :debit).first
-        debit_line&.update!(account: account, cooperative: cooperative)
+        update_line!(debit_line, account: account, cooperative: cooperative) if debit_line
 
         credit_line = entry.amount_lines.where(amount_type: :credit).first
-        credit_line&.update!(account: account, cooperative: cooperative)
+        update_line!(credit_line, account: account, cooperative: cooperative) if credit_line
 
         result = service.scope
         expect(result).to include(debit_line) if debit_line
@@ -93,11 +97,11 @@ RSpec.describe Accounting::LedgerQueryService do
       it "filters by reference number" do
         matching_entry = create(:accounting_entry, cooperative: cooperative, reference_number: "ENT-123-TEST")
         matching_line = matching_entry.amount_lines.first
-        matching_line.update!(account: account, cooperative: cooperative)
+        update_line!(matching_line, account: account, cooperative: cooperative)
 
         non_matching_entry = create(:accounting_entry, cooperative: cooperative, reference_number: "ENT-999-OTHER")
         non_matching_line = non_matching_entry.amount_lines.first
-        non_matching_line.update!(account: account, cooperative: cooperative)
+        update_line!(non_matching_line, account: account, cooperative: cooperative)
 
         result = service.scope
         expect(result).to include(matching_line)
@@ -111,11 +115,11 @@ RSpec.describe Accounting::LedgerQueryService do
       it "filters by entry type" do
         matching_entry = create(:accounting_entry, cooperative: cooperative, entry_type: "interest_entry")
         matching_line = matching_entry.amount_lines.first
-        matching_line.update!(account: account, cooperative: cooperative)
+        update_line!(matching_line, account: account, cooperative: cooperative)
 
         non_matching_entry = create(:accounting_entry, cooperative: cooperative, entry_type: "manual_entry")
         non_matching_line = non_matching_entry.amount_lines.first
-        non_matching_line.update!(account: account, cooperative: cooperative)
+        update_line!(non_matching_line, account: account, cooperative: cooperative)
 
         result = service.scope
         expect(result).to include(matching_line)
@@ -128,7 +132,7 @@ RSpec.describe Accounting::LedgerQueryService do
     it "returns ledger line structs" do
       entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.zone.now)
       line = entry.amount_lines.first
-      line.update!(account: account, cooperative: cooperative)
+      update_line!(line, account: account, cooperative: cooperative)
 
       ledger_lines = service.build_ledger_lines([ line ])
       expect(ledger_lines).to be_an(Array)
@@ -139,21 +143,23 @@ RSpec.describe Accounting::LedgerQueryService do
     end
 
     it "computes running balance correctly for asset accounts" do
+      asc_service = described_class.new(account: account, filters: {}, sort_order: "asc")
+
       posted_at = Time.zone.local(2024, 1, 1)
       entry1 = create(:accounting_entry, cooperative: cooperative, posted_at: posted_at)
       line1 = entry1.amount_lines.where(amount_type: :debit).first
-      line1.update!(account: account, cooperative: cooperative, amount_cents: 10_000)
+      update_line!(line1, account: account, cooperative: cooperative, amount_cents: 10_000)
 
       entry2 = create(:accounting_entry, cooperative: cooperative, posted_at: posted_at + 1.day)
       line2 = entry2.amount_lines.where(amount_type: :credit).first
-      line2.update!(account: account, cooperative: cooperative, amount_cents: 3_000)
+      update_line!(line2, account: account, cooperative: cooperative, amount_cents: 3_000)
 
       entry3 = create(:accounting_entry, cooperative: cooperative, posted_at: posted_at + 2.days)
       line3 = entry3.amount_lines.where(amount_type: :debit).first
-      line3.update!(account: account, cooperative: cooperative, amount_cents: 5_000)
+      update_line!(line3, account: account, cooperative: cooperative, amount_cents: 5_000)
 
       lines = [ line1, line2, line3 ]
-      ledger_lines = service.build_ledger_lines(lines)
+      ledger_lines = asc_service.build_ledger_lines(lines)
 
       expect(ledger_lines[0].running_balance.cents).to eq(10_000)
       expect(ledger_lines[1].running_balance.cents).to eq(7_000)
@@ -167,11 +173,11 @@ RSpec.describe Accounting::LedgerQueryService do
       posted_at = Time.zone.local(2024, 1, 1)
       entry1 = create(:accounting_entry, cooperative: cooperative, posted_at: posted_at)
       line1 = entry1.amount_lines.where(amount_type: :credit).first
-      line1.update!(account: liability_account, cooperative: cooperative, amount_cents: 10_000)
+      update_line!(line1, account: liability_account, cooperative: cooperative, amount_cents: 10_000)
 
       entry2 = create(:accounting_entry, cooperative: cooperative, posted_at: posted_at + 1.day)
       line2 = entry2.amount_lines.where(amount_type: :debit).first
-      line2.update!(account: liability_account, cooperative: cooperative, amount_cents: 3_000)
+      update_line!(line2, account: liability_account, cooperative: cooperative, amount_cents: 3_000)
 
       lines = [ line1, line2 ]
       ledger_lines = liability_service.build_ledger_lines(lines)
@@ -181,10 +187,9 @@ RSpec.describe Accounting::LedgerQueryService do
     end
 
     it "includes posted_by from entry creator" do
-      entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.zone.now)
-      entry.update!(created_by: user)
+      entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.zone.now, created_by: user)
       line = entry.amount_lines.first
-      line.update!(account: account, cooperative: cooperative)
+      update_line!(line, account: account, cooperative: cooperative)
 
       ledger_lines = service.build_ledger_lines([ line ])
       expect(ledger_lines.first.posted_by).to eq(user.email_address.split("@").first)
@@ -207,12 +212,14 @@ RSpec.describe Accounting::LedgerQueryService do
     end
 
     it "computes totals correctly" do
-      entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.zone.now)
-      debit_line = entry.amount_lines.where(amount_type: :debit).first
-      debit_line.update!(account: account, cooperative: cooperative, amount_cents: 15_000)
+      AppendOnlyOverride.with_override(reason: "test setup") do
+        entry = create(:accounting_entry, cooperative: cooperative, posted_at: Time.zone.now)
+        debit_line = entry.amount_lines.where(amount_type: :debit).first
+        debit_line.update!(account: account, cooperative: cooperative, amount_cents: 15_000)
 
-      credit_line = entry.amount_lines.where(amount_type: :credit).first
-      credit_line.update!(account: account, cooperative: cooperative, amount_cents: 15_000)
+        credit_line = entry.amount_lines.where(amount_type: :credit).first
+        credit_line.update!(account: account, cooperative: cooperative, amount_cents: 15_000)
+      end
 
       result = service.summary
       expect(result[:total_debits].cents).to eq(15_000)

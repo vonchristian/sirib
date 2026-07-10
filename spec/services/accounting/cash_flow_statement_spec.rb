@@ -11,11 +11,11 @@ RSpec.describe Accounting::CashFlowStatement do
       create(:accounting_cash_account, user:, account: asset_account)
       create(:accounting_entry, posted_at: Time.current).tap do |entry|
         create(:accounting_amount_line, entry:, account: asset_account, amount_type: "debit", amount_cents: 10000)
-        create(:accounting_amount_line, entry:, account: asset_account, amount_type: "credit", amount_cents: 0)
+        create(:accounting_amount_line, entry:, account: asset_account, amount_type: "credit", amount_cents: 1)
       end
 
       result = described_class.run!(
-        from_date: 1.month.ago,
+        from_date: 1.month.ago.to_date,
         to_date: Date.current,
         user:
       )

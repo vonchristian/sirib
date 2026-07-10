@@ -1,13 +1,13 @@
 require "rails_helper"
 
 RSpec.describe Accounting::Account do
-  subject(:account) { build(:accounting_account) }
+  subject(:account) { build(:accounting_account, cooperative_id: Current.cooperative.id) }
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:account_code) }
     it { is_expected.to validate_presence_of(:account_type) }
-    it { is_expected.to validate_uniqueness_of(:account_code) }
+    it { is_expected.to validate_uniqueness_of(:account_code).scoped_to(:cooperative_id) }
   end
 
   describe "associations" do

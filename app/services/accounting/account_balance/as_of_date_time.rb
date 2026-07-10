@@ -1,7 +1,7 @@
 module Accounting
   module AccountBalance
     class AsOfDateTime
-      def initialize(to_date:, to_time:)
+      def initialize(to_date:, to_time:, **)
         @to_date = to_date
         @to_time = to_time
       end
@@ -20,7 +20,7 @@ module Accounting
       private
 
       def cutoff
-        @cutoff ||= @to_date.to_time.change(
+        @cutoff ||= @to_date.in_time_zone.change(
           hour: @to_time.hour,
           min: @to_time.min,
           sec: @to_time.sec

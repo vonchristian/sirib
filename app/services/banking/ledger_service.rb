@@ -19,22 +19,26 @@ module Banking
     def post_entry(description:, lines:, date: Date.current)
       entry = nil
       ActiveRecord::Base.transaction do
-        entry = Accounting::Entry.create!(
-          date: date,
+        entry = Accounting::Entry.new(
+          posted_at: date.beginning_of_day,
           description: description,
-          entries_type: "ledger"
+          reference_number: "LEDGER-#{SecureRandom.uuid}",
+          entry_type: "system_entry",
+          source_module: "source_manual",
+          status: "pending"
         )
 
         lines.each do |line|
-          entry.amount_lines.create!(
+          entry.amount_lines.build(
             account: line[:account],
             amount_cents: line[:amount_cents],
             amount_currency: line[:amount_currency] || "PHP",
-            side: line[:side]
+            amount_type: line[:amount_type]
           )
         end
 
         Accounting::ValidationEngine.validate!(entry)
+        entry.save!
         entry.update!(status: "posted")
       end
 
@@ -56,9 +60,13 @@ module Banking
 
     def account_balance(account_id, as_of: Time.current)
       account = Accounting::Account.find(account_id)
-      balance = Accounting::AccountBalance::AsOfDateTime.new(account, as_of).call
+      strategy = Accounting::AccountBalance.resolve(to_date: as_of.to_date, to_time: as_of)
+      amounts = strategy.load_amounts
+      balance = Accounting::AccountBalance.balance(account, amounts)
       { account: account.name, balance: balance, as_of: as_of }
     rescue StandardError => e
+      # Intentionally broad: query methods return errors in Result struct
+      # rather than propagating exceptions — caller chooses how to handle.
       Result.new(success?: false, errors: [ e.message ])
     end
   end

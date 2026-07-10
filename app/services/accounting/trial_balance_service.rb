@@ -6,7 +6,11 @@ module Accounting
     NORMAL_DEBIT_TYPES = %w[asset expense].freeze
 
     def execute
-      rows = aggregate_amounts
+      if use_materialized_view?
+        rows = query_materialized_view
+      else
+        rows = aggregate_amounts
+      end
 
       accounts = if cooperative
                    Account.by_cooperative(cooperative).where(id: rows.map { |r| r["account_id"] }).includes(:ledger).index_by(&:id)
@@ -14,7 +18,7 @@ module Accounting
                    Account.where(id: rows.map { |r| r["account_id"] }).includes(:ledger).index_by(&:id)
       end
 
-      account_lines = rows.map do |row|
+      account_lines = rows.filter_map do |row|
         account = accounts[row["account_id"].to_i]
         next unless account
 
@@ -33,7 +37,7 @@ module Accounting
           net_debit_cents: net[:debit_cents],
           net_credit_cents: net[:credit_cents]
         }
-      end.compact
+      end
 
       total_debit_cents = account_lines.sum { |l| l[:debit_cents] }
       total_credit_cents = account_lines.sum { |l| l[:credit_cents] }
@@ -48,6 +52,24 @@ module Accounting
     end
 
     private
+
+    def use_materialized_view?
+      as_of == Date.current && Reporting::TrialBalance.any?
+    end
+
+    def query_materialized_view
+      scope = Reporting::TrialBalance.all
+      scope = scope.by_cooperative(cooperative) if cooperative
+
+      scope.select(
+        "account_id",
+        "(debit_cents - credit_cents) AS net_cents",
+        "debit_cents",
+        "credit_cents"
+      ).map do |row|
+        { "account_id" => row.account_id.to_s, "debit_cents" => row.debit_cents, "credit_cents" => row.credit_cents }
+      end
+    end
 
     def aggregate_amounts
       base = AmountLine
