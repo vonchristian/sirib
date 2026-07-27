@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_27_010426) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1164,78 +1164,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010426) do
     t.index ["uuid"], name: "index_membership_applications_on_uuid", unique: true
   end
 
-  create_table "messaging_channels", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.string "name", null: false
-    t.boolean "enabled", default: true, null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_messaging_channels_on_cooperative_id"
-    t.index ["name"], name: "index_messaging_channels_on_name", unique: true
-  end
-
-  create_table "messaging_message_deliveries", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "message_id", null: false
-    t.bigint "channel_id", null: false
-    t.bigint "provider_id"
-    t.string "status", default: "queued", null: false
-    t.integer "attempts_count", default: 0
-    t.text "last_error"
-    t.string "provider_message_id"
-    t.timestamptz "sent_at"
-    t.timestamptz "delivered_at"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["channel_id"], name: "index_messaging_message_deliveries_on_channel_id"
-    t.index ["cooperative_id"], name: "index_messaging_message_deliveries_on_cooperative_id"
-    t.index ["message_id"], name: "index_messaging_message_deliveries_on_message_id"
-    t.index ["provider_id"], name: "index_messaging_message_deliveries_on_provider_id"
-    t.index ["status"], name: "index_messaging_message_deliveries_on_status"
-  end
-
-  create_table "messaging_messages", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.string "message_type", null: false
-    t.string "recipient_type", null: false
-    t.integer "recipient_id", null: false
-    t.jsonb "payload", default: {}
-    t.string "status", default: "pending", null: false
-    t.timestamptz "scheduled_at"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_messaging_messages_on_cooperative_id"
-    t.index ["message_type"], name: "index_messaging_messages_on_message_type"
-    t.index ["recipient_type", "recipient_id"], name: "index_messaging_messages_on_recipient_type_and_recipient_id"
-    t.index ["status"], name: "index_messaging_messages_on_status"
-  end
-
-  create_table "messaging_provider_webhooks", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "provider_id", null: false
-    t.string "event_type", null: false
-    t.jsonb "payload", default: {}
-    t.timestamptz "processed_at"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_messaging_provider_webhooks_on_cooperative_id"
-    t.index ["provider_id", "event_type"], name: "idx_on_provider_id_event_type_114a5f5c88", unique: true
-    t.index ["provider_id"], name: "index_messaging_provider_webhooks_on_provider_id"
-  end
-
-  create_table "messaging_providers", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "channel_id", null: false
-    t.string "name", null: false
-    t.jsonb "config", default: {}
-    t.boolean "enabled", default: true, null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["channel_id", "name"], name: "index_messaging_providers_on_channel_id_and_name", unique: true
-    t.index ["channel_id"], name: "index_messaging_providers_on_channel_id"
-    t.index ["cooperative_id"], name: "index_messaging_providers_on_cooperative_id"
-  end
-
   create_table "mfa_attempt_logs", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "action", null: false
@@ -1749,16 +1677,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010426) do
   add_foreign_key "members", "cooperatives"
   add_foreign_key "members", "management_branches", column: "branch_id"
   add_foreign_key "membership_applications", "cooperatives"
-  add_foreign_key "messaging_channels", "cooperatives"
-  add_foreign_key "messaging_message_deliveries", "cooperatives"
-  add_foreign_key "messaging_message_deliveries", "messaging_channels", column: "channel_id"
-  add_foreign_key "messaging_message_deliveries", "messaging_messages", column: "message_id"
-  add_foreign_key "messaging_message_deliveries", "messaging_providers", column: "provider_id"
-  add_foreign_key "messaging_messages", "cooperatives"
-  add_foreign_key "messaging_provider_webhooks", "cooperatives"
-  add_foreign_key "messaging_provider_webhooks", "messaging_providers", column: "provider_id"
-  add_foreign_key "messaging_providers", "cooperatives"
-  add_foreign_key "messaging_providers", "messaging_channels", column: "channel_id"
   add_foreign_key "mfa_attempt_logs", "users"
   add_foreign_key "portal_announcements", "cooperatives"
   add_foreign_key "portal_announcements", "users", column: "author_id"
