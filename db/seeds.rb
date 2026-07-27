@@ -20,18 +20,7 @@ unless Rails.env.test?
   require_relative "seeds/demo_data"
 end
 
-unless Rails.env.test?
-  puts "\nPhase 5: Sales demo comprehensive data"
-  require_relative "seeds/sales_demo"
-end
-
-unless Rails.env.test?
-  puts "\nPhase 6: Year-long audit trail"
-  require_relative "seeds/audit_trail"
-  run_year_long_audit_trail
-end
-
-puts "\nPhase 6: Security configuration"
+puts "\nPhase 5: Security configuration"
 require_relative "seeds/security"
 
 puts ""
@@ -40,6 +29,4 @@ puts "Seed complete"
 puts "  Cooperatives: #{Cooperative.count}"
 puts "  Users: #{User.count}"
 puts "  Password Policies: #{Security::PasswordPolicy.count}"
-puts "  Fraud Rules: #{Fraud::Rule.count}"
-puts "  Compliance Controls: #{Compliance::Control.count}"
 puts "=" * 60

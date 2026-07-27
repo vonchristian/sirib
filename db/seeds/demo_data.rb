@@ -86,47 +86,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
 
   admin_user = User.find_by(cooperative: coop, role: :manager)
 
-  # ── 3. Portal setup for members ─────────────────────────────────────
-  admin_user_for_portal = admin_user || User.find_by(cooperative: coop, role: :manager)
-  members_with_portal = 0
-  Membership::Member.where(cooperative: coop).find_each.with_index do |member, member_idx|
-    next if member.password_digest.present?
-
-    member.reload.update!(
-      member_identifier: "MBR-#{coop.name.parameterize.upcase}-#{format('%04d', member_idx + 1)}",
-      password: "password123",
-      portal_status: "active"
-    )
-    members_with_portal += 1
-  end
-
-  puts "    Portal enabled for #{members_with_portal} members" if members_with_portal > 0
-
-  # Portal announcements
-  unless Portal::Announcement.exists?(cooperative: coop)
-    announcements = [
-      { title: "Welcome to the Member Portal!",
-        body: "We are excited to launch our new member portal. You can now view your savings, share capital, loan balances, and repayment schedules online anytime. This is your window into your financial journey with #{coop.name}." },
-      { title: "Quarterly Dividend Declaration",
-        body: "The Board of Directors has approved a 3% dividend for all common shareholders for this quarter. Dividends will be credited to your share capital accounts by the end of the month." },
-      { title: "Annual General Meeting Announcement",
-        body: "The Annual General Meeting will be held on December 15th at the cooperative hall. All members are encouraged to attend. Election of new board members will take place." }
-    ]
-
-    announcements.each do |attrs|
-      Portal::Announcement.create!(
-        cooperative: coop,
-        title: attrs[:title],
-        body: attrs[:body],
-        status: "published",
-        published_at: [ 1.day.ago, 1.week.ago, 2.weeks.ago ][announcements.index(attrs)],
-        author: admin_user_for_portal || User.where(cooperative: coop).first!
-      )
-    end
-    puts "    Portal announcements created for #{coop.name}"
-  end
-
-  # ── 4. Equity products & accounts ──────────────────────────────────
+  # ── 3. Equity products & accounts ──────────────────────────────────
   unless Equity::Product.where(cooperative: coop).exists?
     common = Equity::Product.create!(
       cooperative: coop,
@@ -360,37 +320,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     )
   end
 
-  # ── 9. Branch performance snapshots ────────────────────────────────
-  branches = Management::Branch.where(cooperative: coop).to_a
-  branch_perf_templates = [
-    { loan_portfolio_cents: 8_500_000_00, savings_balance_cents: 3_200_000_00, delinquency_rate: 2.1,
-      collection_efficiency: 95.3, cash_flow_position_cents: 4_100_000_00, estimated_profitability_cents: 1_200_000_00, total_members: 45 },
-    { loan_portfolio_cents: 5_200_000_00, savings_balance_cents: 2_800_000_00, delinquency_rate: 3.8,
-      collection_efficiency: 91.7, cash_flow_position_cents: 2_300_000_00, estimated_profitability_cents: 780_000_00, total_members: 32 },
-    { loan_portfolio_cents: 3_800_000_00, savings_balance_cents: 1_900_000_00, delinquency_rate: 5.2,
-      collection_efficiency: 88.4, cash_flow_position_cents: 1_600_000_00, estimated_profitability_cents: 520_000_00, total_members: 28 }
-  ]
-
-  branches.each_with_index do |branch, i|
-    template = branch_perf_templates[i % branch_perf_templates.size]
-    variation = 1.0 + ((idx + 1) * 0.05)
-
-    [ Date.current, 7.days.ago.to_date ].each do |snap_date|
-      Management::BranchPerformanceSnapshot.find_or_create_by!(branch: branch, snapshot_date: snap_date, cooperative: coop) do |s|
-        s.metrics = {
-          loan_portfolio_cents: (template[:loan_portfolio_cents] * variation).to_i,
-          savings_balance_cents: (template[:savings_balance_cents] * variation).to_i,
-          delinquency_rate: template[:delinquency_rate],
-          collection_efficiency: template[:collection_efficiency],
-          cash_flow_position_cents: (template[:cash_flow_position_cents] * variation).to_i,
-          estimated_profitability_cents: (template[:estimated_profitability_cents] * variation).to_i,
-          total_members: template[:total_members] + idx
-        }
-      end
-    end
-  end
-
-  # ── 10. Role assignments for per-coop users ─────────────────────────
+  # ── 9. Role assignments for per-coop users ─────────────────────────
   coop_users = User.where(cooperative: coop).to_a
   branch = branches.first
 
@@ -411,79 +341,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     Management::RoleAssignment.find_or_create_by!(user: user, role: role, branch: branch, cooperative: coop, active_from: Date.current)
   end
 
-  # ── 11. Risk indicators ────────────────────────────────────────────
-  risk_data = [
-    { type: "credit_risk_delinquency", value: 3.5, threshold: 5.0, status: :elevated, branch: nil },
-    { type: "liquidity_ratio", value: 0.35, threshold: 0.2, status: :normal, branch: nil },
-    { type: "portfolio_at_risk", value: 4.2, threshold: 5.0, status: :elevated, branch: nil }
-  ]
-
-  branches.each do |br|
-    risk_data << { type: "credit_risk_delinquency", value: 2.1 + (idx * 0.5), threshold: 5.0, status: :normal, branch: br }
-    risk_data << { type: "portfolio_at_risk", value: 2.8 + (idx * 0.5), threshold: 5.0, status: :elevated, branch: br }
-  end
-
-  risk_data.each do |data|
-    Management::RiskIndicator.find_or_create_by!(
-      indicator_type: data[:type],
-      branch: data[:branch],
-      as_of_date: Date.current,
-      cooperative: coop
-    ) do |r|
-      r.value = data[:value]
-      r.threshold = data[:threshold]
-      r.status = data[:status]
-    end
-  end
-
-  # ── 12. System health snapshots ────────────────────────────────────
-  health_metrics = [
-    { name: "transaction_throughput", value: 142.5, unit: "tps" },
-    { name: "queue_depth", value: 8, unit: "jobs" },
-    { name: "posting_latency_ms", value: 234.0, unit: "ms" },
-    { name: "error_rate", value: 0.5, unit: "percent" },
-    { name: "database_connections", value: 12, unit: "conn" },
-    { name: "memory_usage_mb", value: 456, unit: "MB" }
-  ]
-
-  health_metrics.each do |m|
-    3.times do |i|
-      Management::SystemHealthSnapshot.find_or_create_by!(
-        metric_name: m[:name],
-        captured_at: i.hours.ago.beginning_of_hour,
-        cooperative: coop
-      ) do |s|
-        s.value = m[:value] + rand(-10.0..10.0)
-        s.unit = m[:unit]
-        s.status = :healthy
-      end
-    end
-  end
-
-  # ── 13. Alerts ─────────────────────────────────────────────────────
-  alert_templates = [
-    { alert_type: "loan_delinquency", severity: :warning,
-      title: "Delinquency rate alert",
-      message: "#{branches.first&.name || coop.name} delinquency rate is elevated." },
-    { alert_type: "system_health", severity: :info,
-      title: "System operating normally",
-      message: "All systems operational for #{coop.name}." }
-  ]
-
-  alert_templates.each do |attrs|
-    Management::Alert.find_or_create_by!(
-      alert_type: attrs[:alert_type],
-      title: attrs[:title],
-      severity: attrs[:severity],
-      source: "system",
-      cooperative: coop
-    ) do |a|
-      a.message = attrs[:message]
-      a.status = :active
-    end
-  end
-
-  # ── 14. Configurations ─────────────────────────────────────────────
+  # ── 10. Configurations ─────────────────────────────────────────────
   {
     "loan_default_interest_rate" => { value: 1.5, unit: "percent" },
     "savings_base_interest_rate" => { value: 0.25, unit: "percent" },
@@ -498,7 +356,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     end
   end
 
-  # ── 15. Audit logs ─────────────────────────────────────────────────
+  # ── 11. Audit logs ─────────────────────────────────────────────────
   unless Management::AuditLog.where(cooperative: coop).exists?
     gm_user = coop_users.find { |u| u.role == "manager" } || admin_user
 
@@ -522,49 +380,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     end
   end
 
-  # ── 16. External banks and bank accounts ────────────────────────────
-  unless External::Bank.where(cooperative: coop).exists?
-    demo_banks = [
-      {
-        name: "Philippine National Bank",
-        code: "PNB",
-        country: "PH",
-        accounts: [
-          { account_name: "PNB Savings Account", account_type: "savings", currency: "PHP", account_number_encrypted: "1234567890123456" },
-          { account_name: "PNB Checking Account", account_type: "checking", currency: "PHP", account_number_encrypted: "2345678901234567" }
-        ]
-      },
-      {
-        name: "Land Bank of the Philippines",
-        code: "LBP",
-        country: "PH",
-        accounts: [
-          { account_name: "LBP Main Account", account_type: "checking", currency: "PHP", account_number_encrypted: "3456789012345678" }
-        ]
-      },
-      {
-        name: "Bank of the Philippine Islands",
-        code: "BPI",
-        country: "PH",
-        accounts: [
-          { account_name: "BPI Corporate Savings", account_type: "savings", currency: "PHP", account_number_encrypted: "4567890123456789" }
-        ]
-      }
-    ]
-
-    demo_banks.each do |bank_attrs|
-      accounts = bank_attrs.delete(:accounts)
-      bank = External::Bank.create!(bank_attrs.merge(cooperative: coop))
-      puts "    Bank created: #{bank.name}"
-
-      accounts.each do |acct_attrs|
-        account = bank.accounts.create!(acct_attrs.merge(cooperative: coop))
-        puts "      Account created: #{account.account_name} → Interest Earned template ready"
-      end
-    end
-  end
-
-  # ── 17. Entry templates (standalone, not tied to external accounts) ─
+  # ── 12. Entry templates ────────────────────────────────────────────
   unless Accounting::EntryTemplate.where(cooperative: coop).exists?
     cash_account = Accounting::Account.joins(:ledger).where(account_code: "11110", ledgers: { cooperative_id: coop.id }).first
     interest_income = Accounting::Account.joins(:ledger).where(account_code: "40110", ledgers: { cooperative_id: coop.id }).first
@@ -614,7 +430,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     end
   end
 
-  # ── 10. Business hours configuration ──────────────────────────────
+  # ── 13. Business hours configuration ──────────────────────────────
   business_hours_config = {
     "business_hours_open"   => { value: 8,  unit: "hour" },
     "business_hours_close"  => { value: 17, unit: "hour" },
@@ -631,7 +447,7 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
     end
   end
 
-  # ── 11. PH Holidays ──────────────────────────────────────────────
+  # ── 14. PH Holidays ──────────────────────────────────────────────
   ph_holidays = [
     { date: Date.new(Date.current.year, 1, 1),  name: "New Year's Day",           recurring: true },
     { date: Date.new(Date.current.year, 4, 9),  name: "Araw ng Kagitingan",        recurring: true },
@@ -651,11 +467,8 @@ Cooperative.active.order(:name).each_with_index do |coop, idx|
   end
   puts "  → #{ph_holidays.size} PH holidays seeded"
 
-  # ── 12. Restructure cases ─────────────────────────────────────────
+  # ── 15. Restructure cases ─────────────────────────────────────────
   load_per_coop_seed(coop, "restructures")
-
-  # ── 11. AI Agent demo data ─────────────────────────────────────────
-  load_per_coop_seed(coop, "ai_demo")
 end
 
 puts "\n✅ Demo data seeded for #{Cooperative.active.count} cooperatives"

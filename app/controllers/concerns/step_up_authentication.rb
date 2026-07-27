@@ -11,7 +11,6 @@ module StepUpAuthentication
     treasury/savings_accounts/confirm_withdraw
     management/configurations#approve
     management/configurations#activate
-    management/alerts#resolve
   ].freeze
 
   included do
