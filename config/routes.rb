@@ -316,29 +316,6 @@ Rails.application.routes.draw do
       end
     end
 
-    namespace :ai do
-      get "dashboard", to: "dashboard#index"
-
-      resources :observations, only: [ :index, :show ] do
-        member do
-          post :resolve
-        end
-      end
-
-      resources :recommendations, only: [ :index, :show ] do
-        member do
-          post :acknowledge
-          post :dismiss
-          post :complete
-        end
-      end
-
-      resources :digests, only: [ :index, :show ] do
-        collection do
-          get :latest
-        end
-      end
-    end
   end
 
   post "messaging/webhooks/receive", to: "messaging/webhooks#receive", as: :messaging_webhooks_receive

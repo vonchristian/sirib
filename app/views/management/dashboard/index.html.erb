@@ -25,37 +25,7 @@
     <p class="mt-1.5 text-2xl font-bold text-text-primary"><%= number_to_currency(@cash_position, unit:"₱") %></p>
   </div>
 </div>
-<% if @ai_has_data %> 
-  <div class="mb-8"> 
-    <div class="flex items-center justify-between mb-4"> 
-      <h3 class="text-sm font-semibold text-text-primary">AI Branch Manager Insights</h3>
-      <%= link_to"View AI Dashboard", management_ai_dashboard_path, class:"text-xs text-accent hover:text-accent-hover" %> 
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4"> 
-      <% if @ai_today_digest %> 
-        <div class="rounded-lg border border-border bg-surface p-4"> 
-          <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Today's Digest</p>
-          <p class="mt-1 text-sm text-text-primary line-clamp-3"><%= @ai_today_digest.summary&.truncate(150) %></p>
-          <p class="mt-2 text-xs text-text-tertiary"><%= time_ago_in_words(@ai_today_digest.generated_at) %> ago</p>
-        </div>
-      <% end %> 
-      <div class="rounded-lg border border-border bg-surface p-4"> 
-        <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Critical Observations</p>
-        <p class="mt-1 text-2xl font-bold text-danger"><%= @ai_critical_observations.count %></p>
-        <% @ai_critical_observations.each do |obs| %> 
-          <p class="mt-1 text-xs text-text-primary truncate"><%= obs.title %></p>
-        <% end %>
-      </div>
-      <div class="rounded-lg border border-border bg-surface p-4"> 
-        <p class="text-xs font-medium text-text-tertiary uppercase tracking-wider">Active Recommendations</p>
-        <p class="mt-1 text-2xl font-bold text-warning"><%= @ai_active_recommendations.count %></p>
-        <% @ai_active_recommendations.each do |rec| %> 
-          <p class="mt-1 text-xs text-text-primary truncate">[<%= rec.priority.titleize %>] <%= rec.title %></p>
-        <% end %>
-      </div>
-    </div>
-  </div>
-<% end %> 
+ 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"> 
   <div class="rounded-lg border border-border bg-surface"> 
     <div class="border-b border-border px-5 py-4"> 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_10_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_27_010426) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -76,105 +76,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_10_000000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
-  end
-
-  create_table "ai_agent_runs", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "agent_id", null: false
-    t.bigint "branch_id"
-    t.timestamptz "started_at", null: false
-    t.timestamptz "completed_at"
-    t.string "status", default: "running", null: false
-    t.integer "tokens_used", default: 0
-    t.integer "execution_time_ms", default: 0
-    t.jsonb "result", default: {}
-    t.text "error_message"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["agent_id", "started_at"], name: "index_ai_agent_runs_on_agent_id_and_started_at"
-    t.index ["agent_id"], name: "index_ai_agent_runs_on_agent_id"
-    t.index ["branch_id"], name: "index_ai_agent_runs_on_branch_id"
-    t.index ["cooperative_id"], name: "index_ai_agent_runs_on_cooperative_id"
-    t.index ["status"], name: "index_ai_agent_runs_on_status"
-  end
-
-  create_table "ai_agents", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.string "name", null: false
-    t.text "description"
-    t.boolean "enabled", default: true, null: false
-    t.string "schedule", default: "daily", null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id", "name"], name: "index_ai_agents_on_cooperative_id_and_name", unique: true
-    t.index ["cooperative_id"], name: "index_ai_agents_on_cooperative_id"
-  end
-
-  create_table "ai_digests", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "branch_id", null: false
-    t.bigint "agent_run_id"
-    t.timestamptz "generated_at", null: false
-    t.text "summary"
-    t.text "risk_summary"
-    t.text "recommendations_summary"
-    t.jsonb "metrics", default: {}
-    t.integer "observation_count", default: 0
-    t.integer "recommendation_count", default: 0
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["agent_run_id"], name: "index_ai_digests_on_agent_run_id"
-    t.index ["branch_id", "generated_at"], name: "index_ai_digests_on_branch_id_and_generated_at"
-    t.index ["branch_id"], name: "index_ai_digests_on_branch_id"
-    t.index ["cooperative_id"], name: "index_ai_digests_on_cooperative_id"
-  end
-
-  create_table "ai_observations", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "branch_id", null: false
-    t.bigint "agent_run_id"
-    t.string "category", null: false
-    t.string "severity", default: "medium", null: false
-    t.string "title", null: false
-    t.text "summary"
-    t.jsonb "metadata", default: {}
-    t.timestamptz "detected_at", null: false
-    t.timestamptz "resolved_at"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["agent_run_id"], name: "index_ai_observations_on_agent_run_id"
-    t.index ["branch_id", "detected_at"], name: "index_ai_observations_on_branch_id_and_detected_at"
-    t.index ["branch_id", "resolved_at"], name: "index_ai_observations_on_branch_id_and_resolved_at"
-    t.index ["branch_id"], name: "index_ai_observations_on_branch_id"
-    t.index ["category"], name: "index_ai_observations_on_category"
-    t.index ["cooperative_id"], name: "index_ai_observations_on_cooperative_id"
-    t.index ["severity"], name: "index_ai_observations_on_severity"
-  end
-
-  create_table "ai_recommendations", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "branch_id", null: false
-    t.bigint "observation_id"
-    t.bigint "agent_run_id"
-    t.string "priority", default: "medium", null: false
-    t.string "title", null: false
-    t.text "summary"
-    t.text "action_text"
-    t.decimal "confidence_score", default: "0.0"
-    t.string "status", default: "open", null: false
-    t.timestamptz "dismissed_at"
-    t.timestamptz "completed_at"
-    t.timestamptz "acknowledged_at"
-    t.bigint "acknowledged_by_id"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["agent_run_id"], name: "index_ai_recommendations_on_agent_run_id"
-    t.index ["branch_id", "status"], name: "index_ai_recommendations_on_branch_id_and_status"
-    t.index ["branch_id"], name: "index_ai_recommendations_on_branch_id"
-    t.index ["cooperative_id"], name: "index_ai_recommendations_on_cooperative_id"
-    t.index ["observation_id"], name: "index_ai_recommendations_on_observation_id"
-    t.index ["priority"], name: "index_ai_recommendations_on_priority"
-    t.index ["status"], name: "index_ai_recommendations_on_status"
   end
 
   create_table "amount_lines", force: :cascade do |t|
@@ -277,7 +178,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_10_000000) do
     t.index ["source_module"], name: "index_entries_on_source_module"
     t.index ["status", "entry_type"], name: "index_entries_on_status_and_entry_type"
     t.index ["template_id"], name: "index_entries_on_template_id"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'posted'::character varying::text, 'reversed'::character varying::text])", name: "chk_entries_status_valid"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'posted'::character varying, 'reversed'::character varying]::text[])", name: "chk_entries_status_valid"
   end
 
   create_table "entry_template_lines", force: :cascade do |t|
@@ -839,7 +740,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_10_000000) do
     t.index ["reference_number"], name: "index_loans_on_reference_number", unique: true
     t.check_constraint "outstanding_principal_cents >= 0", name: "chk_loans_outstanding_principal_non_negative"
     t.check_constraint "principal_cents > 0", name: "chk_loans_principal_cents_positive"
-    t.check_constraint "status::text = ANY (ARRAY['active'::character varying::text, 'paid'::character varying::text, 'defaulted'::character varying::text, 'written_off'::character varying::text, 'refinanced'::character varying::text, 'modified'::character varying::text, 'hybrid_restructured'::character varying::text, 'restructure_requested'::character varying::text, 'under_review'::character varying::text])", name: "chk_loans_status_valid"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'paid'::character varying, 'defaulted'::character varying, 'written_off'::character varying, 'refinanced'::character varying, 'modified'::character varying, 'hybrid_restructured'::character varying, 'restructure_requested'::character varying, 'under_review'::character varying]::text[])", name: "chk_loans_status_valid"
     t.check_constraint "term_months > 0", name: "chk_loans_term_months_positive"
   end
 
@@ -1710,20 +1611,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_10_000000) do
   add_foreign_key "accounts", "ledgers"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "ai_agent_runs", "ai_agents", column: "agent_id"
-  add_foreign_key "ai_agent_runs", "cooperatives"
-  add_foreign_key "ai_agent_runs", "management_branches", column: "branch_id"
-  add_foreign_key "ai_agents", "cooperatives"
-  add_foreign_key "ai_digests", "ai_agent_runs", column: "agent_run_id"
-  add_foreign_key "ai_digests", "cooperatives"
-  add_foreign_key "ai_digests", "management_branches", column: "branch_id"
-  add_foreign_key "ai_observations", "ai_agent_runs", column: "agent_run_id"
-  add_foreign_key "ai_observations", "cooperatives"
-  add_foreign_key "ai_observations", "management_branches", column: "branch_id"
-  add_foreign_key "ai_recommendations", "ai_agent_runs", column: "agent_run_id"
-  add_foreign_key "ai_recommendations", "ai_observations", column: "observation_id"
-  add_foreign_key "ai_recommendations", "cooperatives"
-  add_foreign_key "ai_recommendations", "management_branches", column: "branch_id"
   add_foreign_key "amount_lines", "accounts"
   add_foreign_key "amount_lines", "cooperatives"
   add_foreign_key "amount_lines", "entries"
