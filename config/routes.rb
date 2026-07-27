@@ -230,10 +230,6 @@ Rails.application.routes.draw do
 
   namespace :management do
     get "dashboard", to: "dashboard#index"
-    get "executive_dashboard", to: "executive_dashboard#index"
-    get "branch_performance", to: "branch_performance#index"
-    get "risk_monitoring", to: "risk_monitoring#index"
-    get "system_health", to: "system_health#index"
 
     resources :branches, except: [ :destroy ]
     resources :departments, except: [ :destroy ]
@@ -268,12 +264,6 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :alerts, only: [ :index, :show ] do
-      member do
-        post :resolve
-      end
-    end
-
     resources :entry_templates do
       member do
         post :preview
@@ -283,30 +273,11 @@ Rails.application.routes.draw do
 
     resources :audit_logs, only: [ :index, :show ]
 
-    resources :fraud_incidents, only: [ :index, :show ] do
-      member do
-        post :resolve
-      end
-    end
-
-    resources :compliance_controls, only: [ :index, :show ] do
-      resources :evidences, only: [ :index, :show ]
-    end
-
-    resources :password_policies, only: [ :index, :show, :new, :create, :edit, :update ]
-
-    resources :holidays
-
-    get "settings", to: "settings#index"
-
     resources :restructures, only: [ :index, :show ], controller: "restructures" do
       member do
         post :approve
         post :reject
       end
     end
-
-    get "searches/branches", to: "searches#branches"
-    get "searches/users", to: "searches#users"
   end
 end

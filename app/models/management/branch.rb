@@ -8,8 +8,6 @@ module Management
     has_many :departments, class_name: "Management::Department", dependent: :destroy
     has_many :children, class_name: "Management::Branch", foreign_key: :parent_id
     has_many :role_assignments, class_name: "Management::RoleAssignment"
-    has_many :performance_snapshots, class_name: "Management::BranchPerformanceSnapshot"
-    has_many :risk_indicators, class_name: "Management::RiskIndicator"
 
     validates :name, :code, presence: true
     validates :code, uniqueness: { scope: :cooperative_id }

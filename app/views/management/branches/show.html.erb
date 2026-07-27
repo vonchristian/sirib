@@ -39,27 +39,5 @@
  <% end %> <% if @departments.empty? %> 
           <p class="px-5 py-4 text-sm text-text-tertiary">No departments.</p>
  <% end %> </div>
- </div>
- </div>
- 
-  <div class="space-y-6"> 
-    <div class="rounded-lg border border-border bg-surface"> 
-      <div class="border-b border-border px-5 py-4"> 
-        <h3 class="text-sm font-semibold text-text-primary">Performance</h3>
- </div>
- 
-      <div class="p-5 space-y-3"> <% if @snapshot %> <% m = @snapshot.metrics %> 
-          <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Total Assets</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["loan_portfolio_cents"] || 0).to_f / 100, unit:"₱") %></span> </div>
- 
-          <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Loan Portfolio</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["loan_portfolio_cents"] || 0).to_f / 100, unit:"₱") %></span> </div>
- 
-          <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Savings Deposits</span> <span class="text-sm font-medium text-text-primary"><%= number_to_currency((m["savings_balance_cents"] || 0).to_f / 100, unit:"₱") %></span> </div>
- 
-          <div class="flex justify-between"> <span class="text-sm text-text-tertiary">Members</span> <span class="text-sm font-medium text-text-primary"><%= m["total_members"] || 0 %></span> </div>
- <% else %> 
-          <p class="text-sm text-text-tertiary">No performance data yet.</p>
- <% end %> </div>
- </div>
- </div>
- </div>
- 
+  </div>
+</div>

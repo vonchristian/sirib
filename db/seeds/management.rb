@@ -62,7 +62,7 @@ unless Management::Role.where(cooperative: @coop).exists?
   roles.each { |attrs| Management::Role.create!(attrs.merge(cooperative: @coop)) }
 end
 
-subjects = %w[member loan savings time_deposit share_capital treasury accounting branch policy configuration approval_workflow alert audit_log user role report system fraud_incident loan_restructure]
+subjects = %w[member loan savings time_deposit share_capital treasury accounting branch policy configuration approval_workflow audit_log user role report system loan_restructure]
 actions = %w[view create update delete approve reject configure export resolve]
 
 subjects.each do |subject|
@@ -75,7 +75,6 @@ role_permissions = {
   "board_member" => {
     view: subjects.map(&:to_sym),
     approve: [ :policy ],
-    resolve: [ :fraud_incident, :alert ],
     export: [ :report ]
   },
   "general_manager" => {
@@ -84,15 +83,13 @@ role_permissions = {
     update: [ :member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :configuration ],
     approve: [ :loan, :policy, :configuration, :approval_workflow, :loan_restructure ],
     reject: [ :loan, :policy, :approval_workflow, :loan_restructure ],
-    resolve: [ :fraud_incident, :alert ],
     export: [ :report ]
   },
   "branch_manager" => {
-    view: [ :member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :report, :fraud_incident ],
+    view: [ :member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :report ],
     create: [ :member, :loan ],
     update: [ :member, :loan, :branch ],
     approve: [ :loan ],
-    resolve: [ :alert ],
     export: [ :report ]
   },
   "loan_officer" => {

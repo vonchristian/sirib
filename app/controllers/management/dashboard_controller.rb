@@ -12,20 +12,13 @@ module Management
       @cash_position = cash_account&.balance || Money.new(0, "PHP")
       @branch_count = Management::Branch.active.count
       @member_count = Membership::Member.count
-      @recent_alerts = Management::Alert.active.by_severity.limit(5)
       @pending_approvals = Management::ApprovalRequest.pending.includes(:workflow, :requested_by).limit(5)
-      @recent_reconciliation_results = Reconciliation::Result.recent.limit(5)
     end
 
     private
 
     def ledger_balance(account_type)
       Money.new(Accounting::Ledger.where(account_type: account_type).sum(&:balance), "PHP")
-    end
-
-    def find_user_branch
-      assignments = Current.user.role_assignments.active.where.not(branch_id: nil)
-      assignments.any? ? assignments.first.branch : nil
     end
   end
 end

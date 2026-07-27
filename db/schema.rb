@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_27_011007) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -104,36 +104,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
     t.timestamptz "updated_at", null: false
     t.index ["user_id", "used_at"], name: "index_backup_codes_on_user_id_and_used_at"
     t.index ["user_id"], name: "index_backup_codes_on_user_id"
-  end
-
-  create_table "compliance_controls", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.string "category"
-    t.string "frequency"
-    t.boolean "active"
-    t.jsonb "config"
-    t.bigint "cooperative_id", null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_compliance_controls_on_cooperative_id"
-  end
-
-  create_table "compliance_evidences", force: :cascade do |t|
-    t.bigint "control_id", null: false
-    t.string "status"
-    t.string "evidence_type"
-    t.jsonb "metadata"
-    t.timestamptz "verified_at"
-    t.string "verified_by_type"
-    t.bigint "verified_by_id"
-    t.timestamptz "expires_at"
-    t.bigint "cooperative_id", null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["control_id"], name: "index_compliance_evidences_on_control_id"
-    t.index ["cooperative_id"], name: "index_compliance_evidences_on_cooperative_id"
-    t.index ["verified_by_type", "verified_by_id"], name: "index_compliance_evidences_on_verified_by"
   end
 
   create_table "cooperatives", force: :cascade do |t|
@@ -384,40 +354,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
     t.index ["interest_income_ledger_id"], name: "index_external_banks_on_interest_income_ledger_id"
     t.index ["name"], name: "index_external_banks_on_name"
     t.index ["status"], name: "index_external_banks_on_status"
-  end
-
-  create_table "fraud_incidents", force: :cascade do |t|
-    t.bigint "rule_id", null: false
-    t.string "incident_type"
-    t.string "severity"
-    t.text "description"
-    t.jsonb "metadata"
-    t.string "actor_type", null: false
-    t.bigint "actor_id", null: false
-    t.timestamptz "resolved_at"
-    t.string "resolved_by_type"
-    t.bigint "resolved_by_id"
-    t.string "resolution"
-    t.bigint "cooperative_id", null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["actor_type", "actor_id"], name: "index_fraud_incidents_on_actor"
-    t.index ["cooperative_id"], name: "index_fraud_incidents_on_cooperative_id"
-    t.index ["resolved_by_type", "resolved_by_id"], name: "index_fraud_incidents_on_resolved_by"
-    t.index ["rule_id"], name: "index_fraud_incidents_on_rule_id"
-  end
-
-  create_table "fraud_rules", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.string "rule_type"
-    t.jsonb "config"
-    t.string "severity"
-    t.boolean "active"
-    t.bigint "cooperative_id", null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_fraud_rules_on_cooperative_id"
   end
 
   create_table "idempotency_keys", force: :cascade do |t|
@@ -744,39 +680,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
     t.check_constraint "term_months > 0", name: "chk_loans_term_months_positive"
   end
 
-  create_table "management_alert_subscriptions", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "user_id", null: false
-    t.string "alert_type", null: false
-    t.string "channel", null: false
-    t.boolean "active", default: true, null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_management_alert_subscriptions_on_cooperative_id"
-    t.index ["user_id", "alert_type", "channel"], name: "idx_on_user_id_alert_type_channel_8c88c19464", unique: true
-    t.index ["user_id"], name: "index_management_alert_subscriptions_on_user_id"
-  end
-
-  create_table "management_alerts", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.string "alert_type", null: false
-    t.string "severity", default: "info", null: false
-    t.string "title", null: false
-    t.text "message"
-    t.string "source"
-    t.string "status", default: "active", null: false
-    t.string "triggered_by_type"
-    t.integer "triggered_by_id"
-    t.bigint "resolved_by_id"
-    t.timestamptz "resolved_at"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["alert_type"], name: "index_management_alerts_on_alert_type"
-    t.index ["cooperative_id"], name: "index_management_alerts_on_cooperative_id"
-    t.index ["resolved_by_id"], name: "index_management_alerts_on_resolved_by_id"
-    t.index ["status"], name: "index_management_alerts_on_status"
-  end
-
   create_table "management_approval_requests", force: :cascade do |t|
     t.bigint "cooperative_id", null: false
     t.string "requestable_type", null: false
@@ -859,18 +762,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
     t.index ["branch_id"], name: "index_management_audit_logs_on_branch_id"
     t.index ["cooperative_id"], name: "index_management_audit_logs_on_cooperative_id"
     t.index ["created_at"], name: "index_management_audit_logs_on_created_at"
-  end
-
-  create_table "management_branch_performance_snapshots", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "branch_id", null: false
-    t.date "snapshot_date", null: false
-    t.jsonb "metrics", default: {}, null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["branch_id", "snapshot_date"], name: "idx_on_branch_id_snapshot_date_c28cd56a00", unique: true
-    t.index ["branch_id"], name: "index_management_branch_performance_snapshots_on_branch_id"
-    t.index ["cooperative_id"], name: "idx_on_cooperative_id_5cfce3d3e1"
   end
 
   create_table "management_branches", force: :cascade do |t|
@@ -998,21 +889,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
     t.index ["policy_id"], name: "index_management_policy_rules_on_policy_id"
   end
 
-  create_table "management_risk_indicators", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "branch_id"
-    t.string "indicator_type", null: false
-    t.decimal "value"
-    t.decimal "threshold"
-    t.string "status", default: "normal", null: false
-    t.date "as_of_date", null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["branch_id", "indicator_type", "as_of_date"], name: "idx_on_branch_id_indicator_type_as_of_date_48924e88f2", unique: true
-    t.index ["branch_id"], name: "index_management_risk_indicators_on_branch_id"
-    t.index ["cooperative_id"], name: "index_management_risk_indicators_on_cooperative_id"
-  end
-
   create_table "management_role_assignments", force: :cascade do |t|
     t.bigint "cooperative_id", null: false
     t.bigint "user_id", null: false
@@ -1053,19 +929,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
     t.timestamptz "updated_at", null: false
     t.index ["cooperative_id", "code"], name: "index_management_roles_on_cooperative_id_and_code", unique: true
     t.index ["cooperative_id"], name: "index_management_roles_on_cooperative_id"
-  end
-
-  create_table "management_system_health_snapshots", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.string "metric_name", null: false
-    t.decimal "value"
-    t.string "unit"
-    t.string "status", default: "healthy", null: false
-    t.timestamptz "captured_at", null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_management_system_health_snapshots_on_cooperative_id"
-    t.index ["metric_name", "captured_at"], name: "idx_on_metric_name_captured_at_597dc63458"
   end
 
   create_table "management_teams", force: :cascade do |t|
@@ -1543,9 +1406,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
   add_foreign_key "amount_lines", "cooperatives"
   add_foreign_key "amount_lines", "entries"
   add_foreign_key "backup_codes", "users"
-  add_foreign_key "compliance_controls", "cooperatives"
-  add_foreign_key "compliance_evidences", "compliance_controls", column: "control_id"
-  add_foreign_key "compliance_evidences", "cooperatives"
   add_foreign_key "entries", "cooperatives"
   add_foreign_key "entry_template_lines", "cooperatives"
   add_foreign_key "entry_template_lines", "entry_templates"
@@ -1578,9 +1438,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
   add_foreign_key "external_banks", "cooperatives"
   add_foreign_key "external_banks", "ledgers", column: "cash_on_hand_ledger_id"
   add_foreign_key "external_banks", "ledgers", column: "interest_income_ledger_id"
-  add_foreign_key "fraud_incidents", "cooperatives"
-  add_foreign_key "fraud_incidents", "fraud_rules", column: "rule_id"
-  add_foreign_key "fraud_rules", "cooperatives"
   add_foreign_key "idempotency_keys", "cooperatives"
   add_foreign_key "ledgers", "cooperatives"
   add_foreign_key "loan_aging_snapshots", "loan_aging_groups"
@@ -1620,10 +1477,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
   add_foreign_key "loans", "loan_applications"
   add_foreign_key "loans", "loan_products"
   add_foreign_key "loans", "members"
-  add_foreign_key "management_alert_subscriptions", "cooperatives"
-  add_foreign_key "management_alert_subscriptions", "users"
-  add_foreign_key "management_alerts", "cooperatives"
-  add_foreign_key "management_alerts", "users", column: "resolved_by_id"
   add_foreign_key "management_approval_requests", "cooperatives"
   add_foreign_key "management_approval_requests", "management_approval_workflows", column: "workflow_id"
   add_foreign_key "management_approval_requests", "users", column: "requested_by_id"
@@ -1638,8 +1491,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
   add_foreign_key "management_approvals", "users", column: "approver_id"
   add_foreign_key "management_audit_logs", "cooperatives"
   add_foreign_key "management_audit_logs", "management_branches", column: "branch_id"
-  add_foreign_key "management_branch_performance_snapshots", "cooperatives"
-  add_foreign_key "management_branch_performance_snapshots", "management_branches", column: "branch_id"
   add_foreign_key "management_branches", "cooperatives"
   add_foreign_key "management_configuration_versions", "cooperatives"
   add_foreign_key "management_configuration_versions", "management_configurations", column: "configuration_id"
@@ -1656,8 +1507,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
   add_foreign_key "management_policies", "users", column: "created_by_id"
   add_foreign_key "management_policy_rules", "cooperatives"
   add_foreign_key "management_policy_rules", "management_policies", column: "policy_id"
-  add_foreign_key "management_risk_indicators", "cooperatives"
-  add_foreign_key "management_risk_indicators", "management_branches", column: "branch_id"
   add_foreign_key "management_role_assignments", "cooperatives"
   add_foreign_key "management_role_assignments", "management_branches", column: "branch_id"
   add_foreign_key "management_role_assignments", "management_departments", column: "department_id"
@@ -1667,7 +1516,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_010607) do
   add_foreign_key "management_role_permissions", "management_permissions", column: "permission_id"
   add_foreign_key "management_role_permissions", "management_roles", column: "role_id"
   add_foreign_key "management_roles", "cooperatives"
-  add_foreign_key "management_system_health_snapshots", "cooperatives"
   add_foreign_key "management_teams", "cooperatives"
   add_foreign_key "management_teams", "management_departments", column: "department_id"
   add_foreign_key "member_addresses", "cooperatives"

@@ -12,7 +12,6 @@ module Management
 
     def show
       @departments = @branch.departments.by_name
-      @snapshot = @branch.performance_snapshots.order(snapshot_date: :desc).first
     end
 
     def new
