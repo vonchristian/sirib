@@ -4,29 +4,6 @@ Rails.application.routes.draw do
 
   root "home#landing"
 
-  # Marketing pages
-  get "tellers", to: "home#tellers"
-  get "loan-officers", to: "home#loan_officers"
-  get "finance", to: "home#finance"
-  get "compliance", to: "home#compliance"
-
-  # Member Portal — prefixed with /portal
-  scope :portal, module: :portal, as: :portal do
-    resource :session, only: %i[new create destroy], controller: "sessions"
-    scope :mfa, controller: "mfa", as: :mfa do
-      get :challenge
-      post :verify
-    end
-
-    scope :enrollment, controller: "enrollment", as: :enrollment do
-      get ":token", action: :show, as: :start
-      post "", action: :complete
-    end
-
-    get "dashboard", to: "dashboard#index"
-    resources :announcements, only: %i[index show]
-  end
-
   # Auth
   resource :session
   resources :passwords, param: :token
@@ -47,8 +24,6 @@ Rails.application.routes.draw do
   # App routes
   resources :members, only: [ :index, :show, :new, :create, :edit, :update ] do
     member do
-      post :toggle_portal_access
-      post :deactivate
       get :tab_overview
       get :tab_savings
       get :tab_time_deposits
@@ -196,25 +171,6 @@ Rails.application.routes.draw do
 
   namespace :lending do
     get "loan_aging", to: "loan_aging#index"
-  end
-
-  namespace :external do
-    resources :accounts, only: [ :index, :new, :create ], controller: "accounts"
-    resources :banks do
-      resources :accounts do
-        resources :documents, only: [ :index, :show, :new, :create, :destroy ] do
-          member do
-            post :retry
-          end
-        end
-        resource :reconciliation, only: [ :show ], controller: "reconciliation" do
-          post :allocate
-          post :confirm_allocation
-          post :reject_allocation
-        end
-        resource :entry_template, only: [ :create ], controller: "entry_templates"
-      end
-    end
   end
 
   namespace :equity, path: :equity do

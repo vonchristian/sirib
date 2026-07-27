@@ -18,11 +18,6 @@ module Membership
     has_many_attached :signatures
     has_one_attached :profile_image
 
-    # Portal authentication
-    has_secure_password(validations: false)
-    has_many :portal_sessions, class_name: "Portal::Session", dependent: :destroy
-    has_many :portal_enrollment_tokens, class_name: "Portal::EnrollmentToken", dependent: :destroy
-
     encrypts :otp_secret
 
     accepts_nested_attributes_for :address, allow_destroy: true
@@ -32,7 +27,6 @@ module Membership
     validates :email_address, uniqueness: true, allow_blank: true
     validates :gender, inclusion: { in: %w[male female] }
     validates :civil_status, inclusion: { in: %w[single married divorced widowed] }
-    validates :portal_status, inclusion: { in: %w[inactive active suspended] }, allow_blank: true
 
     normalizes :email_address, with: ->(e) { e.strip.downcase }
 
@@ -45,8 +39,6 @@ module Membership
       associated_against: { address: [ :city, :barangay, :province ] },
       using: { tsearch: { prefix: true, any_word: true, normalization: 2 } }
 
-    scope :portal_active, -> { where(portal_status: "active") }
-
     def must_have_bir_identification
       unless identifications.any? { |id| id.id_type == "BIR" }
         errors.add(:identifications, "must include at least one BIR identification")
@@ -55,42 +47,6 @@ module Membership
 
     def name
       [ first_name, middle_name, last_name ].compact.join(" ")
-    end
-
-    def portal_active?
-      portal_status == "active"
-    end
-
-    def portal_suspended?
-      portal_status == "suspended"
-    end
-
-    def portal_enabled?
-      password_digest.present?
-    end
-
-    def toggle_portal_access!(enabled:)
-      transaction do
-        if enabled
-          update!(portal_status: "active")
-          create_portal_enrollment_token unless has_valid_enrollment_token?
-        else
-          update!(portal_status: "suspended")
-          revoke_all_portal_sessions!
-        end
-      end
-    end
-
-    def has_valid_enrollment_token?
-      portal_enrollment_tokens.valid.exists?
-    end
-
-    def create_portal_enrollment_token
-      portal_enrollment_tokens.create!
-    end
-
-    def revoke_all_portal_sessions!
-      portal_sessions.active.update_all(revoked_at: Time.current)
     end
 
     private

@@ -11,7 +11,7 @@ class MembersController < FinancialBaseController
     settings: :member
   }.freeze
 
-  before_action :set_member, only: [ :show, :toggle_portal_access, *TAB_ACTIONS.map { |t| "tab_#{t}".to_sym } ]
+  before_action :set_member, only: [ :show, *TAB_ACTIONS.map { |t| "tab_#{t}".to_sym } ]
   before_action :require_tab_permission, only: TAB_ACTIONS.map { |t| "tab_#{t}".to_sym }
 
   def index
@@ -57,22 +57,6 @@ class MembersController < FinancialBaseController
     end
   end
 
-  def toggle_portal_access
-    enabled = params[:enabled].to_s == "true"
-
-    @member.toggle_portal_access!(enabled: enabled)
-
-    respond_to do |format|
-      format.html { redirect_to member_path(@member), notice: enabled ? "Portal access enabled." : "Portal access suspended." }
-      format.turbo_stream { redirect_to member_path(@member), notice: enabled ? "Portal access enabled." : "Portal access suspended." }
-    end
-  rescue ActiveRecord::RecordInvalid => e
-    respond_to do |format|
-      format.html { redirect_to member_path(@member), alert: "Failed to update portal access: #{e.message}" }
-      format.turbo_stream { redirect_to member_path(@member), alert: "Failed to update portal access: #{e.message}" }
-    end
-  end
-
   def edit
   end
 
@@ -82,14 +66,6 @@ class MembersController < FinancialBaseController
       redirect_to @member, notice: "Member updated successfully."
     else
       render :edit, status: :unprocessable_entity
-    end
-  end
-
-  def deactivate
-    if @member.update(portal_status: "suspended")
-      redirect_to @member, notice: "Member has been deactivated."
-    else
-      redirect_to @member, alert: "Failed to deactivate member."
     end
   end
 

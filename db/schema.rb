@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_27_011007) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_27_011354) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -253,107 +253,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_011007) do
     t.index ["reference_number"], name: "index_equity_transactions_on_reference_number", unique: true
     t.index ["share_capital_account_id"], name: "index_equity_transactions_on_share_capital_account_id"
     t.check_constraint "shares > 0", name: "chk_equity_transactions_shares_positive"
-  end
-
-  create_table "external_bank_accounts", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "external_bank_id", null: false
-    t.string "account_name", null: false
-    t.text "account_number_encrypted"
-    t.string "account_type", null: false
-    t.string "currency", default: "PHP", null: false
-    t.integer "balance_cents", default: 0, null: false
-    t.string "current_balance_currency", default: "PHP", null: false
-    t.timestamptz "last_synced_at"
-    t.string "status", default: "active", null: false
-    t.bigint "cash_on_hand_account_id"
-    t.bigint "interest_income_account_id"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cash_on_hand_account_id"], name: "index_external_bank_accounts_on_cash_on_hand_account_id"
-    t.index ["cooperative_id"], name: "index_external_bank_accounts_on_cooperative_id"
-    t.index ["external_bank_id"], name: "index_external_bank_accounts_on_external_bank_id"
-    t.index ["interest_income_account_id"], name: "index_external_bank_accounts_on_interest_income_account_id"
-    t.index ["status"], name: "index_external_bank_accounts_on_status"
-  end
-
-  create_table "external_bank_documents", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "external_bank_account_id", null: false
-    t.string "document_type", default: "statement", null: false
-    t.date "period_start"
-    t.date "period_end"
-    t.string "processing_status", default: "pending", null: false
-    t.jsonb "metadata", default: "{}"
-    t.text "error_message"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_external_bank_documents_on_cooperative_id"
-    t.index ["external_bank_account_id"], name: "index_external_bank_documents_on_external_bank_account_id"
-    t.index ["processing_status"], name: "index_external_bank_documents_on_processing_status"
-  end
-
-  create_table "external_bank_transaction_allocations", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "external_bank_transaction_id", null: false
-    t.bigint "journal_entry_id"
-    t.decimal "allocated_amount", null: false
-    t.decimal "allocated_amount_cents", null: false
-    t.string "allocated_amount_currency", default: "PHP", null: false
-    t.string "status", default: "suggested", null: false
-    t.decimal "confidence_score"
-    t.bigint "created_by_id"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_external_bank_transaction_allocations_on_cooperative_id"
-    t.index ["created_by_id"], name: "index_external_bank_transaction_allocations_on_created_by_id"
-    t.index ["external_bank_transaction_id"], name: "idx_on_external_bank_transaction_id_be9fd773f0"
-    t.index ["journal_entry_id"], name: "idx_on_journal_entry_id_313b3a4665"
-    t.index ["status"], name: "index_external_bank_transaction_allocations_on_status"
-  end
-
-  create_table "external_bank_transactions", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "external_bank_account_id", null: false
-    t.bigint "external_bank_document_id"
-    t.date "transaction_date", null: false
-    t.text "description", null: false
-    t.string "reference_number"
-    t.integer "amount_cents", null: false
-    t.string "amount_currency", default: "PHP", null: false
-    t.string "direction", null: false
-    t.integer "running_balance_cents", null: false
-    t.string "running_balance_currency", default: "PHP"
-    t.string "hash_signature", null: false
-    t.jsonb "metadata", default: "{}"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_external_bank_transactions_on_cooperative_id"
-    t.index ["external_bank_account_id", "transaction_date"], name: "idx_on_external_bank_account_id_transaction_date_213f021c2b"
-    t.index ["external_bank_account_id"], name: "index_external_bank_transactions_on_external_bank_account_id"
-    t.index ["external_bank_document_id"], name: "index_external_bank_transactions_on_external_bank_document_id"
-    t.index ["hash_signature"], name: "index_external_bank_transactions_on_hash_signature", unique: true
-    t.index ["transaction_date"], name: "index_external_bank_transactions_on_transaction_date"
-  end
-
-  create_table "external_banks", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.string "name", null: false
-    t.string "code"
-    t.string "country", default: "Philippines", null: false
-    t.string "status", default: "active", null: false
-    t.bigint "cash_on_hand_ledger_id"
-    t.bigint "interest_income_ledger_id"
-    t.bigint "cash_on_hand_account_id"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cash_on_hand_account_id"], name: "index_external_banks_on_cash_on_hand_account_id"
-    t.index ["cash_on_hand_ledger_id"], name: "index_external_banks_on_cash_on_hand_ledger_id"
-    t.index ["code"], name: "index_external_banks_on_code"
-    t.index ["cooperative_id"], name: "index_external_banks_on_cooperative_id"
-    t.index ["interest_income_ledger_id"], name: "index_external_banks_on_interest_income_ledger_id"
-    t.index ["name"], name: "index_external_banks_on_name"
-    t.index ["status"], name: "index_external_banks_on_status"
   end
 
   create_table "idempotency_keys", force: :cascade do |t|
@@ -1044,67 +943,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_011007) do
     t.index ["user_id"], name: "index_mfa_attempt_logs_on_user_id"
   end
 
-  create_table "portal_announcements", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.string "title", null: false
-    t.text "body", null: false
-    t.string "status", default: "draft", null: false
-    t.timestamptz "published_at"
-    t.bigint "author_id", null: false
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["author_id"], name: "index_portal_announcements_on_author_id"
-    t.index ["cooperative_id"], name: "index_portal_announcements_on_cooperative_id"
-    t.index ["published_at"], name: "index_portal_announcements_on_published_at"
-    t.index ["status"], name: "index_portal_announcements_on_status"
-  end
-
-  create_table "portal_enrollment_tokens", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "member_id", null: false
-    t.string "token", null: false
-    t.timestamptz "expires_at", null: false
-    t.timestamptz "used_at"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_portal_enrollment_tokens_on_cooperative_id"
-    t.index ["member_id"], name: "index_portal_enrollment_tokens_on_member_id"
-    t.index ["token"], name: "index_portal_enrollment_tokens_on_token", unique: true
-  end
-
-  create_table "portal_sessions", force: :cascade do |t|
-    t.bigint "cooperative_id", null: false
-    t.bigint "member_id", null: false
-    t.string "ip_address"
-    t.text "user_agent"
-    t.timestamptz "revoked_at"
-    t.timestamptz "last_activity_at"
-    t.timestamptz "mfa_verified_at"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_portal_sessions_on_cooperative_id"
-    t.index ["last_activity_at"], name: "index_portal_sessions_on_last_activity_at"
-    t.index ["member_id", "revoked_at"], name: "index_portal_sessions_on_member_id_and_revoked_at"
-    t.index ["member_id"], name: "index_portal_sessions_on_member_id"
-    t.index ["revoked_at"], name: "index_portal_sessions_on_revoked_at"
-  end
-
-  create_table "reconciliation_results", force: :cascade do |t|
-    t.string "check_name", null: false
-    t.string "status", null: false
-    t.integer "total_checked", default: 0
-    t.integer "failures_count", default: 0
-    t.jsonb "failures", default: []
-    t.text "error_message"
-    t.bigint "cooperative_id", null: false
-    t.datetime "checked_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["check_name", "checked_at"], name: "index_reconciliation_results_on_check_name_and_checked_at"
-    t.index ["checked_at"], name: "index_reconciliation_results_on_checked_at"
-    t.index ["cooperative_id"], name: "index_reconciliation_results_on_cooperative_id"
-  end
-
   create_table "running_balances", force: :cascade do |t|
     t.bigint "cooperative_id", null: false
     t.bigint "account_id"
@@ -1421,23 +1259,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_011007) do
   add_foreign_key "equity_transactions", "entries"
   add_foreign_key "equity_transactions", "equity_accounts", column: "share_capital_account_id"
   add_foreign_key "equity_transactions", "users", column: "posted_by_id"
-  add_foreign_key "external_bank_accounts", "accounts", column: "cash_on_hand_account_id"
-  add_foreign_key "external_bank_accounts", "accounts", column: "interest_income_account_id"
-  add_foreign_key "external_bank_accounts", "cooperatives"
-  add_foreign_key "external_bank_accounts", "external_banks"
-  add_foreign_key "external_bank_documents", "cooperatives"
-  add_foreign_key "external_bank_documents", "external_bank_accounts"
-  add_foreign_key "external_bank_transaction_allocations", "cooperatives"
-  add_foreign_key "external_bank_transaction_allocations", "entries", column: "journal_entry_id"
-  add_foreign_key "external_bank_transaction_allocations", "external_bank_transactions"
-  add_foreign_key "external_bank_transaction_allocations", "users", column: "created_by_id"
-  add_foreign_key "external_bank_transactions", "cooperatives"
-  add_foreign_key "external_bank_transactions", "external_bank_accounts"
-  add_foreign_key "external_bank_transactions", "external_bank_documents"
-  add_foreign_key "external_banks", "accounts", column: "cash_on_hand_account_id"
-  add_foreign_key "external_banks", "cooperatives"
-  add_foreign_key "external_banks", "ledgers", column: "cash_on_hand_ledger_id"
-  add_foreign_key "external_banks", "ledgers", column: "interest_income_ledger_id"
   add_foreign_key "idempotency_keys", "cooperatives"
   add_foreign_key "ledgers", "cooperatives"
   add_foreign_key "loan_aging_snapshots", "loan_aging_groups"
@@ -1526,13 +1347,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_011007) do
   add_foreign_key "members", "management_branches", column: "branch_id"
   add_foreign_key "membership_applications", "cooperatives"
   add_foreign_key "mfa_attempt_logs", "users"
-  add_foreign_key "portal_announcements", "cooperatives"
-  add_foreign_key "portal_announcements", "users", column: "author_id"
-  add_foreign_key "portal_enrollment_tokens", "cooperatives"
-  add_foreign_key "portal_enrollment_tokens", "members"
-  add_foreign_key "portal_sessions", "cooperatives"
-  add_foreign_key "portal_sessions", "members"
-  add_foreign_key "reconciliation_results", "cooperatives"
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "cooperatives"
   add_foreign_key "running_balances", "ledgers"
