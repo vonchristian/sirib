@@ -1,7 +1,5 @@
 module Accounting
-  class AccountsController < ApplicationController
-    layout "shell"
-
+  class AccountsController < FinancialBaseController
     def show
       @account = Accounting::Account.by_cooperative(Current.cooperative).includes(:ledger).find(params[:id])
       @status_service = Accounting::AccountStatusService.new(account: @account)

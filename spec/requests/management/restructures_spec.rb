@@ -5,8 +5,10 @@ RSpec.describe "Management::Restructures" do
   let(:branch) { create(:branch, cooperative: cooperative) }
   let(:user) { create(:user, password: "secret123", cooperative: cooperative) }
   let!(:role) { Management::Role.create!(cooperative: cooperative, name: "Manager", code: "test_manager", rank: 10) }
-  let!(:permission) { Management::Permission.create!(cooperative: cooperative, action: "approve", subject: "loan_restructure") }
-  let!(:role_permission) { Management::RolePermission.create!(role: role, permission: permission, cooperative: cooperative) }
+  let!(:view_permission) { Management::Permission.create!(cooperative: cooperative, action: "view", subject: "loan_restructure") }
+  let!(:approve_permission) { Management::Permission.create!(cooperative: cooperative, action: "approve", subject: "loan_restructure") }
+  let!(:role_view_permission) { Management::RolePermission.create!(role: role, permission: view_permission, cooperative: cooperative) }
+  let!(:role_approve_permission) { Management::RolePermission.create!(role: role, permission: approve_permission, cooperative: cooperative) }
   let!(:role_assignment) {
     Management::RoleAssignment.create!(
       user: user, role: role, branch: branch, cooperative: cooperative, active_from: Date.current

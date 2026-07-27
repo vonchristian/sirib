@@ -47,5 +47,4 @@ RSpec.describe Treasury::SavingsAccount do
       expect(account.depositor_name).to eq("Juan Santos Dela Cruz")
     end
   end
-
 end

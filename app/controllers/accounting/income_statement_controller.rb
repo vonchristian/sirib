@@ -1,7 +1,5 @@
 module Accounting
-  class IncomeStatementController < ApplicationController
-    layout "shell"
-
+  class IncomeStatementController < FinancialBaseController
     TYPE_LABELS = {
       "revenue" => "REVENUES",
       "expense" => "EXPENSES"

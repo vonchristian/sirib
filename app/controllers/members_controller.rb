@@ -1,5 +1,5 @@
-class MembersController < ApplicationController
-  layout "shell"
+class MembersController < FinancialBaseController
+  self.permission_subject = :member
 
   TAB_ACTIONS = %w[overview savings time_deposits loans share_capital settings].freeze
   TAB_PERMISSIONS = {

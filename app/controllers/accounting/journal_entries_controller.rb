@@ -1,7 +1,5 @@
 module Accounting
-  class JournalEntriesController < ApplicationController
-    layout "shell"
-
+  class JournalEntriesController < FinancialBaseController
     def index
       @filters = build_filters
       @query_service = JournalEntryQueryService.new(cooperative: Current.cooperative, **@filters)

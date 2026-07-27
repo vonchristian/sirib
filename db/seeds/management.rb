@@ -62,8 +62,8 @@ unless Management::Role.where(cooperative: @coop).exists?
   roles.each { |attrs| Management::Role.create!(attrs.merge(cooperative: @coop)) }
 end
 
-subjects = %w[member loan savings time_deposit share_capital treasury accounting branch policy configuration approval_workflow alert audit_log user role report system ai_dashboard]
-actions = %w[view create update delete approve reject configure export]
+subjects = %w[member loan savings time_deposit share_capital treasury accounting branch policy configuration approval_workflow alert audit_log user role report system ai_dashboard fraud_incident loan_restructure messaging_channels messaging_providers messaging_messages]
+actions = %w[view create update delete approve reject configure export resolve]
 
 subjects.each do |subject|
   actions.each do |action|
@@ -75,21 +75,24 @@ role_permissions = {
   "board_member" => {
     view: subjects.map(&:to_sym),
     approve: [ :policy ],
+    resolve: [ :fraud_incident, :alert ],
     export: [ :report ]
   },
   "general_manager" => {
     view: subjects.map(&:to_sym),
     create: [ :member, :loan, :savings, :time_deposit, :share_capital ],
     update: [ :member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :configuration ],
-    approve: [ :loan, :policy, :configuration, :approval_workflow ],
-    reject: [ :loan, :policy, :approval_workflow ],
+    approve: [ :loan, :policy, :configuration, :approval_workflow, :loan_restructure ],
+    reject: [ :loan, :policy, :approval_workflow, :loan_restructure ],
+    resolve: [ :fraud_incident, :alert ],
     export: [ :report ]
   },
   "branch_manager" => {
-    view: [ :member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :report, :ai_dashboard ],
+    view: [ :member, :loan, :savings, :time_deposit, :share_capital, :treasury, :accounting, :branch, :policy, :report, :ai_dashboard, :fraud_incident ],
     create: [ :member, :loan ],
     update: [ :member, :loan, :branch ],
     approve: [ :loan ],
+    resolve: [ :alert ],
     export: [ :report ]
   },
   "loan_officer" => {
@@ -120,6 +123,7 @@ role_permissions = {
     delete: subjects.map(&:to_sym),
     approve: subjects.map(&:to_sym),
     reject: subjects.map(&:to_sym),
+    resolve: subjects.map(&:to_sym),
     configure: subjects.map(&:to_sym),
     export: subjects.map(&:to_sym)
   }

@@ -1,5 +1,7 @@
 module Management
   class SystemHealthController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :system) }
+
     def index
       @latest_snapshot = Management::SystemHealthSnapshot.order(captured_at: :desc).first
       @recent_snapshots = Management::SystemHealthSnapshot.order(captured_at: :desc).limit(20)

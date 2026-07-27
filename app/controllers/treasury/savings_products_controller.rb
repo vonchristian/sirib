@@ -1,6 +1,5 @@
 module Treasury
-  class SavingsProductsController < ApplicationController
-    layout "shell"
+  class SavingsProductsController < FinancialBaseController
     before_action :set_product, only: [ :show, :edit, :update, :destroy ]
 
     def index

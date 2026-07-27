@@ -1,5 +1,6 @@
 module Management
   class EntryTemplatesController < BaseController
+    before_action -> { require_permission!(subject: :accounting) }
     before_action :set_template, only: [ :show, :edit, :update, :preview, :execute ]
 
     def index

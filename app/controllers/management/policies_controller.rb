@@ -1,5 +1,6 @@
 module Management
   class PoliciesController < BaseController
+    before_action -> { require_permission!(subject: :policy) }
     before_action :set_policy, only: [ :show, :edit, :update, :activate, :deactivate ]
 
     def index

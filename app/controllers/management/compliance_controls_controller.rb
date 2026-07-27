@@ -1,5 +1,7 @@
 module Management
   class ComplianceControlsController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :policy) }
+
     def index
       @controls = Compliance::Control.by_cooperative(Current.cooperative)
         .includes(:evidences)

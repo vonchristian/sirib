@@ -1,9 +1,5 @@
 module Treasury
-  class VaultTransfersController < ApplicationController
-    layout "shell"
-
-    before_action :require_treasurer
-
+  class VaultTransfersController < FinancialBaseController
     def index
       @transfers = Treasury::VaultTransfer.awaiting
         .includes(cash_session: :user)
@@ -29,14 +25,6 @@ module Treasury
         redirect_to treasury_vault_transfers_path, notice: "Transfer rejected."
       else
         redirect_to treasury_vault_transfers_path, alert: result.errors.join(", ")
-      end
-    end
-
-    private
-
-    def require_treasurer
-      unless Current.user&.treasurer?
-        redirect_to treasury_cash_sessions_path, alert: "Only treasurers can manage vault transfers."
       end
     end
   end

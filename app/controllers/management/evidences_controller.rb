@@ -1,5 +1,6 @@
 module Management
   class EvidencesController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :policy) }
     before_action :set_control
 
     def index

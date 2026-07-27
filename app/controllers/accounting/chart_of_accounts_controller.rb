@@ -1,7 +1,5 @@
 module Accounting
-  class ChartOfAccountsController < ApplicationController
-    layout "shell"
-
+  class ChartOfAccountsController < FinancialBaseController
     before_action :set_service
 
     def index

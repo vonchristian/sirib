@@ -1,5 +1,6 @@
 module Management
   class RolesController < BaseController
+    before_action -> { require_permission!(subject: :role) }
     before_action :set_role, only: [ :show, :edit, :update ]
 
     def index

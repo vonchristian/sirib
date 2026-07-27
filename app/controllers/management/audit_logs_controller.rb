@@ -1,5 +1,7 @@
 module Management
   class AuditLogsController < BaseController
+    before_action -> { require_permission!(subject: :audit_log) }
+
     def index
       @audit_logs = Management::AuditLog.by_recent.includes(:actor)
       @audit_logs = @audit_logs.by_action(params[:action_type]) if params[:action_type].present?

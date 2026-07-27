@@ -1,5 +1,6 @@
 module Management
   class BranchesController < BaseController
+    before_action -> { require_permission!(subject: :branch) }
     before_action :set_branch, only: [ :show, :edit, :update ]
 
     def index

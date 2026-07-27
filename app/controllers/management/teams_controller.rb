@@ -1,5 +1,6 @@
 module Management
   class TeamsController < BaseController
+    before_action -> { require_permission!(subject: :system) }
     before_action :set_team, only: [ :show, :edit, :update ]
 
     def index

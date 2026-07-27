@@ -1,5 +1,6 @@
 module Management
   class FraudIncidentsController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :fraud_incident) }, only: [ :index, :show ]
     before_action :require_permission!, only: :resolve, action: :resolve, subject: :fraud_incident
 
     def index

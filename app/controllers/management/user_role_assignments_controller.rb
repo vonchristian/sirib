@@ -1,8 +1,7 @@
 module Management
   class UserRoleAssignmentsController < BaseController
+    before_action -> { require_permission!(action: :update, subject: :user) }
     before_action :set_user
-    before_action :require_admin
-
     def new
       @role_assignment = @user.role_assignments.build
     end
@@ -26,12 +25,6 @@ module Management
 
     def set_user
       @user = User.find(params[:user_id])
-    end
-
-    def require_admin
-      unless Current.user.role == "manager"
-        redirect_to management_users_path, alert: "Only managers can manage role assignments."
-      end
     end
 
     def role_assignment_params

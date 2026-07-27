@@ -1,5 +1,6 @@
 module Management
   class ApprovalWorkflowsController < BaseController
+    before_action -> { require_permission!(subject: :approval_workflow) }
     before_action :set_workflow, only: [ :show, :edit, :update ]
 
     def index

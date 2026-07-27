@@ -1,7 +1,5 @@
 module Treasury
-  class SavingsAccountsController < ApplicationController
-    layout "shell"
-
+  class SavingsAccountsController < FinancialBaseController
     def index
       @accounts = Treasury::SavingsAccount.includes(:savings_product).by_latest
     end

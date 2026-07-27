@@ -58,7 +58,7 @@ RSpec.describe Accounting::AccountBalance do
       entry.save!
       create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
       result = strategy.load_amounts
-      expect(result[[account.id, "debit"]]).to eq(1001)
+      expect(result[[ account.id, "debit" ]]).to eq(1001)
     end
 
     it "applies scope" do
@@ -79,7 +79,7 @@ RSpec.describe Accounting::AccountBalance do
       entry.save!
       create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
       result = strategy.load_amounts
-      expect(result[[account.id, "debit"]]).to eq(1001)
+      expect(result[[ account.id, "debit" ]]).to eq(1001)
     end
 
     it "applies scope" do
@@ -100,7 +100,7 @@ RSpec.describe Accounting::AccountBalance do
       entry.save!
       create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
       result = strategy.load_amounts
-      expect(result[[account.id, "debit"]]).to eq(1001)
+      expect(result[[ account.id, "debit" ]]).to eq(1001)
     end
 
     it "applies scope" do
@@ -121,7 +121,7 @@ RSpec.describe Accounting::AccountBalance do
       entry.save!
       create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
       result = strategy.load_amounts
-      expect(result[[account.id, "debit"]]).to eq(1001)
+      expect(result[[ account.id, "debit" ]]).to eq(1001)
     end
 
     it "applies scope" do

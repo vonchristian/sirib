@@ -98,6 +98,4 @@ RSpec.describe Accounting::Entry do
       expect(build(:accounting_entry)).to be_valid
     end
   end
-
-
 end

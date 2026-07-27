@@ -1,7 +1,5 @@
 module Lending
-  class LoanAgingController < ApplicationController
-    layout "shell"
-
+  class LoanAgingController < FinancialBaseController
     def index
       @filters = extract_filters
       @dashboard = AgingDashboardData.new(filters: @filters)

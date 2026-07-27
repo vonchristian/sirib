@@ -1,5 +1,7 @@
 module Management
   class SearchesController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :report) }
+
     def branches
       query = params[:q].to_s.strip
       @branches = query.present? ? Management::Branch.active.where("name ILIKE :q OR code ILIKE :q", q: "%#{query}%").limit(10) : Management::Branch.active.limit(10)

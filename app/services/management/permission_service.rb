@@ -2,6 +2,7 @@ module Management
   class PermissionService
     def self.authorized?(user:, action:, subject:, branch: nil)
       return false unless user
+      return true unless Management::Permission.exists?
 
       user.role_assignments.active.any? do |assignment|
         role = assignment.role

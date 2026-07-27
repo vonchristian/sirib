@@ -1,5 +1,6 @@
 module Management
   class HolidaysController < BaseController
+    before_action -> { require_permission!(subject: :system) }
     before_action :set_holiday, only: [ :show, :edit, :update, :destroy ]
 
     def index

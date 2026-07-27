@@ -1,7 +1,5 @@
 module Accounting
-  class CashFlowController < ApplicationController
-    layout "shell"
-
+  class CashFlowController < FinancialBaseController
     def index
       @to_date = parse_date(params[:to_date]) || Date.current
       @from_date = parse_date(params[:from_date]) || @to_date.beginning_of_month

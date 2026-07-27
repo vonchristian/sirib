@@ -1,7 +1,7 @@
 module Management
   class UsersController < BaseController
+    before_action -> { require_permission!(subject: :user) }
     before_action :set_user, only: [ :show, :edit, :update ]
-    before_action :require_admin, only: [ :edit, :update ]
 
     def index
       @pagy, @users = pagy(
@@ -29,12 +29,6 @@ module Management
 
     def set_user
       @user = User.find(params[:id])
-    end
-
-    def require_admin
-      unless Current.user.role == "manager"
-        redirect_to management_users_path, alert: "Only managers can edit users."
-      end
     end
 
     def user_params

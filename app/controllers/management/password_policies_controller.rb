@@ -1,5 +1,6 @@
 module Management
   class PasswordPoliciesController < BaseController
+    before_action -> { require_permission!(subject: :configuration) }
     before_action :set_policy, only: %i[show edit update]
 
     def index

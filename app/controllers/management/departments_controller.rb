@@ -1,5 +1,6 @@
 module Management
   class DepartmentsController < BaseController
+    before_action -> { require_permission!(subject: :branch) }
     before_action :set_department, only: [ :show, :edit, :update ]
 
     def index

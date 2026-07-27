@@ -35,5 +35,4 @@ RSpec.describe Lending::LoanEvent do
       expect(build(:lending_loan_event)).to be_valid
     end
   end
-
 end

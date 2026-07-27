@@ -1,5 +1,6 @@
 module Management
   class RestructuresController < Management::BaseController
+    before_action -> { require_permission!(action: :view, subject: :loan_restructure) }, only: [ :index, :show ]
     before_action -> { require_permission!(action: :approve, subject: :loan_restructure) }, only: [ :approve, :reject ]
 
     def index

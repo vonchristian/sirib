@@ -1,7 +1,5 @@
 module Treasury
-  class DepositsController < ApplicationController
-    layout "shell"
-
+  class DepositsController < FinancialBaseController
     def index
     end
 

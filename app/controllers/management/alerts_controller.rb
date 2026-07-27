@@ -1,5 +1,6 @@
 module Management
   class AlertsController < BaseController
+    before_action -> { require_permission!(subject: :alert) }
     before_action :set_alert, only: [ :show, :resolve ]
 
     def index

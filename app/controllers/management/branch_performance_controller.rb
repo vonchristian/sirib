@@ -1,5 +1,7 @@
 module Management
   class BranchPerformanceController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :report) }
+
     def index
       @branches = Management::Branch.active.by_name.map do |branch|
         snap = branch.performance_snapshots.order(snapshot_date: :desc).first

@@ -1,5 +1,7 @@
 module Management
   class ExecutiveDashboardController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :report) }
+
     def index
       @branch_count = Management::Branch.active.count
       @total_members = Membership::Member.count

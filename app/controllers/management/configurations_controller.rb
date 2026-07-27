@@ -1,5 +1,6 @@
 module Management
   class ConfigurationsController < BaseController
+    before_action -> { require_permission!(subject: :configuration) }
     before_action :set_configuration, only: [ :show, :edit, :update, :approve, :activate ]
 
     def index

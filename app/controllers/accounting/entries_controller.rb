@@ -1,7 +1,5 @@
 module Accounting
-  class EntriesController < ApplicationController
-    layout "shell"
-
+  class EntriesController < FinancialBaseController
     def new
       @entry = Accounting::Entry.new
     end

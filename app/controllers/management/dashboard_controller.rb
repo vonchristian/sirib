@@ -1,5 +1,7 @@
 module Management
   class DashboardController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :report) }
+
     def index
       @total_assets = ledger_balance(:asset)
       @loan_portfolio = Money.new(Lending::Loan.active.sum(:outstanding_principal_cents), "PHP")

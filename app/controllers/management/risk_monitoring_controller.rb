@@ -1,5 +1,7 @@
 module Management
   class RiskMonitoringController < BaseController
+    before_action -> { require_permission!(action: :view, subject: :report) }
+
     def index
       @risk_indicators = Management::RiskIndicator.where(as_of_date: Date.current).order(:indicator_type)
       @critical_count = @risk_indicators.critical.count

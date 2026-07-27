@@ -1,7 +1,5 @@
 module Equity
-  class AccountsController < ApplicationController
-    layout "shell"
-
+  class AccountsController < FinancialBaseController
     def index
       @accounts = Equity::Account.includes(:member, :share_product).by_latest
     end

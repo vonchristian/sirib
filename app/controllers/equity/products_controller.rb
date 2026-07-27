@@ -1,6 +1,5 @@
 module Equity
-  class ProductsController < ApplicationController
-    layout "shell"
+  class ProductsController < FinancialBaseController
     before_action :set_product, only: [ :show, :edit, :update, :destroy ]
 
     def index
