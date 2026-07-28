@@ -192,26 +192,6 @@ unless Management::ApprovalWorkflow.where(cooperative: @coop).exists?
   ])
 end
 
-unless Management::AlertSubscription.where(cooperative: @coop).exists?
-  alert_types = %w[low_cash large_transaction compliance_breach system_error member_activity loan_due]
-  channels = %w[email in_app dashboard]
-
-  Management::Role.where(cooperative: @coop, code: %w[general_manager system_admin]).find_each do |role|
-    role.role_assignments.includes(:user).find_each do |assignment|
-      alert_types.each do |alert_type|
-        channels.each do |channel|
-          Management::AlertSubscription.find_or_create_by!(
-            user: assignment.user,
-            alert_type: alert_type,
-            channel: channel,
-            cooperative: @coop
-          )
-        end
-      end
-    end
-  end
-end
-
 unless Management::Policy.where(cooperative: @coop).exists?
   admin_user = User.where(cooperative: @coop, role: :manager).first
 

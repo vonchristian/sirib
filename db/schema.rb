@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_27_011354) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_27_015154) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -885,7 +885,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_27_011354) do
     t.boolean "otp_enabled", default: false, null: false
     t.timestamptz "otp_verified_at"
     t.timestamptz "last_login_at"
-    t.string "portal_status", default: "inactive", null: false
     t.timestamptz "created_at", null: false
     t.timestamptz "updated_at", null: false
     t.bigint "branch_id"

@@ -324,22 +324,7 @@ if bm_role && mkt_branch && !Management::RoleAssignment.exists?(user: bm_user, r
 end
 
 # ── MEMBER PORTAL E2E TEST DATA ─────────────────────────────────────────
-portal_member = Membership::Member.find_or_create_by!(first_name: "Portal", last_name: "User") do |m|
-  m.middle_name = "M"
-  m.gender = "male"
-  m.civil_status = "single"
-  m.birth_date = Date.new(1990, 1, 15)
-  m.mobile_number = "09170000001"
-  m.email_address = "portal@example.com"
-  m.identifications_attributes = [ { id_type: "BIR", id_number: "BIR-PORTAL-001" } ]
-end
-portal_member.update!(
-  member_identifier: "MBR-PORTAL-001",
-  password: "password123",
-  otp_secret: nil,
-  otp_enabled: false,
-  portal_status: "active"
-)
+
 
 pending_member = Membership::Member.find_or_create_by!(first_name: "Pending", last_name: "Enrollee") do |m|
   m.middle_name = "E"
@@ -350,79 +335,6 @@ pending_member = Membership::Member.find_or_create_by!(first_name: "Pending", la
   m.email_address = "pending@example.com"
   m.identifications_attributes = [ { id_type: "BIR", id_number: "BIR-PENDING-001" } ]
 end
-pending_member.update!(
-  member_identifier: "MBR-PENDING-001",
-  password_digest: nil,
-  otp_secret: nil,
-  otp_enabled: false,
-  portal_status: "inactive"
-)
-Identity::EnrollmentService.create_enrollment(pending_member)
-
-Portal::Announcement.find_or_create_by!(title: "Welcome to the Member Portal") do |a|
-  a.body = "We are pleased to announce the launch of our new member portal. You can now view your savings, share capital, and loan information online."
-  a.status = "published"
-  a.published_at = Time.current
-  a.cooperative = cooperative
-  a.author = test_user
-end
-
-Portal::Announcement.find_or_create_by!(title: "Quarterly Dividend Declaration") do |a|
-  a.body = "The board has declared a 3% dividend for all common shareholders for the current quarter. Dividends will be credited to your share capital accounts by end of month."
-  a.status = "published"
-  a.published_at = 1.day.ago
-  a.cooperative = cooperative
-  a.author = test_user
-end
-  # ── AI AGENT E2E TEST DATA ────────────────────────────────────────
-  seeded_observations = []
-  observation_data = [
-    { category: "collections", severity: "critical", title: "High delinquency rate in HQ Branch", summary: "Delinquency rate exceeds 5% threshold. Immediate collection action required.", detected_at: 2.hours.ago },
-    { category: "liquidity", severity: "high", title: "Low cash position detected", summary: "Cash position is below the minimum reserve requirement.", detected_at: 4.hours.ago },
-    { category: "operations", severity: "medium", title: "Staff overtime increasing", summary: "Staff overtime has increased 20% this week across teller operations.", detected_at: 6.hours.ago },
-    { category: "membership", severity: "low", title: "New member applications pending", summary: "5 new member applications pending review for more than 3 days.", detected_at: 1.day.ago },
-    { category: "compliance", severity: "critical", title: "Overdue compliance report", summary: "Monthly compliance report for regulatory submission is overdue.", detected_at: 3.hours.ago },
-  ]
-  observation_data.each do |data|
-    obs = ::Ai::Observation.find_or_create_by!(title: data[:title], branch: hq_branch) do |o|
-      o.category = data[:category]
-      o.severity = data[:severity]
-      o.summary = data[:summary]
-      o.detected_at = data[:detected_at]
-    end
-    seeded_observations << obs
-  end
-  puts "  AI Observations: #{seeded_observations.size} created"
-
-  seeded_recommendations = []
-  recommendation_data = [
-    { priority: "critical", title: "Initiate special collection drive", summary: "Launch a targeted collection drive for accounts over 30 days past due.", action_text: "Schedule collection drive with branch managers", status: "open", confidence_score: 0.92, observation_index: 0 },
-    { priority: "high", title: "Review cash reserve policy", summary: "Current cash reserves are insufficient for projected member withdrawals.", action_text: "Review and adjust cash reserve thresholds", status: "open", confidence_score: 0.85, observation_index: 1 },
-    { priority: "medium", title: "Optimize teller scheduling", summary: "Adjust teller schedules to reduce overtime costs while maintaining service levels.", status: "acknowledged", confidence_score: 0.78, observation_index: 2 },
-    { priority: "low", title: "Process pending applications", summary: "Assign staff to process the 5 pending membership applications.", status: "dismissed", confidence_score: 0.65, observation_index: 3 },
-    { priority: "critical", title: "File compliance report immediately", summary: "Prepare and submit the monthly compliance report to regulatory body.", status: "completed", confidence_score: 0.95, observation_index: 4 },
-  ]
-  recommendation_data.each do |data|
-    rec = ::Ai::Recommendation.find_or_create_by!(title: data[:title], branch: hq_branch) do |r|
-      r.priority = data[:priority]
-      r.summary = data[:summary]
-      r.action_text = data[:action_text]
-      r.status = data[:status]
-      r.confidence_score = data[:confidence_score]
-      r.observation = seeded_observations[data[:observation_index]]
-    end
-    seeded_recommendations << rec
-  end
-  puts "  AI Recommendations: #{seeded_recommendations.size} created"
-
-  ::Ai::Digest.find_or_create_by!(generated_at: Date.current.midnight + 6.hours, branch: hq_branch) do |d|
-    d.summary = "Branch operations summary for today. Cash position is below threshold. Delinquency rate requires attention. Staff overtime is within acceptable limits."
-    d.risk_summary = "High: Cash position below minimum. Medium: Delinquency rate elevated. Low: Staff overtime."
-    d.observation_count = seeded_observations.size
-    d.recommendation_count = seeded_recommendations.size
-  end
-  puts "  AI Digest: created for today"
-
   # ── BUSINESS HOURS & HOLIDAYS E2E TEST DATA ────────────────────────
   business_hours_config = {
     "business_hours_open"   => { value: 8,  unit: "hour" },
