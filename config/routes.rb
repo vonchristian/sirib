@@ -50,14 +50,6 @@ Rails.application.routes.draw do
 
   get "dashboard", to: "dashboard#index"
   get "dashboard/manager", to: "dashboard#manager", as: :manager_dashboard
-  get "dashboard/treasurer", to: "dashboard#treasurer", as: :treasurer_dashboard
-  get "dashboard/accountant", to: "dashboard#accountant", as: :accountant_dashboard
-  get "dashboard/loan_officer", to: "dashboard#loan_officer", as: :loan_officer_dashboard
-  get "dashboard/loans", to: "dashboard#loans"
-  get "dashboard/payments", to: "dashboard#payments"
-  get "dashboard/members", to: "dashboard#members"
-  get "dashboard/tasks", to: "dashboard#tasks"
-  get "dashboard/reports", to: "dashboard#reports"
   get "dashboard/settings", to: "dashboard#settings"
 
   namespace :accounting do

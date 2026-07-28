@@ -18,8 +18,6 @@ module Membership
     has_many_attached :signatures
     has_one_attached :profile_image
 
-    encrypts :otp_secret
-
     accepts_nested_attributes_for :address, allow_destroy: true
     accepts_nested_attributes_for :identifications, allow_destroy: true, reject_if: :all_blank
 
