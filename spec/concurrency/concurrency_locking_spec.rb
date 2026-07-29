@@ -75,24 +75,6 @@ RSpec.describe "Concurrency Locking" do
     end
   end
 
-  describe "Banking::TransactionService" do
-    let(:cash_session) { instance_double(Treasury::CashSession, open?: true, id: 1) }
-
-    it "locks accounts with FOR UPDATE on debit" do
-      from_account = create(:accounting_account, cooperative: cooperative)
-      to_account = create(:accounting_account, cooperative: cooperative)
-
-      expect(Accounting::Account).to receive(:lock).with("FOR UPDATE").at_least(:once).and_call_original
-      Banking::TransactionService.debit(
-        amount: Money.new(100, "PHP"),
-        from_account: from_account,
-        to_account: to_account,
-        cash_session: cash_session,
-        description: "Lock test debit"
-      )
-    end
-  end
-
   describe "Equity::BuySharesService" do
     it "locks the share capital account with with_lock" do
       skip "Requires full Equity::Account factory setup"

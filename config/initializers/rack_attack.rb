@@ -14,14 +14,6 @@ class Rack::Attack
     req.ip if req.path == "/mfa/verify" && req.post?
   end
 
-  throttle("portal_logins/ip", limit: 10, period: 60) do |req|
-    req.ip if req.path == "/portal/session" && req.post?
-  end
-
-  throttle("api/ip", limit: 100, period: 60) do |req|
-    req.ip if req.path.start_with?("/api/")
-  end
-
   Rack::Attack.blocklist("block-bad-user-agents") do |req|
     bad_agents = /(nikto|scanify|masscan|dirbuster|sqlmap|nmap)/i
     req.user_agent if req.user_agent&.match?(bad_agents)

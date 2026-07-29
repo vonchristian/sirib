@@ -45,9 +45,6 @@ Rails.application.routes.draw do
   end
   get "applications", to: "membership_applications#index", as: :applications
 
-  namespace :dashboard do
-  end
-
   get "dashboard", to: "dashboard#index"
   get "dashboard/manager", to: "dashboard#manager", as: :manager_dashboard
   get "dashboard/settings", to: "dashboard#settings"

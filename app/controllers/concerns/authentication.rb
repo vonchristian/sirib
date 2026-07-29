@@ -83,12 +83,10 @@ module Authentication
     def after_sign_in_url
       return root_url unless Current.user
 
-      case Current.user.role
-      when "manager" then manager_dashboard_url
-      when "treasurer" then treasurer_dashboard_url
-      when "accountant" then accountant_dashboard_url
-      when "loan_officer" then loan_officer_dashboard_url
-      else root_url
+      if Current.user.has_permission?("view", "management")
+        manager_dashboard_url
+      else
+        root_url
       end
     end
 

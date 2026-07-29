@@ -36,11 +36,6 @@ module Accounting
       end
     end
 
-    def to_pdf
-      data = call
-      PDFGenerator.new(report_type: report_type, data: data, date_range: date_range).generate
-    end
-
     private
 
     attr_reader :start_date, :end_date, :branch_id, :account_id, :cooperative, :report_type
