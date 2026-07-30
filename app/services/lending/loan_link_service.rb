@@ -24,15 +24,19 @@ module Lending
           reason: @reason
         )
 
-        LoanLinkCreated.new(
-          aggregate: @from_loan,
+        Lending::LoanEvent.create!(
+          cooperative: @from_loan.cooperative,
+          loan: @from_loan,
           actor: Current.user || User.first,
-          link_id: link.id,
-          link_type: @link_type,
-          from_loan_id: @from_loan.id,
-          to_loan_id: @to_loan.id,
-          amount_cents: @amount_cents
-        ).tap(&:validate!).save!
+          event_type: "loan_link_created",
+          metadata: {
+            link_id: link.id,
+            link_type: @link_type,
+            from_loan_id: @from_loan.id,
+            to_loan_id: @to_loan.id,
+            amount_cents: @amount_cents
+          }
+        )
 
         link
       end

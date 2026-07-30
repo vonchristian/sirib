@@ -25,27 +25,35 @@ module Management
     def approve
       @case = Lending::LoanRestructureCase.find(params[:id])
       @case.approve!(approver: Current.user)
-      RestructureApproved.new(
-        aggregate: @case.loan,
+      Lending::LoanEvent.create!(
+        cooperative: @case.loan.cooperative,
+        loan: @case.loan,
         actor: Current.user,
-        restructure_case_id: @case.id,
-        approved_by: Current.user.id,
-        source: "management"
-      ).tap(&:validate!).save!
+        event_type: "restructure_approved",
+        metadata: {
+          restructure_case_id: @case.id,
+          approved_by: Current.user.id,
+          source: "management"
+        }
+      )
       redirect_to management_restructure_path(@case), notice: "Restructure case approved."
     end
 
     def reject
       @case = Lending::LoanRestructureCase.find(params[:id])
       @case.reject!(approver: Current.user)
-      RestructureRejected.new(
-        aggregate: @case.loan,
+      Lending::LoanEvent.create!(
+        cooperative: @case.loan.cooperative,
+        loan: @case.loan,
         actor: Current.user,
-        restructure_case_id: @case.id,
-        rejected_by: Current.user.id,
-        reason: params[:reason],
-        source: "management"
-      ).tap(&:validate!).save!
+        event_type: "restructure_rejected",
+        metadata: {
+          restructure_case_id: @case.id,
+          rejected_by: Current.user.id,
+          reason: params[:reason],
+          source: "management"
+        }
+      )
       redirect_to management_restructure_path(@case), notice: "Restructure case rejected."
     end
   end
