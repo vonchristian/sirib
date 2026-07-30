@@ -33,8 +33,8 @@ module Accounting
     def execute
       coop = cooperative
 
-      @end_amounts = AccountBalance::RunningBalance.new(to_date: to_date, cooperative: coop).load_amounts
-      @start_amounts = AccountBalance::RunningBalance.new(to_date: from_date - 1.day, cooperative: coop).load_amounts
+      @end_amounts = AccountBalance.load_running_balances(to_date: to_date, cooperative: coop)
+      @start_amounts = AccountBalance.load_running_balances(to_date: from_date - 1.day, cooperative: coop)
 
       scope = coop ? Account.by_cooperative(coop) : Account
       @cash_accounts = scope.cash_accounts_for(user).non_contra.to_a

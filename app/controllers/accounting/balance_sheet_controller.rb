@@ -16,9 +16,9 @@ module Accounting
       if use_materialized_view?
         @amounts = load_from_materialized_view
       else
-        @amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @as_of_date, cooperative: Current.cooperative).load_amounts
+        @amounts = Accounting::AccountBalance.load_running_balances(to_date: @as_of_date, cooperative: Current.cooperative)
       end
-      @compare_amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @compare_date, cooperative: Current.cooperative).load_amounts if @compare_date
+      @compare_amounts = Accounting::AccountBalance.load_running_balances(to_date: @compare_date, cooperative: Current.cooperative) if @compare_date
 
       @report = build_report
     end

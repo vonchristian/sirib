@@ -1,36 +1,57 @@
 require "rails_helper"
 
 RSpec.describe Accounting::AccountBalance do
-  describe ".resolve" do
-    it "returns AsOfDateTime strategy when to_date and to_time given" do
-      strategy = described_class.resolve(to_date: Date.current, to_time: Time.current)
-      expect(strategy).to be_a(Accounting::AccountBalance::AsOfDateTime)
+  describe ".load_amounts" do
+    let(:debit_acct) { create(:accounting_account) }
+    let(:credit_acct) { create(:accounting_account) }
+
+    def create_entry
+      build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0)).tap do |e|
+        e.amount_lines.build(amount_type: "debit", amount_cents: 1001, account: debit_acct)
+        e.amount_lines.build(amount_type: "credit", amount_cents: 1001, account: credit_acct)
+        e.save!
+      end
     end
 
-    it "returns AsOfDate strategy when only to_date given" do
-      strategy = described_class.resolve(to_date: Date.current)
-      expect(strategy).to be_a(Accounting::AccountBalance::AsOfDate)
+    it "returns amounts when to_date and to_time given" do
+      create_entry
+      result = described_class.load_amounts(to_date: Date.current, to_time: Time.current)
+      expect(result[[ debit_acct.id, "debit" ]]).to eq(1001)
     end
 
-    it "returns DateRange strategy when from_date given" do
-      strategy = described_class.resolve(from_date: 5.days.ago)
-      expect(strategy).to be_a(Accounting::AccountBalance::DateRange)
+    it "returns amounts when only to_date given" do
+      create_entry
+      result = described_class.load_amounts(to_date: Date.current)
+      expect(result[[ debit_acct.id, "debit" ]]).to eq(1001)
     end
 
-    it "returns DateRange strategy when from_date and to_date given" do
-      strategy = described_class.resolve(from_date: 5.days.ago, to_date: Date.current)
-      expect(strategy).to be_a(Accounting::AccountBalance::DateRange)
+    it "returns amounts when from_date and to_date given" do
+      create_entry
+      result = described_class.load_amounts(from_date: 1.day.ago, to_date: Date.current)
+      expect(result[[ debit_acct.id, "debit" ]]).to eq(1001)
     end
 
-    it "returns Latest strategy with no args" do
-      strategy = described_class.resolve
-      expect(strategy).to be_a(Accounting::AccountBalance::Latest)
+    it "returns amounts when no args given" do
+      create_entry
+      result = described_class.load_amounts
+      expect(result[[ debit_acct.id, "debit" ]]).to eq(1001)
     end
+  end
 
-    it "raises ArgumentError when to_time given without to_date" do
-      expect {
-        described_class.resolve(to_time: Time.current)
-      }.to raise_error(ArgumentError, "to_time requires to_date")
+  describe ".load_running_balances" do
+    it "loads amounts from running_balances table" do
+      account = create(:accounting_account)
+      create(:accounting_running_balance, account:, balance_cents: 5000)
+      result = described_class.load_running_balances(to_date: Date.current)
+      expect(result[account.id]).to eq(5000)
+    end
+  end
+
+  describe ".apply_scope" do
+    it "returns a relation given a scope" do
+      scope = Accounting::AmountLine.all
+      result = described_class.apply_scope(scope, to_date: Date.current)
+      expect(result).to be_a(ActiveRecord::Relation)
     end
   end
 
@@ -44,101 +65,6 @@ RSpec.describe Accounting::AccountBalance do
     it "returns zero when account not in amounts" do
       account = create(:accounting_account)
       expect(described_class.balance(account, {})).to eq(Money.new(0, "PHP"))
-    end
-  end
-
-  describe Accounting::AccountBalance::AsOfDateTime do
-    subject(:strategy) { described_class.new(to_date: Date.current, to_time: Time.current) }
-
-    it "loads amounts" do
-      account = create(:accounting_account)
-      entry = build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0))
-      entry.amount_lines.build(amount_type: "debit", amount_cents: 1, account: account)
-      entry.amount_lines.build(amount_type: "credit", amount_cents: 1, account: account)
-      entry.save!
-      create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
-      result = strategy.load_amounts
-      expect(result[[ account.id, "debit" ]]).to eq(1001)
-    end
-
-    it "applies scope" do
-      scope = Accounting::AmountLine.all
-      result = strategy.apply(scope)
-      expect(result).to be_a(ActiveRecord::Relation)
-    end
-  end
-
-  describe Accounting::AccountBalance::AsOfDate do
-    subject(:strategy) { described_class.new(to_date: Date.current) }
-
-    it "loads amounts" do
-      account = create(:accounting_account)
-      entry = build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0))
-      entry.amount_lines.build(amount_type: "debit", amount_cents: 1, account: account)
-      entry.amount_lines.build(amount_type: "credit", amount_cents: 1, account: account)
-      entry.save!
-      create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
-      result = strategy.load_amounts
-      expect(result[[ account.id, "debit" ]]).to eq(1001)
-    end
-
-    it "applies scope" do
-      scope = Accounting::AmountLine.all
-      result = strategy.apply(scope)
-      expect(result).to be_a(ActiveRecord::Relation)
-    end
-  end
-
-  describe Accounting::AccountBalance::DateRange do
-    subject(:strategy) { described_class.new(from_date: 5.days.ago, to_date: Date.current) }
-
-    it "loads amounts" do
-      account = create(:accounting_account)
-      entry = build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0))
-      entry.amount_lines.build(amount_type: "debit", amount_cents: 1, account: account)
-      entry.amount_lines.build(amount_type: "credit", amount_cents: 1, account: account)
-      entry.save!
-      create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
-      result = strategy.load_amounts
-      expect(result[[ account.id, "debit" ]]).to eq(1001)
-    end
-
-    it "applies scope" do
-      scope = Accounting::AmountLine.all
-      result = strategy.apply(scope)
-      expect(result).to be_a(ActiveRecord::Relation)
-    end
-  end
-
-  describe Accounting::AccountBalance::Latest do
-    subject(:strategy) { described_class.new }
-
-    it "loads amounts" do
-      account = create(:accounting_account)
-      entry = build(:accounting_entry, create_lines: false, posted_at: Time.current.change(usec: 0))
-      entry.amount_lines.build(amount_type: "debit", amount_cents: 1, account: account)
-      entry.amount_lines.build(amount_type: "credit", amount_cents: 1, account: account)
-      entry.save!
-      create(:accounting_amount_line, entry: entry, account: account, amount_cents: 1000)
-      result = strategy.load_amounts
-      expect(result[[ account.id, "debit" ]]).to eq(1001)
-    end
-
-    it "applies scope" do
-      scope = Accounting::AmountLine.all
-      result = strategy.apply(scope)
-      expect(result).to be_a(ActiveRecord::Relation)
-    end
-  end
-
-  describe Accounting::AccountBalance::RunningBalance do
-    subject(:strategy) { described_class.new(to_date: Date.current) }
-
-    it "loads amounts from running_balances table" do
-      account = create(:accounting_account)
-      create(:accounting_running_balance, account:, balance_cents: 5000)
-      result = strategy.load_amounts
-      expect(result[account.id]).to eq(5000)
     end
   end
 end

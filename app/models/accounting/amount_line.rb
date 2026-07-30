@@ -31,9 +31,11 @@ module Accounting
     end
 
     def self.balance(from_date: nil, to_date: nil, to_time: nil)
-      AccountBalance.resolve(from_date: from_date, to_date: to_date, to_time: to_time)
-        .apply(all)
-        .sum(:amount_cents)
+      apply_scope(all, from_date:, to_date:, to_time:).sum(:amount_cents)
+    end
+
+    def self.apply_scope(scope, from_date: nil, to_date: nil, to_time: nil)
+      AccountBalance.apply_scope(scope, from_date:, to_date:, to_time:)
     end
   end
 end

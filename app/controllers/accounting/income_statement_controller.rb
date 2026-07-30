@@ -12,8 +12,8 @@ module Accounting
       @comparison = params[:comparison].presence_in(%w[none prior_period prior_quarter prior_year]) || "none"
       @compare_date = compute_compare_date
 
-      @amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @as_of_date, cooperative: Current.cooperative).load_amounts
-      @compare_amounts = Accounting::AccountBalance::RunningBalance.new(to_date: @compare_date, cooperative: Current.cooperative).load_amounts if @compare_date
+      @amounts = Accounting::AccountBalance.load_running_balances(to_date: @as_of_date, cooperative: Current.cooperative)
+      @compare_amounts = Accounting::AccountBalance.load_running_balances(to_date: @compare_date, cooperative: Current.cooperative) if @compare_date
 
       @report = build_report
       revenue_total = @report.find { |s| s[:name] == "REVENUES" }&.dig(:total) || Money.new(0, "PHP")
