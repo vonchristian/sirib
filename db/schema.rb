@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_28_033814) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_30_012138) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -94,16 +94,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_033814) do
     t.index ["entry_id"], name: "index_amount_lines_on_entry_id"
     t.check_constraint "amount_cents > 0", name: "chk_amount_lines_amount_cents_positive"
     t.check_constraint "amount_type = ANY (ARRAY[0, 1])", name: "chk_amount_lines_amount_type_valid"
-  end
-
-  create_table "backup_codes", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.string "code_digest", null: false
-    t.timestamptz "used_at"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["user_id", "used_at"], name: "index_backup_codes_on_user_id_and_used_at"
-    t.index ["user_id"], name: "index_backup_codes_on_user_id"
   end
 
   create_table "cooperatives", force: :cascade do |t|
@@ -922,23 +912,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_033814) do
     t.index ["uuid"], name: "index_membership_applications_on_uuid", unique: true
   end
 
-  create_table "mfa_attempt_logs", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.string "action", null: false
-    t.boolean "success", null: false
-    t.string "ip_address"
-    t.text "user_agent"
-    t.string "device_fingerprint"
-    t.string "failure_reason"
-    t.jsonb "metadata", default: {}
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["action"], name: "index_mfa_attempt_logs_on_action"
-    t.index ["created_at"], name: "index_mfa_attempt_logs_on_created_at"
-    t.index ["user_id", "created_at"], name: "index_mfa_attempt_logs_on_user_id_and_created_at"
-    t.index ["user_id"], name: "index_mfa_attempt_logs_on_user_id"
-  end
-
   create_table "running_balances", force: :cascade do |t|
     t.bigint "cooperative_id", null: false
     t.bigint "account_id"
@@ -1010,7 +983,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_033814) do
     t.timestamptz "updated_at", null: false
     t.timestamptz "revoked_at"
     t.timestamptz "last_activity_at"
-    t.timestamptz "mfa_verified_at"
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -1189,29 +1161,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_033814) do
     t.index ["voucher_number"], name: "index_treasury_vouchers_on_voucher_number", unique: true
   end
 
-  create_table "trusted_devices", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.string "device_fingerprint_hash", null: false
-    t.timestamptz "last_used_at", null: false
-    t.timestamptz "expires_at", null: false
-    t.string "user_agent"
-    t.string "ip_address"
-    t.timestamptz "created_at", null: false
-    t.timestamptz "updated_at", null: false
-    t.index ["expires_at"], name: "index_trusted_devices_on_expires_at"
-    t.index ["user_id", "device_fingerprint_hash"], name: "index_trusted_devices_on_user_id_and_device_fingerprint_hash", unique: true
-    t.index ["user_id"], name: "index_trusted_devices_on_user_id"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
     t.timestamptz "created_at", null: false
     t.timestamptz "updated_at", null: false
     t.integer "role", default: 0, null: false
-    t.string "otp_secret"
-    t.boolean "otp_enabled", default: false, null: false
-    t.timestamptz "otp_verified_at"
     t.string "employee_id"
     t.string "full_name"
     t.string "status"
@@ -1239,7 +1194,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_033814) do
   add_foreign_key "amount_lines", "accounts"
   add_foreign_key "amount_lines", "cooperatives"
   add_foreign_key "amount_lines", "entries"
-  add_foreign_key "backup_codes", "users"
   add_foreign_key "entries", "cooperatives"
   add_foreign_key "entry_template_lines", "cooperatives"
   add_foreign_key "entry_template_lines", "entry_templates"
@@ -1342,7 +1296,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_033814) do
   add_foreign_key "members", "cooperatives"
   add_foreign_key "members", "management_branches", column: "branch_id"
   add_foreign_key "membership_applications", "cooperatives"
-  add_foreign_key "mfa_attempt_logs", "users"
   add_foreign_key "running_balances", "accounts"
   add_foreign_key "running_balances", "cooperatives"
   add_foreign_key "running_balances", "ledgers"
@@ -1378,6 +1331,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_033814) do
   add_foreign_key "treasury_vouchers", "cooperatives"
   add_foreign_key "treasury_vouchers", "entries"
   add_foreign_key "treasury_vouchers", "treasury_cash_sessions", column: "cash_session_id"
-  add_foreign_key "trusted_devices", "users"
   add_foreign_key "users", "cooperatives"
 end

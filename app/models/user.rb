@@ -9,12 +9,7 @@ class User < ApplicationRecord
   has_many :role_assignments, class_name: "Management::RoleAssignment", dependent: :destroy
   has_many :management_roles, through: :role_assignments, source: :role, class_name: "Management::Role"
   has_many :managed_branches, through: :role_assignments, source: :branch, class_name: "Management::Branch"
-  has_many :backup_codes, class_name: "Access::BackupCode", dependent: :destroy
-  has_many :trusted_devices, class_name: "Access::TrustedDevice", dependent: :destroy
-  has_many :mfa_attempt_logs, class_name: "Access::MfaAttemptLog", dependent: :destroy
   has_many :password_histories, class_name: "Security::PasswordHistory", dependent: :destroy
-
-  encrypts :otp_secret
 
   enum :role, {
     manager: 0,

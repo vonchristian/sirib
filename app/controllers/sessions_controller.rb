@@ -47,20 +47,6 @@ class SessionsController < ApplicationController
       metadata: { ip_address: request.remote_ip, user_agent: request.user_agent }
     )
 
-    if user.otp_enabled
-      fingerprint = Mfa::TotpService.build_device_fingerprint(request)
-
-      if Mfa::TotpService.device_trusted?(user, fingerprint)
-        start_new_session_for user
-        Current.session.verify_mfa!
-        Mfa::TotpService.log_attempt(user, action: "login_trusted_device", success: true, ip_address: request.remote_ip, user_agent: request.user_agent)
-        redirect_to(after_authentication_url) && return
-      end
-
-      session[:mfa_user_id] = user.id
-      redirect_to(challenge_mfa_path) && return
-    end
-
     start_new_session_for user
     redirect_to after_authentication_url
   end
